@@ -1,5 +1,7 @@
 // lib/features/client/BottomNavigation.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/features/client/home_page.dart';
 import 'package:photopia/features/client/user_profile_screen.dart';
@@ -35,6 +37,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   }
 
   int _selectedIndex = 0;
+  DateTime? _lastBackPressTime;
 
   // Use keys for each navigator to maintain state and allow internal navigation
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
@@ -79,9 +82,56 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
     // Detect if keyboard is visible
     bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false, // Prevent push up
-      body: IndexedStack(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        final NavigatorState? currentNavigator =
+            _navigatorKeys[_selectedIndex].currentState;
+
+        if (currentNavigator != null && currentNavigator.canPop()) {
+          // Go back within the current tab's inner screens
+          currentNavigator.pop();
+        } else if (_selectedIndex != 0) {
+          // If not on Home tab, go back to Home tab root
+          setState(() {
+            _selectedIndex = 0;
+          });
+        } else {
+          // Already on root of Home tab — double back to exit
+          final now = DateTime.now();
+          final isDoubleBack = _lastBackPressTime != null &&
+              now.difference(_lastBackPressTime!) <
+                  const Duration(seconds: 2);
+
+          if (isDoubleBack) {
+            // Exit the app
+            SystemNavigator.pop();
+          } else {
+            _lastBackPressTime = now;
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  'Press back again to exit',
+                  textAlign: TextAlign.center,
+                ),
+                duration: const Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: EdgeInsets.symmetric(horizontal: 40.w, vertical: 20.h),
+                backgroundColor: const Color(0xFF1A1A1A),
+              ),
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false, // Prevent push up
+        body: IndexedStack(
         index: _selectedIndex,
         children: [
           _buildTabNavigator(0, const MyHomePage()),
@@ -148,6 +198,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                 ),
               ),
             ),
+      ),
     );
   }
 

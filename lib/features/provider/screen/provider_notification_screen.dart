@@ -159,10 +159,82 @@ class _ProviderNotificationScreenState extends State<ProviderNotificationScreen>
             itemCount: controller.notifications.length,
             itemBuilder: (context, index) {
               final notification = controller.notifications[index];
-              return _buildNotificationCard(notification, index, controller);
+              return GestureDetector(
+                onTap: () =>
+                    _showNotificationDialog(context, notification, controller),
+                child: _buildNotificationCard(notification, index, controller),
+              );
             },
           );
         },
+      ),
+    );
+  }
+
+  void _showNotificationDialog(
+    BuildContext context,
+    NotificationModel notification,
+    NotificationController controller,
+  ) {
+    // Mark as read immediately when clicked
+    if (!notification.isRead) {
+      controller.markSingleAsRead(notification.id);
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20).r,
+        ),
+        title: Row(
+          children: [
+            Icon(
+              controller.getIconForType(notification.type),
+              color: Colors.black,
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Text(
+                notification.title,
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              notification.content,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.black87,
+                height: 1.5,
+              ),
+            ),
+            SizedBox(height: 15.h),
+            Text(
+              controller.formatTime(notification.createdAt),
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Close',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
