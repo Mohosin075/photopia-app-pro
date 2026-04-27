@@ -11,7 +11,8 @@ import 'package:photopia/data/models/service_list_model.dart';
 import 'package:photopia/controller/client/favorites_controller.dart';
 
 class CategoryDetailsScreen extends StatefulWidget {
-  const CategoryDetailsScreen({super.key});
+  final String categoryName;
+  const CategoryDetailsScreen({super.key, this.categoryName = 'Category'});
   static const String name = "category-details";
 
   @override
@@ -62,6 +63,32 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Back button + Category title
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(8.w, 8.h, 16.w, 0),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                          splashRadius: 22.r,
+                        ),
+                        SizedBox(width: 4.w),
+                        Expanded(
+                          child: Text(
+                            widget.categoryName,
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   SearchHeader(
                     onFilterApplied: (filters) {
                       final serviceCtrl = context.read<ServiceListController>();

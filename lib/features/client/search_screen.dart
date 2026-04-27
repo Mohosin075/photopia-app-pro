@@ -59,10 +59,13 @@ class _SearchScreenState extends State<SearchScreen> {
     // Usually, we just toggle back to categories.
   }
 
-  void _navigateToCategoryDetails() {
+  void _navigateToCategoryDetails(String categoryName) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CategoryDetailsScreen()),
+      MaterialPageRoute(
+        builder: (context) =>
+            CategoryDetailsScreen(categoryName: categoryName),
+      ),
     );
   }
 
@@ -117,16 +120,58 @@ class _SearchScreenState extends State<SearchScreen> {
             _buildSearchResults()
           else ...[
             // Categories Header
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Text(
-                'Browse Categories',
-                style: TextStyle(
-                  fontSize: AppTypography.h2,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
+            Consumer<CategoryController>(
+              builder: (context, controller, child) {
+                final bool inSubcategory =
+                    controller.selectedCategoryId != null;
+
+                // Safely find the selected category name
+                String headerTitle = 'Browse Categories';
+                if (inSubcategory) {
+                  try {
+                    final selected = controller.categories.firstWhere(
+                      (c) => c.id == controller.selectedCategoryId,
+                    );
+                    headerTitle = selected.name;
+                  } catch (_) {
+                    headerTitle = 'Categories';
+                  }
+                }
+
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Row(
+                    children: [
+                      if (inSubcategory) ...[
+                        GestureDetector(
+                          onTap: () => controller.selectCategory(null),
+                          child: Container(
+                            padding: EdgeInsets.all(6.w),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.arrow_back,
+                              size: 20.sp,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10.w),
+                      ],
+                      Text(
+                        headerTitle,
+                        style: TextStyle(
+                          fontSize: AppTypography.h2,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
             SizedBox(height: 16.h),
 
@@ -176,7 +221,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             controller.selectCategory(category.id);
                           } else {
                             // If it's a subcategory, navigate to details
-                            _navigateToCategoryDetails();
+                            _navigateToCategoryDetails(category.name);
                           }
                         },
                         child: Column(
