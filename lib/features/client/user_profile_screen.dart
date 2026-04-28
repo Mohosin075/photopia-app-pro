@@ -25,6 +25,9 @@ import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/features/provider/screen/provider_profile_screen.dart'
     as provider_view;
 import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
+import 'package:photopia/controller/language_controller.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/features/client/settings_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   static const String name = '/user_profile';
@@ -35,6 +38,82 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
+  void _showLanguagePicker() {
+    final langCtrl = context.read<LanguageController>();
+    final l10n = context.l10n;
+
+    // Map: display name → lang code
+    const languages = [
+      {'label': 'English', 'code': 'en'},
+      {'label': 'French', 'code': 'fr'},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                l10n.selectLanguage,
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              ...languages.map((lang) {
+                final isSelected = langCtrl.locale.languageCode == lang['code'];
+                return ListTile(
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                  title: Text(
+                    lang['label']!,
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: Colors.black,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? Icon(Icons.check_circle,
+                          color: Colors.black, size: 20.sp)
+                      : Icon(Icons.radio_button_unchecked,
+                          color: Colors.grey[300], size: 20.sp),
+                  onTap: () {
+                    langCtrl.setLanguage(lang['code']!);
+                    Navigator.pop(ctx);
+                  },
+                );
+              }),
+              SizedBox(height: 10.h),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +128,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final langCtrl = context.watch<LanguageController>();
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
@@ -56,7 +137,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          'Profile',
+          l10n.profile,
           style: TextStyle(
             color: Colors.black,
             fontSize: 20.sp.clamp(20, 22),
@@ -241,7 +322,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 borderRadius: BorderRadius.circular(10).r,
               ),
               child: Text(
-                'View All',
+                context.l10n.viewAll,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: AppTypography.bodyMedium,
@@ -269,7 +350,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Recent Orders',
+              context.l10n.recentOrders,
               style: TextStyle(
                 fontSize: AppTypography.h2,
                 fontWeight: FontWeight.bold,
@@ -281,7 +362,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 padding: EdgeInsets.symmetric(vertical: 20.h),
                 child: Center(
                   child: Text(
-                    'No recent orders',
+                    context.l10n.noRecentOrders,
                     style: TextStyle(color: Colors.grey, fontSize: 14.sp),
                   ),
                 ),
@@ -321,7 +402,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   );
                 },
                 child: Text(
-                  'View All Orders',
+                  context.l10n.viewAllOrders,
                   style: TextStyle(
                     fontSize: AppTypography.bodyMedium,
                     color: Colors.black,
@@ -427,7 +508,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               children: [
                 _buildMenuItem(
                   Icons.shopping_bag_outlined,
-                  'Order History',
+                  context.l10n.orderHistory,
                   badge: bookingController.bookings.length.toString(),
                   onTap: () {
                     Navigator.push(
@@ -440,7 +521,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 _buildMenuItem(
                   Icons.notifications_none_outlined,
-                  'Notifications',
+                  context.l10n.notifications,
                   badge: notificationController.unreadCount.toString(),
                   onTap: () {
                     Navigator.push(
@@ -453,7 +534,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 _buildMenuItem(
                   Icons.lock_outline,
-                  'Privacy Policy',
+                  context.l10n.privacyPolicy,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -465,12 +546,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 _buildMenuItem(
                   Icons.language_outlined,
-                  'Language',
-                  value: 'English',
+                  context.l10n.language,
+                  value: context.watch<LanguageController>().languageName,
+                  onTap: _showLanguagePicker,
                 ),
                 _buildMenuItem(
                   Icons.help_outline,
-                  'Help & Support',
+                  context.l10n.helpAndSupport,
                   onTap: () async {
                     final chatController = context.read<ChatController>();
                     final chatId = await chatController.contactAdmin();
@@ -515,8 +597,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 _buildMenuItem(
                   Icons.settings_outlined,
-                  'Settings',
+                  context.l10n.settings,
                   isLast: true,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SettingsScreen(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

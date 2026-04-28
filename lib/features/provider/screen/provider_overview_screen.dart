@@ -13,6 +13,7 @@ import 'package:photopia/features/provider/widgets/provider_overview_shimmer.dar
 import 'package:provider/provider.dart';
 import 'package:photopia/data/models/my_listing_model.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderOverviewScreen extends StatefulWidget {
   const ProviderOverviewScreen({super.key});
@@ -56,7 +57,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'My Listings',
+                context.l10n.myListings,
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: AppTypography.h1,
@@ -84,7 +85,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 },
                 icon: Icon(Icons.add, size: 18.sp, color: Colors.white),
                 label: Text(
-                  'Create',
+                  context.l10n.create,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: AppTypography.bodyLarge,
@@ -135,11 +136,11 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                   // Status Tabs
                   Row(
                     children: [
-                      _buildStatusTab('Active'),
+                      _buildStatusTab(context.l10n.active, 'Active'),
                       SizedBox(width: 12.w),
-                      _buildStatusTab('Drafts'),
+                      _buildStatusTab(context.l10n.drafts, 'Drafts'),
                       SizedBox(width: 12.w),
-                      _buildStatusTab('Past'),
+                      _buildStatusTab(context.l10n.past, 'Past'),
                     ],
                   ),
                   SizedBox(height: 20.h),
@@ -149,7 +150,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                       child: Padding(
                         padding: EdgeInsets.only(top: 50.h),
                         child: Text(
-                          'No $_selectedStatus listings found',
+                          context.l10n.noListingsFound(_selectedStatus),
                           style: TextStyle(
                             fontSize: AppTypography.bodyLarge,
                             color: Colors.grey,
@@ -172,7 +173,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
     );
   }
 
-  Widget _buildStatusTab(String status) {
+  Widget _buildStatusTab(String title, String status) {
     bool isSelected = _selectedStatus == status;
     return Expanded(
       child: GestureDetector(
@@ -186,7 +187,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
             borderRadius: BorderRadius.circular(10.r),
           ),
           child: Text(
-            status,
+            title,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: isSelected ? Colors.white : Colors.black54,
@@ -223,7 +224,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
             children: [
               Expanded(
                 child: Text(
-                  listing.title ?? 'No Title',
+                  listing.title ?? context.l10n.noTitle,
                   style: TextStyle(
                     fontSize: AppTypography.h2,
                     fontWeight: FontWeight.bold,
@@ -254,7 +255,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
           Row(
             children: [
               Text(
-                listing.category?.name ?? 'No Category',
+                listing.category?.name ?? context.l10n.noCategory,
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
                   color: Colors.grey[600],
@@ -284,7 +285,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               ),
               SizedBox(width: 4.w),
               Text(
-                '189 views', // Not in model yet
+                context.l10n.viewsCount(189), // Not in model yet
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
                   color: Colors.black87,
@@ -296,7 +297,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                   context.read<BottomNavController>().setIndex(0);
                 },
                 child: Text(
-                  '8 bookings', // Not in model yet
+                  context.l10n.bookingsCount(8), // Not in model yet
                   style: TextStyle(
                     fontSize: AppTypography.bodyMedium,
                     color: const Color(0xFF636AFF),
@@ -315,7 +316,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 flex: 2,
                 child: _buildListingButton(
                   icon: Icons.visibility_outlined,
-                  label: 'View',
+                  label: context.l10n.viewBtn,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -333,7 +334,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 flex: 2,
                 child: _buildListingButton(
                   icon: Icons.edit_outlined,
-                  label: 'Edit',
+                  label: context.l10n.editBtn,
                   onTap: () async {
                     // We need full details to edit, so we fetch it first
                     final success = await context
@@ -432,7 +433,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Overall Statistics',
+            context.l10n.overallStatistics,
             style: TextStyle(
               fontSize: AppTypography.h2,
               fontWeight: FontWeight.bold,
@@ -443,10 +444,10 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildStatItem('Total', controller.totalListings.toString()),
-              _buildStatItem('Active', controller.activeListings.toString()),
-              _buildStatItem('Drafts', controller.draftListings.toString()),
-              _buildStatItem('Past', controller.pastListings.toString()),
+              _buildStatItem(context.l10n.total, controller.totalListings.toString()),
+              _buildStatItem(context.l10n.active, controller.activeListings.toString()),
+              _buildStatItem(context.l10n.drafts, controller.draftListings.toString()),
+              _buildStatItem(context.l10n.past, controller.pastListings.toString()),
             ],
           ),
         ],
@@ -526,7 +527,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                     ),
                     SizedBox(height: 16.h),
                     Text(
-                      'Profile Photo Required',
+                      context.l10n.profilePhotoRequired,
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
@@ -536,7 +537,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                     ),
                     SizedBox(height: 10.h),
                     Text(
-                      'You need to add a profile photo before you can create a service listing. Clients trust creators they can see!',
+                      context.l10n.profilePhotoRequiredDesc,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13.sp,
@@ -559,7 +560,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                               ),
                             ),
                             child: Text(
-                              'Later',
+                              context.l10n.later,
                               style: TextStyle(
                                 color: Colors.grey[700],
                                 fontWeight: FontWeight.w600,
@@ -591,7 +592,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                               ),
                             ),
                             child: Text(
-                              'Edit Profile',
+                              context.l10n.editProfile,
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 fontWeight: FontWeight.w600,
@@ -627,7 +628,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Delete Confirmation',
+                    context.l10n.deleteConfirmation,
                     style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
                   ),
                   GestureDetector(
@@ -638,7 +639,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               ),
               SizedBox(height: 15.h),
               Text(
-                'Are you sure you want to delete this?',
+                context.l10n.areYouSureDelete,
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w500,
@@ -665,7 +666,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                         if (success && mounted) {
                           CustomSnackBar.show(
                             context: context,
-                            message: "Service deleted successfully",
+                            message: context.l10n.serviceDeletedSuccess,
                           );
                           context
                               .read<MyListingController>()
@@ -677,7 +678,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                                 context
                                     .read<ServiceController>()
                                     .errorMessage ??
-                                "Delete failed",
+                                context.l10n.deleteFailed,
                             isError: true,
                           );
                         }
@@ -699,7 +700,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                             ),
                             SizedBox(width: 8.w),
                             Text(
-                              'Yes',
+                              context.l10n.yes,
                               style: TextStyle(
                                 color: const Color(0xFF2E7D32),
                                 fontWeight: FontWeight.w600,
@@ -733,7 +734,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                             ),
                             SizedBox(width: 8.w),
                             Text(
-                              'No',
+                              context.l10n.no,
                               style: TextStyle(
                                 color: const Color(0xFFC62828),
                                 fontWeight: FontWeight.w600,

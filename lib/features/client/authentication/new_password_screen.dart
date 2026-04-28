@@ -6,6 +6,7 @@ import 'package:photopia/features/client/authentication/widgets/auth_widgets.dar
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/client/reset_password_controller.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class NewPasswordScreen extends StatefulWidget {
   static const String name = '/new_password';
@@ -60,15 +61,14 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
       if (result && mounted) {
         CustomSnackBar.show(
           context: context,
-          message: 'Password reset successfully! Please log in.',
+          message: context.l10n.passwordResetSuccess,
           isError: false,
         );
         Navigator.pushNamedAndRemoveUntil(context, '/log_in', (route) => false);
       } else if (mounted) {
         CustomSnackBar.show(
           context: context,
-          message:
-              resetPassController.errorMessage ?? 'Failed to reset password',
+          message: resetPassController.errorMessage ?? context.l10n.failedToResetPassword,
           isError: true,
         );
       }
@@ -103,7 +103,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
                 // Title
                 Text(
-                  'Forget Password',
+                  context.l10n.forgotPasswordTitle,
                   style: TextStyle(
                     fontSize: 24.sp.clamp(24, 28),
                     fontWeight: FontWeight.bold,
@@ -115,7 +115,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
                 // Subtitle
                 Text(
-                  'New password',
+                  context.l10n.newPasswordTitle,
                   style: TextStyle(
                     fontSize: 18.sp.clamp(18, 20),
                     fontWeight: FontWeight.w600,
@@ -127,7 +127,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
                 // New Password Field
                 AuthTextField(
-                  label: 'New Password',
+                  label: context.l10n.newPasswordLabel,
                   controller: _newPasswordController,
                   hintText: '••••••••••',
                   isValid: _isNewPasswordValid,
@@ -139,7 +139,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
                 // Confirm Password Field
                 AuthTextField(
-                  label: 'Confirmed Password',
+                  label: context.l10n.confirmPasswordLabel,
                   controller: _confirmPasswordController,
                   hintText: '••••••••••',
                   isValid: _isConfirmPasswordValid,
@@ -153,7 +153,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                 Consumer<ResetPasswordController>(
                   builder: (context, controller, child) {
                     return AuthButton(
-                      text: 'Submit',
+                      text: context.l10n.submitBtn,
                       onTap: _submitNewPassword,
                       isEnabled:
                           (_isNewPasswordValid && _isConfirmPasswordValid),

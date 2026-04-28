@@ -7,6 +7,7 @@ import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
 import 'package:photopia/features/client/chat_screen.dart';
 import 'package:photopia/controller/auth_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -92,7 +93,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ),
             SizedBox(height: 24.h),
             Text(
-              'No Messages Yet',
+              context.l10n.noMessagesYet,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -103,7 +104,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 40.w),
               child: Text(
-                "When you start a conversation, it will appear here. Start exploring to connect!",
+                context.l10n.noMessagesDesc,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.sp,
@@ -131,7 +132,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
           SizedBox(width: 12.w),
           Text(
-            'Messages',
+            context.l10n.navMessages,
             style: TextStyle(
               fontSize: 20.sp.clamp(20, 22),
               fontWeight: FontWeight.bold,
@@ -157,7 +158,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           controller: _searchController,
           textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
-            hintText: 'Search conversations...',
+            hintText: context.l10n.searchConversations,
             isCollapsed: true,
             hintStyle: TextStyle(
               color: Colors.grey,

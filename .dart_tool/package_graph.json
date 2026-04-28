@@ -18,6 +18,7 @@
         "flutter",
         "flutter_image_compress",
         "flutter_local_notifications",
+        "flutter_localizations",
         "flutter_screenutil",
         "flutter_secure_storage",
         "flutter_spinkit",
@@ -28,6 +29,7 @@
         "http",
         "image",
         "image_picker",
+        "intl",
         "mime",
         "open_filex",
         "path_provider",
@@ -405,6 +407,24 @@
       "dependencies": []
     },
     {
+      "name": "intl",
+      "version": "0.20.2",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
+      ]
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
+        "path"
+      ]
+    },
+    {
       "name": "flutter",
       "version": "0.0.0",
       "dependencies": [
@@ -624,15 +644,6 @@
       "dependencies": [
         "flutter",
         "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "intl",
-      "version": "0.20.2",
-      "dependencies": [
-        "clock",
-        "meta",
-        "path"
       ]
     },
     {
@@ -1230,15 +1241,6 @@
       "dependencies": [
         "flutter",
         "freezed_annotation"
-      ]
-    },
-    {
-      "name": "flutter_localizations",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter",
-        "intl",
-        "path"
       ]
     },
     {

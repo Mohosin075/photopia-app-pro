@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:photopia/controller/category_controller.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -120,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: 'Recently Viewed', onSeeAllTap: () {}),
+        SectionHeader(title: context.l10n.recentlyViewed, onSeeAllTap: () {}),
         SizedBox(
           height: 280.h,
           child: ListView.builder(
@@ -155,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: 'Get Inspired', onSeeAllTap: () {}),
+        SectionHeader(title: context.l10n.getInspired, onSeeAllTap: () {}),
         SizedBox(
           height: 120.h,
           child: ListView.builder(
@@ -223,7 +224,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: 'Super Pros', onSeeAllTap: () {}),
+        SectionHeader(title: context.l10n.superPros, onSeeAllTap: () {}),
         SizedBox(
           height: 140.h,
           child: ListView.builder(
@@ -537,7 +538,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             SizedBox(height: 16.h),
                             Text(
-                              'Unable to load home',
+                              context.l10n.unableToLoadHome,
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
@@ -546,7 +547,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             SizedBox(height: 24.h),
                             ElevatedButton(
                               onPressed: () => homeController.fetchHomeData(),
-                              child: Text('Try Again'),
+                              child: Text(context.l10n.tryAgain),
                             ),
                           ],
                         ),
@@ -556,7 +557,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                   final data = homeController.homeData;
                   if (data == null) {
-                    return const Center(child: Text('No Data'));
+                    return Center(child: Text(context.l10n.noData));
                   }
 
                   return RefreshIndicator(
@@ -589,7 +590,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           // Original Projects
                           if (data.originalProjects != null)
                             _buildHorizontalServiceSection(
-                              title: 'Original Projects',
+                              title: context.l10n.originalProjects,
                               items: data.originalProjects!,
                             ),
 
@@ -608,7 +609,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           // Available Right Now
                           if (data.availableNow != null)
                             _buildHorizontalServiceSection(
-                              title: 'Available Right Now',
+                              title: context.l10n.availableRightNow,
                               items: data.availableNow!,
                               showAvailability: true,
                             ),

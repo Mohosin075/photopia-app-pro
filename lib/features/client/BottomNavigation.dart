@@ -13,8 +13,8 @@ import 'package:photopia/features/client/authentication/sign_up_screen.dart';
 import 'package:photopia/controller/auth_controller.dart';
 import 'package:photopia/controller/client/service_list_controller.dart';
 import 'package:photopia/core/utils/guest_dialog_helper.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:provider/provider.dart';
-
 import 'package:photopia/controller/client/booking_controller.dart';
 import 'package:photopia/core/notification/notification_service.dart';
 
@@ -113,8 +113,8 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
             ScaffoldMessenger.of(context).clearSnackBars();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text(
-                  'Press back again to exit',
+                content: Text(
+                  context.l10n.pressBackToExit,
                   textAlign: TextAlign.center,
                 ),
                 duration: const Duration(seconds: 2),
@@ -168,14 +168,14 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                         child: _buildNavItem(
                           index: 0,
                           iconAsset: 'assets/images/client_home_icon.png',
-                          label: 'Home',
+                          label: context.l10n.navHome,
                         ),
                       ),
                       Expanded(
                         child: _buildNavItem(
                           index: 1,
                           iconAsset: 'assets/images/message_icon.png',
-                          label: 'Messages',
+                          label: context.l10n.navMessages,
                         ),
                       ),
                       Expanded(child: _buildSearchButton()),
@@ -183,14 +183,14 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                         child: _buildNavItem(
                           index: 3,
                           iconAsset: 'assets/images/client_favorite_icon.png',
-                          label: 'Favorites',
+                          label: context.l10n.navFavorites,
                         ),
                       ),
                       Expanded(
                         child: _buildNavItem(
                           index: 4,
                           iconAsset: 'assets/images/client_profile_icon.png',
-                          label: 'Profile',
+                          label: context.l10n.navProfile,
                         ),
                       ),
                     ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/features/client/home_page.dart';
 import 'package:photopia/features/client/BottomNavigation.dart';
@@ -31,12 +32,12 @@ import 'package:photopia/controller/location_controller.dart';
 import 'package:photopia/controller/client/notification_controller.dart';
 import 'package:photopia/controller/client/payment_controller.dart';
 import 'package:photopia/controller/provider/subscription_controller.dart';
+import 'package:photopia/controller/language_controller.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/core/routes/app_routes.dart';
 import 'package:photopia/features/onboarding/get_started.dart';
 import 'package:photopia/features/provider/screen/BottomNavigationBar/bottom_navigation_screen.dart';
-
 import 'package:photopia/core/notification/notification_service.dart';
-
 import 'package:photopia/controller/category_controller.dart';
 
 class Photopia extends StatefulWidget {
@@ -65,6 +66,7 @@ class _PhotopiaState extends State<Photopia> {
       builder: (context, child) {
         return MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (_) => LanguageController()),
             ChangeNotifierProvider(create: (_) => FavoritesController()),
             ChangeNotifierProvider(create: (_) => ProviderProfileController()),
             ChangeNotifierProvider(create: (_) => AuthController()),
@@ -97,25 +99,37 @@ class _PhotopiaState extends State<Photopia> {
             ChangeNotifierProvider(create: (_) => PaymentController()),
             ChangeNotifierProvider(create: (_) => SubscriptionController()),
           ],
-          child: MaterialApp(
-            navigatorKey: navigatorKey,
-            debugShowCheckedModeBanner: false,
-            useInheritedMediaQuery: true,
-            theme: ThemeData(
-              primaryColor: Colors.blue,
-              useMaterial3: true,
-              progressIndicatorTheme: const ProgressIndicatorThemeData(
-                color: Colors.black,
-              ),
-              textSelectionTheme: const TextSelectionThemeData(
-                cursorColor: Colors.black54,
-              ),
-            ),
-            builder: (context, child) {
-              return child!;
+          child: Consumer<LanguageController>(
+            builder: (context, langController, child) {
+              return MaterialApp(
+                navigatorKey: navigatorKey,
+                debugShowCheckedModeBanner: false,
+                useInheritedMediaQuery: true,
+                locale: langController.locale,
+                supportedLocales: const [Locale('en'), Locale('fr')],
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                theme: ThemeData(
+                  primaryColor: Colors.blue,
+                  useMaterial3: true,
+                  progressIndicatorTheme: const ProgressIndicatorThemeData(
+                    color: Colors.black,
+                  ),
+                  textSelectionTheme: const TextSelectionThemeData(
+                    cursorColor: Colors.black54,
+                  ),
+                ),
+                builder: (context, child) {
+                  return child!;
+                },
+                routes: AppRoutes.routes,
+                home: _getInitialScreen(),
+              );
             },
-            routes: AppRoutes.routes,
-            home: _getInitialScreen(),
           ),
         );
       },

@@ -6,6 +6,7 @@ import 'package:photopia/features/client/authentication/widgets/auth_widgets.dar
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/client/verify_otp_controller.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   static const String name = '/otp_verification';
@@ -58,7 +59,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         if (mounted) {
           CustomSnackBar.show(
             context: context,
-            message: 'Verification successful! Please log in.',
+            message: context.l10n.verificationSuccessful,
             isError: false,
           );
           if (widget.isForgotPassword) {
@@ -78,7 +79,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         if (mounted) {
           CustomSnackBar.show(
             context: context,
-            message: verifyOtpController.errorMessage ?? 'Verification failed',
+            message: verifyOtpController.errorMessage ?? context.l10n.verificationFailed,
             isError: true,
           );
         }
@@ -112,7 +113,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
               // Title
               Text(
-                'OTP Verification',
+                context.l10n.otpVerificationTitle,
                 style: TextStyle(
                   fontSize: 24.sp.clamp(24, 28),
                   fontWeight: FontWeight.bold,
@@ -124,7 +125,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
               // Subtitle
               Text(
-                'Code Submit',
+                context.l10n.codeSubmit,
                 style: TextStyle(
                   fontSize: 18.sp.clamp(18, 20),
                   fontWeight: FontWeight.w600,
@@ -135,7 +136,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               SizedBox(height: 8.h.clamp(8, 12)),
 
               Text(
-                'Enter the 6-Digit code sent to you at\n${widget.email}',
+                context.l10n.enterCodeSentTo(widget.email),
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
                   color: Colors.grey.shade600,
@@ -157,7 +158,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               Consumer<VerifyOtpController>(
                 builder: (context, controller, child) {
                   return AuthButton(
-                    text: 'Submit',
+                    text: context.l10n.submitBtn,
                     isLoading: controller.inProgress,
                     onTap: _submitOtp,
                     isEnabled: _isOtpComplete() && !controller.inProgress,
@@ -175,14 +176,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   },
                   child: RichText(
                     text: TextSpan(
-                      text: "Didn't receive code?  ",
+                      text: context.l10n.didntReceiveCode,
                       style: TextStyle(
                         fontSize: AppTypography.bodyMedium,
                         color: Colors.black87,
                       ),
                       children: [
                         TextSpan(
-                          text: 'Resend Again',
+                          text: context.l10n.resendAgain,
                           style: TextStyle(
                             fontSize: AppTypography.bodyMedium,
                             color: const Color(0xFF2196F3),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderCustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -37,27 +38,27 @@ class ProviderCustomBottomNavBar extends StatelessWidget {
               children: [
                 _buildNavItem(
                   iconAsset: 'assets/images/provider_order_icon.png',
-                  label: 'Orders',
+                  label: context.l10n.providerNavOrders,
                   index: 0,
                 ),
                 _buildNavItem(
                   iconAsset: 'assets/images/calendar_icon.png',
-                  label: 'Calendar',
+                  label: context.l10n.providerNavCalendar,
                   index: 1,
                 ),
                 _buildNavItem(
                   iconAsset: 'assets/images/overview_icon.png',
-                  label: 'Listing',
+                  label: context.l10n.providerNavListing,
                   index: 2,
                 ),
                 _buildNavItem(
                   iconAsset: 'assets/images/message_icon.png',
-                  label: 'Message',
+                  label: context.l10n.navMessages,
                   index: 3,
                 ),
                 _buildNavItem(
                   iconAsset: 'assets/images/menu_icon.png',
-                  label: 'Menu',
+                  label: context.l10n.providerNavMenu,
                   index: 4,
                 ),
               ],

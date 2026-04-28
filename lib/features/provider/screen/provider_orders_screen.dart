@@ -11,6 +11,7 @@ import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/data/models/chat_message_model.dart';
 import 'package:photopia/features/client/chat_screen.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderOrdersScreen extends StatefulWidget {
   const ProviderOrdersScreen({super.key});
@@ -147,7 +148,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       child: Center(
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
-                          child: Text('Today'),
+                          child: Text(context.l10n.tabToday),
                         ),
                       ),
                     ),
@@ -155,7 +156,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       child: Center(
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
-                          child: Text('Upcoming'),
+                          child: Text(context.l10n.tabUpcoming),
                         ),
                       ),
                     ),
@@ -163,7 +164,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       child: Center(
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
-                          child: Text('Pending'),
+                          child: Text(context.l10n.tabPending),
                         ),
                       ),
                     ),
@@ -217,14 +218,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Today's Bookings",
+                    context.l10n.todaysBookings,
                     style: TextStyle(
                       fontSize: AppTypography.h1,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    '${todayOrders.length} bookings',
+                    context.l10n.bookingsCount(todayOrders.length),
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
                       color: Colors.grey[500],
@@ -237,7 +238,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: 50.h),
-                    child: Text('No bookings right now'),
+                    child: Text(context.l10n.noBookingsRightNow),
                   ),
                 ),
             ],
@@ -279,10 +280,10 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         }
 
         return _buildTodayBookingCard(
-          name: client['name'] ?? 'Unknown Client',
-          service: service['title'] ?? 'Unknown Service',
-          time: order['startTime'] ?? 'N/A',
-          location: location['address'] ?? 'Location N/A',
+          name: client['name'] ?? context.l10n.unknownClient,
+          service: service['title'] ?? context.l10n.unknownService,
+          time: order['startTime'] ?? context.l10n.notAvailable,
+          location: location['address'] ?? context.l10n.locationNA,
           price: price,
           imageUrl: client['profile'] ?? client['profileImage'] ?? client['image'] ?? client['avatar'] ?? '',
           status: order['status'] ?? 'pending',
@@ -311,14 +312,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Upcoming Bookings",
+                    context.l10n.upcomingBookings,
                     style: TextStyle(
                       fontSize: AppTypography.h1,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    '${upcomingOrders.length} bookings',
+                    context.l10n.bookingsCount(upcomingOrders.length),
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
                       color: Colors.grey[500],
@@ -331,7 +332,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: 50.h),
-                    child: Text('No upcoming bookings'),
+                    child: Text(context.l10n.noUpcomingBookings),
                   ),
                 ),
             ],
@@ -372,10 +373,10 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         }
 
         return _buildUpcomingBookingCard(
-          name: client['name'] ?? 'Unknown Client',
-          service: service['title'] ?? 'Unknown Service',
-          date: order['bookingDate']?.toString().split('T')[0] ?? 'N/A',
-          time: order['startTime'] ?? 'N/A',
+          name: client['name'] ?? context.l10n.unknownClient,
+          service: service['title'] ?? context.l10n.unknownService,
+          date: order['bookingDate']?.toString().split('T')[0] ?? context.l10n.notAvailable,
+          time: order['startTime'] ?? context.l10n.notAvailable,
           price: price,
           status: order['status'] ?? 'confirmed',
           booking: order,
@@ -403,14 +404,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Pending Approval",
+                    context.l10n.pendingApproval,
                     style: TextStyle(
                       fontSize: AppTypography.h1,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    '${pendingOrders.length} requests',
+                    context.l10n.requestsCount(pendingOrders.length),
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
                       color: Colors.grey[500],
@@ -423,7 +424,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: 50.h),
-                    child: Text('No pending requests'),
+                    child: Text(context.l10n.noPendingRequests),
                   ),
                 ),
             ],
@@ -465,12 +466,12 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         }
 
         return _buildPendingBookingCard(
-          name: client['name'] ?? 'Unknown Client',
-          service: service['title'] ?? 'Unknown Service',
-          requestedAgo: 'Requested recently',
-          date: order['bookingDate']?.toString().split('T')[0] ?? 'N/A',
-          time: order['startTime'] ?? 'N/A',
-          location: location['address'] ?? 'Location N/A',
+          name: client['name'] ?? context.l10n.unknownClient,
+          service: service['title'] ?? context.l10n.unknownService,
+          requestedAgo: context.l10n.requestedRecently,
+          date: order['bookingDate']?.toString().split('T')[0] ?? context.l10n.notAvailable,
+          time: order['startTime'] ?? context.l10n.notAvailable,
+          location: location['address'] ?? context.l10n.locationNA,
           price: price,
           imageUrl: client['profile'] ?? client['profileImage'] ?? client['image'] ?? client['avatar'] ?? '',
           booking: order,
@@ -611,13 +612,13 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     _buildButton(
-                      text: 'Contact',
+                      text: context.l10n.contactBtn,
                       onTap: () => _navigateToChat(context, booking),
                       isPrimary: false,
                     ),
                     SizedBox(width: 10.w),
                     _buildButton(
-                      text: 'Details',
+                      text: context.l10n.detailsBtn,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -759,7 +760,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                     children: [
                       Flexible(
                         child: Text(
-                          'View Details',
+                          context.l10n.viewDetails,
                           style: TextStyle(
                             fontSize: AppTypography.bodyMedium,
                             color: Colors.grey[600],
@@ -839,7 +840,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                             borderRadius: BorderRadius.circular(6.r),
                           ),
                           child: Text(
-                            'Pending',
+                            context.l10n.tabPending,
                             style: TextStyle(
                               fontSize: AppTypography.bodySmall,
                               color: Colors.grey[600],
@@ -925,13 +926,13 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 Row(
                   children: [
                     _buildButton(
-                      text: 'Contact',
+                      text: context.l10n.contactBtn,
                       onTap: () => _navigateToChat(context, booking),
                       isPrimary: false,
                     ),
                     SizedBox(width: 10.w),
                     _buildTextButton(
-                      text: 'Decline',
+                      text: context.l10n.declineBtn,
                       onTap: () => _showConfirmationDialog(
                         context: context,
                         isAccept: false,
@@ -942,7 +943,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                     ),
                     SizedBox(width: 15.w),
                     _buildTextButton(
-                      text: 'Accept',
+                      text: context.l10n.acceptBtn,
                       onTap: () => _showConfirmationDialog(
                         context: context,
                         isAccept: true,
@@ -970,7 +971,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'View Full Details',
+                    context.l10n.viewFullDetails,
                     style: TextStyle(
                       fontSize: AppTypography.bodyMedium,
                       color: Colors.grey[600],
@@ -1003,7 +1004,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
     if (clientId.isEmpty) {
       CustomSnackBar.show(
         context: context,
-        message: 'Client information not available',
+        message: context.l10n.clientInfoNotAvailable,
         isError: true,
       );
       return;
@@ -1056,7 +1057,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                   children: [
                     Expanded(
                       child: Text(
-                        isAccept ? 'Do you want to accept this?' : 'Do you want to decline this?',
+                        isAccept ? context.l10n.doYouWantToAccept : context.l10n.doYouWantToDecline,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16.sp,
@@ -1094,8 +1095,8 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                             CustomSnackBar.show(
                               context: context,
                               message: success 
-                                ? 'Order ${isAccept ? 'accepted' : 'declined'} successfully!' 
-                                : 'Failed to update order status',
+                                ? (isAccept ? context.l10n.orderAcceptedSuccess : context.l10n.orderDeclinedSuccess)
+                                : context.l10n.orderStatusUpdateFailed,
                               isError: !success,
                             );
                           }
@@ -1112,7 +1113,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                               const Icon(Icons.check, color: Color(0xFF2E7D32), size: 18),
                               SizedBox(width: 8.w),
                               Text(
-                                'Yes',
+                                context.l10n.yes,
                                 style: TextStyle(
                                   color: const Color(0xFF2E7D32),
                                   fontSize: 14.sp,
@@ -1141,7 +1142,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                               Icon(Icons.close, size: 18.sp, color: Colors.red),
                               SizedBox(width: 8.w),
                               Text(
-                                'No',
+                                context.l10n.no,
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.bold,

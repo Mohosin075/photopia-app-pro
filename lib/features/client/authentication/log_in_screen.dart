@@ -11,6 +11,7 @@ import 'package:photopia/core/network/Api_service/network_caller.dart';
 import 'package:photopia/core/network/urls.dart';
 import 'package:photopia/core/notification/notification_service.dart';
 import 'package:photopia/core/routes/app_routes.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class LogInScreen extends StatefulWidget {
   static const String name = '/log_in';
@@ -75,7 +76,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 SizedBox(height: 32.h.clamp(32, 40)),
                 // Title
                 Text(
-                  'Log in to continue',
+                  context.l10n.logInToContinue,
                   style: TextStyle(
                     fontSize: 24.sp.clamp(24, 28),
                     fontWeight: FontWeight.bold,
@@ -87,9 +88,9 @@ class _LogInScreenState extends State<LogInScreen> {
 
                 // Email Field
                 AuthTextField(
-                  label: 'Email',
+                  label: context.l10n.emailLabel,
                   controller: _emailController,
-                  hintText: 'your@email.com',
+                  hintText: context.l10n.emailHint,
                   isValid: _isEmailValid,
                   onChanged: _validateEmail,
                   keyboardType: TextInputType.emailAddress,
@@ -99,7 +100,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
                 // Password Field
                 AuthTextField(
-                  label: 'Password',
+                  label: context.l10n.passwordLabel,
                   controller: _passwordController,
                   hintText: '••••••••••',
                   isValid: _isPasswordValid,
@@ -119,7 +120,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       Navigator.pushNamed(context, '/forgot_password');
                     },
                     child: Text(
-                      'Forget Password?',
+                      context.l10n.forgotPassword,
                       style: TextStyle(
                         fontSize: AppTypography.bodyMedium,
                         color: const Color(0xFF2196F3),
@@ -135,7 +136,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 Consumer<SignInController>(
                   builder: (context, signInController, child) {
                     return AuthButton(
-                      text: 'Login',
+                      text: context.l10n.loginBtn,
                       isLoading: signInController.inProgress,
                       onTap: () async {
                         debugPrint('🚀 Login button clicked');
@@ -143,7 +144,7 @@ class _LogInScreenState extends State<LogInScreen> {
                           debugPrint('⚠️ Validation failed: Email=$_isEmailValid, Password=$_isPasswordValid');
                           CustomSnackBar.show(
                             context: context,
-                            message: 'Please enter valid email and password',
+                            message: context.l10n.validEmailPasswordRequired,
                             isError: true,
                           );
                           return;
@@ -181,7 +182,7 @@ class _LogInScreenState extends State<LogInScreen> {
                             
                             CustomSnackBar.show(
                               context: context,
-                              message: 'Login successful',
+                              message: context.l10n.loginSuccessful,
                               isError: false,
                             );
 
@@ -209,7 +210,7 @@ class _LogInScreenState extends State<LogInScreen> {
                               context: context,
                               message:
                                   signInController.errorMessage ??
-                                  'Login failed',
+                                  context.l10n.loginFailed,
                               isError: true,
                             );
                           }
@@ -228,7 +229,7 @@ class _LogInScreenState extends State<LogInScreen> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: Text(
-                        'OR CONTINUE WITH',
+                        context.l10n.orContinueWith,
                         style: TextStyle(
                           fontSize: AppTypography.bodySmall,
                           color: Colors.grey.shade600,
@@ -283,14 +284,14 @@ class _LogInScreenState extends State<LogInScreen> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: "Don't have an account? ",
+                        text: context.l10n.noAccount,
                         style: TextStyle(
                           fontSize: AppTypography.bodyMedium,
                           color: Colors.black87,
                         ),
                         children: [
                           TextSpan(
-                            text: 'Sign up',
+                            text: context.l10n.signUpLink,
                             style: TextStyle(
                               fontSize: AppTypography.bodyMedium,
                               color: const Color(0xFF2196F3),

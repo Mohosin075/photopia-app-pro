@@ -481,30 +481,81 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
   }
 
   void _showAddDialog(String title, Function(String) onAdd) {
-    final controller = TextEditingController();
+    final textController = TextEditingController();
+
+    const List<String> _availableLanguages = [
+      'English', 'French', 'Spanish', 'German', 'Arabic',
+      'Bengali', 'Portuguese', 'Italian', 'Dutch',
+      'Chinese', 'Japanese', 'Korean', 'Hindi',
+    ];
+    String? _selectedLanguage;
+    final isLanguage = title == 'Languages';
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Add $title'),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(hintText: 'Enter name'),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          title: Text('Add $title'),
+          content: isLanguage
+              ? Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F7),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: _selectedLanguage,
+                      hint: Text(
+                        'Select a language',
+                        style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+                      ),
+                      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(10.r),
+                      items: _availableLanguages
+                          .where((lang) => !_tempLanguages.contains(lang))
+                          .map((lang) => DropdownMenuItem(
+                                value: lang,
+                                child: Text(lang),
+                              ))
+                          .toList(),
+                      onChanged: (val) {
+                        setDialogState(() => _selectedLanguage = val);
+                      },
+                    ),
+                  ),
+                )
+              : TextField(
+                  controller: textController,
+                  decoration: const InputDecoration(hintText: 'Enter name'),
+                ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (isLanguage) {
+                  if (_selectedLanguage != null) {
+                    onAdd(_selectedLanguage!);
+                    Navigator.pop(context);
+                  }
+                } else {
+                  if (textController.text.isNotEmpty) {
+                    onAdd(textController.text);
+                    Navigator.pop(context);
+                  }
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (controller.text.isNotEmpty) {
-                onAdd(controller.text);
-                Navigator.pop(context);
-              }
-            },
-            child: Text('Add'),
-          ),
-        ],
       ),
     );
   }

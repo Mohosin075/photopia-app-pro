@@ -6,6 +6,7 @@ import 'package:photopia/features/provider/screen/provider_transaction_details_s
 import 'package:photopia/features/provider/screen/provider_request_payout_screen.dart';
 import 'package:photopia/controller/provider/wallet_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderWalletScreen extends StatefulWidget {
   const ProviderWalletScreen({super.key});
@@ -30,7 +31,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         title: Text(
-          'Wallet',
+          context.l10n.walletTitle,
           style: TextStyle(
             fontSize: AppTypography.h1,
             fontWeight: FontWeight.w600,
@@ -67,10 +68,10 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                     children: [
                       Expanded(
                         child: _buildStatsCard(
-                          title: 'This Month',
+                          title: context.l10n.thisMonth,
                           amount: '€${thisMonth?.amount?.toStringAsFixed(0) ?? '0'}',
                           growth:
-                              '${(thisMonth?.percentageChange?.toDouble() ?? 0) >= 0 ? '+' : ''}${thisMonth?.percentageChange?.toStringAsFixed(0) ?? '0'}% vs last month',
+                              context.l10n.vsLastMonth(thisMonth?.percentageChange?.toDouble() ?? 0),
                           isPositive:
                               (thisMonth?.percentageChange?.toDouble() ?? 0) >=
                               0,
@@ -79,10 +80,10 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                       SizedBox(width: 16.w),
                       Expanded(
                         child: _buildStatsCard(
-                          title: 'Last Month',
+                          title: context.l10n.lastMonth,
                           amount: '€${lastMonth?.amount?.toStringAsFixed(0) ?? '0'}',
                           growth:
-                              '${(lastMonth?.percentageChange?.toDouble() ?? 0) >= 0 ? '+' : ''}${lastMonth?.percentageChange?.toStringAsFixed(0) ?? '0'}% vs last month',
+                              context.l10n.vsLastMonth(lastMonth?.percentageChange?.toDouble() ?? 0),
                           isPositive:
                               (lastMonth?.percentageChange?.toDouble() ?? 0) >=
                               0,
@@ -116,8 +117,8 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                     name: 'Sarah Johnson',
                     date: '2024-12-01',
                     status: isUpcoming
-                        ? 'Upcoming'
-                        : (isCompleted ? 'Completed' : 'Paid Out'),
+                        ? context.l10n.filterUpcoming
+                        : (isCompleted ? context.l10n.statusCompleted : context.l10n.statusPaidOut),
                     statusColor: isUpcoming
                         ? Colors.orange
                         : (isCompleted ? Colors.blue : Colors.green),
@@ -146,7 +147,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Total Balance',
+                context.l10n.totalBalance,
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
                   color: Colors.white.withOpacity(0.7),
@@ -170,7 +171,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Available',
+                        context.l10n.balanceAvailable,
                         style: TextStyle(
                           fontSize: AppTypography.bodySmall,
                           color: Colors.white.withOpacity(0.7),
@@ -191,7 +192,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pending',
+                        context.l10n.balancePending,
                         style: TextStyle(
                           fontSize: AppTypography.bodySmall,
                           color: Colors.white.withOpacity(0.7),
@@ -232,7 +233,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Request Payout',
+                    context.l10n.requestPayout,
                     style: TextStyle(
                       fontSize: AppTypography.bodyLarge,
                       fontWeight: FontWeight.w600,
@@ -315,11 +316,11 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildFilterChip('All Transactions', true),
+          _buildFilterChip(context.l10n.allTransactions, true),
           SizedBox(width: 12.w),
-          _buildFilterChip('Received', false),
+          _buildFilterChip(context.l10n.filterReceived, false),
           SizedBox(width: 12.w),
-          _buildFilterChip('Upcoming', false),
+          _buildFilterChip(context.l10n.filterUpcoming, false),
         ],
       ),
     );
@@ -462,7 +463,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                       padding: EdgeInsets.symmetric(vertical: 12.h),
                     ),
                     child: Text(
-                      'View Details',
+                      context.l10n.viewDetails,
                       style: TextStyle(
                         fontSize: AppTypography.bodyMedium,
                         color: Colors.black,
@@ -489,7 +490,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                         Icon(Icons.download, size: 16.sp, color: Colors.white),
                         SizedBox(width: 8.w),
                         Text(
-                          'Invoice',
+                          context.l10n.invoiceBtn,
                           style: TextStyle(
                             fontSize: AppTypography.bodyMedium,
                             color: Colors.white,

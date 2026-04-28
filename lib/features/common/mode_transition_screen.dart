@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:async';
 import 'package:photopia/controller/client/role_switch_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ModeTransitionScreen extends StatefulWidget {
   final String targetRole; // 'client' or 'professional'
@@ -75,10 +76,9 @@ class _ModeTransitionScreenState extends State<ModeTransitionScreen>
           (route) => false,
         );
       } else if (mounted) {
-        // Handle failure - maybe show a message or go back
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to switch mode. Please try again.'),
+          SnackBar(
+            content: Text(context.l10n.failedToSwitchMode),
           ),
         );
         Navigator.pop(context);
@@ -95,8 +95,8 @@ class _ModeTransitionScreenState extends State<ModeTransitionScreen>
   @override
   Widget build(BuildContext context) {
     String message = widget.targetRole == 'professional'
-        ? 'Switching to Professional Mode...'
-        : 'Switching to client mode';
+        ? context.l10n.switchingToProfessional
+        : context.l10n.switchingToClient;
 
     return Scaffold(
       backgroundColor: Colors.white,

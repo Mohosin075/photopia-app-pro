@@ -6,6 +6,7 @@ import 'package:photopia/data/models/booking_model.dart';
 import 'package:photopia/features/client/widgets/auth_profile_image.dart';
 import 'package:photopia/core/network/urls.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   static const String name = '/order_history';
@@ -16,13 +17,21 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  String _selectedFilter = 'All Orders';
-  final List<String> _filters = [
-    'All Orders',
-    'Upcoming',
-    'Completed',
-    'Cancelled',
-  ];
+  late String _selectedFilter;
+  late List<String> _filters;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final l = context.l10n;
+    _filters = [
+      l.filterAllOrders,
+      l.filterUpcoming,
+      l.statusCompleted,
+      l.statusCancelled,
+    ];
+    _selectedFilter = _filters[0];
+  }
 
   @override
   void initState() {
@@ -45,7 +54,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Order History',
+          context.l10n.orderHistoryTitle,
           style: TextStyle(
             color: Colors.black,
             fontSize: 20.sp.clamp(20, 22),
@@ -86,7 +95,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                             ),
                             SizedBox(height: 16.h),
                             Text(
-                              'No orders found',
+                              context.l10n.noOrdersFound,
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 color: Colors.grey,
@@ -166,9 +175,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   List<Booking> _getFilteredBookings(List<Booking> bookings) {
-    if (_selectedFilter == 'All Orders') return bookings;
+    final l = context.l10n;
+    if (_selectedFilter == l.filterAllOrders) return bookings;
+    String apiStatus = 'upcoming';
+    if (_selectedFilter == l.statusCompleted) apiStatus = 'completed';
+    else if (_selectedFilter == l.statusCancelled) apiStatus = 'cancelled';
+    else if (_selectedFilter == l.filterUpcoming) apiStatus = 'upcoming';
     return bookings
-        .where((b) => b.status?.toLowerCase() == _selectedFilter.toLowerCase())
+        .where((b) => b.status?.toLowerCase() == apiStatus)
         .toList();
   }
 
@@ -246,7 +260,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            booking.serviceId?.title ?? 'Service Title',
+                            booking.serviceId?.title ?? context.l10n.serviceTitleDefault,
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
@@ -260,7 +274,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      booking.package?.name ?? 'Standard Package',
+                      booking.package?.name ?? context.l10n.standardPackageDefault,
                       style: TextStyle(
                         fontSize: 13.sp,
                         color: Colors.grey[600],
@@ -288,7 +302,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         ),
                         SizedBox(width: 8.w),
                         Text(
-                          booking.providerId?.name ?? 'Provider Name',
+                          booking.providerId?.name ?? context.l10n.providerNameDefault,
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w500,
@@ -345,7 +359,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               SizedBox(width: 6.w),
               Expanded(
                 child: Text(
-                  booking.serviceId?.location?.address ?? 'Location not set',
+                  booking.serviceId?.location?.address ?? context.l10n.locationNotSet,
                   style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

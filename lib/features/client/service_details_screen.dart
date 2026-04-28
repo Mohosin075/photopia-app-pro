@@ -14,6 +14,7 @@ import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/data/models/chat_message_model.dart';
 import 'package:photopia/core/widgets/subscription_badge.dart';
 import 'package:photopia/features/client/chat_screen.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
@@ -51,12 +52,12 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               final serviceDetail = controller.serviceDetail;
               final isLoading = controller.isLoading;
 
-              final String title = serviceDetail?.title ?? widget.service['title'] ?? 'Service Details';
-              final String description = serviceDetail?.description ?? 'No description available.';
+              final String title = serviceDetail?.title ?? widget.service['title'] ?? context.l10n.serviceDetailsTitle;
+              final String description = serviceDetail?.description ?? context.l10n.noDescriptionAvailable;
               final List<String> equipment = serviceDetail?.equipment ?? [];
               final List<dynamic> gallery = serviceDetail?.gallery ?? [];
               final String coverMedia = serviceDetail?.coverMedia ?? widget.service['coverMedia'] ?? widget.service['imageUrl'] ?? '';
-              final String providerName = serviceDetail?.providerId?.name ?? widget.service['subtitle'] ?? 'Professional';
+              final String providerName = serviceDetail?.providerId?.name ?? widget.service['subtitle'] ?? context.l10n.professional;
               final String providerAvatar = serviceDetail?.providerId?.profile ?? 'assets/images/img6.png';
               final double rating = serviceDetail?.rating ?? (widget.service['rating'] ?? 0.0).toDouble();
               final int reviews = serviceDetail?.reviews ?? widget.service['reviews'] ?? 0;
@@ -77,7 +78,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                               SizedBox(height: 20.h),
                               Text(title, style: TextStyle(fontSize: 20.sp.clamp(20, 22), fontWeight: FontWeight.bold, color: Colors.black)),
                               SizedBox(height: 20.h),
-                              Text('Provider', style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Colors.black)),
+                              Text(context.l10n.providerLabel, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Colors.black)),
                               SizedBox(height: 12.h),
                               _buildProviderCard(providerName, providerAvatar, rating, reviews),
                               SizedBox(height: 18.h),
@@ -92,18 +93,18 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                 completedProjects: serviceDetail?.completedProjects ?? widget.service['completedProjects'],
                               ),
                               SizedBox(height: 25.h),
-                              _buildSectionTitle('About'),
+                              _buildSectionTitle(context.l10n.aboutLabel),
                               SizedBox(height: 8.h),
                               Text(description, style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Colors.black87, height: 1.5)),
                               if (equipment.isNotEmpty) ...[
                                 SizedBox(height: 25.h),
-                                Row(children: [Icon(Icons.camera_alt_outlined, size: 20.sp, color: Colors.black87), SizedBox(width: 8.w), _buildSectionTitle('Equipment')]),
+                                Row(children: [Icon(Icons.camera_alt_outlined, size: 20.sp, color: Colors.black87), SizedBox(width: 8.w), _buildSectionTitle(context.l10n.equipmentLabel)]),
                                 SizedBox(height: 12.h),
                                 _buildEquipmentTags(equipment),
                               ],
                               if (gallery.isNotEmpty) ...[
                                 SizedBox(height: 25.h),
-                                _buildSectionTitle('Portfolio'),
+                                _buildSectionTitle(context.l10n.portfolioTitle),
                                 SizedBox(height: 12.h),
                                 _buildPortfolioGrid(gallery),
                               ],
@@ -251,7 +252,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     ),
                   ],
                 ),
-                Row(children: [Icon(Icons.star, color: Colors.orange, size: 14.sp), SizedBox(width: 4.w), Text('${rating} (${reviews} reviews)', style: TextStyle(fontSize: 12.sp.clamp(12, 13), color: Colors.grey))]),
+                Row(children: [Icon(Icons.star, color: Colors.orange, size: 14.sp), SizedBox(width: 4.w), Text(context.l10n.reviewsCount(reviews, rating), style: TextStyle(fontSize: 12.sp.clamp(12, 13), color: Colors.grey))]),
               ],
             ),
           ),
@@ -288,7 +289,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 ),
               );
             },
-            child: Container(height: 48.h, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12).r), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.message_outlined, color: Colors.white, size: 18.sp), SizedBox(width: 8.w), Text('Message', style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold))])),
+            child: Container(height: 48.h, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12).r), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.message_outlined, color: Colors.white, size: 18.sp), SizedBox(width: 8.w), Text(context.l10n.messageBtn, style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold))])),
           ),
         ),
         SizedBox(width: 12.w),
@@ -297,7 +298,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => ProviderProfileScreen(provider: {'name': name, 'avatar': profile, 'id': providerId, '_id': providerId})));
             },
-            child: Container(height: 48.h, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12).r, border: Border.all(color: Colors.black)), child: Center(child: Text('View Profile', style: TextStyle(color: Colors.black, fontSize: 14.sp, fontWeight: FontWeight.bold)))),
+            child: Container(height: 48.h, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12).r, border: Border.all(color: Colors.black)), child: Center(child: Text(context.l10n.viewProfileBtn, style: TextStyle(color: Colors.black, fontSize: 14.sp, fontWeight: FontWeight.bold)))),
           ),
         ),
       ],
@@ -307,9 +308,9 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   Widget _buildStatsRow({String? responseTime, dynamic completedProjects}) {
     return Row(
       children: [
-        Expanded(child: _buildStatBox('Response Time', responseTime != null && responseTime.isNotEmpty ? responseTime : 'N/A')),
+        Expanded(child: _buildStatBox(context.l10n.responseTimeLabel, responseTime != null && responseTime.isNotEmpty ? responseTime : context.l10n.notAvailable)),
         SizedBox(width: 12.w),
-        Expanded(child: _buildStatBox('Completed Projects', completedProjects != null ? completedProjects.toString() : 'N/A')),
+        Expanded(child: _buildStatBox(context.l10n.completedProjectsLabel, completedProjects != null ? completedProjects.toString() : context.l10n.notAvailable)),
       ],
     );
   }
@@ -383,7 +384,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => BookingConfirmationScreen(service: fullService)));
                 }
               },
-              child: Container(height: 50.h, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12).r), child: Center(child: Text('Book Now', style: TextStyle(color: Colors.white, fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold)))),
+              child: Container(height: 50.h, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12).r), child: Center(child: Text(context.l10n.bookNowBtn, style: TextStyle(color: Colors.white, fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold)))),
             ),
           ),
         ],

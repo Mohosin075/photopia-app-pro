@@ -7,6 +7,7 @@ import 'package:photopia/controller/provider/calender_availibility_controller.da
 import 'package:photopia/controller/client/user_profile_controller.dart';
 import 'package:photopia/data/models/calender_availibility_model.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderCalendarScreen extends StatefulWidget {
   const ProviderCalendarScreen({super.key});
@@ -128,7 +129,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         elevation: 0,
         centerTitle: false,
         title: Text(
-          'Calendar & Availability',
+          context.l10n.calendarAvailability,
           style: TextStyle(
             color: Colors.black,
             fontSize: AppTypography.h1,
@@ -191,9 +192,9 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
       ),
       child: Row(
         children: [
-          _buildToggleItem('Week', 0),
-          _buildToggleItem('Month', 1),
-          _buildToggleItem('Year', 2),
+          _buildToggleItem(context.l10n.viewWeek, 0),
+          _buildToggleItem(context.l10n.viewMonth, 1),
+          _buildToggleItem(context.l10n.viewYear, 2),
         ],
       ),
     );
@@ -284,7 +285,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         _buildCalendarGrid(),
         SizedBox(height: 30.h),
         Text(
-          'Monthly Schedule',
+          context.l10n.monthlySchedule,
           style: TextStyle(
             fontSize: AppTypography.h1,
             fontWeight: FontWeight.bold,
@@ -302,7 +303,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                 padding: EdgeInsets.symmetric(vertical: 20.h),
                 child: Center(
                   child: Text(
-                    'No bookings for this date',
+                    context.l10n.noBookingsForDate,
                     style: TextStyle(color: Colors.grey, fontSize: 14.sp),
                   ),
                 ),
@@ -317,10 +318,10 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                 return Padding(
                   padding: EdgeInsets.only(bottom: 12.h),
                   child: _buildScheduleItem(
-                    title: service?['title'] ?? booking['eventType'] ?? 'Booking',
-                    client: booking['clientName'] ?? booking['clientId']?['name'] ?? 'Client',
-                    time: booking['startTime'] ?? 'N/A',
-                    location: booking['eventLocation']?['address'] ?? 'N/A',
+                    title: service?['title'] ?? booking['eventType'] ?? context.l10n.defaultBookingTitle,
+                    client: booking['clientName'] ?? booking['clientId']?['name'] ?? context.l10n.defaultClientName,
+                    time: booking['startTime'] ?? context.l10n.notAvailable,
+                    location: booking['eventLocation']?['address'] ?? context.l10n.locationNA,
                     cost: '€${pricing?['subtotal'] ?? '0'}',
                     status: booking['status'] ?? 'pending',
                   ),
@@ -531,7 +532,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Weekly Overview',
+          context.l10n.weeklyOverview,
           style: TextStyle(
             fontSize: AppTypography.h1,
             fontWeight: FontWeight.bold,
@@ -563,7 +564,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         ),
         SizedBox(height: 30.h),
         Text(
-          'Upcoming this week',
+          context.l10n.upcomingThisWeek,
           style: TextStyle(
             fontSize: AppTypography.h2,
             fontWeight: FontWeight.bold,
@@ -611,7 +612,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
             ),
             SizedBox(height: 5.h),
             Text(
-              isWorking ? 'ON' : 'OFF',
+              isWorking ? context.l10n.statusOn : context.l10n.statusOff,
               style: TextStyle(
                 fontSize: 8.sp,
                 fontWeight: FontWeight.w600,

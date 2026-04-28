@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/features/onboarding/onboarding_screen.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   static const String name = '/role_selection';
@@ -40,7 +41,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               ),
               SizedBox(height: 40.h),
               Text(
-                'How do you want to use Photopia?',
+                context.l10n.howToUsePhotopia,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22.sp,
@@ -50,7 +51,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               ),
               SizedBox(height: 10.h),
               Text(
-                'Select your role to get started',
+                context.l10n.selectRoleToStart,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14.sp, color: Colors.grey),
               ),
@@ -59,8 +60,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               // Client Box
               _buildRoleBox(
                 id: 'client',
-                title: 'Client',
-                subtitle: 'Find and book photography & video professionals',
+                title: context.l10n.roleClient,
+                subtitle: context.l10n.roleClientSubtitle,
                 icon: Icons.person_outline,
                 isSelected: _selectedRole == 'client',
                 onTap: () {
@@ -81,8 +82,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               // Professional Box
               _buildRoleBox(
                 id: 'professional',
-                title: 'Professional',
-                subtitle: 'Showcase your work and grow your business',
+                title: context.l10n.roleProfessional,
+                subtitle: context.l10n.roleProfessionalSubtitle,
                 icon: Icons.business_center_outlined,
                 isSelected: _selectedRole == 'professional',
                 onTap: () {

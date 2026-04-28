@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/client/notification_controller.dart';
 import 'package:photopia/data/models/notification_model.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -50,7 +51,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Notifications',
+                    context.l10n.notifications,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 20.sp.clamp(20, 22),
@@ -58,7 +59,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                   ),
                   Text(
-                    '${controller.unreadCount} unread',
+                    context.l10n.unread(controller.unreadCount),
                     style: TextStyle(
                       color: const Color(0xFF8E949A),
                       fontSize: 14.sp.clamp(14, 16),
@@ -78,7 +79,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 context.read<NotificationController>().markAllAsRead();
               },
               child: Text(
-                'Mark all as read',
+                context.l10n.markAllAsRead,
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 14.sp.clamp(14, 16),

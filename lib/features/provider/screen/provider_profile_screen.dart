@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:photopia/data/models/professional_profile_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
@@ -13,9 +14,9 @@ import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
 import 'package:photopia/core/widgets/document_viewer_screen.dart';
-import 'package:photopia/data/models/professional_profile_model.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
   const ProviderProfileScreen({super.key});
@@ -125,7 +126,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       if (mounted) {
         CustomSnackBar.show(
           context: context, 
-          message: 'Some items failed to delete: ${controller.errorMessage}', 
+          message: context.l10n.itemsFailedToDelete(controller.errorMessage ?? ''), 
           isError: true
         );
       }
@@ -172,7 +173,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         
         CustomSnackBar.show(
           context: context, 
-          message: 'Profile updated successfully', 
+          message: context.l10n.profileUpdatedSuccess, 
           isError: false
         );
       }
@@ -181,7 +182,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       if (mounted) {
         CustomSnackBar.show(
           context: context, 
-          message: controller.errorMessage ?? 'Update failed', 
+          message: controller.errorMessage ?? context.l10n.updateFailed, 
           isError: true
         );
       }
@@ -371,9 +372,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                       children: [
                         _buildAboutSection(),
                         SizedBox(height: 25.h),
-                        _buildChipsSection('Specializations', true),
+                        _buildChipsSection(context.l10n.specializationsTitle, true),
                         SizedBox(height: 25.h),
-                        _buildChipsSection('Languages', false),
+                        _buildChipsSection(context.l10n.languagesTitle, false),
                         SizedBox(height: 25.h),
                         _buildDocumentsSection(),
                         SizedBox(height: 25.h),
@@ -414,7 +415,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Profile',
+                    context.l10n.profileTitle,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
@@ -531,7 +532,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                             controller: _nameController,
                             style: TextStyle(fontSize: 19.sp, fontWeight: FontWeight.bold, color: Colors.white),
                             decoration: InputDecoration(
-                              hintText: 'Full Name',
+                              hintText: context.l10n.fullNameHint,
                               hintStyle: TextStyle(color: Colors.white60, fontSize: 16.sp),
                               isCollapsed: true,
                               contentPadding: EdgeInsets.symmetric(vertical: 4.h),
@@ -543,7 +544,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                             controller: _bioController,
                             style: TextStyle(fontSize: 12.5.sp, color: Colors.white.withOpacity(0.8)),
                             decoration: InputDecoration(
-                              hintText: 'Bio Tagline (e.g. Wedding Photographer)',
+                              hintText: context.l10n.bioTaglineHint,
                               hintStyle: TextStyle(color: Colors.white60, fontSize: 13.sp),
                               isCollapsed: true,
                               contentPadding: EdgeInsets.symmetric(vertical: 4.h),
@@ -604,10 +605,10 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildStatItem(Icons.star_border, rating, 'Rating'),
-        _buildStatItem(Icons.verified_outlined, reviews, 'Reviews'),
-        _buildStatItem(Icons.military_tech_outlined, responseRate, 'Response\nRate'),
-        _buildStatItem(Icons.camera_alt_outlined, projectsCount, 'Projects'),
+        _buildStatItem(Icons.star_border, rating, context.l10n.ratingLabel),
+        _buildStatItem(Icons.verified_outlined, reviews, context.l10n.reviewsLabel),
+        _buildStatItem(Icons.military_tech_outlined, responseRate, context.l10n.responseRateLabel),
+        _buildStatItem(Icons.camera_alt_outlined, projectsCount, context.l10n.projectsLabel),
       ],
     );
   }
@@ -663,7 +664,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'About Me',
+          context.l10n.aboutMeTitle,
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 12.h),
@@ -768,7 +769,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Portfolio (${_tempPortfolio.length})',
+              context.l10n.portfolioCount(_tempPortfolio.length),
               style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
             ),
             if (_isEditing)
@@ -786,7 +787,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                       Icon(Icons.add_photo_alternate_outlined, color: Colors.white, size: 16.sp),
                       SizedBox(width: 6.w),
                       Text(
-                        'Add Photo',
+                        context.l10n.addPhotoBtn,
                         style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -861,7 +862,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Client Reviews',
+              context.l10n.clientReviewsTitle,
               style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
             ),
             Row(
@@ -891,7 +892,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                 Icon(Icons.rate_review_outlined, color: Colors.grey[400], size: 40.sp),
                 SizedBox(height: 12.h),
                 Text(
-                  'No reviews yet',
+                  context.l10n.noReviewsYet,
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.grey[500],
@@ -900,7 +901,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'Completed bookings will appear here',
+                  context.l10n.completedBookingsWillAppearHere,
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: Colors.grey[400],
@@ -919,7 +920,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             itemBuilder: (context, index) {
               final review = reviews[index];
               return _buildReviewItem(
-                review.user?.name ?? 'Anonymous',
+                review.user?.name ?? context.l10n.anonymous,
                 review.createdAt ?? '',
                 review.comment ?? '',
                 review.rating?.toDouble() ?? 5.0,
@@ -998,103 +999,155 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
 
   void _showAddChipDialog(String title, bool isSpecialty) {
     final TextEditingController chipController = TextEditingController();
+
+    // Predefined language list for dropdown
+    const List<String> _availableLanguages = [
+      'English', 'French', 'Spanish', 'German', 'Arabic',
+      'Bengali', 'Portuguese', 'Italian', 'Dutch',
+      'Chinese', 'Japanese', 'Korean', 'Hindi',
+    ];
+    String? _selectedLanguage;
+
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
-        backgroundColor: Colors.white,
-        child: Padding(
-          padding: EdgeInsets.all(24.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Add $title',
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                'Enter the ${title.toLowerCase()} you want to add to your profile.',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: Colors.grey[600],
-                  height: 1.4,
-                ),
-              ),
-              SizedBox(height: 24.h),
-              TextField(
-                controller: chipController,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: 'e.g. ${isSpecialty ? "Portrait Photography" : "English"}',
-                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F7),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: const BorderSide(color: Colors.black, width: 1),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.addTitle(title),
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                style: TextStyle(fontSize: 15.sp),
-              ),
-              SizedBox(height: 24.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12).r),
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w600),
+                SizedBox(height: 8.h),
+                Text(
+                  isSpecialty
+                      ? context.l10n.enterSpecializationHint
+                      : context.l10n.selectLanguageHint,
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: Colors.grey[600],
+                    height: 1.4,
+                  ),
+                ),
+                SizedBox(height: 24.h),
+
+                // Dropdown for Languages, text field for Specializations
+                if (!isSpecialty)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F5F7),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: _selectedLanguage,
+                        hint: Text(
+                          context.l10n.selectLanguageDropdownHint,
+                          style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+                        ),
+                        icon: Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 20.sp),
+                        style: TextStyle(fontSize: 15.sp, color: Colors.black87),
+                        dropdownColor: Colors.white,
+                        borderRadius: BorderRadius.circular(12.r),
+                        items: _availableLanguages
+                            .where((lang) => !_tempLanguages.contains(lang))
+                            .map((lang) => DropdownMenuItem(
+                                  value: lang,
+                                  child: Text(lang),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setDialogState(() => _selectedLanguage = val);
+                        },
                       ),
                     ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12).r),
+                  )
+                else
+                  TextField(
+                    controller: chipController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: context.l10n.exPortraitPhotography,
+                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+                      filled: true,
+                      fillColor: const Color(0xFFF5F5F7),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide.none,
                       ),
-                      onPressed: () {
-                        if (chipController.text.trim().isNotEmpty) {
-                          setState(() {
-                            if (isSpecialty) {
-                              _tempSpecializations.add(chipController.text.trim());
-                            } else {
-                              _tempLanguages.add(chipController.text.trim());
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: const BorderSide(color: Colors.black, width: 1),
+                      ),
+                    ),
+                    style: TextStyle(fontSize: 15.sp),
+                  ),
+
+                SizedBox(height: 24.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12).r),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          context.l10n.cancelBtn,
+                          style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12).r),
+                        ),
+                        onPressed: () {
+                          if (!isSpecialty) {
+                            // Language dropdown
+                            if (_selectedLanguage != null) {
+                              setState(() => _tempLanguages.add(_selectedLanguage!));
+                              Navigator.pop(context);
                             }
-                          });
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: Text(
-                        'Add',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                          } else {
+                            // Specialization text field
+                            if (chipController.text.trim().isNotEmpty) {
+                              setState(() => _tempSpecializations.add(chipController.text.trim()));
+                              Navigator.pop(context);
+                            }
+                          }
+                        },
+                        child: Text(
+                          context.l10n.addBtn,
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1109,7 +1162,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Documents',
+              context.l10n.documentsTitle,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -1126,7 +1179,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         SizedBox(height: 10.h),
         if (_tempDocuments.isEmpty)
           Text(
-            'No documents added yet.',
+            context.l10n.noDocumentsAdded,
             style: TextStyle(fontSize: 14.sp, color: Colors.grey),
           )
         else
@@ -1183,7 +1236,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                           } else {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Could not open document")),
+                                SnackBar(content: Text(context.l10n.couldNotOpenDocument)),
                               );
                             }
                           }

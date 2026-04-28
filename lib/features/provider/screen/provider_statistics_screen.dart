@@ -9,6 +9,7 @@ import 'package:photopia/data/models/statistics_model.dart';
 import 'package:photopia/features/provider/screen/provider_subscription_screen.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderStatisticsScreen extends StatefulWidget {
   const ProviderStatisticsScreen({super.key});
@@ -52,7 +53,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
         title: Row(
           children: [
             Text(
-              'Statistics',
+              context.l10n.statisticsTitle,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 20.sp,
@@ -97,9 +98,9 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                       Expanded(
                         child: _buildSummaryCard(
                           icon: Icons.visibility_outlined,
-                          label: 'Profile Views',
+                          label: context.l10n.profileViewsTitle,
                           value: '${stats?.profileViews?.count ?? 0}',
-                          subValue: '${stats?.profileViews?.change ?? 0}% this week',
+                          subValue: context.l10n.thisWeek,
                           isPositive: (stats?.profileViews?.change ?? 0) >= 0,
                         ),
                       ),
@@ -107,9 +108,9 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                       Expanded(
                         child: _buildSummaryCard(
                           icon: Icons.euro,
-                          label: 'Monthly Revenue',
+                          label: context.l10n.monthlyRevenue,
                           value: '€${stats?.revenueAnalytics?.currentMonth ?? 0}',
-                          subValue: '${(stats?.revenueAnalytics?.percentageChange ?? 0) >= 0 ? "+" : ""}${stats?.revenueAnalytics?.percentageChange ?? 0}% vs last month',
+                          subValue: context.l10n.vsLastMonth(stats?.revenueAnalytics?.percentageChange ?? 0),
                           isPositive: (stats?.revenueAnalytics?.percentageChange ?? 0) >= 0,
                         ),
                       ),
@@ -119,32 +120,34 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
 
                   // Views vs Category Comparison
                   _buildComparisonCard(
-                    title: 'Views vs Category Average',
+                    title: context.l10n.viewsVsCategoryAvg,
                     icon: Icons.trending_up,
                     myData: stats?.profileViews?.count ?? 0,
                     avgData: stats?.profileViews?.performanceVsCategory?.categoryAverage ?? 0,
                     unit: '',
-                    myLabel: 'Your Views',
-                    avgLabel: 'Category Average',
+                    myLabel: context.l10n.yourViews,
+                    avgLabel: context.l10n.categoryAverage,
                     statusText: stats?.profileViews?.performanceVsCategory?.percentageAbove != null 
-                      ? 'You\'re performing ${stats!.profileViews!.performanceVsCategory!.percentageAbove}% ${stats.profileViews!.performanceVsCategory!.percentageAbove! >= 0 ? "above" : "below"} category average'
-                      : 'N/A',
+                      ? (stats!.profileViews!.performanceVsCategory!.percentageAbove! >= 0 
+                          ? context.l10n.performingAboveAvg(stats.profileViews!.performanceVsCategory!.percentageAbove!)
+                          : context.l10n.performingBelowAvg(stats.profileViews!.performanceVsCategory!.percentageAbove!.abs()))
+                      : context.l10n.notAvailable,
                   ),
                   SizedBox(height: 24.h),
 
                   // Rating vs Category Comparison
                   _buildComparisonCard(
-                    title: 'Rating vs Category Average',
+                    title: context.l10n.ratingVsCategoryAvg,
                     icon: Icons.star_border_rounded,
                     myData: stats?.rating?.score ?? 0,
                     avgData: stats?.rating?.performanceVsCategory?.categoryAverage ?? 0,
                     unit: '',
-                    myLabel: 'Your Rating',
-                    avgLabel: 'Category Average',
+                    myLabel: context.l10n.yourRating,
+                    avgLabel: context.l10n.categoryAverage,
                     statusText: stats?.rating?.performanceVsCategory?.percentageHigher != null
-                      ? 'Your rating is ${stats!.rating!.performanceVsCategory!.percentageHigher}% higher than similar providers'
-                      : 'N/A',
-                    extraText: '(${stats?.rating?.reviews ?? 0} reviews)',
+                      ? context.l10n.ratingHigherThanProviders(stats!.rating!.performanceVsCategory!.percentageHigher!)
+                      : context.l10n.notAvailable,
+                    extraText: '(${context.l10n.reviewCount(stats?.rating?.reviews ?? 0)})',
                   ),
                   SizedBox(height: 24.h),
 
@@ -183,7 +186,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                              if (path != null && context.mounted) {
                                CustomSnackBar.show(
                                  context: context,
-                                 message: 'Report saved to: ${path.split("/").last}',
+                                 message: context.l10n.reportSavedTo(path.split("/").last),
                                  isError: false,
                                );
                              }
@@ -196,7 +199,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                           )
                         : Icon(Icons.download_outlined, size: 20.sp),
                       label: Text(
-                        controller.isExporting ? 'Exporting...' : 'Export Full Report',
+                        controller.isExporting ? context.l10n.exportingBtn : context.l10n.exportFullReport,
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
@@ -430,7 +433,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
               Icon(Icons.location_on_outlined, size: 18.sp, color: Colors.black),
               SizedBox(width: 8.w),
               Text(
-                'Profile Views by Region',
+                context.l10n.profileViewsByRegion,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
@@ -443,7 +446,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
           if (regions.isEmpty)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 20.h),
-              child: const Center(child: Text('No regional data available')),
+              child: Center(child: Text(context.l10n.noRegionalData)),
             )
           else
             ...regions.map((reg) {
@@ -491,7 +494,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total Views',
+                context.l10n.totalViews,
                 style: TextStyle(color: Colors.grey, fontSize: 13.sp),
               ),
               Text(
@@ -536,7 +539,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
               Icon(Icons.euro, size: 18.sp, color: Colors.black),
               SizedBox(width: 8.w),
               Text(
-                'Revenue Analytics',
+                context.l10n.revenueAnalyticsTitle,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
@@ -596,7 +599,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Current Month',
+                      context.l10n.currentMonth,
                       style: TextStyle(color: Colors.grey, fontSize: 13.sp),
                     ),
                     Row(
@@ -630,7 +633,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'vs previous month: €${revenue?.previousMonth ?? 0}',
+                  context.l10n.vsPreviousMonth(revenue?.previousMonth ?? 0),
                   style: TextStyle(color: Colors.grey, fontSize: 12.sp),
                 ),
               ],
@@ -679,7 +682,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Average per period', style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
+                    Text(context.l10n.avgPerPeriod, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
                     SizedBox(height: 4.h),
                     Text('€${revenue?.averagePerPeriod ?? 0}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
                   ],
@@ -687,7 +690,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('Best performing', style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
+                    Text(context.l10n.bestPerforming, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
                     SizedBox(height: 4.h),
                     Text('€${revenue?.bestPerforming ?? 0}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
                   ],
@@ -725,7 +728,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
               Icon(Icons.diamond_outlined, size: 18.sp, color: Colors.blueAccent),
               SizedBox(width: 8.w),
               Text(
-                'Deep Business Insights',
+                context.l10n.deepBusinessInsights,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
@@ -747,7 +750,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Conversion Rate', style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
+                      Text(context.l10n.conversionRate, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
                       SizedBox(height: 4.h),
                       Text('${displayMetrics.conversionRate ?? 0}%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.black)),
                     ],
@@ -765,7 +768,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Repeat Rate', style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
+                      Text(context.l10n.repeatRate, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
                       SizedBox(height: 4.h),
                       Text('${displayMetrics.repeatRate ?? 0}%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.black)),
                     ],
@@ -785,7 +788,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Most Viewed Project', style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
+                Text(context.l10n.mostViewedProject, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
                 SizedBox(height: 4.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -799,7 +802,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                       ),
                     ),
                     Text(
-                      '${displayMetrics.mostViewedProject?.views ?? 0} views',
+                      context.l10n.viewsCount(displayMetrics.mostViewedProject?.views ?? 0),
                       style: TextStyle(color: Colors.blueAccent, fontSize: 12.sp, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -834,7 +837,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
               Icon(Icons.workspace_premium, color: Colors.amberAccent, size: 28.sp),
               SizedBox(width: 12.w),
               Text(
-                "Unlock Insights",
+                context.l10n.unlockInsights,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18.sp,
@@ -845,7 +848,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
           ),
           SizedBox(height: 16.h),
           Text(
-            "Upgrade your subscription to get access to advanced business analytics including:",
+            context.l10n.upgradeSubscriptionDesc,
             style: TextStyle(
               color: Colors.grey.shade300,
               fontSize: 13.sp,
@@ -853,10 +856,10 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             ),
           ),
           SizedBox(height: 20.h),
-          _buildPromoBullet("Deep regional profile view tracking"),
-          _buildPromoBullet("Weekly revenue breakdowns"),
-          _buildPromoBullet("Business Conversion rates"),
-          _buildPromoBullet("Average order value analytics"),
+          _buildPromoBullet(context.l10n.premiumFeature1),
+          _buildPromoBullet(context.l10n.premiumFeature2),
+          _buildPromoBullet(context.l10n.premiumFeature3),
+          _buildPromoBullet(context.l10n.premiumFeature4),
           SizedBox(height: 24.h),
           SizedBox(
             width: double.infinity,
@@ -875,7 +878,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                 ),
               ),
               child: Text(
-                "Upgrade to Premium",
+                context.l10n.upgradeToPremium,
                 style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
               ),
             ),

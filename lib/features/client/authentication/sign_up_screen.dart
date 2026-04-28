@@ -6,6 +6,7 @@ import 'package:photopia/features/client/authentication/widgets/auth_widgets.dar
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/client/sign_up_controller.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const String name = '/sign_up';
@@ -71,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                 // Title
                 Text(
-                  'Create Account',
+                  context.l10n.createAccount,
                   style: TextStyle(
                     fontSize: 24.sp.clamp(24, 28),
                     fontWeight: FontWeight.bold,
@@ -83,7 +84,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                 // Name Field
                 AuthTextField(
-                  label: 'Name',
+                  label: context.l10n.nameLabel,
                   controller: _nameController,
                   hintText: 'Photopia',
                   isValid: _isNameValid,
@@ -94,9 +95,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                 // Email Field
                 AuthTextField(
-                  label: 'Email',
+                  label: context.l10n.emailLabel,
                   controller: _emailController,
-                  hintText: 'your@email.com',
+                  hintText: context.l10n.emailHint,
                   isValid: _isEmailValid,
                   onChanged: _validateEmail,
                   keyboardType: TextInputType.emailAddress,
@@ -106,7 +107,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                 // Password Field
                 AuthTextField(
-                  label: 'Password',
+                  label: context.l10n.passwordLabel,
                   controller: _passwordController,
                   hintText: '••••••••••',
                   isValid: _isPasswordValid,
@@ -120,7 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Consumer<SignUpController>(
                   builder: (context, signUpController, child) {
                     return AuthButton(
-                      text: 'Sign Up',
+                      text: context.l10n.signUpBtn,
                       isLoading: signUpController.inProgress,
                       onTap: () async {
                         if (!_isNameValid ||
@@ -128,7 +129,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             !_isPasswordValid) {
                           CustomSnackBar.show(
                             context: context,
-                            message: 'Please fill all fields correctly',
+                            message: context.l10n.fillAllFields,
                             isError: true,
                           );
                           return;
@@ -160,8 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 .contains('already exist')) {
                               CustomSnackBar.show(
                                 context: context,
-                                message:
-                                    'Account already exists. Redirecting to verification...',
+                                message: context.l10n.accountAlreadyExists,
                               );
                               Navigator.pushNamed(
                                 context,
@@ -176,7 +176,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 context: context,
                                 message:
                                     signUpController.errorMessage ??
-                                    'Registration failed',
+                                    context.l10n.registrationFailed,
                                 isError: true,
                               );
                             }
@@ -196,7 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: Text(
-                        'OR CONTINUE WITH',
+                        context.l10n.orContinueWith,
                         style: TextStyle(
                           fontSize: AppTypography.bodySmall,
                           color: Colors.grey.shade600,
@@ -245,14 +245,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: "Already have an account? ",
+                        text: context.l10n.alreadyHaveAccount,
                         style: TextStyle(
                           fontSize: AppTypography.bodyMedium,
                           color: Colors.black87,
                         ),
                         children: [
                           TextSpan(
-                            text: 'Log in',
+                            text: context.l10n.logInLink,
                             style: TextStyle(
                               fontSize: AppTypography.bodyMedium,
                               color: const Color(0xFF2196F3),

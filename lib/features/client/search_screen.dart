@@ -9,9 +9,9 @@ import 'package:photopia/features/client/widgets/service_card.dart';
 import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/client/service_list_controller.dart';
-
 import 'package:photopia/controller/category_controller.dart';
 import 'package:photopia/data/models/category_model.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class SearchScreen extends StatefulWidget {
   static const String name = '/search';
@@ -126,7 +126,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     controller.selectedCategoryId != null;
 
                 // Safely find the selected category name
-                String headerTitle = 'Browse Categories';
+                String headerTitle = context.l10n.browseCategories;
                 if (inSubcategory) {
                   try {
                     final selected = controller.categories.firstWhere(
@@ -134,7 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     );
                     headerTitle = selected.name;
                   } catch (_) {
-                    headerTitle = 'Categories';
+                    headerTitle = context.l10n.categories;
                   }
                 }
 
@@ -192,8 +192,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     return Center(
                       child: Text(
                         controller.selectedCategoryId == null
-                            ? 'No categories found'
-                            : 'No subcategories found for this category',
+                            ? context.l10n.noCategoriesFound
+                            : context.l10n.noSubcategoriesFound,
                         style: TextStyle(color: Colors.grey, fontSize: 14.sp),
                       ),
                     );

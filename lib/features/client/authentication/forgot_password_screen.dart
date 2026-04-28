@@ -6,6 +6,7 @@ import 'package:photopia/features/client/authentication/widgets/auth_widgets.dar
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/client/forgot_pass_controller.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   static const String name = '/forgot_password';
@@ -51,7 +52,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       } else if (mounted) {
         CustomSnackBar.show(
           context: context,
-          message: forgotPassController.errorMessage ?? 'Something went wrong',
+          message: forgotPassController.errorMessage ?? context.l10n.somethingWentWrong,
           isError: true,
         );
       }
@@ -85,7 +86,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // Title
                 Text(
-                  'Forget Password',
+                  context.l10n.forgotPasswordTitle,
                   style: TextStyle(
                     fontSize: 24.sp.clamp(24, 28),
                     fontWeight: FontWeight.bold,
@@ -97,7 +98,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // Subtitle
                 Text(
-                  'Enter your email address and we will send\nyou a reset instructions.',
+                  context.l10n.forgotPasswordSubtitle,
                   style: TextStyle(
                     fontSize: AppTypography.bodyMedium,
                     color: Colors.grey.shade600,
@@ -109,9 +110,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // Email Field
                 AuthTextField(
-                  label: 'Email',
+                  label: context.l10n.emailLabel,
                   controller: _emailController,
-                  hintText: 'your@email.com',
+                  hintText: context.l10n.emailHint,
                   isValid: _isEmailValid,
                   onChanged: _validateEmail,
                   keyboardType: TextInputType.emailAddress,
@@ -123,7 +124,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Consumer<ForgotPassController>(
                   builder: (context, forgotPassController, child) {
                     return AuthButton(
-                      text: 'Send',
+                      text: context.l10n.sendBtn,
                       onTap: _sendResetLink,
                       isEnabled: _isEmailValid,
                       isLoading: forgotPassController.inProgress,
@@ -141,14 +142,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: "Didn't receive code?  ",
+                        text: context.l10n.didntReceiveCode,
                         style: TextStyle(
                           fontSize: AppTypography.bodyMedium,
                           color: Colors.black87,
                         ),
                         children: [
                           TextSpan(
-                            text: 'Resend Again',
+                            text: context.l10n.resendAgain,
                             style: TextStyle(
                               fontSize: AppTypography.bodyMedium,
                               color: const Color(0xFF2196F3),

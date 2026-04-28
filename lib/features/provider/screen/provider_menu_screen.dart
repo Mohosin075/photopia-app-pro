@@ -17,6 +17,7 @@ import 'package:photopia/controller/client/chat_controller.dart';
 import 'package:photopia/features/client/chat_screen.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:photopia/data/models/conversation_model.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderMenuScreen extends StatefulWidget {
   const ProviderMenuScreen({super.key});
@@ -63,7 +64,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                     // Menu Items
                     _buildMenuItem(
                       icon: Icons.payment,
-                      title: 'Payments & Transactions',
+                      title: context.l10n.paymentsTransactions,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -78,7 +79,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
 
                     _buildMenuItem(
                       icon: Icons.bar_chart,
-                      title: 'Detailed Statistics',
+                      title: context.l10n.detailedStatistics,
                       showBadge: true,
                       isSubscribed: controller.userProfile?.isPremium ?? false,
                       onTap: () {
@@ -100,7 +101,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                     // 4/ Price and Rates
                     _buildMenuItem(
                       icon: Icons.notifications_outlined,
-                      title: 'Notifications',
+                      title: context.l10n.notifications,
                       hasNotification: true,
                       onTap: () {
                         Navigator.push(
@@ -116,7 +117,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
 
                     _buildMenuItem(
                       icon: Icons.help_outline,
-                      title: 'Help & Support',
+                      title: context.l10n.helpAndSupport,
                       onTap: () async {
                         final chatController = context.read<ChatController>();
                         final chatId = await chatController.contactAdmin();
@@ -153,7 +154,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                             context: context,
                             message: chatController.errorMessage.isNotEmpty
                                 ? chatController.errorMessage
-                                : 'Failed to contact admin',
+                                : context.l10n.failedToContactAdmin,
                             isError: true,
                           );
                         }
@@ -261,7 +262,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                 elevation: 0,
               ),
               child: Text(
-                'View Public Profile',
+                context.l10n.viewPublicProfile,
                 style: TextStyle(
                   fontSize: 15.sp.clamp(14, 16),
                   fontWeight: FontWeight.w600,
@@ -283,18 +284,18 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
             Expanded(
               child: _buildStatCard(
                 icon: Icons.calendar_today,
-                label: 'Bookings',
+                label: context.l10n.bookingsTitle,
                 value: controller.bookingsCount.toString(),
-                subtitle: '+${controller.bookingsThisWeek} this week',
+                subtitle: context.l10n.bookingsThisWeek(controller.bookingsThisWeek),
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: _buildStatCard(
                 icon: Icons.euro,
-                label: 'Revenue',
+                label: context.l10n.revenueTitle,
                 value: '€${_formatLargeNumber(controller.revenueAmount)}',
-                subtitle: '+${controller.revenueChange}% vs last month',
+                subtitle: context.l10n.revenueVsLastMonth(controller.revenueChange),
               ),
             ),
           ],
@@ -305,18 +306,18 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
             Expanded(
               child: _buildStatCard(
                 icon: Icons.trending_up,
-                label: 'Profile Views',
+                label: context.l10n.profileViewsTitle,
                 value: _formatLargeNumber(controller.profileViews.toDouble()),
-                subtitle: 'this week', // API doesn't have weekly views % yet
+                subtitle: context.l10n.thisWeek, // API doesn't have weekly views % yet
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: _buildStatCard(
                 icon: Icons.star,
-                label: 'Rating',
+                label: context.l10n.rating,
                 value: controller.rating.toStringAsFixed(1),
-                subtitle: '${controller.reviewCount} reviews',
+                subtitle: context.l10n.reviewCount(controller.reviewCount),
               ),
             ),
           ],
@@ -404,7 +405,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
               Icon(Icons.workspace_premium, color: Colors.amber, size: 20.sp),
               SizedBox(width: 8.w),
               Text(
-                'Premium Member',
+                context.l10n.premiumMember,
                 style: TextStyle(
                   fontSize: 14.sp.clamp(13, 15),
                   fontWeight: FontWeight.bold,
@@ -413,7 +414,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
               ),
               const Spacer(),
               Text(
-                '€10/month',
+                context.l10n.premiumPrice,
                 style: TextStyle(
                   fontSize: 13.sp.clamp(12, 14),
                   fontWeight: FontWeight.w600,
@@ -424,7 +425,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
           ),
           SizedBox(height: 12.h.clamp(10, 14)),
           Text(
-            'Priority search placement • Extended analytics • Premium badge',
+            context.l10n.premiumBenefits,
             style: TextStyle(
               fontSize: 12.sp.clamp(11, 13),
               color: Colors.grey[400],
@@ -451,7 +452,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                 ),
               ),
               child: Text(
-                'Manage Subscription',
+                context.l10n.manageSubscription,
                 style: TextStyle(
                   fontSize: 13.sp.clamp(12, 14),
                   fontWeight: FontWeight.w600,
@@ -554,7 +555,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
             Icon(Icons.camera_alt_outlined, color: Colors.white, size: 20.sp),
             SizedBox(width: 12.w),
             Text(
-              'Switch to Client',
+              context.l10n.switchToClient,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16.sp,
@@ -607,7 +608,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                           ),
                           SizedBox(height: 12.h),
                           Text(
-                            'Log Out',
+                            context.l10n.logOut,
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
@@ -617,7 +618,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                         ],
                       ),
                       content: Text(
-                        'Are you sure you want to log out of your account?',
+                        context.l10n.logOutConfirm,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13.sp,
@@ -639,7 +640,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  'Cancel',
+                                  context.l10n.cancel,
                                   style: TextStyle(
                                     color: Colors.grey[700],
                                     fontWeight: FontWeight.w600,
@@ -662,7 +663,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  'Log Out',
+                                  context.l10n.logOut,
                                   style: TextStyle(
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w600,
@@ -716,7 +717,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                   Icon(Icons.logout, color: Colors.red, size: 20.sp),
                   SizedBox(width: 10.w),
                   Text(
-                    'Log Out',
+                    context.l10n.logOut,
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: 16.sp,

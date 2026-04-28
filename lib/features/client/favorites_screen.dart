@@ -6,6 +6,7 @@ import 'package:photopia/features/client/widgets/provider_card.dart';
 import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
 import 'package:photopia/controller/auth_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class FavoritesScreen extends StatefulWidget {
   static const String name = '/favorites';
@@ -66,7 +67,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           Icon(Icons.bookmark_outline, size: 24.sp),
           SizedBox(width: 8.w),
           Text(
-            'Favorites',
+            context.l10n.navFavorites,
             style: TextStyle(
               fontSize: 20.sp.clamp(20, 22),
               fontWeight: FontWeight.bold,
@@ -99,13 +100,13 @@ class _FavoritesScreenState extends State<FavoritesScreen>
         tabs: [
           Consumer<FavoritesController>(
             builder: (context, controller, child) {
-              return Tab(text: 'Posts (${controller.favoritePosts.length})');
+              return Tab(text: context.l10n.favoritePostsCount(controller.favoritePosts.length));
             },
           ),
           Consumer<FavoritesController>(
             builder: (context, controller, child) {
               return Tab(
-                text: 'Providers (${controller.favoriteProviders.length})',
+                text: context.l10n.favoriteProvidersCount(controller.favoriteProviders.length),
               );
             },
           ),
@@ -131,7 +132,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           );
         }
         if (controller.favoritePosts.isEmpty) {
-          return _buildEmptyState('No favorite posts yet');
+          return _buildEmptyState(context.l10n.noFavoritePosts);
         }
         return GridView.builder(
           padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 100.h),
@@ -178,7 +179,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           );
         }
         if (controller.favoriteProviders.isEmpty) {
-          return _buildEmptyState('No favorite providers yet');
+          return _buildEmptyState(context.l10n.noFavoriteProviders);
         }
         return ListView.builder(
           padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 100.h),
