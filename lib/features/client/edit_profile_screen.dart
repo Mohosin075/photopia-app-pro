@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
@@ -63,43 +64,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      try {
-        // ১. ছবির বাইটস (bytes) রিড করা
-        final Uint8List originalBytes = await image.readAsBytes();
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Profile Picture',
+            toolbarColor: Colors.black,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true,
+          ),
+          IOSUiSettings(
+            title: 'Crop Profile Picture',
+            aspectRatioLockEnabled: true,
+          ),
+        ],
+      );
 
-        // ২. ছবিটিকে ডিকোড করা
-        final img.Image? decoded = img.decodeImage(originalBytes);
-
-        if (decoded != null) {
-          // ৩. bakeOrientation ফাংশনটি EXIF ডাটা অনুযায়ী পিক্সেলগুলোকে ঘুরিয়ে সোজা করে দেয়
-          final img.Image oriented = img.bakeOrientation(decoded);
-
-          // ৪. সোজা করা ছবিটিকে আবার JPG ফরম্যাটে কনভার্ট করা
-          final List<int> fixedBytes = img.encodeJpg(oriented, quality: 90);
-
-          // ৫. একটি টেম্পোরারি ফাইলে এটি সেভ করা
-          final tempDir = await getTemporaryDirectory();
-          final targetPath = p.join(
-            tempDir.path,
-            "${DateTime.now().millisecondsSinceEpoch}_fixed.jpg",
-          );
-          final File fixedFile = File(targetPath);
-          await fixedFile.writeAsBytes(fixedBytes);
-
-          setState(() {
-            _selectedImage = fixedFile;
-          });
-          debugPrint("✅ Image orientation fixed and saved to: $targetPath");
-        } else {
-          // Fallback if decoding fails
-          setState(() {
-            _selectedImage = File(image.path);
-          });
-        }
-      } catch (e) {
-        debugPrint("❌ Error fixing image orientation: $e");
+      if (croppedFile != null) {
         setState(() {
-          _selectedImage = File(image.path);
+          _selectedImage = File(croppedFile.path);
         });
       }
     }

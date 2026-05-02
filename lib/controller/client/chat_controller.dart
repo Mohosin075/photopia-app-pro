@@ -440,8 +440,14 @@ class ChatController extends ChangeNotifier {
     final extension = p.extension(filePath).toLowerCase();
 
     ChatMessageType msgType = ChatMessageType.image;
-    if (['.mp4', '.mov', '.avi'].contains(extension)) {
+    String fileKey = 'images';
+
+    if (['.mp4', '.mov', '.avi', '.m4v'].contains(extension)) {
       msgType = ChatMessageType.video;
+      fileKey = 'video';
+    } else if (!['.jpg', '.jpeg', '.png', '.heic', '.webp'].contains(extension)) {
+      msgType = ChatMessageType.file;
+      fileKey = 'file';
     }
 
     final ChatMessage tempMsg = ChatMessage(
@@ -499,7 +505,7 @@ class ChatController extends ChangeNotifier {
         url: Urls.sendMessage,
         method: 'POST',
         fields: fields,
-        fileKey: 'images',
+        fileKey: fileKey,
         filePath: pathToSend,
       );
 

@@ -1,0 +1,8 @@
+General Issues:
+ক্রিয়েটরদের জন্য প্রোফাইল ছবি দেওয়া বাধ্যতামূলক করা উচিত.. eta pore abr dekho 
+ব্যানার বা প্রোফাইল ছবিতে ক্লিক করলে বড় করে দেখা যায় না- jodi kono user kono img ba profile ekhono set na kore jodi profile e click kore tahole ekta person icon and no profile photo show korbe
+প্রোফাইলে থাকা হ্যাশট্যাগে ক্লিক করলে সেই হ্যাশট্যাগ অনুযায়ী সার্চ পেজে যাওয়া যায় না (যেখানে profile/service আলাদা করে দেখাবে)-- ei hastag ekhono kaj kortece na ar jodi kono user hashtag theke kono service e jay tahole oitar titale e oi hashtag ta jeno show kore 
+মেসেজে ডকুমেন্ট যোগ করা যায় না -- jodi user kono document or img pathay seta jeno user user ke dekhabe. user jodi click kore oi img or docs er upor seta jeno boro hoy show kore
+Search Page:
+কোনো ক্যাটাগরিতে ঢোকার পর, উপরের বাম পাশে একটি "← Back" বাটন থাকতে হবে
+→ যাতে ইউজার আবার সব ক্যাটাগরি দেখার মেইন সার্চ পেজে ফিরে যেতে পারে

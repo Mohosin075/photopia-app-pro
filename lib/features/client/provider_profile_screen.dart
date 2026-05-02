@@ -16,6 +16,7 @@ import 'package:photopia/controller/client/favorites_controller.dart';
 import 'package:photopia/core/widgets/subscription_badge.dart';
 import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
 import 'package:photopia/features/client/widgets/auth_profile_image.dart';
+import 'package:photopia/features/client/search_screen.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
   final Map<String, dynamic> provider;
@@ -81,6 +82,15 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
     super.dispose();
   }
 
+  void _onHashtagTap(String hashtag) {
+    // Navigate to Search Screen with initial query
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SearchScreen(initialSearchTerm: '#$hashtag'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,13 +149,29 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                   builder: (context, controller, child) {
                     final String? cover =
                         controller.profProfileDetails?.coverPhoto;
-                    return CustomNetworkImage(
-                      imageUrl: (cover != null && cover.isNotEmpty)
-                          ? cover
-                          : 'assets/images/img5.png',
-                      height: 220.h,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FullScreenImageViewer(
+                              imageUrl: (cover != null && cover.isNotEmpty) ? cover : null,
+                              tag: 'banner_hero',
+                            ),
+                          ),
+                        );
+                      },
+                      child: Hero(
+                        tag: 'banner_hero',
+                        child: CustomNetworkImage(
+                          imageUrl: (cover != null && cover.isNotEmpty)
+                              ? cover
+                              : 'assets/images/img5.png',
+                          height: 220.h,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -259,17 +285,15 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                 children: [
                   GestureDetector(
                     onTap: () {
-                      if (avatar.isNotEmpty) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => FullScreenImageViewer(
-                              imageUrl: avatar,
-                              tag: 'header_avatar',
-                            ),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FullScreenImageViewer(
+                            imageUrl: avatar,
+                            tag: 'header_avatar',
                           ),
-                        );
-                      }
+                        ),
+                      );
                     },
                     child: Hero(
                       tag: 'header_avatar',
@@ -762,6 +786,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                     .toList(),
               ),
             ],
+
             SizedBox(height: 20.h),
           ],
         );
@@ -806,10 +831,21 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
   }
 
   Widget _buildChip(String label) {
-    return Chip(
-      label: Text(label, style: TextStyle(fontSize: 12.sp)),
-      backgroundColor: Colors.grey[100],
-      side: BorderSide.none,
+    return GestureDetector(
+      onTap: () => _onHashtagTap(label),
+      child: Chip(
+        label: Text(
+          '#$label', 
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: Colors.blue[700],
+            fontWeight: FontWeight.w600,
+          )
+        ),
+        backgroundColor: Colors.blue.withOpacity(0.05),
+        side: BorderSide(color: Colors.blue.withOpacity(0.2)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20).r),
+      ),
     );
   }
 }

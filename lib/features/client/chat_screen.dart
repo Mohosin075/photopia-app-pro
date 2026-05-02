@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/controller/client/chat_controller.dart';
+import 'package:photopia/core/widgets/custom_network_image.dart';
+import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
 import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/data/models/chat_message_model.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +11,10 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photopia/features/client/media_preview_screen.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:photopia/core/widgets/document_viewer_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final Conversation conversation;
@@ -70,6 +76,56 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> _pickDocument() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      final String path = result.files.single.path!;
+      
+      // Directly send document or show preview? 
+      // For now, let's just send it via the controller's media method
+      if (mounted) {
+        context.read<ChatController>().sendMediaMessage(
+          _currentChatId, 
+          path, 
+          receiverId: widget.conversation.receiverId,
+        );
+      }
+    }
+  }
+
+  Future<void> _openFile(String? url, String? localPath, {String? fileName}) async {
+    final pathOrUrl = localPath ?? url;
+    if (pathOrUrl == null || pathOrUrl.isEmpty) return;
+
+    if (pathOrUrl.toLowerCase().endsWith('.pdf')) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DocumentViewerScreen(
+            urlOrPath: pathOrUrl,
+            title: fileName ?? 'Document',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (localPath != null && await File(localPath).exists()) {
+      await OpenFilex.open(localPath);
+      return;
+    }
+    
+    if (url != null && url.isNotEmpty) {
+      final Uri uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    }
+  }
+
   void _showAttachmentMenu() {
     showModalBottomSheet(
       context: context,
@@ -107,6 +163,15 @@ class _ChatScreenState extends State<ChatScreen> {
                   onTap: () {
                     Navigator.pop(context);
                     _pickMedia(ImageSource.camera, false);
+                  },
+                ),
+                _buildAttachmentOption(
+                  icon: Icons.insert_drive_file,
+                  label: 'Document',
+                  color: Colors.orange,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickDocument();
                   },
                 ),
               ],
@@ -323,34 +388,65 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildMediaContent(ChatMessage message) {
     if (message.fileUrl == null) return const SizedBox.shrink();
-    final bool isLocal = !message.fileUrl!.startsWith('http');
-
     if (message.type == ChatMessageType.image) {
       return Padding(
         padding: EdgeInsets.only(bottom: 8.h),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12).r,
-          child: isLocal
-              ? Image.file(File(message.fileUrl!), width: double.infinity, height: 180.h, fit: BoxFit.cover)
-              : CachedNetworkImage(imageUrl: message.fileUrl!, fit: BoxFit.cover),
-        ),
+        child: _buildImageContent(message),
       );
     }
     return const SizedBox.shrink();
   }
 
+  Widget _buildImageContent(ChatMessage message) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FullScreenImageViewer(
+              imageUrl: message.fileUrl,
+              tag: 'chat_img_${message.id}',
+            ),
+          ),
+        );
+      },
+      child: Hero(
+        tag: 'chat_img_${message.id}',
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12).r,
+          child: message.isLocal
+              ? Image.file(
+                  File(message.fileUrl!),
+                  height: 200.h,
+                  width: 150.w,
+                  fit: BoxFit.cover,
+                )
+              : CustomNetworkImage(
+                  imageUrl: message.fileUrl!,
+                  height: 200.h,
+                  width: 150.w,
+                  fit: BoxFit.cover,
+                ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFileContent(ChatMessage message) {
-    return Container(
-      padding: EdgeInsets.all(10.r),
-      margin: EdgeInsets.only(bottom: 8.h),
-      decoration: BoxDecoration(color: message.isMe ? Colors.white.withOpacity(0.1) : Colors.white, borderRadius: BorderRadius.circular(12).r),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.attach_file, color: message.isMe ? Colors.white : Colors.black, size: 20.sp),
-          SizedBox(width: 8.w),
-          Flexible(child: Text(message.fileName ?? 'File', style: TextStyle(color: message.isMe ? Colors.white : Colors.black, fontSize: 13.sp), overflow: TextOverflow.ellipsis)),
-        ],
+    return GestureDetector(
+      onTap: () => _openFile(message.fileUrl, message.isLocal ? message.fileUrl : null, fileName: message.fileName),
+      child: Container(
+        padding: EdgeInsets.all(10.r),
+        margin: EdgeInsets.only(bottom: 8.h),
+        decoration: BoxDecoration(color: message.isMe ? Colors.white.withOpacity(0.1) : Colors.white, borderRadius: BorderRadius.circular(12).r),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.attach_file, color: message.isMe ? Colors.white : Colors.black, size: 20.sp),
+            SizedBox(width: 8.w),
+            Flexible(child: Text(message.fileName ?? 'File', style: TextStyle(color: message.isMe ? Colors.white : Colors.black, fontSize: 13.sp), overflow: TextOverflow.ellipsis)),
+          ],
+        ),
       ),
     );
   }

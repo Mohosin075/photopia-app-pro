@@ -14,6 +14,7 @@ import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/data/models/chat_message_model.dart';
 import 'package:photopia/core/widgets/subscription_badge.dart';
 import 'package:photopia/features/client/chat_screen.dart';
+import 'package:photopia/features/client/search_screen.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
@@ -332,7 +333,38 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   }
 
   Widget _buildBottomTags(List<String> tags) {
-    return Wrap(spacing: 8.w, runSpacing: 8.h, children: tags.map((tag) => Container(padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h), decoration: BoxDecoration(color: Colors.grey.withOpacity(0.05), borderRadius: BorderRadius.circular(20).r), child: Text(tag.startsWith('#') ? tag : '#$tag', style: TextStyle(fontSize: 12.sp.clamp(12, 13), color: Colors.black87, fontWeight: FontWeight.w600)))).toList());
+    return Wrap(
+      spacing: 8.w,
+      runSpacing: 8.h,
+      children: tags.map((tag) {
+        final formattedTag = tag.startsWith('#') ? tag : '#$tag';
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => SearchScreen(initialSearchTerm: formattedTag),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(20).r,
+              border: Border.all(color: Colors.blue.withOpacity(0.1)),
+            ),
+            child: Text(
+              formattedTag,
+              style: TextStyle(
+                fontSize: 12.sp.clamp(12, 13),
+                color: Colors.blue[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 
   Widget _buildBottomBar({required String providerId, required String name, required String avatar, required Map<String, dynamic> fullService}) {

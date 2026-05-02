@@ -311,7 +311,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => provider_view.ProviderProfileScreen(),
+                  builder: (context) => provider_view.ProviderProfileScreen(
+                    showSpecializations: false,
+                  ),
                 ),
               );
             },

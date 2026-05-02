@@ -10,6 +10,7 @@ import 'package:photopia/core/widgets/custom_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:photopia/features/client/widgets/service_card.dart';
 import 'package:photopia/features/client/search_result_screen.dart';
+import 'package:photopia/features/client/search_screen.dart';
 import 'dart:ui';
 
 class HorizontalProjectCard extends StatefulWidget {
@@ -274,10 +275,11 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                         children: widget.tags!.take(3).map((tag) {
                           return GestureDetector(
                             onTap: () {
+                              final formattedTag = tag.startsWith('#') ? tag : '#$tag';
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => SearchResultScreen(
-                                    filters: {'tags': tag},
+                                  builder: (_) => SearchScreen(
+                                    initialSearchTerm: formattedTag,
                                   ),
                                 ),
                               );

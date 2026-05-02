@@ -15,7 +15,8 @@ import 'package:photopia/core/localization/app_localizations.dart';
 
 class SearchScreen extends StatefulWidget {
   static const String name = '/search';
-  const SearchScreen({super.key});
+  final String? initialSearchTerm;
+  const SearchScreen({super.key, this.initialSearchTerm});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -31,6 +32,10 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CategoryController>().getAllCategories();
+      
+      if (widget.initialSearchTerm != null && widget.initialSearchTerm!.isNotEmpty) {
+        _onSearch({'searchTerm': widget.initialSearchTerm});
+      }
     });
   }
 
@@ -146,19 +151,33 @@ class _SearchScreenState extends State<SearchScreen> {
                         GestureDetector(
                           onTap: () => controller.selectCategory(null),
                           child: Container(
-                            padding: EdgeInsets.all(6.w),
+                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              shape: BoxShape.circle,
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(20.r),
                             ),
-                            child: Icon(
-                              Icons.arrow_back,
-                              size: 20.sp,
-                              color: Colors.black87,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.arrow_back,
+                                  size: 16.sp,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 4.w),
+                                Text(
+                                  'Back',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        SizedBox(width: 10.w),
+                        SizedBox(width: 12.w),
                       ],
                       Text(
                         headerTitle,
@@ -328,7 +347,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Search Results',
+                      _currentFilters['searchTerm'] != null && _currentFilters['searchTerm'].toString().startsWith('#') 
+                      ? 'Results for ${_currentFilters['searchTerm']}' 
+                      : 'Search Results',
                       style: TextStyle(
                         fontSize: AppTypography.h2,
                         fontWeight: FontWeight.bold,

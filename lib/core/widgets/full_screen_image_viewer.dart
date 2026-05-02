@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'dart:io';
 import 'package:photopia/core/widgets/exif_aware_network_image.dart';
+import 'package:photopia/core/network/urls.dart';
 
 class FullScreenImageViewer extends StatelessWidget {
   final String? imageUrl;
@@ -62,20 +63,30 @@ class FullScreenImageViewer extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    if (imageUrl != null && imageUrl!.startsWith('http')) {
+    final bool hasImageUrl = imageUrl != null && imageUrl!.isNotEmpty && imageUrl != 'null';
+    final bool hasFilePath = filePath != null && filePath!.isNotEmpty;
+
+    if (hasImageUrl) {
+      if (imageUrl!.startsWith('assets/')) {
+        return _buildEmptyState();
+      }
+      final String fullUrl = imageUrl!.startsWith('http') ? imageUrl! : '${Urls.baseUrl}$imageUrl';
       return ExifAwareNetworkImage(
-        url: imageUrl!,
+        url: fullUrl,
         height: double.infinity,
         width: double.infinity,
         fit: BoxFit.contain,
       );
-    } else if (filePath != null || (imageUrl != null && !imageUrl!.startsWith('http'))) {
-      final path = filePath ?? imageUrl!;
+    } else if (hasFilePath) {
+      if (filePath!.startsWith('assets/')) {
+        return _buildEmptyState();
+      }
       return Image.file(
-        File(path),
+        File(filePath!),
         fit: BoxFit.contain,
         width: double.infinity,
         height: double.infinity,
+        errorBuilder: (context, error, stackTrace) => _buildEmptyState(),
       );
     } else if (imageProvider != null) {
       return Image(
@@ -83,8 +94,33 @@ class FullScreenImageViewer extends StatelessWidget {
         fit: BoxFit.contain,
         width: double.infinity,
         height: double.infinity,
+        errorBuilder: (context, error, stackTrace) => _buildEmptyState(),
       );
     }
-    return const Center(child: Icon(Icons.broken_image, color: Colors.white));
+    return _buildEmptyState();
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.person,
+            color: Colors.white.withOpacity(0.5),
+            size: 100.sp,
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            'No profile picture',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

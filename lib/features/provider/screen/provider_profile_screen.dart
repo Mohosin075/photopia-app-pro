@@ -17,9 +17,11 @@ import 'package:photopia/core/widgets/document_viewer_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/features/client/search_screen.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
-  const ProviderProfileScreen({super.key});
+  final bool showSpecializations;
+  const ProviderProfileScreen({super.key, this.showSpecializations = true});
 
   @override
   State<ProviderProfileScreen> createState() => _ProviderProfileScreenState();
@@ -86,6 +88,18 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     super.dispose();
   }
 
+  void _onHashtagTap(String hashtag) {
+    if (_isEditing) return;
+    
+    // Navigate to Search Screen with initial query
+    // We assume SearchScreen is the main search page in the client flow
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SearchScreen(initialSearchTerm: '#$hashtag'),
+      ),
+    );
+  }
+
   Future<void> _saveChanges() async {
     final controller = context.read<ProviderProfileController>();
     
@@ -94,6 +108,20 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       _isSaving = true;
     });
     
+    // 0. Enforce mandatory profile picture
+    final bool hasProfileImage = controller.profileImage != null && controller.profileImage!.isNotEmpty;
+    if (!hasProfileImage && _profilePhoto == null) {
+      setState(() => _isSaving = false);
+      if (mounted) {
+        CustomSnackBar.show(
+          context: context,
+          message: 'Profile picture is mandatory for creators',
+          isError: true,
+        );
+      }
+      return;
+    }
+
     // 1. Handle explicit removals first using the new API
     bool removalSuccess = true;
     
@@ -295,12 +323,29 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                               width: double.infinity,
                               fit: BoxFit.cover,
                             )
-                          : CustomNetworkImage(
-                              imageUrl: profileController.coverPhoto ?? 'assets/images/img5.png',
-                              height: 220.h,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                          : (profileController.coverPhoto != null && profileController.coverPhoto!.isNotEmpty)
+                              ? CustomNetworkImage(
+                                  imageUrl: profileController.coverPhoto!,
+                                  height: 220.h,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                )
+                              : Container(
+                                  height: 220.h,
+                                  width: double.infinity,
+                                  color: Colors.grey[900],
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.image_not_supported, color: Colors.grey, size: 32.sp),
+                                      SizedBox(height: 8.h),
+                                      Text(
+                                        'No cover photo',
+                                        style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                                      ),
+                                    ],
+                                  ),
+                                ),
 
                       // Gradient Overlay
                       Container(
@@ -372,8 +417,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                       children: [
                         _buildAboutSection(),
                         SizedBox(height: 25.h),
-                        _buildChipsSection(context.l10n.specializationsTitle, true),
-                        SizedBox(height: 25.h),
+                        if (widget.showSpecializations) ...
+                          [
+                            _buildChipsSection(context.l10n.specializationsTitle, true),
+                            SizedBox(height: 25.h),
+                          ],
                         _buildChipsSection(context.l10n.languagesTitle, false),
                         SizedBox(height: 25.h),
                         _buildDocumentsSection(),
@@ -724,39 +772,47 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   }
 
   Widget _buildChip(String label, bool isSpecialty) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F7),
-        borderRadius: BorderRadius.circular(20).r,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 13.sp, color: Colors.black87),
-          ),
-          if (_isEditing) ...[
-            SizedBox(width: 8.w),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (isSpecialty) {
-                    final item = label;
-                    _tempSpecializations.remove(item);
-                    _removedSpecializations.add(item);
-                  } else {
-                    final item = label;
-                    _tempLanguages.remove(item);
-                    _removedLanguages.add(item);
-                  }
-                });
-              },
-              child: Icon(Icons.close, size: 14.sp, color: Colors.red),
+    return GestureDetector(
+      onTap: () => isSpecialty ? _onHashtagTap(label) : null,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F5F7),
+          borderRadius: BorderRadius.circular(20).r,
+          border: !_isEditing && isSpecialty ? Border.all(color: Colors.blue.withOpacity(0.3), width: 1) : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isSpecialty ? '#$label' : label,
+              style: TextStyle(
+                fontSize: 13.sp, 
+                color: !_isEditing && isSpecialty ? Colors.blue[700] : Colors.black87,
+                fontWeight: !_isEditing && isSpecialty ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
+            if (_isEditing) ...[
+              SizedBox(width: 8.w),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isSpecialty) {
+                      final item = label;
+                      _tempSpecializations.remove(item);
+                      _removedSpecializations.add(item);
+                    } else {
+                      final item = label;
+                      _tempLanguages.remove(item);
+                      _removedLanguages.add(item);
+                    }
+                  });
+                },
+                child: Icon(Icons.close, size: 14.sp, color: Colors.red),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

@@ -28,6 +28,7 @@
         "get_storage",
         "http",
         "image",
+        "image_cropper",
         "image_picker",
         "intl",
         "mime",
@@ -70,6 +71,15 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "image_cropper",
+      "version": "12.2.1",
+      "dependencies": [
+        "flutter",
+        "image_cropper_for_web",
+        "image_cropper_platform_interface"
       ]
     },
     {
@@ -523,6 +533,25 @@
         "stream_channel",
         "string_scanner",
         "term_glyph"
+      ]
+    },
+    {
+      "name": "image_cropper_platform_interface",
+      "version": "8.0.0",
+      "dependencies": [
+        "flutter",
+        "http",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "image_cropper_for_web",
+      "version": "7.0.0",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "image_cropper_platform_interface",
+        "web"
       ]
     },
     {

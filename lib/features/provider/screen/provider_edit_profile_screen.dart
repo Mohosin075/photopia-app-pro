@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/core/constants/app_typography.dart';
 import 'dart:ui';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/provider/provider_profile_controller.dart';
 import 'package:photopia/core/widgets/custom_network_image.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:photopia/core/widgets/subscription_badge.dart';
 import 'package:photopia/features/client/widgets/auth_profile_image.dart';
+import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
 
 class ProviderEditProfileScreen extends StatefulWidget {
   const ProviderEditProfileScreen({super.key});
@@ -25,6 +29,10 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
   late List<String> _tempLanguages;
   late List<String> _tempRecentWork;
 
+  File? _profilePhoto;
+  File? _coverPhoto;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
@@ -37,22 +45,75 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
     _tempRecentWork = List.from(controller.recentWork);
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _specialtyController.dispose();
-    _aboutController.dispose();
-    super.dispose();
+  Future<void> _pickAndCropImage({required bool isProfile}) async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        aspectRatio: isProfile
+            ? const CropAspectRatio(ratioX: 1, ratioY: 1)
+            : const CropAspectRatio(ratioX: 16, ratioY: 9),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: isProfile ? 'Crop Profile Picture' : 'Crop Cover Photo',
+            toolbarColor: Colors.black,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: isProfile ? CropAspectRatioPreset.square : CropAspectRatioPreset.ratio16x9,
+            lockAspectRatio: true,
+          ),
+          IOSUiSettings(
+            title: isProfile ? 'Crop Profile Picture' : 'Crop Cover Photo',
+            aspectRatioLockEnabled: true,
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        setState(() {
+          if (isProfile) {
+            _profilePhoto = File(croppedFile.path);
+          } else {
+            _coverPhoto = File(croppedFile.path);
+          }
+        });
+      }
+    }
   }
 
   Future<void> _saveChanges() async {
     final controller = context.read<ProviderProfileController>();
     final navigator = Navigator.of(context);
 
+    // Mandatory profile picture check
+    if ((controller.profileImage == null || controller.profileImage!.isEmpty) && _profilePhoto == null) {
+      if (mounted) {
+        CustomSnackBar.show(
+          context: context,
+          message: 'Profile picture is mandatory for creators',
+          isError: true,
+        );
+      }
+      return;
+    }
+
+    // Check for changes
+    final String currentName = controller.name;
+    final String newName = _nameController.text;
+    final bool nameChanged = newName != currentName;
+
+    final String currentBio = controller.aboutMe;
+    final String newBio = _aboutController.text;
+    final bool bioChanged = newBio != currentBio;
+
     // Call update API
     final success = await controller.updateProviderProfile(
-      name: _nameController.text,
-      bio: _aboutController.text,
+      name: nameChanged ? newName : null,
+      bio: bioChanged ? newBio : null,
+      profilePhoto: _profilePhoto,
+      coverPhoto: _coverPhoto,
     );
 
     if (success) {
@@ -105,11 +166,58 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       clipBehavior: Clip.none,
       children: [
         // Header Image
-        CustomNetworkImage(
-          width: double.infinity,
-          height: 220.h,
-          imageUrl: 'assets/images/img5.png',
-          fit: BoxFit.cover,
+        GestureDetector(
+          onTap: () => _pickAndCropImage(isProfile: false),
+          child: Hero(
+            tag: 'banner_hero',
+            child: _coverPhoto != null
+                ? Image.file(
+                    _coverPhoto!,
+                    width: double.infinity,
+                    height: 220.h,
+                    fit: BoxFit.cover,
+                  )
+                : (controller.coverPhoto != null && controller.coverPhoto!.isNotEmpty)
+                    ? CustomNetworkImage(
+                        width: double.infinity,
+                        height: 220.h,
+                        imageUrl: controller.coverPhoto!,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        height: 220.h,
+                        width: double.infinity,
+                        color: Colors.grey[900],
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.image_not_supported, color: Colors.grey, size: 32.sp),
+                            SizedBox(height: 8.h),
+                            Text(
+                              'No cover photo',
+                              style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                            ),
+                          ],
+                        ),
+                      ),
+          ),
+        ),
+        // Camera overlay for banner
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 10.h,
+          right: 20.w,
+          child: GestureDetector(
+            onTap: () => _pickAndCropImage(isProfile: false),
+            child: Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withOpacity(0.5)),
+              ),
+              child: Icon(Icons.camera_alt, color: Colors.white, size: 20.sp),
+            ),
+          ),
         ),
         // Container(
         //   width: double.infinity,
@@ -237,29 +345,48 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Stack(
-                    children: [
-                      AuthProfileImage(
-                        imageUrl: controller.profileImage,
-                        size: 75.r,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: EdgeInsets.all(4.w),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
+                  GestureDetector(
+                    onTap: () => _pickAndCropImage(isProfile: true),
+                    child: Hero(
+                      tag: 'profile_hero',
+                      child: Stack(
+                        children: [
+                          _profilePhoto != null
+                              ? Container(
+                                  width: 75.r,
+                                  height: 75.r,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.grey.shade200,
+                                    border: Border.all(color: Colors.white, width: 3),
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.file(_profilePhoto!, fit: BoxFit.cover),
+                                  ),
+                                )
+                              : AuthProfileImage(
+                                  imageUrl: controller.profileImage,
+                                  size: 75.r,
+                                ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(4.w),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: Colors.black,
+                                size: 12.sp,
+                              ),
+                            ),
                           ),
-                          child: Icon(
-                            Icons.camera_alt,
-                            color: Colors.black,
-                            size: 12.sp,
-                          ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                   SizedBox(width: 18.w),
                   Expanded(
