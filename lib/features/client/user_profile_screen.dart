@@ -144,18 +144,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EditProfileScreen()),
-              );
-            },
-            icon: Icon(Icons.edit_outlined, color: Colors.black, size: 24.sp),
-          ),
-          SizedBox(width: 10.w),
-        ],
+        actions: const [],
       ),
       body: Consumer<UserProfileController>(
         builder: (context, controller, child) {
@@ -635,7 +624,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
             child: Row(
               children: [
-                Icon(icon, size: 24.sp, color: Colors.black),
+                Icon(icon, size: 24.sp, color: const Color(0xFF374151)),
                 SizedBox(width: 15.w),
                 Text(
                   title,

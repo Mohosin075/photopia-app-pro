@@ -536,15 +536,6 @@
       ]
     },
     {
-      "name": "image_cropper_platform_interface",
-      "version": "8.0.0",
-      "dependencies": [
-        "flutter",
-        "http",
-        "plugin_platform_interface"
-      ]
-    },
-    {
       "name": "image_cropper_for_web",
       "version": "7.0.0",
       "dependencies": [
@@ -552,6 +543,15 @@
         "flutter_web_plugins",
         "image_cropper_platform_interface",
         "web"
+      ]
+    },
+    {
+      "name": "image_cropper_platform_interface",
+      "version": "8.0.0",
+      "dependencies": [
+        "flutter",
+        "http",
+        "plugin_platform_interface"
       ]
     },
     {

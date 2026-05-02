@@ -114,6 +114,7 @@ class _PhotopiaState extends State<Photopia> {
                   GlobalCupertinoLocalizations.delegate,
                 ],
                 theme: ThemeData(
+                  fontFamily: 'HelveticaNeue',
                   primaryColor: Colors.blue,
                   useMaterial3: true,
                   progressIndicatorTheme: const ProgressIndicatorThemeData(
