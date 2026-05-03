@@ -13,6 +13,13 @@ class AppLocalizations {
 
   bool get _isFr => locale.languageCode == 'fr';
 
+  Future<String> translateDynamic(String text) async {
+    if (!_isFr) return text;
+    // You can import TranslationService here if needed, 
+    // but better to keep it decoupled or use a callback.
+    return text; // Placeholder for now to avoid circular dependency
+  }
+
   // ── Navigation ────────────────────────────────────────────────────────────
   String get navHome => _isFr ? 'Accueil' : 'Home';
   String get navMessages => 'Messages';

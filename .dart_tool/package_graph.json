@@ -40,6 +40,7 @@
         "syncfusion_flutter_pdfviewer",
         "table_calendar",
         "timeago",
+        "translator",
         "url_launcher",
         "video_player"
       ],
@@ -71,6 +72,13 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "translator",
+      "version": "1.0.4+1",
+      "dependencies": [
+        "http"
       ]
     },
     {

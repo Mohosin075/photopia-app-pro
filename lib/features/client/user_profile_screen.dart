@@ -27,6 +27,7 @@ import 'package:photopia/features/provider/screen/provider_profile_screen.dart'
 import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
 import 'package:photopia/controller/language_controller.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/core/services/translation_service.dart';
 import 'package:photopia/features/client/settings_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -421,50 +422,39 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: AppTypography.bodyLarge,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                provider,
-                style: TextStyle(
-                  fontSize: AppTypography.bodySmall,
-                  color: Colors.grey,
-                ),
-              ),
-              Text(
-                date,
-                style: TextStyle(
-                  fontSize: AppTypography.bodySmall,
-                  color: Colors.grey[400],
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: Colors.green.withAlpha(25),
-                  borderRadius: BorderRadius.circular(5).r,
-                ),
-                child: Text(
-                  status,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TranslatedText(
+                  title,
                   style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 10.sp.clamp(10, 11),
+                    fontSize: AppTypography.bodyLarge,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+                TranslatedText(
+                  provider,
+                  style: TextStyle(
+                    fontSize: AppTypography.bodySmall,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  date,
+                  style: TextStyle(
+                    fontSize: AppTypography.bodySmall,
+                    color: Colors.grey[400],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _buildCompactStatusBadge(status),
               SizedBox(height: 5.h),
               Text(
                 price,
@@ -476,6 +466,41 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCompactStatusBadge(String status) {
+    Color color;
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+      case 'completed':
+        color = Colors.green;
+        break;
+      case 'pending':
+      case 'upcoming':
+        color = Colors.blue;
+        break;
+      case 'cancelled':
+        color = Colors.red;
+        break;
+      default:
+        color = Colors.orange;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(5.r),
+      ),
+      child: Text(
+        status.toUpperCase(),
+        style: TextStyle(
+          color: color,
+          fontSize: 10.sp,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

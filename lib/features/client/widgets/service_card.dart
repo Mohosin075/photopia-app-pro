@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:photopia/core/services/translation_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
 import 'package:photopia/features/client/service_details_screen.dart';
@@ -196,24 +197,20 @@ class ServiceCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        TranslatedText(
                           title,
                           style: TextStyle(
                             fontSize: 13.sp.clamp(13, 14),
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        Text(
+                        TranslatedText(
                           subtitle,
                           style: TextStyle(
                             fontSize: 11.sp.clamp(11, 12),
                             color: Colors.grey,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),

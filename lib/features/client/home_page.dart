@@ -20,6 +20,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:photopia/controller/category_controller.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/core/services/translation_service.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -191,22 +192,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Text(item.icon ?? '💡', style: TextStyle(fontSize: 24.sp)),
                     SizedBox(height: 8.h),
-                    Text(
+                    TranslatedText(
                       item.title ?? 'Idea',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4.h),
-                    Text(
+                    TranslatedText(
                       item.description ?? '',
                       style: TextStyle(color: Colors.white70, fontSize: 12.sp),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -282,14 +279,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                     SizedBox(height: 10.h),
-                    Text(
+                    TranslatedText(
                       pro.user?.name ?? 'Pro',
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w600,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4.h),
                     Row(

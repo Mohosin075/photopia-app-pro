@@ -7,6 +7,8 @@ import 'package:photopia/features/client/widgets/auth_profile_image.dart';
 import 'package:photopia/core/network/urls.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/features/client/client_booking_details_screen.dart';
+import 'package:photopia/core/services/translation_service.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   static const String name = '/order_history';
@@ -209,167 +211,176 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     }
     debugPrint("🖼️ Final Cover URL: $coverUrl");
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 20.h),
-      padding: EdgeInsets.all(15.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ClientBookingDetailsScreen(booking: booking),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(15.r),
-                child: coverUrl.isNotEmpty
-                    ? Image.network(
-                        coverUrl,
-                        width: 80.w,
-                        height: 80.w,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 20.h),
+        padding: EdgeInsets.all(15.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15.r),
+                  child: coverUrl.isNotEmpty
+                      ? Image.network(
+                          coverUrl,
+                          width: 80.w,
+                          height: 80.w,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            width: 80.w,
+                            height: 80.w,
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.image, color: Colors.grey),
+                          ),
+                        )
+                      : Container(
                           width: 80.w,
                           height: 80.w,
                           color: Colors.grey[200],
                           child: const Icon(Icons.image, color: Colors.grey),
                         ),
-                      )
-                    : Container(
-                        width: 80.w,
-                        height: 80.w,
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.image, color: Colors.grey),
-                      ),
-              ),
-              SizedBox(width: 15.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            booking.serviceId?.title ?? context.l10n.serviceTitleDefault,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
+                ),
+                SizedBox(width: 15.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: TranslatedText(
+                              booking.serviceId?.title ?? context.l10n.serviceTitleDefault,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        _buildStatusBadge(booking.status ?? 'PENDING'),
-                      ],
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      booking.package?.name ?? context.l10n.standardPackageDefault,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.grey[600],
+                          _buildStatusBadge(booking.status ?? 'PENDING'),
+                        ],
                       ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Row(
-                      children: [
-                        Builder(
-                          builder: (context) {
-                            String? profileUrl = booking.providerId?.profile;
-                            if (profileUrl != null &&
-                                !profileUrl.startsWith('http')) {
-                              profileUrl = '${Urls.baseUrl}$profileUrl';
-                            }
-                            debugPrint(
-                              "👤 Provider Name: ${booking.providerId?.name}",
-                            );
-                            debugPrint("👤 Final Profile URL: $profileUrl");
-                            return AuthProfileImage(
-                              imageUrl: profileUrl,
-                              size: 24.w,
-                            );
-                          },
+                      SizedBox(height: 4.h),
+                      TranslatedText(
+                        booking.package?.name ?? context.l10n.standardPackageDefault,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: Colors.grey[600],
                         ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          booking.providerId?.name ?? context.l10n.providerNameDefault,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w500,
+                      ),
+                      SizedBox(height: 8.h),
+                      Row(
+                        children: [
+                          Builder(
+                            builder: (context) {
+                              String? profileUrl = booking.providerId?.profile;
+                              if (profileUrl != null &&
+                                  !profileUrl.startsWith('http')) {
+                                profileUrl = '${Urls.baseUrl}$profileUrl';
+                              }
+                              debugPrint(
+                                "👤 Provider Name: ${booking.providerId?.name}",
+                              );
+                              debugPrint("👤 Final Profile URL: $profileUrl");
+                              return AuthProfileImage(
+                                imageUrl: profileUrl,
+                                size: 24.w,
+                              );
+                            },
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 8.w),
+                          Text(
+                            booking.providerId?.name ?? context.l10n.providerNameDefault,
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 15.h),
+            const Divider(),
+            SizedBox(height: 10.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 14.sp,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(width: 6.w),
+                    Text(
+                      formattedDate,
+                      style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                    ),
+                    SizedBox(width: 15.w),
+                    Icon(Icons.access_time, size: 14.sp, color: Colors.grey),
+                    SizedBox(width: 6.w),
+                    Text(
+                      booking.startTime ?? '00:00',
+                      style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 15.h),
-          const Divider(),
-          SizedBox(height: 10.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today_outlined,
-                    size: 14.sp,
-                    color: Colors.grey,
+                Text(
+                  '${booking.currency ?? booking.pricingDetails?.currency ?? '€'}${booking.totalPrice?.toStringAsFixed(0) ?? '0'}',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  SizedBox(width: 6.w),
-                  Text(
-                    formattedDate,
-                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-                  ),
-                  SizedBox(width: 15.w),
-                  Icon(Icons.access_time, size: 14.sp, color: Colors.grey),
-                  SizedBox(width: 6.w),
-                  Text(
-                    booking.startTime ?? '00:00',
-                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-              Text(
-                '${booking.currency ?? booking.pricingDetails?.currency ?? '€'}${booking.totalPrice?.toStringAsFixed(0) ?? '0'}',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8.h),
-          Row(
-            children: [
-              Icon(Icons.location_on_outlined, size: 14.sp, color: Colors.grey),
-              SizedBox(width: 6.w),
-              Expanded(
-                child: Text(
-                  booking.serviceId?.location?.address ?? context.l10n.locationNotSet,
-                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              ],
+            ),
+            SizedBox(height: 8.h),
+            Row(
+              children: [
+                Icon(Icons.location_on_outlined, size: 14.sp, color: Colors.grey),
+                SizedBox(width: 6.w),
+                Expanded(
+                  child: Text(
+                    booking.serviceId?.location?.address ?? context.l10n.locationNotSet,
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
+
   }
 
   Widget _buildStatusBadge(String status) {

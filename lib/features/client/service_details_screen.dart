@@ -16,6 +16,7 @@ import 'package:photopia/core/widgets/subscription_badge.dart';
 import 'package:photopia/features/client/chat_screen.dart';
 import 'package:photopia/features/client/search_screen.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/core/services/translation_service.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
@@ -77,7 +78,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 20.h),
-                              Text(title, style: TextStyle(fontSize: 20.sp.clamp(20, 22), fontWeight: FontWeight.bold, color: Colors.black)),
+                              TranslatedText(title, style: TextStyle(fontSize: 20.sp.clamp(20, 22), fontWeight: FontWeight.bold, color: Colors.black)),
                               SizedBox(height: 20.h),
                               Text(context.l10n.providerLabel, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Colors.black)),
                               SizedBox(height: 12.h),
@@ -96,7 +97,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                               SizedBox(height: 25.h),
                               _buildSectionTitle(context.l10n.aboutLabel),
                               SizedBox(height: 8.h),
-                              Text(description, style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Colors.black87, height: 1.5)),
+                              TranslatedText(description, style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Colors.black87, height: 1.5)),
                               if (equipment.isNotEmpty) ...[
                                 SizedBox(height: 25.h),
                                 Row(children: [Icon(Icons.camera_alt_outlined, size: 20.sp, color: Colors.black87), SizedBox(width: 8.w), _buildSectionTitle(context.l10n.equipmentLabel)]),

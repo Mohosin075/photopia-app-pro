@@ -9,8 +9,8 @@ import 'package:photopia/core/utils/guest_dialog_helper.dart';
 import 'package:photopia/core/widgets/custom_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:photopia/features/client/widgets/service_card.dart';
-import 'package:photopia/features/client/search_result_screen.dart';
 import 'package:photopia/features/client/search_screen.dart';
+import 'package:photopia/core/services/translation_service.dart';
 import 'dart:ui';
 
 class HorizontalProjectCard extends StatefulWidget {
@@ -161,7 +161,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                             color: Colors.white,
                           ),
                           SizedBox(width: 4.w),
-                          Text(
+                          TranslatedText(
                             'Available',
                             style: TextStyle(
                               fontSize: 10.sp,
@@ -234,15 +234,13 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    TranslatedText(
                       widget.title,
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4.h),
                     Row(
@@ -254,14 +252,12 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                         ),
                         SizedBox(width: 4.w),
                         Expanded(
-                          child: Text(
+                          child: TranslatedText(
                             widget.providerName,
                             style: TextStyle(
                               fontSize: 11.sp,
                               color: Colors.grey[600],
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
