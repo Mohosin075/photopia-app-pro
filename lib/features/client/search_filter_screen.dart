@@ -46,19 +46,19 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Search Filter',
           style: TextStyle(
-            color: Colors.black, // Light blue color from image
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18.sp.clamp(18, 20),
             fontWeight: FontWeight.bold,
           ),
@@ -88,9 +88,9 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                 trackHeight: 4.h,
                 thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8.r),
                 overlayShape: RoundSliderOverlayShape(overlayRadius: 16.r),
-                activeTrackColor: Colors.black,
-                inactiveTrackColor: Colors.grey.shade200,
-                thumbColor: Colors.black,
+                activeTrackColor: Theme.of(context).colorScheme.primary,
+                inactiveTrackColor: Theme.of(context).dividerColor.withOpacity(0.1),
+                thumbColor: Theme.of(context).colorScheme.primary,
               ),
               child: Slider(
                 value: _radius,
@@ -114,9 +114,9 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                   enabledThumbRadius: 8,
                 ),
                 overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-                activeTrackColor: Colors.black,
-                inactiveTrackColor: Colors.grey.shade200,
-                thumbColor: Colors.black,
+                activeTrackColor: Theme.of(context).colorScheme.primary,
+                inactiveTrackColor: Theme.of(context).dividerColor.withOpacity(0.1),
+                thumbColor: Theme.of(context).colorScheme.primary,
               ),
               child: RangeSlider(
                 values: _budgetRange,
@@ -202,7 +202,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                       ); // Optional: if "clear all" should also go back
                     },
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE9ECEF),
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       side: BorderSide.none,
                       padding: EdgeInsets.symmetric(vertical: 15.h),
                       shape: RoundedRectangleBorder(
@@ -212,7 +212,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                     child: Text(
                       'Clear All',
                       style: TextStyle(
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16.sp.clamp(16, 18),
                         fontWeight: FontWeight.w600,
                       ),
@@ -237,7 +237,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1A1A1A),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       padding: EdgeInsets.symmetric(vertical: 15.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10).r,
@@ -246,7 +246,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                     child: Text(
                       'Apply Filters',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: 16.sp.clamp(16, 18),
                         fontWeight: FontWeight.w600,
                       ),
@@ -268,7 +268,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
       style: TextStyle(
         fontSize: 15.sp.clamp(15, 17),
         fontWeight: FontWeight.w600,
-        color: Colors.black87,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
@@ -281,15 +281,17 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10).r,
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
       ),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           hintText: hint,
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
           prefixIcon: prefixIcon != null
               ? Icon(prefixIcon, color: Colors.grey, size: 20.sp)
               : null,
@@ -312,18 +314,18 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
       label: Text(label),
       selected: isSelected,
       onSelected: onSelected,
-      backgroundColor: Colors.white,
-      selectedColor: Colors.black,
-      checkmarkColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      selectedColor: Theme.of(context).colorScheme.primary,
+      checkmarkColor: Theme.of(context).colorScheme.onPrimary,
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.black87,
+        color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
         fontSize: 13.sp.clamp(13, 15),
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10).r,
         side: BorderSide(
-          color: isSelected ? Colors.black : Colors.grey.shade200,
+          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor.withOpacity(0.1),
         ),
       ),
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),

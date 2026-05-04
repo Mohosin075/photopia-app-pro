@@ -24,7 +24,7 @@ class CategoryBar extends StatelessWidget {
     final categories = categoryController.rootCategories;
 
     return SizedBox(
-      height: 40.h.clamp(35, 45),
+      height: 34.h.clamp(32, 38),
       child: ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         scrollDirection: Axis.horizontal,
@@ -53,7 +53,7 @@ class CategoryBar extends StatelessWidget {
             },
             child: Container(
               margin: EdgeInsets.only(right: 12.w),
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
               decoration: BoxDecoration(
                 color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(25).r,

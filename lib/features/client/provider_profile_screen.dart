@@ -128,14 +128,6 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
               );
             },
           ),
-          IconButton(
-            icon: Icon(
-              Icons.outlined_flag,
-              color: Colors.blueGrey,
-              size: 24.sp,
-            ),
-            onPressed: () {},
-          ),
           SizedBox(width: 10.w),
         ],
       ),
