@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/features/client/privacy_policy_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:photopia/controller/theme_controller.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const String name = '/settings';
@@ -12,7 +14,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _darkMode = false;
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -21,7 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       SnackBar(
         content: Text('$feature – ${context.l10n.comingSoon}'),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
       ),
     );
@@ -37,18 +38,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
         contentPadding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 8.h),
         actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
         title: Text(
           title,
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
         ),
         content: Text(
           body,
-          style: TextStyle(fontSize: 13.sp, color: Colors.grey[600], height: 1.4),
+          style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.4),
         ),
         actions: [
           Row(
@@ -58,12 +59,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: () => Navigator.pop(ctx),
                   style: OutlinedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 12.h),
-                    side: BorderSide(color: Colors.grey[300]!),
+                    side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                   child: Text(
                     context.l10n.cancelBtn,
-                    style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 13.sp),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontWeight: FontWeight.w600, fontSize: 13.sp),
                   ),
                 ),
               ),
@@ -99,13 +100,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
+    final themeController = Provider.of<ThemeController>(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 22.sp),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 22.sp),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -113,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         centerTitle: false,
@@ -146,11 +149,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _toggleTile(
               icon: Icons.dark_mode_outlined,
               title: l.settingsDarkMode,
-              value: _darkMode,
+              value: themeController.isDarkMode,
               onChanged: (val) {
-                setState(() => _darkMode = val);
-                // TODO: apply theme dynamically
-                _showComingSoon(l.settingsDarkMode);
+                themeController.toggleTheme();
               },
             ),
           ]),
@@ -178,7 +179,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _tile(
               icon: Icons.help_outline,
               title: l.settingsHelpSupport,
-              trailing: Icon(Icons.arrow_forward_ios, size: 14.sp, color: Colors.grey),
+              trailing: Icon(Icons.arrow_forward_ios, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
               onTap: () => _showHelpSheet(),
             ),
           ]),
@@ -241,7 +242,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final l = context.l10n;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -255,7 +256,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 40.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: Theme.of(context).dividerColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
@@ -263,7 +264,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(height: 20.h),
             Text(
               l.settingsHelpSupport,
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.black),
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             ),
             SizedBox(height: 20.h),
             _helpTile(
@@ -302,31 +303,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
           borderRadius: BorderRadius.circular(14.r),
         ),
         child: Row(
           children: [
             Container(
               padding: EdgeInsets.all(10.w),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1A1A1A),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.white, size: 20.sp),
+              child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20.sp),
             ),
             SizedBox(width: 14.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Colors.black)),
+                  Text(title, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                   SizedBox(height: 3.h),
-                  Text(subtitle, style: TextStyle(fontSize: 12.sp, color: Colors.grey[600])),
+                  Text(subtitle, style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 14.sp, color: Colors.grey),
+            Icon(Icons.arrow_forward_ios, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
           ],
         ),
       ),
@@ -339,13 +340,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
         child: Text(
           label.toUpperCase(),
-          style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600, color: Colors.grey[500], letterSpacing: 0.8),
+          style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), letterSpacing: 0.8),
         ),
       );
 
   Widget _card(List<Widget> children) => Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16.r),
         ),
         child: Column(children: children),
@@ -376,11 +377,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
-                  color: textColor ?? Colors.black,
+                  color: textColor ?? Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
-            trailing ?? Icon(Icons.arrow_forward_ios, size: 14.sp, color: Colors.grey),
+            trailing ?? Icon(Icons.arrow_forward_ios, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
           ],
         ),
       ),
@@ -402,13 +403,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Expanded(
             child: Text(
               title,
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: Colors.black),
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
           Switch.adaptive(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFF1A1A1A),
+            activeColor: Theme.of(context).colorScheme.primary,
           ),
         ],
       ),

@@ -51,7 +51,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -78,7 +78,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 12.h),
@@ -93,12 +93,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       fontSize: 15.sp,
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   trailing: isSelected
                       ? Icon(Icons.check_circle,
-                          color: Colors.black, size: 20.sp)
+                          color: Theme.of(context).colorScheme.primary, size: 20.sp)
                       : Icon(Icons.radio_button_unchecked,
                           color: Colors.grey[300], size: 20.sp),
                   onTap: () {
@@ -132,15 +132,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final l10n = context.l10n;
     final langCtrl = context.watch<LanguageController>();
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: Text(
           l10n.profile,
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20.sp.clamp(20, 22),
             fontWeight: FontWeight.bold,
           ),
@@ -162,7 +162,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 await context.read<BookingController>().getMyBookings();
               }
             },
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
@@ -207,7 +208,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     return Container(
       width: double.infinity,
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       padding: EdgeInsets.symmetric(vertical: 15.h),
       child: Column(
         children: [
@@ -240,7 +241,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             style: TextStyle(
               fontSize: AppTypography.h1,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           Text(
@@ -310,13 +311,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 10.h),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? Colors.white 
+                    : const Color(0xFF1A1A1A),
                 borderRadius: BorderRadius.circular(10).r,
               ),
               child: Text(
                 context.l10n.viewAll,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.black 
+                      : Colors.white,
                   fontSize: AppTypography.bodyMedium,
                   fontWeight: FontWeight.bold,
                 ),
@@ -335,7 +340,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         width: double.infinity,
         padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20).r,
         ),
         child: Column(
@@ -397,9 +402,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   context.l10n.viewAllOrders,
                   style: TextStyle(
                     fontSize: AppTypography.bodyMedium,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,
+                    decorationColor: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -517,7 +523,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 10.h),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20).r,
             ),
             child: Column(
@@ -649,7 +655,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
             child: Row(
               children: [
-                Icon(icon, size: 24.sp, color: const Color(0xFF374151)),
+                Icon(icon, size: 24.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8)),
                 SizedBox(width: 15.w),
                 Text(
                   title,
@@ -662,13 +668,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 if (badge != null)
                   Container(
                     padding: EdgeInsets.all(6.w),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF1A1A1A),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                     child: Text(
                       badge,
-                      style: TextStyle(color: Colors.white, fontSize: 10.sp),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 10.sp),
                     ),
                   ),
                 if (value != null)
@@ -740,7 +746,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               width: double.infinity,
               height: 55.h,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(15).r,
               ),
               child: Row(
@@ -748,14 +754,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 children: [
                   Icon(
                     Icons.camera_alt_outlined,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     size: 20.sp,
                   ),
                   SizedBox(width: 12.w),
                   Text(
                     'Switch to Professional',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,
                     ),

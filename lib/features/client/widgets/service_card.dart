@@ -52,8 +52,7 @@ class ServiceCard extends StatelessWidget {
     }
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
+        Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) => ServiceDetailsScreen(
               service: {
@@ -77,11 +76,13 @@ class ServiceCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16).r,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? Colors.black.withOpacity(0.3) 
+                  : Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -156,10 +157,10 @@ class ServiceCard extends StatelessWidget {
                             child: Container(
                               padding: EdgeInsets.all(5.w),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withOpacity(0.1),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withOpacity(0.2),
                                   width: 0.5,
                                 ),
                                 boxShadow: [
@@ -202,14 +203,14 @@ class ServiceCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13.sp.clamp(13, 14),
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         TranslatedText(
                           subtitle,
                           style: TextStyle(
                             fontSize: 11.sp.clamp(11, 12),
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                           ),
                         ),
                       ],
@@ -227,7 +228,7 @@ class ServiceCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -371,14 +372,14 @@ class _RatingInfoWidgetState extends State<RatingInfoWidget> {
               style: TextStyle(
                 fontSize: widget.fontSize ?? 12.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             Text(
               ' ($displayReviews)',
               style: TextStyle(
                 fontSize: widget.fontSize ?? 12.sp,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               ),
             ),
           ],

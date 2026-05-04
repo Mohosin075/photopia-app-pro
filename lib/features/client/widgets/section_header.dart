@@ -19,7 +19,7 @@ class SectionHeader extends StatelessWidget {
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           if (onSeeAllTap != null)
@@ -32,14 +32,14 @@ class SectionHeader extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black54,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                   SizedBox(width: 4.w),
                   Icon(
                     Icons.arrow_forward_ios,
                     size: 14.sp,
-                    color: Colors.black54,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ],
               ),

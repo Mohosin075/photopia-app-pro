@@ -45,7 +45,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Main Scrollable Content
@@ -78,9 +78,9 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 20.h),
-                              TranslatedText(title, style: TextStyle(fontSize: 20.sp.clamp(20, 22), fontWeight: FontWeight.bold, color: Colors.black)),
+                              TranslatedText(title, style: TextStyle(fontSize: 20.sp.clamp(20, 22), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                               SizedBox(height: 20.h),
-                              Text(context.l10n.providerLabel, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Colors.black)),
+                              Text(context.l10n.providerLabel, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                               SizedBox(height: 12.h),
                               _buildProviderCard(providerName, providerAvatar, rating, reviews),
                               SizedBox(height: 18.h),
@@ -97,10 +97,10 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                               SizedBox(height: 25.h),
                               _buildSectionTitle(context.l10n.aboutLabel),
                               SizedBox(height: 8.h),
-                              TranslatedText(description, style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Colors.black87, height: 1.5)),
+                              TranslatedText(description, style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8), height: 1.5)),
                               if (equipment.isNotEmpty) ...[
                                 SizedBox(height: 25.h),
-                                Row(children: [Icon(Icons.camera_alt_outlined, size: 20.sp, color: Colors.black87), SizedBox(width: 8.w), _buildSectionTitle(context.l10n.equipmentLabel)]),
+                                Row(children: [Icon(Icons.camera_alt_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface), SizedBox(width: 8.w), _buildSectionTitle(context.l10n.equipmentLabel)]),
                                 SizedBox(height: 12.h),
                                 _buildEquipmentTags(equipment),
                               ],
@@ -189,7 +189,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             children: [
               GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: Container(padding: EdgeInsets.all(8.w), decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: Icon(Icons.arrow_back, size: 20.sp, color: Colors.black)),
+                child: Container(padding: EdgeInsets.all(8.w), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, shape: BoxShape.circle), child: Icon(Icons.arrow_back, size: 20.sp, color: Theme.of(context).colorScheme.onSurface)),
               ),
               Row(
                 children: [
@@ -204,7 +204,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           }
                           controller.toggleFavorite(serviceId: widget.service['_id'] ?? widget.service['id'], optimisticData: widget.service);
                         },
-                        child: Container(padding: EdgeInsets.all(8.w), decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: Icon(isFavorite ? Icons.bookmark : Icons.bookmark_border, size: 20.sp, color: Colors.black)),
+                        child: Container(padding: EdgeInsets.all(8.w), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, shape: BoxShape.circle), child: Icon(isFavorite ? Icons.bookmark : Icons.bookmark_border, size: 20.sp, color: Theme.of(context).colorScheme.onSurface)),
                       );
                     },
                   ),
@@ -244,7 +244,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               children: [
                 Row(
                   children: [
-                    Text(name, style: TextStyle(fontSize: 15.sp.clamp(15, 16), fontWeight: FontWeight.bold, color: Colors.black)),
+                    Text(name, style: TextStyle(fontSize: 15.sp.clamp(15, 16), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                     SizedBox(width: 8.w),
                     SubscriptionBadge(
                       isSubscribed: widget.service['isPremium'] == true,
@@ -291,7 +291,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 ),
               );
             },
-            child: Container(height: 48.h, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12).r), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.message_outlined, color: Colors.white, size: 18.sp), SizedBox(width: 8.w), Text(context.l10n.messageBtn, style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold))])),
+            child: Container(height: 48.h, decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(12).r), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.message_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 18.sp), SizedBox(width: 8.w), Text(context.l10n.messageBtn, style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 14.sp, fontWeight: FontWeight.bold))])),
           ),
         ),
         SizedBox(width: 12.w),
@@ -300,7 +300,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => ProviderProfileScreen(provider: {'name': name, 'avatar': profile, 'id': providerId, '_id': providerId})));
             },
-            child: Container(height: 48.h, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12).r, border: Border.all(color: Colors.black)), child: Center(child: Text(context.l10n.viewProfileBtn, style: TextStyle(color: Colors.black, fontSize: 14.sp, fontWeight: FontWeight.bold)))),
+            child: Container(height: 48.h, decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12).r, border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))), child: Center(child: Text(context.l10n.viewProfileBtn, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14.sp, fontWeight: FontWeight.bold)))),
           ),
         ),
       ],
@@ -318,15 +318,15 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   }
 
   Widget _buildStatBox(String label, String value) {
-    return Container(padding: EdgeInsets.all(15.w), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12).r, border: Border.all(color: Colors.grey.shade200)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: TextStyle(fontSize: 11.sp.clamp(11, 12), color: Colors.grey)), SizedBox(height: 4.h), Text(value, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Colors.black))]));
+    return Container(padding: EdgeInsets.all(15.w), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12).r, border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: TextStyle(fontSize: 11.sp.clamp(11, 12), color: Colors.grey)), SizedBox(height: 4.h), Text(value, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface))]));
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(title, style: TextStyle(fontSize: 16.sp.clamp(16, 18), fontWeight: FontWeight.bold, color: Colors.black));
+    return Text(title, style: TextStyle(fontSize: 16.sp.clamp(16, 18), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface));
   }
 
   Widget _buildEquipmentTags(List<String> tags) {
-    return Wrap(spacing: 8.w, runSpacing: 8.h, children: tags.map((tag) => Container(padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h), decoration: BoxDecoration(color: Colors.grey.withOpacity(0.05), borderRadius: BorderRadius.circular(8).r), child: Text(tag, style: TextStyle(fontSize: 11.sp.clamp(11, 12), color: Colors.black87, fontWeight: FontWeight.w500)))).toList());
+    return Wrap(spacing: 8.w, runSpacing: 8.h, children: tags.map((tag) => Container(padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)), borderRadius: BorderRadius.circular(8).r), child: Text(tag, style: TextStyle(fontSize: 11.sp.clamp(11, 12), color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500)))).toList());
   }
 
   Widget _buildPortfolioGrid(List<dynamic> images) {
@@ -371,7 +371,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   Widget _buildBottomBar({required String providerId, required String name, required String avatar, required Map<String, dynamic> fullService}) {
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4))]),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, boxShadow: [BoxShadow(color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05), blurRadius: 10, offset: const Offset(0, -4))]),
       child: Row(
         children: [
           GestureDetector(
@@ -399,7 +399,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 ),
               );
             },
-            child: Container(padding: EdgeInsets.all(12.w), decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(12).r), child: Image.asset('assets/images/message_icon.png', width: 24.sp.clamp(24, 24), height: 24.sp.clamp(24, 24), fit: BoxFit.contain)),
+            child: Container(padding: EdgeInsets.all(12.w), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)), borderRadius: BorderRadius.circular(12).r), child: Image.asset('assets/images/message_icon.png', width: 24.sp.clamp(24, 24), height: 24.sp.clamp(24, 24), fit: BoxFit.contain, color: Theme.of(context).colorScheme.onSurface)),
           ),
           SizedBox(width: 15.w),
           Expanded(
@@ -417,7 +417,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => BookingConfirmationScreen(service: fullService)));
                 }
               },
-              child: Container(height: 50.h, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12).r), child: Center(child: Text(context.l10n.bookNowBtn, style: TextStyle(color: Colors.white, fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold)))),
+              child: Container(height: 50.h, decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(12).r), child: Center(child: Text(context.l10n.bookNowBtn, style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold)))),
             ),
           ),
         ],

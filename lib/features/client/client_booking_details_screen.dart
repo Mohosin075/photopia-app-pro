@@ -18,19 +18,19 @@ class ClientBookingDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           context.l10n.orderHistoryTitle, // Or a new key like 'Booking Details'
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18.sp.clamp(18, 20),
             fontWeight: FontWeight.bold,
           ),
@@ -59,12 +59,12 @@ class ClientBookingDetailsScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -82,7 +82,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ),
               ),
@@ -115,7 +115,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -123,7 +123,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       'Booking ID: #${booking.bookingId ?? booking.sId?.substring(0, 8)}',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Colors.grey[500],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                       ),
                     ),
                   ],
@@ -148,9 +148,9 @@ class ClientBookingDetailsScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,6 +160,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 16.h),
@@ -184,6 +185,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -191,7 +193,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       package?.name ?? 'Standard Package',
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -202,9 +204,9 @@ class ClientBookingDetailsScreen extends StatelessWidget {
           SizedBox(height: 20.h),
           const Divider(),
           SizedBox(height: 16.h),
-          _buildInfoRow(Icons.calendar_today_outlined, 'Date', booking.bookingDate?.split('T')[0] ?? 'N/A'),
-          _buildInfoRow(Icons.access_time, 'Time', '${booking.startTime ?? ''} - ${booking.endTime ?? ''}'),
-          _buildInfoRow(Icons.location_on_outlined, 'Location', service?.location?.address ?? 'Location not set'),
+          _buildInfoRow(context, Icons.calendar_today_outlined, 'Date', booking.bookingDate?.split('T')[0] ?? 'N/A'),
+          _buildInfoRow(context, Icons.access_time, 'Time', '${booking.startTime ?? ''} - ${booking.endTime ?? ''}'),
+          _buildInfoRow(context, Icons.location_on_outlined, 'Location', service?.location?.address ?? 'Location not set'),
           SizedBox(height: 10.h),
           const Divider(),
           SizedBox(height: 16.h),
@@ -216,7 +218,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               Text(
@@ -224,7 +226,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -234,17 +236,17 @@ class ClientBookingDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(BuildContext context, IconData icon, String label, String value) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
         children: [
-          Icon(icon, size: 16.sp, color: Colors.grey[400]),
+          Icon(icon, size: 16.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
           SizedBox(width: 12.w),
           Expanded(
             child: TranslatedText(
               label,
-              style: TextStyle(fontSize: 13.sp, color: Colors.grey[500]),
+              style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
             ),
           ),
           SizedBox(width: 12.w),
@@ -255,7 +257,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -329,7 +331,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.r),
           ),
@@ -338,7 +340,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
         child: TranslatedText(
           'Contact Professional',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),

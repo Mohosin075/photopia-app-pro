@@ -41,19 +41,19 @@ class _ProviderListingDetailsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 20.sp),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 20.sp),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Listing Details',
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: AppTypography.h1,
             fontWeight: FontWeight.bold,
           ),
@@ -183,7 +183,7 @@ class _ProviderListingDetailsScreenState
                         style: TextStyle(
                           fontSize: AppTypography.h1,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -218,7 +218,7 @@ class _ProviderListingDetailsScreenState
                       style: TextStyle(
                         fontSize: AppTypography.h1,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(width: 8.w),
@@ -228,7 +228,7 @@ class _ProviderListingDetailsScreenState
                       listing.duration ?? 'per session',
                       style: TextStyle(
                         fontSize: AppTypography.bodyLarge,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -242,14 +242,14 @@ class _ProviderListingDetailsScreenState
                     vertical: 6.h,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F7),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
                     listing.category?.name ?? 'Photography',
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -273,7 +273,7 @@ class _ProviderListingDetailsScreenState
                   listing.description ?? 'No description provided.',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     height: 1.5,
                   ),
                 ),
@@ -297,7 +297,7 @@ class _ProviderListingDetailsScreenState
                       '${listing.location?.city ?? ''}, ${listing.location?.country ?? ''}',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
                 SizedBox(height: 20.h),
@@ -317,14 +317,14 @@ class _ProviderListingDetailsScreenState
                             style: TextStyle(
                               fontSize: AppTypography.h1,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
                             'Total Views',
                             style: TextStyle(
                               fontSize: AppTypography.bodySmall,
-                              color: Colors.grey,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                             ),
                           ),
                         ],
@@ -354,7 +354,7 @@ class _ProviderListingDetailsScreenState
                               'Bookings',
                               style: TextStyle(
                                 fontSize: AppTypography.bodySmall,
-                                color: Colors.grey,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                               ),
                             ),
                           ],
@@ -388,7 +388,7 @@ class _ProviderListingDetailsScreenState
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
+                          backgroundColor: Theme.of(context).colorScheme.onSurface,
                           minimumSize: Size(0, 50.h),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.r),
@@ -397,7 +397,7 @@ class _ProviderListingDetailsScreenState
                         child: Text(
                           'Edit Listing',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                             fontSize: AppTypography.h2,
                             fontWeight: FontWeight.bold,
                           ),
@@ -441,7 +441,7 @@ class _ProviderListingDetailsScreenState
         backgroundColor: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(15.r),
           ),
           child: Column(
@@ -459,18 +459,18 @@ class _ProviderListingDetailsScreenState
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(Icons.close, size: 24.sp, color: Colors.black87),
+                      child: Icon(Icons.close, size: 24.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 1, color: Color(0xFFE0E0E0)),
+              const Divider(height: 1),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 25.h, horizontal: 20.w),
                 child: Row(

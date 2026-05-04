@@ -214,16 +214,16 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         title: Text(
           'Availability Settings',
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -234,7 +234,7 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
             child: Text(
               'Save',
               style: TextStyle(
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
                 fontSize: 14.sp,
               ),
@@ -372,13 +372,15 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
                   ElevatedButton(
                     onPressed: _saveSettings,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       minimumSize: Size(double.infinity, 55.h),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                      elevation: 0,
                     ),
                     child: Text(
                       'Save All Changes',
-                      style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                   SizedBox(height: 30.h),
@@ -399,12 +401,12 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
       width: double.infinity,
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.grey[100]!),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.03),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -429,7 +431,7 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -449,16 +451,16 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 10.h),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.black : Colors.white,
+            color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(color: isSelected ? Colors.black : Colors.grey[300]!),
+            border: Border.all(color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
           ),
           child: Center(
             child: Text(
               label,
               style: TextStyle(
                 fontSize: 12.sp,
-                color: isSelected ? Colors.white : Colors.grey[600],
+                color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -480,15 +482,15 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
           style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFF9F9FB),
+            fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
             contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Colors.black12),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Colors.black, width: 1.5),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 1.5),
             ),
             isDense: true,
           ),
@@ -510,9 +512,9 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: schedule.isActive == true ? Colors.white : const Color(0xFFF9F9F9),
+        color: schedule.isActive == true ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: schedule.isActive == true ? Colors.black12 : Colors.transparent),
+        border: Border.all(color: schedule.isActive == true ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Colors.transparent),
       ),
       child: Column(
         children: [
@@ -521,14 +523,15 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
               Checkbox(
                 value: schedule.isActive,
                 onChanged: (val) => setState(() => schedule.isActive = val),
-                activeColor: Colors.black,
+                activeColor: Theme.of(context).colorScheme.primary,
+                checkColor: Theme.of(context).colorScheme.onPrimary,
               ),
               Text(
                 day,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
-                  color: schedule.isActive == true ? Colors.black : Colors.grey,
+                  color: schedule.isActive == true ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                 ),
               ),
               const Spacer(),
@@ -563,16 +566,17 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
                           onChanged: (val) => schedule.maxBookings = int.tryParse(val) ?? 1,
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                           decoration: InputDecoration(
                             isDense: true,
                             hintText: schedule.maxBookings?.toString(),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.r),
-                              borderSide: const BorderSide(color: Colors.black12),
+                              borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.r),
-                              borderSide: const BorderSide(color: Colors.black),
+                              borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface),
                             ),
                           ),
                         ),
@@ -613,15 +617,15 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
               height: 35.h,
               padding: EdgeInsets.symmetric(horizontal: 8.w),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black12),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               alignment: Alignment.center,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(value, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold)),
-                  Icon(Icons.access_time, size: 14.sp, color: Colors.black54),
+                  Text(value, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                  Icon(Icons.access_time, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 ],
               ),
             ),
@@ -645,21 +649,22 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
         SizedBox(height: 15.h),
         Container(
           padding: EdgeInsets.all(12.w),
-          decoration: BoxDecoration(color: const Color(0xFFF9F9F9), borderRadius: BorderRadius.circular(10.r)),
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02), borderRadius: BorderRadius.circular(10.r)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Auto-block After Booking', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
-                  Text('Block time for prep', style: TextStyle(fontSize: 10.sp, color: Colors.grey)),
+                  Text('Auto-block After Booking', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
+                  Text('Block time for prep', style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
                 ],
               ),
               Switch(
                 value: _autoBlockAfterBooking,
                 onChanged: (val) => setState(() => _autoBlockAfterBooking = val),
-                activeColor: Colors.black,
+                activeColor: Theme.of(context).colorScheme.onSurface,
+                activeTrackColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
               ),
             ],
           ),
@@ -677,16 +682,16 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
       children: [
         Container(
           padding: EdgeInsets.all(8.w),
-          decoration: BoxDecoration(color: const Color(0xFFF1F1F1), borderRadius: BorderRadius.circular(8.r)),
-          child: Icon(icon, size: 20.sp, color: Colors.black87),
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05), borderRadius: BorderRadius.circular(8.r)),
+          child: Icon(icon, size: 20.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8)),
         ),
         SizedBox(width: 12.w),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
-              Text(subtitle, style: TextStyle(fontSize: 10.sp, color: Colors.grey)),
+              Text(title, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
+              Text(subtitle, style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
             ],
           ),
         ),
@@ -697,17 +702,17 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
             controller: controller,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 8.h),
               isDense: true,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.r),
-                borderSide: const BorderSide(color: Colors.black12),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.r),
-                borderSide: const BorderSide(color: Colors.black),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
           ),
@@ -730,7 +735,7 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(color: const Color(0xFFF9F9F9), borderRadius: BorderRadius.circular(10.r)),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02), borderRadius: BorderRadius.circular(10.r)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -738,9 +743,9 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(date != null ? DateFormat('MMM dd, yyyy').format(date) : 'Unknown Date', 
-                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
               Text(isAvailable ? 'Available: ${cd.start} - ${cd.end}' : 'Unavailable', 
-                  style: TextStyle(fontSize: 10.sp, color: Colors.grey)),
+                  style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
             ],
           ),
           IconButton(

@@ -34,7 +34,7 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -57,7 +57,8 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
 
                   return RefreshIndicator(
                     onRefresh: () => controller.getChats(),
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.primary,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     child: _buildConversationList(controller),
                   );
                 },
@@ -74,13 +75,13 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.message_outlined, size: 64.sp, color: Colors.grey[300]),
+          Icon(Icons.message_outlined, size: 64.sp, color: Theme.of(context).dividerColor.withOpacity(0.1)),
           SizedBox(height: 16.h),
           Text(
             'No messages yet',
             style: TextStyle(
               fontSize: 16.sp,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -98,7 +99,7 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
             'assets/images/message_icon.png',
             width: 28.sp.clamp(24, 32),
             height: 28.sp.clamp(24, 32),
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           SizedBox(width: 12.w),
           Text(
@@ -106,7 +107,7 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
             style: TextStyle(
               fontSize: 20.sp.clamp(20, 22),
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -120,20 +121,26 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
       child: Container(
         height: 40.h.clamp(40, 45),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12).r,
-          border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          border: Border(
+            bottom: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+          ),
         ),
         child: TextField(
           controller: _searchController,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 14.sp.clamp(14, 16),
+          ),
           decoration: InputDecoration(
             hintText: 'Search conversations...',
             hintStyle: TextStyle(
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               fontSize: 14.sp.clamp(14, 16),
             ),
             prefixIcon: Icon(Icons.search,
-                color: Colors.grey, size: 20.sp.clamp(18, 24)),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 20.sp.clamp(18, 24)),
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(vertical: 12.h),
           ),

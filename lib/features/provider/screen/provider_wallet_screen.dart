@@ -27,7 +27,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -38,17 +38,17 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
           ),
         ),
         centerTitle: false,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.sp),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 24.sp),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: RefreshIndicator(
         onRefresh: () => context.read<WalletController>().getMyWallet(),
-        color: Colors.black,
-        backgroundColor: Colors.white,
+        color: Theme.of(context).colorScheme.onSurface,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
@@ -258,12 +258,12 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -295,6 +295,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
             style: TextStyle(
               fontSize: AppTypography.h1,
               fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 4.h),
@@ -330,14 +331,14 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: isSelected ? Colors.black : Colors.grey[100],
+        color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: AppTypography.bodyMedium,
-          color: isSelected ? Colors.white : Colors.black,
+          color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
         ),
       ),
@@ -364,9 +365,9 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: Colors.grey.withOpacity(0.1)),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
         ),
         child: Column(
           children: [
@@ -381,6 +382,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                       style: TextStyle(
                         fontSize: AppTypography.bodyLarge,
                         fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -456,7 +458,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
                       ),
@@ -466,7 +468,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                       context.l10n.viewDetails,
                       style: TextStyle(
                         fontSize: AppTypography.bodyMedium,
-                        color: Colors.black,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -478,7 +480,7 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                       // Action for Invoice
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: Theme.of(context).colorScheme.onSurface,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
                       ),
@@ -487,13 +489,13 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.download, size: 16.sp, color: Colors.white),
+                        Icon(Icons.download, size: 16.sp, color: Theme.of(context).colorScheme.surface),
                         SizedBox(width: 8.w),
                         Text(
                           context.l10n.invoiceBtn,
                           style: TextStyle(
                             fontSize: AppTypography.bodyMedium,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                           ),
                         ),
                       ],

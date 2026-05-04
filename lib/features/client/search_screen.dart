@@ -76,21 +76,22 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(15.r),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.08),
                   blurRadius: 12,
                   spreadRadius: 2,
                   offset: const Offset(0, 6),
@@ -153,7 +154,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                             decoration: BoxDecoration(
-                              color: Colors.black,
+                              color: Theme.of(context).colorScheme.primary,
                               borderRadius: BorderRadius.circular(20.r),
                             ),
                             child: Row(
@@ -162,13 +163,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                 Icon(
                                   Icons.arrow_back,
                                   size: 16.sp,
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                                 SizedBox(width: 4.w),
                                 Text(
                                   'Back',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onPrimary,
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -179,13 +180,14 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                         SizedBox(width: 12.w),
                       ],
+
                       Text(
-                        headerTitle,
-                        style: TextStyle(
-                          fontSize: AppTypography.h2,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
+                          headerTitle,
+                          style: TextStyle(
+                            fontSize: AppTypography.h2,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                       ),
                     ],
                   ),
@@ -260,13 +262,13 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                             SizedBox(height: 8.h),
                             Text(
-                              category.name,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: AppTypography.bodySmall,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                              ),
+                                category.name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: AppTypography.bodySmall,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),

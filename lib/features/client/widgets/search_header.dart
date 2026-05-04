@@ -43,7 +43,7 @@ class _SearchHeaderState extends State<SearchHeader> {
             style: TextStyle(
               fontSize: 20.sp.clamp(20, 22),
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
               letterSpacing: -0.5,
             ),
           ),
@@ -57,9 +57,9 @@ class _SearchHeaderState extends State<SearchHeader> {
                 child: Container(
                   height: 40.h.clamp(40, 42),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12).r,
-                    border: Border.all(color: Colors.black54.withOpacity(0.3)),
+                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                   ),
                   child: TextField(
                     controller: _searchController,
@@ -75,7 +75,7 @@ class _SearchHeaderState extends State<SearchHeader> {
                         padding: EdgeInsets.only(left: 12.w, right: 4.w),
                         child: Icon(
                           Icons.search,
-                          color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                           size: 20.sp.clamp(20, 22),
                         ),
                       ),
@@ -100,9 +100,9 @@ class _SearchHeaderState extends State<SearchHeader> {
                 height: 40.h.clamp(40, 42),
                 width: 40.h.clamp(40, 42),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12).r,
-                  border: Border.all(color: Colors.black54.withOpacity(0.3)),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                 ),
                 child: IconButton(
                   onPressed: () async {
@@ -124,6 +124,7 @@ class _SearchHeaderState extends State<SearchHeader> {
                     height: 20.h,
                     width: 20.h,
                     fit: BoxFit.contain,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),

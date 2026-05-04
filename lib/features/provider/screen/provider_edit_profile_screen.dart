@@ -145,7 +145,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
     return Consumer<ProviderProfileController>(
       builder: (context, controller, child) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
             child: Column(
@@ -194,9 +194,9 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                             Icon(Icons.image_not_supported, color: Colors.grey, size: 32.sp),
                             SizedBox(height: 8.h),
                             Text(
-                              'No cover photo',
-                              style: TextStyle(color: Colors.grey, fontSize: 12.sp),
-                            ),
+                               'No cover photo',
+                               style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 12.sp),
+                             ),
                           ],
                         ),
                       ),
@@ -219,28 +219,6 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
             ),
           ),
         ),
-        // Container(
-        //   width: double.infinity,
-        //   height: 220.h,
-        //   color: Colors.black.withOpacity(0.4),
-        //   child: Center(
-        //     child: Icon(Icons.camera_alt_outlined, color: Colors.white, size: 40.sp),
-        //   ),
-        // ),
-        // Gradient Overlay
-        // Container(
-        //   height: 200.h,
-        //   decoration: BoxDecoration(
-        //     gradient: LinearGradient(
-        //       begin: Alignment.topCenter,
-        //       end: Alignment.bottomCenter,
-        //       colors: [
-        //         Colors.black.withOpacity(0.1),
-        //         Colors.black.withOpacity(0.4),
-        //       ],
-        //     ),
-        //   ),
-        // ),
 
         // Floating Glassmorphism Profile Card
         Positioned(
@@ -373,13 +351,13 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                             right: 0,
                             child: Container(
                               padding: EdgeInsets.all(4.w),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
+                               decoration: BoxDecoration(
+                                 color: Theme.of(context).colorScheme.surface,
+                                 shape: BoxShape.circle,
+                               ),
                               child: Icon(
                                 Icons.camera_alt,
-                                color: Colors.black,
+                                 color: Theme.of(context).colorScheme.onSurface,
                                 size: 12.sp,
                               ),
                             ),
@@ -457,11 +435,11 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       height: 90.h,
       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 4.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10).r,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -470,15 +448,15 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Icon(icon, size: 22.sp, color: Colors.black87),
+          Icon(icon, size: 22.sp, color: Theme.of(context).colorScheme.onSurface),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: TextStyle(
                 fontSize: AppTypography.h1,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+                 fontWeight: FontWeight.bold,
+                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -486,8 +464,8 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: AppTypography.bodySmall,
-              color: Colors.grey[600],
+               fontSize: AppTypography.bodySmall,
+               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               height: 1,
               fontWeight: FontWeight.w500,
             ),
@@ -513,16 +491,16 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           SizedBox(height: 12.h),
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: const Color(0xFFE0E0E0)),
+               borderRadius: BorderRadius.circular(12.r),
+               border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
             ),
             child: TextField(
               controller: _aboutController,
               maxLines: 4,
-              style: TextStyle(
-                fontSize: AppTypography.bodyLarge,
-                color: Colors.black87,
-              ),
+               style: TextStyle(
+                 fontSize: AppTypography.bodyLarge,
+                 color: Theme.of(context).colorScheme.onSurface,
+               ),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(12.w),
@@ -590,8 +568,8 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
               ),
             ),
             GestureDetector(
-              onTap: () => _showAddDialog(title, onAdd),
-              child: Icon(Icons.add, size: 22.sp, color: Colors.black),
+               onTap: () => _showAddDialog(title, onAdd),
+               child: Icon(Icons.add, size: 22.sp, color: Theme.of(context).colorScheme.onSurface),
             ),
           ],
         ),
@@ -622,26 +600,26 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: Colors.white,
+           backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
           title: Text('Add $title'),
           content: isLanguage
               ? Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F7),
-                    borderRadius: BorderRadius.circular(10.r),
+                   decoration: BoxDecoration(
+                     color: Theme.of(context).scaffoldBackgroundColor,
+                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
                       value: _selectedLanguage,
                       hint: Text(
-                        'Select a language',
-                        style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+                         'Select a language',
+                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 14.sp),
                       ),
-                      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
-                      dropdownColor: Colors.white,
+                       icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                       dropdownColor: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(10.r),
                       items: _availableLanguages
                           .where((lang) => !_tempLanguages.contains(lang))
@@ -662,24 +640,24 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                 ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+               onPressed: () => Navigator.pop(context),
+               child: Text('Cancel', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
             ),
             TextButton(
-              onPressed: () {
-                if (isLanguage) {
-                  if (_selectedLanguage != null) {
-                    onAdd(_selectedLanguage!);
-                    Navigator.pop(context);
-                  }
-                } else {
-                  if (textController.text.isNotEmpty) {
-                    onAdd(textController.text);
-                    Navigator.pop(context);
-                  }
-                }
-              },
-              child: const Text('Add'),
+               onPressed: () {
+                 if (isLanguage) {
+                   if (_selectedLanguage != null) {
+                     onAdd(_selectedLanguage!);
+                     Navigator.pop(context);
+                   }
+                 } else {
+                   if (textController.text.isNotEmpty) {
+                     onAdd(textController.text);
+                     Navigator.pop(context);
+                   }
+                 }
+               },
+               child: Text('Add', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -690,9 +668,10 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
   Widget _buildEditChip(String label, VoidCallback onRemove) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F7),
+       decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -700,14 +679,14 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           Text(
             label,
             style: TextStyle(
-              fontSize: AppTypography.bodySmall,
-              color: Colors.black87,
+               fontSize: AppTypography.bodySmall,
+               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(width: 6.w),
           GestureDetector(
-            onTap: onRemove,
-            child: Icon(Icons.close, size: 14.sp, color: Colors.black54),
+             onTap: onRemove,
+             child: Icon(Icons.close, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
           ),
         ],
       ),
@@ -737,14 +716,14 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
               },
               child: Row(
                 children: [
-                  Icon(Icons.add, size: 14.sp, color: Colors.grey),
+                   Icon(Icons.add, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                   SizedBox(width: 4.w),
                   Text(
                     'Add Photo',
                     style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[600],
+                       fontSize: 12.sp,
+                       fontWeight: FontWeight.bold,
+                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],

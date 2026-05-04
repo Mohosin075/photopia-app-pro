@@ -19,26 +19,26 @@ class BookingDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Booking Details',
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18.sp.clamp(18, 20),
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline, color: Colors.black),
+            icon: Icon(Icons.help_outline, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () {},
           ),
         ],
@@ -71,11 +71,11 @@ class BookingDetailsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildClientInfo(client, currentBooking),
+                _buildClientInfo(context, client, currentBooking),
                 SizedBox(height: 20.h),
-                _buildServiceDetails(service, location, currentBooking),
+                _buildServiceDetails(context, service, location, currentBooking),
                 SizedBox(height: 20.h),
-                _buildSpecialNotes(location['notes']?.toString() ?? 'No special notes provided'),
+                _buildSpecialNotes(context, location['notes']?.toString() ?? 'No special notes provided'),
                 SizedBox(height: 30.h),
                 _buildActionButtons(context, currentBooking['status']?.toString() ?? 'pending', currentBooking),
               ],
@@ -86,14 +86,14 @@ class BookingDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildClientInfo(Map<String, dynamic> client, Map<String, dynamic> currentBooking) {
+  Widget _buildClientInfo(BuildContext context, Map<String, dynamic> client, Map<String, dynamic> currentBooking) {
     final status = currentBooking['status']?.toString() ?? 'pending';
     return Container(
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +109,7 @@ class BookingDetailsScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.sp.clamp(14, 18),
                       fontWeight: FontWeight.w500,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   if (currentBooking['depositPercentage'] != null) ...[
@@ -134,14 +134,18 @@ class BookingDetailsScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: status.toLowerCase() == 'confirmed' ? const Color(0xFFE8F5E9) : const Color(0xFFFFF3E0),
+                  color: status.toLowerCase() == 'confirmed' 
+                    ? (Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.2) : const Color(0xFFE8F5E9)) 
+                    : (Theme.of(context).brightness == Brightness.dark ? Colors.orange.withOpacity(0.2) : const Color(0xFFFFF3E0)),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(
                   status[0].toUpperCase() + status.substring(1),
                   style: TextStyle(
                     fontSize: 10.sp.clamp(9, 11),
-                    color: status.toLowerCase() == 'confirmed' ? const Color(0xFF2E7D32) : const Color(0xFFE65100),
+                    color: status.toLowerCase() == 'confirmed' 
+                      ? (Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32)) 
+                      : (Theme.of(context).brightness == Brightness.dark ? Colors.orange[300] : const Color(0xFFE65100)),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -169,6 +173,7 @@ class BookingDetailsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 17.sp.clamp(16, 18),
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 8.h),
@@ -181,7 +186,7 @@ class BookingDetailsScreen extends StatelessWidget {
                             client['email'] ?? currentBooking['clientEmail'] ?? 'No email available',
                             style: TextStyle(
                               fontSize: 13.sp.clamp(12, 14),
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -198,7 +203,7 @@ class BookingDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceDetails(Map<String, dynamic> service, Map<String, dynamic> location, Map<String, dynamic> currentBooking) {
+  Widget _buildServiceDetails(BuildContext context, Map<String, dynamic> service, Map<String, dynamic> location, Map<String, dynamic> currentBooking) {
     // 1. Move logic to the START of the function
     final String displayPrice = () {
       String price = '0';
@@ -235,9 +240,9 @@ class BookingDetailsScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,14 +252,14 @@ class BookingDetailsScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 16.sp.clamp(14, 18),
               fontWeight: FontWeight.w500,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 20.h),
-          _buildDetailRow('Service', service['title'] ?? 'Generic Service'),
-          _buildDetailRow('Date', currentBooking['bookingDate']?.toString().split('T')[0] ?? 'N/A'),
-          _buildDetailRow('Time', '${currentBooking['startTime'] ?? 'N/A'} - ${currentBooking['endTime'] ?? ''}'),
-          _buildDetailRow('Location', location['address'] ?? 'Location N/A'),
+          _buildDetailRow(context, 'Service', service['title'] ?? 'Generic Service'),
+          _buildDetailRow(context, 'Date', currentBooking['bookingDate']?.toString().split('T')[0] ?? 'N/A'),
+          _buildDetailRow(context, 'Time', '${currentBooking['startTime'] ?? 'N/A'} - ${currentBooking['endTime'] ?? ''}'),
+          _buildDetailRow(context, 'Location', location['address'] ?? 'Location N/A'),
           SizedBox(height: 10.h),
           const Divider(),
           SizedBox(height: 10.h),
@@ -278,7 +283,7 @@ class BookingDetailsScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18.sp.clamp(16, 20),
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -288,12 +293,14 @@ class BookingDetailsScreen extends StatelessWidget {
           if (currentBooking['depositPercentage'] != null && currentBooking['depositPercentage'] < 1.0) ...[
             SizedBox(height: 12.h),
             _buildPaymentDetailRow(
+              context,
               'Paid (Deposit ${((dDepositPercent) * 100).toInt()}%)', 
               '€${displayPaid.toStringAsFixed(2)}',
               color: const Color(0xFF4CAF50),
             ),
             SizedBox(height: 8.h),
             _buildPaymentDetailRow(
+              context,
               'Remaining Balance', 
               '€${displayRemaining.toStringAsFixed(2)}',
               color: Colors.redAccent,
@@ -305,7 +312,7 @@ class BookingDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentDetailRow(String label, String value, {Color? color, bool isBold = false}) {
+  Widget _buildPaymentDetailRow(BuildContext context, String label, String value, {Color? color, bool isBold = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -322,14 +329,14 @@ class BookingDetailsScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.sp.clamp(13, 15),
             fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-            color: color ?? Colors.black,
+            color: color ?? Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(BuildContext context, String label, String value) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
@@ -349,7 +356,7 @@ class BookingDetailsScreen extends StatelessWidget {
               textAlign: TextAlign.right,
               style: TextStyle(
                 fontSize: 14.sp.clamp(13, 15),
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
@@ -361,14 +368,14 @@ class BookingDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSpecialNotes(String notes) {
+  Widget _buildSpecialNotes(BuildContext context, String notes) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +385,7 @@ class BookingDetailsScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 16.sp.clamp(14, 18),
               fontWeight: FontWeight.w500,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 10.h),
@@ -446,7 +453,7 @@ class BookingDetailsScreen extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.r),
               ),
@@ -455,7 +462,7 @@ class BookingDetailsScreen extends StatelessWidget {
             child: Text(
               'Contact Client',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontSize: 15.sp.clamp(14, 16),
                 fontWeight: FontWeight.bold,
               ),
@@ -468,7 +475,7 @@ class BookingDetailsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildTextActionButton(context, 'Decline', Icons.close, Colors.red, false, currentBooking),
-              _buildTextActionButton(context, 'Accept', Icons.check, Colors.black, true, currentBooking),
+              _buildTextActionButton(context, 'Accept', Icons.check, Theme.of(context).colorScheme.onSurface, true, currentBooking),
             ],
           ),
         ],
@@ -487,7 +494,7 @@ class BookingDetailsScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(15.r),
           ),
           child: Column(
@@ -505,13 +512,13 @@ class BookingDetailsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(dialogContext),
-                      child: Icon(Icons.close, size: 24.sp, color: Colors.black87),
+                      child: Icon(Icons.close, size: 24.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8)),
                     ),
                   ],
                 ),
@@ -550,7 +557,7 @@ class BookingDetailsScreen extends StatelessWidget {
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE8F5E9),
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.2) : const Color(0xFFE8F5E9),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Row(
@@ -561,7 +568,7 @@ class BookingDetailsScreen extends StatelessWidget {
                               Text(
                                 'Yes',
                                 style: TextStyle(
-                                  color: const Color(0xFF2E7D32),
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32),
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -579,7 +586,7 @@ class BookingDetailsScreen extends StatelessWidget {
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFEBEE),
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withOpacity(0.2) : const Color(0xFFFFEBEE),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Row(
@@ -590,7 +597,7 @@ class BookingDetailsScreen extends StatelessWidget {
                               Text(
                                 'No',
                                 style: TextStyle(
-                                  color: const Color(0xFFC62828),
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.red[300] : const Color(0xFFC62828),
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.bold,
                                 ),

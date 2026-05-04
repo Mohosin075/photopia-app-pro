@@ -279,34 +279,34 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     return Consumer<ProviderProfileController>(
       builder: (context, profileController, child) {
         if (profileController.inProgress && profileController.userProfile == null) {
-          return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.sp),
+              icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 24.sp),
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
               if (_isEditing)
                 IconButton(
-                  icon: Icon(Icons.camera_alt_outlined, color: Colors.black, size: 24.sp),
+                  icon: Icon(Icons.camera_alt_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24.sp),
                   onPressed: _pickCoverPhoto,
                 ),
-              SizedBox(width: 10.w),
-            ],
+              ],
           ),
           body: RefreshIndicator(
             onRefresh: () async => _loadProfileData(),
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
@@ -333,15 +333,15 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                               : Container(
                                   height: 220.h,
                                   width: double.infinity,
-                                  color: Colors.grey[900],
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.image_not_supported, color: Colors.grey, size: 32.sp),
+                                      Icon(Icons.image_not_supported, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), size: 32.sp),
                                       SizedBox(height: 8.h),
                                       Text(
                                         'No cover photo',
-                                        style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2), fontSize: 12.sp),
                                       ),
                                     ],
                                   ),
@@ -390,7 +390,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                         bottom: -5.h,
                         left: 6.w,
                         right: 6.w,
-                        child: _buildProfileCard(profileController),
+                        child: _buildProfileCard(context, profileController),
                       ),
 
                       // Overlapping Stats Row
@@ -400,7 +400,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                         right: 0,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: _buildStatsRow(profileController),
+                          child: _buildStatsRow(context, profileController),
                         ),
                       ),
                     ],
@@ -442,7 +442,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     );
   }
 
-  Widget _buildProfileCard(ProviderProfileController controller) {
+  Widget _buildProfileCard(BuildContext context, ProviderProfileController controller) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10.r),
       child: BackdropFilter(
@@ -450,9 +450,16 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: Colors.black12.withOpacity(0.5),
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? Colors.black.withOpacity(0.4) 
+                : Colors.black.withOpacity(0.05),
             borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+            border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? Colors.white.withOpacity(0.1) 
+                  : Colors.white.withOpacity(0.3), 
+              width: 1
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -644,7 +651,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     );
   }
 
-  Widget _buildStatsRow(ProviderProfileController controller) {
+  Widget _buildStatsRow(BuildContext context, ProviderProfileController controller) {
     final rating = controller.rating.toStringAsFixed(1);
     final reviews = controller.reviewCount.toString();
     final responseRate = '${controller.responseRate}%';
@@ -667,11 +674,13 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       height: 90.h,
       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 4.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10).r,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? Colors.black.withOpacity(0.3) 
+                : Colors.black.withOpacity(0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -680,7 +689,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Icon(icon, size: 22.sp, color: Colors.black87),
+          Icon(icon, size: 22.sp, color: Theme.of(context).colorScheme.onSurface),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
@@ -688,7 +697,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -697,7 +706,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11.sp,
-              color: Colors.grey[600],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               height: 1,
               fontWeight: FontWeight.w500,
             ),
@@ -713,7 +722,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       children: [
         Text(
           context.l10n.aboutMeTitle,
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18.sp, 
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         SizedBox(height: 12.h),
         if (_isEditing)
@@ -722,7 +735,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             maxLines: null,
             decoration: InputDecoration(
               filled: true,
-              fillColor: const Color(0xFFF5F5F7),
+              fillColor: Theme.of(context).colorScheme.surface,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
                 borderSide: BorderSide.none,
@@ -733,10 +746,10 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           Text(
             _aboutController.text,
             style: TextStyle(
-              fontSize: 14.sp,
-              color: Colors.grey[700],
-              height: 1.5,
-            ),
+            fontSize: 14.sp,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            height: 1.5,
+          ),
           ),
       ],
     );
@@ -752,7 +765,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           children: [
             Text(
               title,
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18.sp, 
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             if (_isEditing)
               IconButton(
@@ -777,9 +794,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F7),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20).r,
-          border: !_isEditing && isSpecialty ? Border.all(color: Colors.blue.withOpacity(0.3), width: 1) : null,
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -787,28 +804,25 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             Text(
               isSpecialty ? '#$label' : label,
               style: TextStyle(
-                fontSize: 13.sp, 
-                color: !_isEditing && isSpecialty ? Colors.blue[700] : Colors.black87,
-                fontWeight: !_isEditing && isSpecialty ? FontWeight.w600 : FontWeight.normal,
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
               ),
             ),
             if (_isEditing) ...[
-              SizedBox(width: 8.w),
+              SizedBox(width: 6.w),
               GestureDetector(
                 onTap: () {
                   setState(() {
                     if (isSpecialty) {
-                      final item = label;
-                      _tempSpecializations.remove(item);
-                      _removedSpecializations.add(item);
+                      _tempSpecializations.remove(label);
+                      _removedSpecializations.add(label);
                     } else {
-                      final item = label;
-                      _tempLanguages.remove(item);
-                      _removedLanguages.add(item);
+                      _tempLanguages.remove(label);
+                      _removedLanguages.add(label);
                     }
                   });
                 },
-                child: Icon(Icons.close, size: 14.sp, color: Colors.red),
+                child: Icon(Icons.close, size: 14.sp, color: Colors.red[400]),
               ),
             ],
           ],
@@ -834,17 +848,17 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.add_photo_alternate_outlined, color: Colors.white, size: 16.sp),
+                      Icon(Icons.add_photo_alternate_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 16.sp),
                       SizedBox(width: 6.w),
                       Text(
                         context.l10n.addPhotoBtn,
-                        style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 13.sp, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -939,19 +953,19 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             padding: EdgeInsets.symmetric(vertical: 30.h),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F7).withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
               borderRadius: BorderRadius.circular(15.r),
-              border: Border.all(color: Colors.grey[200]!, width: 1),
+              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1), width: 1),
             ),
             child: Column(
               children: [
-                Icon(Icons.rate_review_outlined, color: Colors.grey[400], size: 40.sp),
+                Icon(Icons.rate_review_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2), size: 40.sp),
                 SizedBox(height: 12.h),
                 Text(
                   context.l10n.noReviewsYet,
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: Colors.grey[500],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -960,7 +974,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   context.l10n.completedBookingsWillAppearHere,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: Colors.grey[400],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                   ),
                 ),
               ],
@@ -1008,8 +1022,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 18.r,
-                  backgroundColor: Colors.grey[200],
-                  child: Icon(Icons.person, color: Colors.grey[400], size: 20.sp),
+                  backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                  child: Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), size: 20.sp),
                 ),
                 SizedBox(width: 12.w),
                 Column(
@@ -1023,7 +1037,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     Row(
                       children: List.generate(5, (index) => Icon(
                         Icons.star, 
-                        color: index < rating ? Colors.amber : Colors.grey[300], 
+                        color: index < rating ? Colors.amber : Theme.of(context).colorScheme.onSurface.withOpacity(0.1), 
                         size: 12.sp
                       )),
                     ),
@@ -1033,7 +1047,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             ),
             Text(
               formattedDate,
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+              style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
             ),
           ],
         ),
@@ -1044,7 +1058,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             comment,
             style: TextStyle(
               fontSize: 13.sp,
-              color: Colors.grey[700],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               height: 1.4,
             ),
           ),
@@ -1069,7 +1083,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
           child: Padding(
             padding: EdgeInsets.all(24.w),
             child: Column(
@@ -1081,7 +1096,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   style: TextStyle(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -1092,7 +1107,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                       : context.l10n.selectLanguageHint,
                   style: TextStyle(
                     fontSize: 13.sp,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     height: 1.4,
                   ),
                 ),
@@ -1103,7 +1118,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F7),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -1112,11 +1127,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                         value: _selectedLanguage,
                         hint: Text(
                           context.l10n.selectLanguageDropdownHint,
-                          style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14.sp),
                         ),
-                        icon: Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 20.sp),
-                        style: TextStyle(fontSize: 15.sp, color: Colors.black87),
-                        dropdownColor: Colors.white,
+                        icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), size: 20.sp),
+                        style: TextStyle(fontSize: 15.sp, color: Theme.of(context).colorScheme.onSurface),
+                        dropdownColor: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12.r),
                         items: _availableLanguages
                             .where((lang) => !_tempLanguages.contains(lang))
@@ -1137,9 +1152,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     autofocus: true,
                     decoration: InputDecoration(
                       hintText: context.l10n.exPortraitPhotography,
-                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14.sp),
                       filled: true,
-                      fillColor: const Color(0xFFF5F5F7),
+                      fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                       contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.r),
@@ -1147,10 +1162,10 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.r),
-                        borderSide: const BorderSide(color: Colors.black, width: 1),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1),
                       ),
                     ),
-                    style: TextStyle(fontSize: 15.sp),
+                    style: TextStyle(fontSize: 15.sp, color: Theme.of(context).colorScheme.onSurface),
                   ),
 
                 SizedBox(height: 24.h),
@@ -1165,7 +1180,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                         onPressed: () => Navigator.pop(context),
                         child: Text(
                           context.l10n.cancelBtn,
-                          style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w600),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -1173,8 +1188,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           elevation: 0,
                           padding: EdgeInsets.symmetric(vertical: 14.h),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12).r),
@@ -1222,7 +1237,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             if (_isEditing)
@@ -1236,7 +1251,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         if (_tempDocuments.isEmpty)
           Text(
             context.l10n.noDocumentsAdded,
-            style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+            style: TextStyle(fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
           )
         else
           ListView.separated(
@@ -1252,9 +1267,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
                   borderRadius: BorderRadius.circular(10.r),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
                 ),
                 child: Row(
                   children: [
@@ -1274,7 +1289,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     Expanded(
                       child: Text(
                         fileName,
-                        style: TextStyle(fontSize: 14.sp, color: Colors.black87, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

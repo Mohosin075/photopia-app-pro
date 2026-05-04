@@ -61,7 +61,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,8 +101,8 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                           child: Container(
                             width: 8.w,
                             height: 8.w,
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.error,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -120,19 +120,19 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
               child: Container(
                 height: 40.h,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F7),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: TabBar(
                   controller: _tabController,
                   padding: EdgeInsets.all(4.w),
                   indicator: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: const Color(0xFF455A64),
+                  labelColor: Theme.of(context).colorScheme.onPrimary,
+                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   labelStyle: TextStyle(
                     fontSize: 12.sp.clamp(11, 13),
                     fontWeight: FontWeight.w600,
@@ -204,8 +204,8 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
     final todayOrders = controller.todayOrders;
     
     return RefreshIndicator(
-      color: Colors.black,
-      backgroundColor: Colors.white,
+      color: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       onRefresh: () => controller.getMyOrders(filterType: 'today'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -222,13 +222,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                     style: TextStyle(
                       fontSize: AppTypography.h1,
                       fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   Text(
                     context.l10n.bookingsCount(todayOrders.length),
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
-                      color: Colors.grey[500],
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     ),
                   ),
                 ],
@@ -298,8 +299,8 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
     final upcomingOrders = controller.upcomingOrders;
     
     return RefreshIndicator(
-      color: Colors.black,
-      backgroundColor: Colors.white,
+      color: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       onRefresh: () => controller.getMyOrders(filterType: 'upcoming'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -322,7 +323,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                     context.l10n.bookingsCount(upcomingOrders.length),
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
-                      color: Colors.grey[500],
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     ),
                   ),
                 ],
@@ -390,8 +391,8 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
     final pendingOrders = controller.pendingOrders;
     
     return RefreshIndicator(
-      color: Colors.black,
-      backgroundColor: Colors.white,
+      color: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       onRefresh: () => controller.getMyOrders(status: 'pending'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -414,7 +415,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                     context.l10n.requestsCount(pendingOrders.length),
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
-                      color: Colors.grey[500],
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     ),
                   ),
                 ],
@@ -495,9 +496,9 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
       margin: EdgeInsets.only(bottom: 15.h),
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[200] ?? Colors.grey),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Column(
         children: [
@@ -525,6 +526,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                             style: TextStyle(
                               fontSize: AppTypography.bodyLarge,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -534,8 +536,8 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                           decoration: BoxDecoration(
                             color: status.toString().toLowerCase() == 'confirmed' 
-                              ? const Color(0xFFE8F5E9) 
-                              : const Color(0xFFFFF3E0),
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.2) : const Color(0xFFE8F5E9)) 
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.orange.withOpacity(0.2) : const Color(0xFFFFF3E0)),
                             borderRadius: BorderRadius.circular(6.r),
                           ),
                           child: Text(
@@ -543,8 +545,8 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                             style: TextStyle(
                               fontSize: AppTypography.bodySmall,
                               color: status.toString().toLowerCase() == 'confirmed' 
-                                ? const Color(0xFF2E7D32) 
-                                : const Color(0xFFE65100),
+                                ? (Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32)) 
+                                : (Theme.of(context).brightness == Brightness.dark ? Colors.orange[300] : const Color(0xFFE65100)),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -555,20 +557,20 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       service,
                       style: TextStyle(
                         fontSize: AppTypography.bodyMedium,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 10.h),
                     Row(
                       children: [
-                        Icon(Icons.access_time, size: 14.sp, color: Colors.grey[600]),
+                        Icon(Icons.access_time, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
                         SizedBox(width: 6.w),
                         Text(
                           time,
                           style: TextStyle(
                             fontSize: AppTypography.bodySmall,
-                            color: Colors.grey[700],
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                           ),
                         ),
                       ],
@@ -576,14 +578,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                     SizedBox(height: 4.h),
                     Row(
                       children: [
-                        Icon(Icons.location_on_outlined, size: 14.sp, color: Colors.grey[600]),
+                        Icon(Icons.location_on_outlined, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
                         SizedBox(width: 6.w),
                         Expanded(
                           child: Text(
                             location,
                             style: TextStyle(
                               fontSize: AppTypography.bodySmall,
-                              color: Colors.grey[700],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -605,6 +607,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                 style: TextStyle(
                   fontSize: AppTypography.h2,
                   fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               Expanded(
@@ -639,6 +642,8 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
     );
   }
 
+
+
   Widget _buildUpcomingBookingCard({
     required String name,
     required String service,
@@ -652,9 +657,9 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
       margin: EdgeInsets.only(bottom: 15.h),
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[200] ?? Colors.grey),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -671,6 +676,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       style: TextStyle(
                         fontSize: AppTypography.bodyLarge,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -678,7 +684,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       service,
                       style: TextStyle(
                         fontSize: 13.sp.clamp(12, 14),
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -689,14 +695,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: status.toString().toLowerCase() == 'confirmed' ? const Color(0xFFE8F5E9) : const Color(0xFFFFF3E0),
+                  color: status.toString().toLowerCase() == 'confirmed' ? (Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.2) : const Color(0xFFE8F5E9)) : (Theme.of(context).brightness == Brightness.dark ? Colors.orange.withOpacity(0.2) : const Color(0xFFFFF3E0)),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(
                   status,
                   style: TextStyle(
                     fontSize: AppTypography.bodySmall,
-                    color: status.toString().toLowerCase() == 'confirmed' ? const Color(0xFF2E7D32) : const Color(0xFFE65100),
+                    color: status.toString().toLowerCase() == 'confirmed' ? (Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32)) : (Theme.of(context).brightness == Brightness.dark ? Colors.orange[300] : Theme.of(context).colorScheme.error),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -706,23 +712,23 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
           SizedBox(height: 12.h),
           Row(
             children: [
-              Icon(Icons.calendar_today, size: 14.sp, color: Colors.grey[600]),
+              Icon(Icons.calendar_today, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               SizedBox(width: 6.w),
               Text(
                 date,
                 style: TextStyle(
                   fontSize: AppTypography.bodySmall,
-                  color: Colors.grey[700],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               SizedBox(width: 15.w),
-              Icon(Icons.access_time, size: 14.sp, color: Colors.grey[600]),
+              Icon(Icons.access_time, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               SizedBox(width: 6.w),
               Text(
                 time,
                 style: TextStyle(
                   fontSize: AppTypography.bodySmall,
-                  color: Colors.grey[700],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
             ],
@@ -739,6 +745,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                   style: TextStyle(
                     fontSize: AppTypography.h2,
                     fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -763,14 +770,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                           context.l10n.viewDetails,
                           style: TextStyle(
                             fontSize: AppTypography.bodyMedium,
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             fontWeight: FontWeight.w600,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       SizedBox(width: 4.w),
-                      Icon(Icons.arrow_forward, size: 14.sp, color: Colors.grey[600]),
+                      Icon(Icons.arrow_forward, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                     ],
                   ),
                 ),
@@ -797,9 +804,9 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
       margin: EdgeInsets.only(bottom: 15.h),
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[200] ?? Colors.grey),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -828,6 +835,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                             style: TextStyle(
                               fontSize: AppTypography.bodyLarge,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -836,14 +844,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                           decoration: BoxDecoration(
-                            color: Colors.grey[100],
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(6.r),
                           ),
                           child: Text(
                             context.l10n.tabPending,
                             style: TextStyle(
                               fontSize: AppTypography.bodySmall,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -854,7 +862,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       service,
                       style: TextStyle(
                         fontSize: AppTypography.bodyMedium,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -862,7 +870,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       requestedAgo,
                       style: TextStyle(
                         fontSize: AppTypography.bodySmall,
-                        color: Colors.grey[400],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       ),
                     ),
                   ],
@@ -873,13 +881,13 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
           SizedBox(height: 15.h),
           Row(
             children: [
-              Icon(Icons.calendar_today, size: 14.sp, color: Colors.grey[600]),
+              Icon(Icons.calendar_today, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               SizedBox(width: 6.w),
               Text(
                 date,
                 style: TextStyle(
                   fontSize: 12.sp.clamp(11, 13),
-                  color: Colors.grey[700],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
             ],
@@ -887,13 +895,13 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
           SizedBox(height: 6.h),
           Row(
             children: [
-              Icon(Icons.access_time, size: 14.sp, color: Colors.grey[600]),
+              Icon(Icons.access_time, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               SizedBox(width: 6.w),
               Text(
                 time,
                 style: TextStyle(
                   fontSize: 12.sp.clamp(11, 13),
-                  color: Colors.grey[700],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
             ],
@@ -901,13 +909,13 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
           SizedBox(height: 6.h),
           Row(
             children: [
-              Icon(Icons.location_on_outlined, size: 14.sp, color: Colors.grey[600]),
+              Icon(Icons.location_on_outlined, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               SizedBox(width: 6.w),
               Text(
                 location,
                 style: TextStyle(
                   fontSize: AppTypography.bodySmall,
-                  color: Colors.grey[700],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
             ],
@@ -921,6 +929,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                   style: TextStyle(
                     fontSize: AppTypography.h2,
                     fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 Row(
@@ -950,7 +959,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                         bookingId: booking['_id'] ?? '',
                       ),
                       icon: Icons.check,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ],
                 ),
@@ -974,13 +983,13 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                     context.l10n.viewFullDetails,
                     style: TextStyle(
                       fontSize: AppTypography.bodyMedium,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       fontWeight: FontWeight.w600,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(width: 4.w),
-                  Icon(Icons.arrow_forward, size: 14.sp, color: Colors.grey[600]),
+                  Icon(Icons.arrow_forward, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 ],
               ),
             ),
@@ -1044,7 +1053,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         backgroundColor: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(15.r),
           ),
           child: Column(
@@ -1062,18 +1071,18 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(Icons.close, size: 24.sp, color: Colors.black87),
+                      child: Icon(Icons.close, size: 24.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8)),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 1, color: Color(0xFFE0E0E0)),
+              Divider(height: 1, color: Theme.of(context).dividerColor.withOpacity(0.1)),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 25.h, horizontal: 20.w),
                 child: Row(
@@ -1104,18 +1113,18 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE8F5E9),
+                            color: Colors.green.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.check, color: Color(0xFF2E7D32), size: 18),
+                              const Icon(Icons.check, color: Colors.green, size: 18),
                               SizedBox(width: 8.w),
                               Text(
                                 context.l10n.yes,
                                 style: TextStyle(
-                                  color: const Color(0xFF2E7D32),
+                                  color: Colors.green,
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -1133,7 +1142,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFEBEE),
+                            color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Row(
@@ -1174,15 +1183,15 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: isPrimary ? Colors.black : Colors.white,
+          color: isPrimary ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(8.r),
-          border: isPrimary ? null : Border.all(color: Colors.grey[300] ?? Colors.grey),
+          border: isPrimary ? null : Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
         ),
         child: Text(
           text,
           style: TextStyle(
             fontSize: 13.sp.clamp(12, 14),
-            color: isPrimary ? Colors.white : Colors.black,
+            color: isPrimary ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -1225,20 +1234,20 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
           margin: EdgeInsets.only(bottom: 15.h),
           padding: EdgeInsets.all(15.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: Colors.grey[200] ?? Colors.grey),
+            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
           ),
           child: Shimmer.fromColors(
-            baseColor: Colors.grey[300] ?? Colors.grey,
-            highlightColor: Colors.grey[100] ?? Colors.white,
+            baseColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            highlightColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
             child: Row(
               children: [
                 Container(
                   width: 50.r,
                   height: 50.r,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -1250,19 +1259,19 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                       Container(
                         width: 120.w,
                         height: 16.h,
-                        color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                       ),
                       SizedBox(height: 8.h),
                       Container(
                         width: 180.w,
                         height: 12.h,
-                        color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                       ),
                       SizedBox(height: 8.h),
                       Container(
                         width: 100.w,
                         height: 12.h,
-                        color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                       ),
                     ],
                   ),

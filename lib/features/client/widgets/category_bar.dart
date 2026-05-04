@@ -55,12 +55,12 @@ class CategoryBar extends StatelessWidget {
               margin: EdgeInsets.only(right: 12.w),
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.black : Colors.white,
+                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(25).r,
                 border: Border.all(
                   color: isSelected
-                      ? Colors.black
-                      : Colors.grey.withOpacity(0.3),
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 ),
               ),
               child: Row(
@@ -70,14 +70,14 @@ class CategoryBar extends StatelessWidget {
                      Icon(
                         Icons.category_outlined,
                         size: 18.sp.clamp(18, 20),
-                        color: isSelected ? Colors.white : Colors.black,
+                        color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
                       ),
                       SizedBox(width: 8.w),
                   ] else if (isAll) ...[
                       Icon(
                         Icons.grid_view_outlined,
                         size: 18.sp.clamp(18, 20),
-                        color: isSelected ? Colors.white : Colors.black,
+                        color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
                       ),
                       SizedBox(width: 8.w),
                   ],
@@ -86,7 +86,7 @@ class CategoryBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14.sp.clamp(14, 15),
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.white : Colors.black,
+                      color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ],

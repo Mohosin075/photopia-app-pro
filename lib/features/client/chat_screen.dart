@@ -129,7 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void _showAttachmentMenu() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20).r)),
       builder: (context) {
         return SafeArea(
@@ -235,7 +235,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(),
       body: Consumer<ChatController>(
         builder: (context, controller, child) {
@@ -270,24 +270,24 @@ class _ChatScreenState extends State<ChatScreen> {
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       surfaceTintColor: Colors.transparent,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
         onPressed: () => Navigator.pop(context),
       ),
       title: Row(
         children: [
           CircleAvatar(
             radius: 20.r,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: Theme.of(context).colorScheme.surface,
             backgroundImage: widget.conversation.avatarUrl.isNotEmpty
                 ? (widget.conversation.avatarUrl.startsWith('assets/')
                     ? AssetImage(widget.conversation.avatarUrl) as ImageProvider
                     : NetworkImage(widget.conversation.avatarUrl))
                 : null,
             child: widget.conversation.avatarUrl.isEmpty
-                ? Icon(Icons.person, color: Colors.grey[400], size: 24.sp)
+                ? Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 24.sp)
                 : null,
           ),
           SizedBox(width: 12.w),
@@ -296,11 +296,11 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Text(
                 widget.conversation.name,
-                style: TextStyle(color: Colors.black, fontSize: 15.sp, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.bold),
               ),
               Text(
                 widget.conversation.isOnline ? 'Online' : 'Offline',
-                style: TextStyle(color: Colors.grey, fontSize: 11.sp),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11.sp),
               ),
             ],
           ),
@@ -314,9 +314,9 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline, size: 64.sp, color: Colors.grey[300]),
+          Icon(Icons.chat_bubble_outline, size: 64.sp, color: Theme.of(context).dividerColor.withOpacity(0.1)),
           SizedBox(height: 16.h),
-          Text('No messages yet', style: TextStyle(color: Colors.grey, fontSize: 16.sp)),
+          Text('No messages yet', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 16.sp)),
         ],
       ),
     );
@@ -334,7 +334,7 @@ class _ChatScreenState extends State<ChatScreen> {
             constraints: BoxConstraints(maxWidth: 0.75.sw),
             padding: EdgeInsets.all(12.r),
             decoration: BoxDecoration(
-              color: message.isMe ? const Color(0xFF1A1A1A) : const Color(0xFFF1F3F5),
+              color: message.isMe ? Theme.of(context).colorScheme.primary : (Theme.of(context).brightness == Brightness.dark ? Theme.of(context).dividerColor.withOpacity(0.1) : const Color(0xFFF1F3F5)),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16).r,
                 topRight: Radius.circular(16).r,
@@ -350,7 +350,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (message.text.trim().isNotEmpty && message.text != "[Empty Message]")
                   Text(
                     message.text.trim(),
-                    style: TextStyle(color: message.isMe ? Colors.white : Colors.black, fontSize: 14.sp),
+                    style: TextStyle(color: message.isMe ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface, fontSize: 14.sp),
                   ),
               ],
             ),
@@ -360,7 +360,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(DateFormat('hh:mm a').format(message.time), style: TextStyle(color: Colors.grey, fontSize: 10.sp)),
+                Text(DateFormat('hh:mm a').format(message.time), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 10.sp)),
                 if (message.isMe) ...[
                   SizedBox(width: 4.w),
                   _buildStatusIcon(message.status),
@@ -438,13 +438,13 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Container(
         padding: EdgeInsets.all(10.r),
         margin: EdgeInsets.only(bottom: 8.h),
-        decoration: BoxDecoration(color: message.isMe ? Colors.white.withOpacity(0.1) : Colors.white, borderRadius: BorderRadius.circular(12).r),
+        decoration: BoxDecoration(color: message.isMe ? Colors.white.withOpacity(0.1) : (Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : Colors.white), borderRadius: BorderRadius.circular(12).r),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.attach_file, color: message.isMe ? Colors.white : Colors.black, size: 20.sp),
+            Icon(Icons.attach_file, color: message.isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 20.sp),
             SizedBox(width: 8.w),
-            Flexible(child: Text(message.fileName ?? 'File', style: TextStyle(color: message.isMe ? Colors.white : Colors.black, fontSize: 13.sp), overflow: TextOverflow.ellipsis)),
+            Flexible(child: Text(message.fileName ?? 'File', style: TextStyle(color: message.isMe ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface, fontSize: 13.sp), overflow: TextOverflow.ellipsis)),
           ],
         ),
       ),
@@ -454,17 +454,17 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildInputArea(bool isSending) {
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 30.h),
-      decoration: BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.1)))),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)))),
       child: Row(
         children: [
-          IconButton(icon: Icon(Icons.attach_file, color: Colors.grey, size: 24.sp), onPressed: _showAttachmentMenu),
+          IconButton(icon: Icon(Icons.attach_file, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), size: 24.sp), onPressed: _showAttachmentMenu),
           Expanded(
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24).r, border: Border.all(color: Colors.grey.withOpacity(0.3))),
+              decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(24).r, border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1))),
               child: TextField(
                 controller: _messageController,
-                decoration: const InputDecoration(hintText: 'Type a message...', border: InputBorder.none),
+                decoration: InputDecoration(hintText: 'Type a message...', border: InputBorder.none, hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
                 onSubmitted: (_) => _handleSendMessage(),
               ),
             ),
@@ -475,8 +475,8 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Container(
               width: 48.r,
               height: 48.r,
-              decoration: const BoxDecoration(color: Color(0xFF1A1A1A), shape: BoxShape.circle),
-              child: const Icon(Icons.send_rounded, color: Colors.white, size: 22),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
+              child: Icon(Icons.send_rounded, color: Theme.of(context).colorScheme.onPrimary, size: 22),
             ),
           ),
         ],

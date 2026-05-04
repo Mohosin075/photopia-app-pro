@@ -45,9 +45,9 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
@@ -59,7 +59,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               Text(
                 context.l10n.myListings,
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: AppTypography.h1,
                   fontWeight: FontWeight.bold,
                 ),
@@ -83,17 +83,18 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                     ),
                   );
                 },
-                icon: Icon(Icons.add, size: 18.sp, color: Colors.white),
+                icon: Icon(Icons.add, size: 18.sp, color: Theme.of(context).colorScheme.onPrimary),
                 label: Text(
                   context.l10n.create,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     fontSize: AppTypography.bodyLarge,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: EdgeInsets.symmetric(
                     horizontal: 16.w,
                     vertical: 8.h,
@@ -124,8 +125,8 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               HapticFeedback.lightImpact();
               await controller.getMyListings();
             },
-            color: Colors.black,
-            backgroundColor: Colors.white,
+            color: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               physics: const AlwaysScrollableScrollPhysics(),
@@ -153,7 +154,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                           context.l10n.noListingsFound(_selectedStatus),
                           style: TextStyle(
                             fontSize: AppTypography.bodyLarge,
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                           ),
                         ),
                       ),
@@ -182,15 +183,16 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
           padding: EdgeInsets.symmetric(vertical: 10.h),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF1F1F1F)
-                : const Color(0xFFF5F5F7),
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10.r),
+            border: isSelected ? null : Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
           ),
           child: Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black54,
+              color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               fontSize: AppTypography.bodyLarge,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             ),
@@ -205,12 +207,12 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
       margin: EdgeInsets.only(bottom: 5.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(color: const Color(0xFFF0F0F0)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -228,7 +230,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                   style: TextStyle(
                     fontSize: AppTypography.h2,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -237,14 +239,14 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.2) : const Color(0xFFE8F5E9),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(
                   listing.status ?? 'Active',
                   style: TextStyle(
                     fontSize: AppTypography.bodySmall,
-                    color: const Color(0xFF2E7D32),
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -258,19 +260,19 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 listing.category?.name ?? context.l10n.noCategory,
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 6.w),
-                child: Icon(Icons.circle, size: 4.sp, color: Colors.grey[400]),
+                child: Icon(Icons.circle, size: 4.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
               ),
               Text(
                 '${listing.currency ?? '\$'} ${listing.price ?? 0} / ${((listing.duration != null && num.tryParse(listing.duration!) != null) ? '${listing.duration} hrs' : (listing.duration ?? 'hr'))}',
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -281,14 +283,14 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               Icon(
                 Icons.visibility_outlined,
                 size: 16.sp,
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               ),
               SizedBox(width: 4.w),
               Text(
                 context.l10n.viewsCount(189), // Not in model yet
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(width: 16.w),
@@ -300,7 +302,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                   context.l10n.bookingsCount(8), // Not in model yet
                   style: TextStyle(
                     fontSize: AppTypography.bodyMedium,
-                    color: const Color(0xFF636AFF),
+                    color: Theme.of(context).colorScheme.primary,
                     decoration: TextDecoration.underline,
                   ),
                 ),
@@ -308,7 +310,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
             ],
           ),
           SizedBox(height: 16.h),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          const Divider(height: 1),
           SizedBox(height: 16.h),
           Row(
             children: [
@@ -393,14 +395,14 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
         height: 30.h,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(color: const Color(0xFFF0F0F0)),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 15.sp, color: Colors.black87),
+            Icon(icon, size: 15.sp, color: Theme.of(context).colorScheme.onSurface),
             if (label.isNotEmpty) ...[
               SizedBox(width: 8.w),
               Flexible(
@@ -409,7 +411,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                   style: TextStyle(
                     fontSize: 12.sp.clamp(12, 13),
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -425,9 +427,9 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(color: const Color(0xFFF0F0F0)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,7 +439,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
             style: TextStyle(
               fontSize: AppTypography.h2,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 20.h),
@@ -462,7 +464,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
           label,
           style: TextStyle(
             fontSize: AppTypography.bodyMedium,
-            color: Colors.grey[600],
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           ),
         ),
         SizedBox(height: 8.h),
@@ -471,7 +473,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
           style: TextStyle(
             fontSize: AppTypography.h2,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ],
@@ -499,7 +501,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               child: Container(
                 padding: EdgeInsets.all(24.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(24.r),
                   boxShadow: [
                     BoxShadow(
@@ -515,14 +517,14 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                     // Icon in circle
                     Container(
                       padding: EdgeInsets.all(16.w),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F5F5),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.person_add_alt_1_rounded,
                         size: 32.sp,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -531,7 +533,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -541,7 +543,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         height: 1.5,
                       ),
                     ),
@@ -554,7 +556,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                             onPressed: () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               padding: EdgeInsets.symmetric(vertical: 12.h),
-                              side: BorderSide(color: Colors.grey[300]!),
+                              side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
@@ -562,7 +564,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                             child: Text(
                               context.l10n.later,
                               style: TextStyle(
-                                color: Colors.grey[700],
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13.sp,
                               ),
@@ -583,8 +585,8 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
                               elevation: 0,
                               padding: EdgeInsets.symmetric(vertical: 12.h),
                               shape: RoundedRectangleBorder(
@@ -621,6 +623,10 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
         ),
         child: Container(
           padding: EdgeInsets.all(20.w),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(15.r),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -629,7 +635,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 children: [
                   Text(
                     context.l10n.deleteConfirmation,
-                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                   ),
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
@@ -643,7 +649,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 25.h),
@@ -686,9 +692,9 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 10.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1FFF3),
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.1) : const Color(0xFFF1FFF3),
                           borderRadius: BorderRadius.circular(10.r),
-                          border: Border.all(color: const Color(0xFFB9F6C0)),
+                          border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.3) : const Color(0xFFB9F6C0)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -696,13 +702,13 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                             Icon(
                               Icons.check,
                               size: 16.sp,
-                              color: const Color(0xFF2E7D32),
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32),
                             ),
                             SizedBox(width: 8.w),
                             Text(
                               context.l10n.yes,
                               style: TextStyle(
-                                color: const Color(0xFF2E7D32),
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14.sp,
                               ),
@@ -720,9 +726,9 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 10.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFF1F1),
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withOpacity(0.1) : const Color(0xFFFFF1F1),
                           borderRadius: BorderRadius.circular(10.r),
-                          border: Border.all(color: const Color(0xFFFFCDD2)),
+                          border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withOpacity(0.3) : const Color(0xFFFFCDD2)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -730,13 +736,13 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                             Icon(
                               Icons.close,
                               size: 16.sp,
-                              color: const Color(0xFFC62828),
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.red[300] : const Color(0xFFC62828),
                             ),
                             SizedBox(width: 8.w),
                             Text(
                               context.l10n.no,
                               style: TextStyle(
-                                color: const Color(0xFFC62828),
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.red[300] : const Color(0xFFC62828),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14.sp,
                               ),

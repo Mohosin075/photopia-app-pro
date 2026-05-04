@@ -144,21 +144,25 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
           _buildTabNavigator(3, const FavoritesScreen()),
           _buildTabNavigator(4, const UserProfileScreen()),
         ],
+
       ),
       bottomNavigationBar: isKeyboardVisible
           ? const SizedBox.shrink()
           : Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.black.withOpacity(0.3) 
+                        : Colors.black.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
                 ],
               ),
               child: SafeArea(
+
                 top: false,
                 child: SizedBox(
                   height: 65.h,
@@ -221,9 +225,14 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
           width: 56.w,
           height: 56.w,
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? Colors.white 
+                : const Color(0xFF1A1A1A),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 4),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.surface, 
+              width: 4,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.15),
@@ -234,7 +243,9 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
           ),
           child: Icon(
             Icons.search,
-            color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
+            color: isSelected 
+                ? (Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white)
+                : (Theme.of(context).brightness == Brightness.dark ? Colors.black87 : Colors.white.withOpacity(0.8)),
             size: 26.sp,
           ),
         ),
@@ -262,20 +273,26 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
               iconAsset,
               width: 24.w,
               height: 24.w,
-              color: isSelected ? Colors.black : Colors.grey[400],
+              color: isSelected 
+                  ? Theme.of(context).colorScheme.onSurface 
+                  : Colors.grey[400],
             )
           else
             Icon(
               icon,
               size: 24.sp,
-              color: isSelected ? Colors.black : Colors.grey[400],
+              color: isSelected 
+                  ? Theme.of(context).colorScheme.onSurface 
+                  : Colors.grey[400],
             ),
           SizedBox(height: 4.h),
           Text(
             label,
             style: TextStyle(
               fontSize: 11.sp,
-              color: isSelected ? Colors.black : Colors.grey[400],
+              color: isSelected 
+                  ? Theme.of(context).colorScheme.onSurface 
+                  : Colors.grey[400],
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),

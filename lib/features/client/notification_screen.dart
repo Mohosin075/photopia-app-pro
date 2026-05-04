@@ -32,14 +32,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         toolbarHeight: 60.h,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Padding(
@@ -53,7 +53,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   Text(
                     context.l10n.notifications,
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 20.sp.clamp(20, 22),
                       fontWeight: FontWeight.bold,
                     ),
@@ -61,7 +61,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   Text(
                     context.l10n.unread(controller.unreadCount),
                     style: TextStyle(
-                      color: const Color(0xFF8E949A),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 14.sp.clamp(14, 16),
                       fontWeight: FontWeight.w400,
                     ),
@@ -81,9 +81,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
               child: Text(
                 context.l10n.markAllAsRead,
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 14.sp.clamp(14, 16),
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -97,7 +97,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Theme.of(context).dividerColor.withOpacity(0.05),
                   width: 1,
                 ),
               ),
@@ -117,7 +117,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             child: Text(
                               'All (${controller.notifications.length})',
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 14.sp.clamp(14, 16),
                                 fontWeight: FontWeight.bold,
                               ),
@@ -127,7 +127,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           SizedBox(height: 12.h),
                           Container(
                             height: 2.h,
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ],
                       ),
@@ -154,7 +154,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             return Center(
               child: Text(
                 "No notifications available.",
-                style: TextStyle(color: Colors.grey, fontSize: 16.sp),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 16.sp),
               ),
             );
           }
@@ -189,8 +189,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20).r,
         ),
@@ -198,13 +198,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
           children: [
             Icon(
               controller.getIconForType(notification.type),
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             SizedBox(width: 10.w),
             Expanded(
               child: Text(
                 notification.title,
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
           ],
@@ -217,24 +217,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
               notification.content,
               style: TextStyle(
                 fontSize: 14.sp,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                 height: 1.5,
               ),
             ),
             SizedBox(height: 15.h),
             Text(
               controller.formatTime(notification.createdAt),
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+              style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'Close',
               style: TextStyle(
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -252,11 +252,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(15).r,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -269,7 +269,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             children: [
               // Unread Indicator
               if (!notification.isRead)
-                Container(width: 4.w, color: Colors.black),
+                Container(width: 4.w, color: Theme.of(context).colorScheme.primary),
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.all(15.w),
@@ -279,14 +279,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       // Icon
                       Container(
                         padding: EdgeInsets.all(10.w),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF8F9FA),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           controller.getIconForType(notification.type),
                           size: 20.sp.clamp(20, 22),
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       SizedBox(width: 15.w),
@@ -303,7 +303,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   style: TextStyle(
                                     fontSize: 15.sp.clamp(15, 17),
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                                 GestureDetector(
@@ -313,7 +313,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   child: Icon(
                                     Icons.close,
                                     size: 16.sp.clamp(16, 18),
-                                    color: Colors.grey.shade400,
+                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                                   ),
                                 ),
                               ],
@@ -323,7 +323,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               notification.content,
                               style: TextStyle(
                                 fontSize: 13.sp.clamp(13, 15),
-                                color: Colors.grey.shade600,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                 height: 1.3,
                               ),
                             ),
@@ -332,7 +332,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               controller.formatTime(notification.createdAt),
                               style: TextStyle(
                                 fontSize: 12.sp.clamp(12, 14),
-                                color: Colors.grey.shade400,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                               ),
                             ),
                           ],

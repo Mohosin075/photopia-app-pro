@@ -22,11 +22,11 @@ class ProviderCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16).r,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -75,7 +75,7 @@ class ProviderCard extends StatelessWidget {
                     ),
                     Text(
                       provider['category'] ?? 'Wedding & Event Photography',
-                      style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                      style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                     ),
                     SizedBox(height: 4.h),
                     Row(
@@ -84,7 +84,7 @@ class ProviderCard extends StatelessWidget {
                         SizedBox(width: 4.w),
                         Text(
                           provider['location'] ?? 'Barcelona, Spain',
-                          style: TextStyle(fontSize: 11.sp, color: Colors.grey),
+                          style: TextStyle(fontSize: 11.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                         ),
                       ],
                     ),
@@ -185,16 +185,16 @@ class ProviderCard extends StatelessWidget {
                   },
                   style: OutlinedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 12.h),
-                    side: const BorderSide(color: Color(0xFFE9ECEF)),
+                    side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8).r,
                     ),
-                    backgroundColor: const Color(0xFF1A1A1A),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   child: Text(
                     'Message',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 13.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -219,12 +219,12 @@ class ProviderCard extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8).r,
                     ),
-                    backgroundColor: const Color(0xFFF1F3F5),
+                    backgroundColor: Theme.of(context).dividerColor.withOpacity(0.05),
                   ),
                   child: Text(
                     'View Profile',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 13.sp,
                       fontWeight: FontWeight.bold,
                     ),

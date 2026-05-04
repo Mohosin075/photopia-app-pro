@@ -252,7 +252,7 @@ class _BookingConfirmationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -301,7 +301,7 @@ class _BookingConfirmationScreenState
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: Icon(Icons.arrow_back, size: 24.sp, color: Colors.black),
+                icon: Icon(Icons.arrow_back, size: 24.sp, color: Theme.of(context).colorScheme.onSurface),
                 onPressed: () {
                   if (_pageIndex > 0) {
                     _pageController.previousPage(
@@ -317,7 +317,7 @@ class _BookingConfirmationScreenState
                 'Step ${_currentStep + 1} of 4',
                 style: TextStyle(
                   fontSize: 14.sp.clamp(14, 16),
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -332,19 +332,19 @@ class _BookingConfirmationScreenState
                   margin: EdgeInsets.symmetric(horizontal: 2.w),
                   decoration: BoxDecoration(
                     color: index <= _currentStep
-                        ? Colors.black
-                        : Colors.grey.withOpacity(0.2),
+                        ? Theme.of(context).colorScheme.onSurface
+                        : Theme.of(context).dividerColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(2).r,
                   ),
                 ),
               );
             }),
           ),
-          Divider(color: Colors.grey.withOpacity(0.1)),
+          Divider(color: Theme.of(context).dividerColor.withOpacity(0.1)),
           if (_isLoadingAvailability)
             LinearProgressIndicator(
-              backgroundColor: Colors.grey.shade100,
-              color: Colors.black,
+              backgroundColor: Theme.of(context).dividerColor.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.primary,
               minHeight: 2,
             ),
         ],
@@ -458,7 +458,7 @@ class _BookingConfirmationScreenState
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: Theme.of(context).dividerColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12).r,
       ),
       child: Row(
@@ -479,14 +479,14 @@ class _BookingConfirmationScreenState
                 duration: const Duration(milliseconds: 200),
                 padding: EdgeInsets.symmetric(vertical: 10.h),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.black : Colors.transparent,
+                  color: isSelected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
                   borderRadius: BorderRadius.circular(10).r,
                 ),
                 child: Center(
                   child: Text(
                     tab,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.grey,
+                      color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       fontSize: 13.sp.clamp(13, 14),
                       fontWeight: isSelected
                           ? FontWeight.bold
@@ -538,10 +538,10 @@ class _BookingConfirmationScreenState
           onTap: () => _onDateSelected(date),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10).r,
               border: Border.all(
-                color: isSelected ? Colors.black : Colors.grey.shade200,
+                color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).dividerColor.withOpacity(0.1),
                 width: isSelected ? 1.5 : 1,
               ),
             ),
@@ -552,7 +552,7 @@ class _BookingConfirmationScreenState
                   DateFormat('EEE').format(date), // Mon, Tue...
                   style: TextStyle(
                     fontSize: 10.sp,
-                    color: Colors.grey,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   ),
                 ),
                 Text(
@@ -560,7 +560,7 @@ class _BookingConfirmationScreenState
                   style: TextStyle(
                     fontSize: 12.sp.clamp(12, 13),
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -579,7 +579,7 @@ class _BookingConfirmationScreenState
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.h),
           child: Text('No time slots available.',
-              style: TextStyle(color: Colors.grey, fontSize: 13.sp)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 13.sp)),
         ),
       );
     }
@@ -595,10 +595,10 @@ class _BookingConfirmationScreenState
             width: 80.w,
             padding: EdgeInsets.symmetric(vertical: 10.h),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(8).r,
               border: Border.all(
-                color: isSelected ? Colors.black : Colors.grey.shade200,
+                color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).dividerColor.withOpacity(0.1),
               ),
             ),
             child: Center(
@@ -666,7 +666,7 @@ class _BookingConfirmationScreenState
                             height: 20.sp,
                             child: const CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Icon(Icons.my_location_outlined, color: Colors.black, size: 28.sp),
+                        : Icon(Icons.my_location_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28.sp),
                   );
                 },
               ),
@@ -1368,7 +1368,7 @@ class _BookingConfirmationScreenState
         label,
         style: TextStyle(
             fontSize: 13.sp.clamp(13, 14),
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w500),
       ),
     );
@@ -1384,6 +1384,7 @@ class _BookingConfirmationScreenState
       controller: controller,
       maxLines: maxLines,
       onChanged: onChanged,
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle:
@@ -1391,15 +1392,15 @@ class _BookingConfirmationScreenState
         prefixIcon:
             icon != null ? Icon(icon, size: 20.sp, color: Colors.grey) : null,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Theme.of(context).colorScheme.surface,
         contentPadding: EdgeInsets.all(16.w),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10).r,
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10).r,
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface),
         ),
       ),
     );
@@ -1420,7 +1421,7 @@ class _BookingConfirmationScreenState
               style: TextStyle(
                   fontSize: 14.sp.clamp(14, 16),
                   fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-                  color: color)),
+                  color: color == Colors.black ? Theme.of(context).colorScheme.onSurface : color)),
         ],
       ),
     );

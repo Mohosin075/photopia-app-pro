@@ -128,19 +128,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final imageUrl = profile?.profile;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Edit Profile',
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20.sp.clamp(20, 22),
             fontWeight: FontWeight.bold,
           ),
@@ -163,10 +163,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 height: 120.w,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.grey.shade200,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                                   border: Border.all(
-                                    color: Colors.white,
-                                    width: 4,
+                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                                    width: 2,
                                   ),
                                 ),
                                 child: ClipOval(
@@ -185,13 +185,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             onTap: _pickImage,
                             child: Container(
                               padding: EdgeInsets.all(8.w),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF1A1A1A),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.camera_alt,
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 size: 20.sp,
                               ),
                             ),
@@ -252,17 +252,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ? null
                           : _updateProfile,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1A1A1A),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15).r,
                         ),
                       ),
                       child: controller.isUpdateInProgress
-                          ? const CircularProgressIndicator(color: Colors.white)
+                          ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary)
                           : Text(
                               'Save Changes',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -292,29 +292,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(
-          color: Colors.grey,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
           fontSize: 14.sp,
           fontWeight: FontWeight.w500,
         ),
-        prefixIcon: Icon(icon, color: Colors.grey),
+        prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15).r,
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15).r,
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15).r,
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Theme.of(context).colorScheme.surface,
       ),
       style: TextStyle(
         fontSize: AppTypography.bodyLarge,
         fontWeight: FontWeight.w500,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }

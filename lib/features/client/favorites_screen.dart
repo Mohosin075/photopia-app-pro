@@ -41,7 +41,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -83,19 +83,20 @@ class _FavoritesScreenState extends State<FavoritesScreen>
       margin: EdgeInsets.symmetric(horizontal: 20.w),
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F3F5),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12).r,
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.05)),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: Theme.of(context).colorScheme.onSurface,
           borderRadius: BorderRadius.circular(10).r,
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.grey,
+        labelColor: Theme.of(context).colorScheme.surface,
+        unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
         labelStyle: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold),
         tabs: [
           Consumer<FavoritesController>(
@@ -198,11 +199,11 @@ class _FavoritesScreenState extends State<FavoritesScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.favorite_border, size: 64.sp, color: Colors.grey[300]),
+          Icon(Icons.favorite_border, size: 64.sp, color: Theme.of(context).dividerColor.withOpacity(0.1)),
           SizedBox(height: 16.h),
           Text(
             message,
-            style: TextStyle(fontSize: 16.sp, color: Colors.grey),
+            style: TextStyle(fontSize: 16.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
           ),
         ],
       ),

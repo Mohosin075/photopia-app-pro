@@ -38,7 +38,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -57,8 +57,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
                   return RefreshIndicator(
                     onRefresh: () => chatController.getChats(),
-                    color: Colors.black,
-                    backgroundColor: Colors.white,
+                    color: Theme.of(context).colorScheme.primary,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     child: _buildConversationList(chatController.chats),
                   );
                 },
@@ -80,15 +80,19 @@ class _MessagesScreenState extends State<MessagesScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(24.r),
+              padding: EdgeInsets.all(32.r),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8F9FA),
+                color: Theme.of(context).colorScheme.surface,
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: Theme.of(context).dividerColor.withOpacity(0.05),
+                  width: 1,
+                ),
               ),
               child: Icon(
                 Icons.chat_bubble_outline_rounded,
                 size: 64.sp,
-                color: Colors.grey.shade400,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
               ),
             ),
             SizedBox(height: 24.h),
@@ -97,7 +101,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             SizedBox(height: 12.h),
@@ -108,7 +112,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   height: 1.5,
                 ),
               ),
@@ -128,7 +132,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             'assets/images/message_icon.png',
             width: 28.sp.clamp(24, 32),
             height: 28.sp.clamp(24, 32),
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           SizedBox(width: 12.w),
           Text(
@@ -136,7 +140,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             style: TextStyle(
               fontSize: 20.sp.clamp(20, 22),
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -150,22 +154,28 @@ class _MessagesScreenState extends State<MessagesScreen> {
       child: Container(
         height: 40.h.clamp(40, 45),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12).r,
-          border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          border: Border(
+            bottom: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+          ),
         ),
         child: TextField(
           controller: _searchController,
           textAlignVertical: TextAlignVertical.center,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 14.sp.clamp(14, 16),
+          ),
           decoration: InputDecoration(
             hintText: context.l10n.searchConversations,
             isCollapsed: true,
             hintStyle: TextStyle(
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               fontSize: 14.sp.clamp(14, 16),
             ),
             prefixIcon: Icon(Icons.search,
-                color: Colors.grey, size: 20.sp.clamp(18, 24)),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 20.sp.clamp(18, 24)),
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(vertical: 10.h),
           ),

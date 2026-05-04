@@ -94,13 +94,13 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.sp),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 24.sp),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -112,7 +112,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
               return IconButton(
                 icon: Icon(
                   isFavorite ? Icons.bookmark : Icons.bookmark_border,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 24.sp,
                 ),
                 onPressed: () {
@@ -375,19 +375,19 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
       width: 78.w,
       height: 90.h,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10).r,
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12),
+          BoxShadow(color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.04), blurRadius: 12),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 22.sp),
+          Icon(icon, size: 22.sp, color: Theme.of(context).colorScheme.onSurface),
           Text(
             value,
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
           ),
           Text(
             label,
@@ -402,17 +402,18 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
     return Container(
       height: 35.h,
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F7),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(30).r,
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(30).r,
         ),
-        labelColor: Colors.white,
-        unselectedLabelColor: const Color(0xFF455A64),
+        labelColor: Theme.of(context).colorScheme.onPrimary,
+        unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         tabs: [
@@ -569,8 +570,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                   margin: EdgeInsets.only(bottom: 10.h),
                   padding: EdgeInsets.all(12.r),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
                   ),
                   child: Row(
                     children: [
@@ -581,6 +583,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                           fileName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                         ),
                       ),
                       IconButton(
@@ -738,7 +741,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
               description,
               style: TextStyle(
                 fontSize: 14.sp,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
                 height: 1.5,
               ),
             ),
@@ -802,10 +805,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
           Container(
             padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
             ),
-            child: Icon(icon, size: 20.sp, color: Colors.black54),
+            child: Icon(icon, size: 20.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
           ),
           SizedBox(width: 15.w),
           Column(
@@ -820,7 +824,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],

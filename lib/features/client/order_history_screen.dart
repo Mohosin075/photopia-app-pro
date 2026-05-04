@@ -46,19 +46,19 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           context.l10n.orderHistoryTitle,
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20.sp.clamp(20, 22),
             fontWeight: FontWeight.bold,
           ),
@@ -81,7 +81,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 if (filteredBookings.isEmpty) {
                   return RefreshIndicator(
                     onRefresh: () => controller.getMyBookings(),
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.primary,
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Container(
@@ -93,14 +93,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                             Icon(
                               Icons.shopping_bag_outlined,
                               size: 60.sp,
-                              color: Colors.grey[300],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                             ),
                             SizedBox(height: 16.h),
                             Text(
                               context.l10n.noOrdersFound,
                               style: TextStyle(
                                 fontSize: 16.sp,
-                                color: Colors.grey,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                               ),
                             ),
                           ],
@@ -112,7 +112,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
                 return RefreshIndicator(
                   onRefresh: () => controller.getMyBookings(),
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.primary,
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.all(20.w),
@@ -133,7 +133,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   Widget _buildFilterBar() {
     return Container(
       height: 60.h,
-      color: Colors.white,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 15.w),
         scrollDirection: Axis.horizontal,
@@ -154,14 +154,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? const Color(0xFF1A1A1A)
-                      : Colors.grey[100],
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Text(
                   filter,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black87,
+                    color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
                     fontWeight: isSelected
                         ? FontWeight.bold
                         : FontWeight.normal,
@@ -224,11 +224,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         margin: EdgeInsets.only(bottom: 20.h),
         padding: EdgeInsets.all(15.w),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.03),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -250,15 +250,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           errorBuilder: (context, error, stackTrace) => Container(
                             width: 80.w,
                             height: 80.w,
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.image, color: Colors.grey),
+                            color: Theme.of(context).dividerColor.withOpacity(0.05),
+                            child: Icon(Icons.image, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                           ),
                         )
                       : Container(
                           width: 80.w,
                           height: 80.w,
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.image, color: Colors.grey),
+                          color: Theme.of(context).dividerColor.withOpacity(0.05),
+                          child: Icon(Icons.image, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                         ),
                 ),
                 SizedBox(width: 15.w),
@@ -275,6 +275,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -286,7 +287,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         booking.package?.name ?? context.l10n.standardPackageDefault,
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Colors.grey[600],
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                       SizedBox(height: 8.h),
@@ -315,6 +316,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                             style: TextStyle(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.w500,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
@@ -335,19 +337,19 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     Icon(
                       Icons.calendar_today_outlined,
                       size: 14.sp,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                     ),
                     SizedBox(width: 6.w),
                     Text(
                       formattedDate,
-                      style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                     ),
                     SizedBox(width: 15.w),
-                    Icon(Icons.access_time, size: 14.sp, color: Colors.grey),
+                    Icon(Icons.access_time, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                     SizedBox(width: 6.w),
                     Text(
                       booking.startTime ?? '00:00',
-                      style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                     ),
                   ],
                 ),
@@ -356,7 +358,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -364,12 +366,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             SizedBox(height: 8.h),
             Row(
               children: [
-                Icon(Icons.location_on_outlined, size: 14.sp, color: Colors.grey),
+                Icon(Icons.location_on_outlined, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                 SizedBox(width: 6.w),
                 Expanded(
                   child: Text(
                     booking.serviceId?.location?.address ?? context.l10n.locationNotSet,
-                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

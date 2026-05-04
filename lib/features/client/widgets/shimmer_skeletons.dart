@@ -16,14 +16,15 @@ class ShimmerSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: Colors.grey[200]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+      highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: borderRadius ?? BorderRadius.circular(8).r,
         ),
       ),
@@ -38,9 +39,9 @@ class ServiceCardSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16).r,
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,9 +116,9 @@ class ProviderCardSkeleton extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16).r,
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Column(
         children: [
@@ -175,9 +176,9 @@ class ProfileHeaderSkeleton extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(20.w),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
               borderRadius: BorderRadius.circular(20).r,
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
             ),
             child: Row(
               children: [
@@ -255,9 +256,9 @@ class ProfileInfoSkeleton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 16.h),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.05),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(color: Colors.black.withOpacity(0.05), width: 1),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,19 +303,19 @@ class StatsRowSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: List.generate(4, (index) => _buildStatItemSkeleton()),
+      children: List.generate(4, (index) => _buildStatItemSkeleton(context)),
     );
   }
 
-  Widget _buildStatItemSkeleton() {
+  Widget _buildStatItemSkeleton(BuildContext context) {
     return Container(
       width: 78.w,
       height: 90.h,
       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 4.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10).r,
-        border: Border.all(color: Colors.grey.withOpacity(0.05)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -334,11 +335,11 @@ class ReviewListSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: List.generate(3, (index) => _buildReviewItemSkeleton()),
+      children: List.generate(3, (index) => _buildReviewItemSkeleton(context)),
     );
   }
 
-  Widget _buildReviewItemSkeleton() {
+  Widget _buildReviewItemSkeleton(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: 20.h),
       child: Column(
@@ -379,17 +380,17 @@ class HomeShimmer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 10.h),
-          _buildSectionSkeleton(),
+          _buildSectionSkeleton(context),
           SizedBox(height: 10.h),
-          _buildSectionSkeleton(),
+          _buildSectionSkeleton(context),
           SizedBox(height: 10.h),
-          _buildSectionSkeleton(),
+          _buildSectionSkeleton(context),
         ],
       ),
     );
   }
 
-  Widget _buildSectionSkeleton() {
+  Widget _buildSectionSkeleton(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -413,9 +414,9 @@ class HomeShimmer extends StatelessWidget {
               width: 140.w,
               margin: EdgeInsets.only(right: 15.w),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12).r,
-                border: Border.all(color: Colors.grey.withOpacity(0.05)),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

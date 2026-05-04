@@ -33,12 +33,15 @@ import 'package:photopia/controller/client/notification_controller.dart';
 import 'package:photopia/controller/client/payment_controller.dart';
 import 'package:photopia/controller/provider/subscription_controller.dart';
 import 'package:photopia/controller/language_controller.dart';
+import 'package:photopia/controller/theme_controller.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/core/routes/app_routes.dart';
 import 'package:photopia/features/onboarding/get_started.dart';
 import 'package:photopia/features/provider/screen/BottomNavigationBar/bottom_navigation_screen.dart';
 import 'package:photopia/core/notification/notification_service.dart';
 import 'package:photopia/controller/category_controller.dart';
+import 'package:photopia/core/theme/app_theme.dart';
+
 
 class Photopia extends StatefulWidget {
   const Photopia({super.key});
@@ -98,9 +101,10 @@ class _PhotopiaState extends State<Photopia> {
             ChangeNotifierProvider(create: (_) => NotificationController()),
             ChangeNotifierProvider(create: (_) => PaymentController()),
             ChangeNotifierProvider(create: (_) => SubscriptionController()),
+            ChangeNotifierProvider(create: (_) => ThemeController()),
           ],
-          child: Consumer<LanguageController>(
-            builder: (context, langController, child) {
+          child: Consumer2<LanguageController, ThemeController>(
+            builder: (context, langController, themeController, child) {
               return MaterialApp(
                 navigatorKey: navigatorKey,
                 debugShowCheckedModeBanner: false,
@@ -113,17 +117,10 @@ class _PhotopiaState extends State<Photopia> {
                   GlobalWidgetsLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,
                 ],
-                theme: ThemeData(
-                  fontFamily: 'HelveticaNeue',
-                  primaryColor: Colors.blue,
-                  useMaterial3: true,
-                  progressIndicatorTheme: const ProgressIndicatorThemeData(
-                    color: Colors.black,
-                  ),
-                  textSelectionTheme: const TextSelectionThemeData(
-                    cursorColor: Colors.black54,
-                  ),
-                ),
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeController.themeMode,
+
                 builder: (context, child) {
                   return child!;
                 },

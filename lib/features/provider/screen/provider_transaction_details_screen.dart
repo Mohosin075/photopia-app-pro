@@ -10,7 +10,7 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
 
@@ -22,10 +22,10 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
           ),
         ),
         centerTitle: false,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.sp),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 24.sp),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -62,7 +62,7 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
               'INV-2024-001234',
               style: TextStyle(
                 fontSize: AppTypography.bodySmall,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               ),
             ),
             SizedBox(height: 24.h),
@@ -72,7 +72,7 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
               'Service',
               style: TextStyle(
                 fontSize: AppTypography.bodyMedium,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               ),
             ),
             SizedBox(height: 8.h),
@@ -81,23 +81,24 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppTypography.h2,
                 fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             SizedBox(height: 4.h),
             Row(
               children: [
-                Icon(Icons.calendar_today, size: 14.sp, color: Colors.grey),
+                Icon(Icons.calendar_today, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 SizedBox(width: 6.w),
-                Text(
+                 Text(
                   '2024-12-01',
-                  style: TextStyle(fontSize: AppTypography.bodyMedium),
+                  style: TextStyle(fontSize: AppTypography.bodyMedium, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 SizedBox(width: 16.w),
-                Icon(Icons.access_time, size: 14.sp, color: Colors.grey),
+                Icon(Icons.access_time, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 SizedBox(width: 6.w),
-                Text(
+                 Text(
                   '8 hours',
-                  style: TextStyle(fontSize: AppTypography.bodyMedium),
+                  style: TextStyle(fontSize: AppTypography.bodyMedium, color: Theme.of(context).colorScheme.onSurface),
                 ),
               ],
             ),
@@ -108,7 +109,7 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
               'Client',
               style: TextStyle(
                 fontSize: AppTypography.bodyMedium,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               ),
             ),
             SizedBox(height: 12.h),
@@ -124,18 +125,19 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                     Text(
                       'Sarah Johnson',
                       style: TextStyle(
                         fontSize: AppTypography.bodyLarge,
                         fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     Text(
                       'sarah.j@email.com',
                       style: TextStyle(
                         fontSize: AppTypography.bodySmall,
-                        color: Colors.grey,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -148,17 +150,17 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
                 Icon(
                   Icons.location_on_outlined,
                   size: 16.sp,
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
                 SizedBox(width: 8.w),
-                Text(
+                 Text(
                   '123 Garden Street, New York, NY',
-                  style: TextStyle(fontSize: AppTypography.bodyMedium),
+                  style: TextStyle(fontSize: AppTypography.bodyMedium, color: Theme.of(context).colorScheme.onSurface),
                 ),
               ],
             ),
             SizedBox(height: 24.h),
-            Divider(color: Colors.grey.withOpacity(0.2)),
+            Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
             SizedBox(height: 24.h),
 
             // Payment Breakdown
@@ -167,25 +169,22 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppTypography.bodyLarge,
                 fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             SizedBox(height: 16.h),
-            _buildBreakdownItem('Wedding Photography Package', '€1200.00'),
-            _buildBreakdownItem('Additional editing (50 photos)', '€200.00'),
-            _buildBreakdownItem('Rush delivery', '€100.00'),
-            SizedBox(height: 8.h),
-            Divider(color: Colors.grey.withOpacity(0.2)),
-            SizedBox(height: 8.h),
-            _buildBreakdownItem('Subtotal', '€1500.00', isBold: true),
+            _buildBreakdownItem(context, 'Subtotal', '€1500.00', isBold: true),
             _buildBreakdownItem(
+              context,
               'Platform Fee (5%)',
               '-€75.00',
               valueColor: Colors.red,
             ),
             SizedBox(height: 8.h),
-            Divider(color: Colors.grey.withOpacity(0.2)),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.1)),
             SizedBox(height: 8.h),
             _buildBreakdownItem(
+              context,
               'Your Earnings',
               '€1425.00',
               isBold: true,
@@ -196,9 +195,9 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
             SizedBox(height: 32.h),
 
             // Additional Details
-            _buildInfoRow('Payment Method', 'Bank Transfer'),
-            _buildInfoRow('Expected Payout', '2024-12-15'),
-            _buildInfoRow('Status', 'Processing', valueColor: Colors.blue),
+            _buildInfoRow(context, 'Payment Method', 'Bank Transfer'),
+            _buildInfoRow(context, 'Expected Payout', '2024-12-15'),
+            _buildInfoRow(context, 'Status', 'Processing', valueColor: Colors.blue),
 
             SizedBox(height: 32.h),
 
@@ -209,17 +208,17 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: Theme.of(context).colorScheme.onSurface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSizes.borderRadius),
                   ),
                 ),
-                icon: Icon(Icons.download, color: Colors.white, size: 20.sp),
+                icon: Icon(Icons.download, color: Theme.of(context).colorScheme.surface, size: 20.sp),
                 label: Text(
                   'Download Invoice',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -232,17 +231,17 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: () {},
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.black),
+                  side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSizes.borderRadius),
                   ),
                 ),
-                icon: Icon(Icons.share, color: Colors.black, size: 20.sp),
+                icon: Icon(Icons.share, color: Theme.of(context).colorScheme.onSurface, size: 20.sp),
                 label: Text(
                   'Share Invoice',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -262,8 +261,8 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.grey[400], // Disabled look or secondary
+                  backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                  foregroundColor: Theme.of(context).colorScheme.onSurface,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSizes.borderRadius),
@@ -273,7 +272,6 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
                   'Request Payout',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
-                    color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -287,6 +285,7 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildBreakdownItem(
+    BuildContext context,
     String label,
     String value, {
     bool isBold = false,
@@ -302,7 +301,7 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: isBold ? 14.sp : 13.sp,
-              color: Colors.grey[800],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
               fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -310,7 +309,7 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: fontSize ?? (isBold ? 14.sp : 13.sp),
-              color: valueColor ?? Colors.black,
+              color: valueColor ?? Theme.of(context).colorScheme.onSurface,
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -319,7 +318,7 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
+  Widget _buildInfoRow(BuildContext context, String label, String value, {Color? valueColor}) {
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: Row(
@@ -329,14 +328,14 @@ class ProviderTransactionDetailsScreen extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: AppTypography.bodyMedium,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             ),
           ),
           Text(
             value,
             style: TextStyle(
               fontSize: AppTypography.bodyMedium,
-              color: valueColor ?? Colors.black,
+              color: valueColor ?? Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w500,
             ),
           ),

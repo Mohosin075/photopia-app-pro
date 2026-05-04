@@ -41,13 +41,13 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -55,7 +55,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             Text(
               context.l10n.statisticsTitle,
               style: TextStyle(
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -75,8 +75,8 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: _handleRefresh,
-        color: Colors.black,
-        backgroundColor: Colors.white,
+        color: Theme.of(context).colorScheme.onSurface,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         child: Consumer<StatisticsController>(
           builder: (context, controller, child) {
             final stats = controller.statisticsData;
@@ -206,8 +206,8 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        side: BorderSide(color: Colors.grey.shade300),
+                        foregroundColor: Theme.of(context).colorScheme.onSurface,
+                        side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
                         ),
@@ -234,9 +234,9 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,7 +257,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             style: TextStyle(
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 8.h),
@@ -298,23 +298,23 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 18.sp, color: Colors.black),
+              Icon(icon, size: 18.sp, color: Theme.of(context).colorScheme.onSurface),
               SizedBox(width: 8.w),
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -332,7 +332,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                     TextSpan(
                       text: '$unit$myData',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 14.sp,
                       ),
@@ -356,8 +356,8 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             child: LinearProgressIndicator(
               value: myData / total,
               minHeight: 8.h,
-              backgroundColor: const Color(0xFFF1F3F5),
-              color: Colors.black,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 16.h),
@@ -383,8 +383,8 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             child: LinearProgressIndicator(
               value: avgData / total,
               minHeight: 8.h,
-              backgroundColor: const Color(0xFFF1F3F5),
-              color: Colors.grey.shade300,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
             ),
           ),
           SizedBox(height: 16.h),
@@ -392,18 +392,18 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: const Color(0xFFEDFCF2),
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.1) : const Color(0xFFEDFCF2),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Row(
               children: [
-                Icon(Icons.trending_up, size: 16.sp, color: const Color(0xFF12B76A)),
+                Icon(Icons.trending_up, size: 16.sp, color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF12B76A)),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
                     statusText,
                     style: TextStyle(
-                      color: const Color(0xFF027A48),
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.green[200] : const Color(0xFF027A48),
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -421,23 +421,23 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.location_on_outlined, size: 18.sp, color: Colors.black),
+              Icon(Icons.location_on_outlined, size: 18.sp, color: Theme.of(context).colorScheme.onSurface),
               SizedBox(width: 8.w),
               Text(
                 context.l10n.profileViewsByRegion,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -457,7 +457,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                       Expanded(
                         child: Text(
                           reg.city ?? 'Unknown',
-                          style: TextStyle(fontSize: 13.sp, color: Colors.black),
+                          style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface),
                         ),
                       ),
                       Text(
@@ -470,7 +470,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -481,8 +481,8 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                     child: LinearProgressIndicator(
                       value: (reg.percentage ?? 0) / 100,
                       minHeight: 6.h,
-                      backgroundColor: const Color(0xFFF1F3F5),
-                      color: const Color(0xFF344054),
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -502,7 +502,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14.sp,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -527,23 +527,23 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.euro, size: 18.sp, color: Colors.black),
+              Icon(Icons.euro, size: 18.sp, color: Theme.of(context).colorScheme.onSurface),
               SizedBox(width: 8.w),
               Text(
                 context.l10n.revenueAnalyticsTitle,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -553,7 +553,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
           // Filters
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F4F7),
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(12).r,
             ),
             child: Row(
@@ -565,14 +565,14 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 10.h),
                       decoration: BoxDecoration(
-                        color: isSelected ? Colors.black : Colors.transparent,
+                        color: isSelected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
                         borderRadius: BorderRadius.circular(10).r,
                       ),
                       child: Text(
                         f,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.grey,
+                          color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                           fontSize: 13.sp,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                         ),
@@ -589,7 +589,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Column(
@@ -628,7 +628,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                   style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: 8.h),
@@ -657,7 +657,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13.sp,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -668,8 +668,8 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                     child: LinearProgressIndicator(
                       value: (amount as num) / (max as num),
                       minHeight: 10.h,
-                      backgroundColor: const Color(0xFFF1F3F5),
-                      color: Colors.black,
+                      backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   SizedBox(height: 16.h),
@@ -716,9 +716,9 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -732,7 +732,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -744,15 +744,15 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                 child: Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB),
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(context.l10n.conversionRate, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
+                      Text(context.l10n.conversionRate, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 11.sp)),
                       SizedBox(height: 4.h),
-                      Text('${displayMetrics.conversionRate ?? 0}%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.black)),
+                      Text('${displayMetrics.conversionRate ?? 0}%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Theme.of(context).colorScheme.onSurface)),
                     ],
                   ),
                 ),
@@ -762,15 +762,15 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                 child: Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB),
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(context.l10n.repeatRate, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
+                      Text(context.l10n.repeatRate, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 11.sp)),
                       SizedBox(height: 4.h),
-                      Text('${displayMetrics.repeatRate ?? 0}%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.black)),
+                      Text('${displayMetrics.repeatRate ?? 0}%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Theme.of(context).colorScheme.onSurface)),
                     ],
                   ),
                 ),
@@ -782,13 +782,13 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(context.l10n.mostViewedProject, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
+                Text(context.l10n.mostViewedProject, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 11.sp)),
                 SizedBox(height: 4.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -796,7 +796,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
                     Expanded(
                       child: Text(
                         displayMetrics.mostViewedProject?.title ?? 'N/A',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp, color: Colors.black),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

@@ -63,11 +63,13 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
         width: 140.w,
         margin: EdgeInsets.only(right: 15.w, bottom: 2.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? Colors.black.withOpacity(0.3) 
+                  : Colors.black.withOpacity(0.04),
               blurRadius: 6,
               spreadRadius: 0,
               offset: const Offset(0, 2),
@@ -100,9 +102,9 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                                 width: 140.w,
                                 height: 125.h,
                                 child: Shimmer.fromColors(
-                                  baseColor: Colors.grey[300]!,
-                                  highlightColor: Colors.grey[100]!,
-                                  child: Container(color: Colors.white),
+                                  baseColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800]! : Colors.grey[300]!,
+                                  highlightColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[100]!,
+                                  child: Container(color: Theme.of(context).colorScheme.surface),
                                 ),
                               );
                             }
@@ -149,7 +151,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                         vertical: 6.h,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.8),
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Row(
@@ -158,7 +160,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                           Icon(
                             Icons.bookmark_outline,
                             size: 10.sp,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                           SizedBox(width: 4.w),
                           TranslatedText(
@@ -166,7 +168,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                             style: TextStyle(
                               fontSize: 10.sp,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
                         ],
@@ -204,10 +206,10 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                             child: Container(
                               padding: EdgeInsets.all(4.w),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withOpacity(0.1),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withOpacity(0.2),
                                   width: 0.5,
                                 ),
                               ),
@@ -239,7 +241,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -248,7 +250,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                         Icon(
                           Icons.person_outline,
                           size: 12.sp,
-                          color: Colors.grey[600],
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                         ),
                         SizedBox(width: 4.w),
                         Expanded(
@@ -256,7 +258,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                             widget.providerName,
                             style: TextStyle(
                               fontSize: 11.sp,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                             ),
                           ),
                         ),
@@ -283,12 +285,17 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                             child: Container(
                               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
+                                color: Theme.of(context).brightness == Brightness.dark 
+                                    ? Colors.grey.shade800 
+                                    : Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
                               child: Text(
                                 '#$tag',
-                                style: TextStyle(fontSize: 9.sp, color: Colors.black54),
+                                style: TextStyle(
+                                  fontSize: 9.sp, 
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -316,7 +323,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                         ],

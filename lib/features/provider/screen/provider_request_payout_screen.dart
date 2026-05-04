@@ -75,7 +75,7 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -86,10 +86,10 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
           ),
         ),
         centerTitle: false,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.sp),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 24.sp),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -172,11 +172,12 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
                       });
                     }
                   },
-                  style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
                   decoration: InputDecoration(
                     prefixText: '€ ',
+                    prefixStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSizes.borderRadius),
                       borderSide: BorderSide.none,
@@ -274,24 +275,24 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
                            }
                          }
                      },
-                     style: ElevatedButton.styleFrom(
-                       backgroundColor: Colors.black,
-                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.borderRadius)),
-                     ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.onSurface,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.borderRadius)),
+                      ),
                      child: walletController.isLoading 
                        ? SizedBox(
                            height: 20.sp, 
                            width: 20.sp, 
                            child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                          )
-                       : Text(
-                           walletController.isStripeReady ? 'Request Payout' : 'Connect Stripe Account', 
-                           style: TextStyle(
-                             fontSize: AppTypography.bodyLarge,
-                             color: Colors.white,
-                             fontWeight: FontWeight.w600,
-                           ),
-                         ),
+                        : Text(
+                            walletController.isStripeReady ? 'Request Payout' : 'Connect Stripe Account', 
+                            style: TextStyle(
+                              fontSize: AppTypography.bodyLarge,
+                              color: Theme.of(context).colorScheme.surface,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                    ),
                  ),
                  SizedBox(height: 20.h),
@@ -311,7 +312,7 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 8.h),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.black : Colors.grey[100],
+            color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
             borderRadius: BorderRadius.circular(8.r),
           ),
           alignment: Alignment.center,
@@ -320,7 +321,7 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.w600,
-              color: isSelected ? Colors.white : Colors.grey[600],
+              color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             ),
           ),
         ),
@@ -343,7 +344,7 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: isSelected ? Colors.black : Colors.grey.withOpacity(0.3),
+            color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -353,19 +354,20 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
             Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              child: Icon(icon, size: 24.sp, color: Colors.black),
+              child: Icon(icon, size: 24.sp, color: Theme.of(context).colorScheme.onSurface),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(
+                   Text(title, style: TextStyle(
                     fontSize: AppTypography.bodyMedium,
                     fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
                   )),
                   SizedBox(height: 4.h),
                   Text(subtitle, style: TextStyle(fontSize: AppTypography.bodySmall, color: Colors.grey)),
@@ -380,8 +382,8 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
                   color: Colors.grey,
                 )),
               ),
-            if (isSelected)
-              Icon(Icons.check_circle, color: Colors.black, size: 20.sp),
+             if (isSelected)
+              Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onSurface, size: 20.sp),
           ],
         ),
       ),
@@ -392,14 +394,14 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(
+         Text(label, style: TextStyle(
           fontSize: isTotal ? 14.sp : 13.sp,
-          color: isTotal ? Colors.black : Colors.grey[700],
+          color: isTotal ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal,
         )),
-        Text(value, style: TextStyle(
+         Text(value, style: TextStyle(
           fontSize: isTotal ? 16.sp : 14.sp,
-          color: isTotal ? Colors.green : Colors.black,
+          color: isTotal ? Colors.green : Theme.of(context).colorScheme.onSurface,
           fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
         )),
       ],
@@ -409,7 +411,8 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
+       builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
         child: Padding(
           padding: EdgeInsets.all(24.w),
@@ -425,9 +428,10 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
                 child: Icon(Icons.check, color: Colors.green, size: 32.sp),
               ),
               SizedBox(height: 16.h),
-              Text('Payout Requested!', style: TextStyle(
+               Text('Payout Requested!', style: TextStyle(
                 fontSize: AppTypography.h1,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
               )),
               SizedBox(height: 8.h),
               Text(
@@ -452,7 +456,7 @@ class _ProviderRequestPayoutScreenState extends State<ProviderRequestPayoutScree
                  ),
                  child: Text('Close', style: TextStyle(
                    fontSize: AppTypography.bodyLarge,
-                   color: Colors.grey[800],
+                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                    fontWeight: FontWeight.w600,
                  )),
                ),

@@ -122,16 +122,16 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: false,
         title: Text(
           context.l10n.calendarAvailability,
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: AppTypography.h1,
             fontWeight: FontWeight.bold,
           ),
@@ -140,7 +140,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
           IconButton(
             icon: Icon(
               Icons.settings_outlined,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 24.sp,
             ),
             onPressed: () async {
@@ -187,7 +187,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F1F1),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: Row(
@@ -208,7 +208,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 10.h),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.black : Colors.transparent,
+            color: isSelected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
             borderRadius: BorderRadius.circular(8.r),
           ),
           child: Text(
@@ -217,7 +217,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
             style: TextStyle(
               fontSize: AppTypography.bodyLarge,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? Colors.white : Colors.grey[600],
+              color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             ),
           ),
         ),
@@ -254,6 +254,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
               style: TextStyle(
                 fontSize: AppTypography.h2,
                 fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             IconButton(
@@ -273,7 +274,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
-                      color: Colors.grey[400],
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -303,9 +304,9 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                 padding: EdgeInsets.symmetric(vertical: 20.h),
                 child: Center(
                   child: Text(
-                    context.l10n.noBookingsForDate,
-                    style: TextStyle(color: Colors.grey, fontSize: 14.sp),
-                  ),
+                     context.l10n.noBookingsForDate,
+                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 14.sp),
+                   ),
                 ),
               );
             }
@@ -376,11 +377,11 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
             _fetchBookingsForDate(date);
           },
           child: Container(
-            decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFF3F3F3) : Colors.transparent,
-              borderRadius: BorderRadius.circular(8.r),
-              border: isSelected ? Border.all(color: Colors.black12) : null,
-            ),
+             decoration: BoxDecoration(
+               color: isSelected ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Colors.transparent,
+               borderRadius: BorderRadius.circular(8.r),
+               border: isSelected ? Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)) : null,
+             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -388,9 +389,9 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                   dayNum.toString(),
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
-                    color: isWorking ? Colors.black : Colors.grey[300],
-                  ),
+                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
+                     color: isWorking ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                   ),
                 ),
                 if (isWorking)
                   Container(
@@ -421,16 +422,16 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
     return Container(
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(color: Colors.grey[100]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+         color: Theme.of(context).colorScheme.surface,
+         borderRadius: BorderRadius.circular(15.r),
+         border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+         boxShadow: [
+           BoxShadow(
+             color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.02),
+             blurRadius: 10,
+             offset: const Offset(0, 4),
+           ),
+         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -441,9 +442,10 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
+                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
                     fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -451,15 +453,15 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
               SizedBox(width: 8.w),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
+                 decoration: BoxDecoration(
+                  color: status.toLowerCase() == 'confirmed' ? (Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.2) : const Color(0xFFE8F5E9)) : (Theme.of(context).brightness == Brightness.dark ? Colors.orange.withOpacity(0.2) : const Color(0xFFFFF3E0)),
+                   borderRadius: BorderRadius.circular(6.r),
+                 ),
                 child: Text(
                   status,
-                  style: TextStyle(
+                   style: TextStyle(
                     fontSize: AppTypography.bodySmall,
-                    color: const Color(0xFF2E7D32),
+                    color: status.toLowerCase() == 'confirmed' ? (Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32)) : (Theme.of(context).brightness == Brightness.dark ? Colors.orange[300] : const Color(0xFFE65100)),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -469,13 +471,13 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
           SizedBox(height: 8.h),
           Row(
             children: [
-              Icon(Icons.person_outline, size: 14.sp, color: Colors.grey),
+               Icon(Icons.person_outline, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               SizedBox(width: 5.w),
               Text(
                 client,
-                style: TextStyle(
+                 style: TextStyle(
                   fontSize: AppTypography.bodySmall,
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],
@@ -487,24 +489,24 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
               Expanded(
                 child: Row(
                   children: [
-                    Icon(Icons.access_time, size: 14.sp, color: Colors.grey),
+                     Icon(Icons.access_time, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
                     SizedBox(width: 5.w),
                     Text(
                       time,
-                      style: TextStyle(
+                       style: TextStyle(
                         fontSize: AppTypography.bodySmall,
-                        color: Colors.grey,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                     SizedBox(width: 15.w),
-                    Icon(Icons.location_on_outlined, size: 14.sp, color: Colors.grey),
+                     Icon(Icons.location_on_outlined, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
                     SizedBox(width: 5.w),
                     Expanded(
                       child: Text(
                         location,
-                        style: TextStyle(
+                         style: TextStyle(
                           fontSize: AppTypography.bodySmall,
-                          color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -549,7 +551,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: Colors.grey[400],
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -566,9 +568,10 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         Text(
           context.l10n.upcomingThisWeek,
           style: TextStyle(
-            fontSize: AppTypography.h2,
-            fontWeight: FontWeight.bold,
-          ),
+             fontSize: AppTypography.h2,
+             fontWeight: FontWeight.bold,
+             color: Theme.of(context).colorScheme.onSurface,
+           ),
         ),
         SizedBox(height: 15.h),
         _buildScheduleItem(
@@ -596,19 +599,19 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         margin: EdgeInsets.symmetric(horizontal: 2.w),
         padding: EdgeInsets.symmetric(vertical: 15.h),
         decoration: BoxDecoration(
-          color: isWorking ? const Color(0xFFFBFBFB) : const Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(color: isWorking ? Colors.grey[200]! : Colors.grey[100]!),
-        ),
+           color: isWorking ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+           borderRadius: BorderRadius.circular(10.r),
+           border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+         ),
         child: Column(
           children: [
             Text(
               date.day.toString(),
               style: TextStyle(
                 fontSize: AppTypography.h2,
-                fontWeight: FontWeight.bold,
-                color: isWorking ? Colors.black : Colors.grey[400],
-              ),
+                 fontWeight: FontWeight.bold,
+                 color: isWorking ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+               ),
             ),
             SizedBox(height: 5.h),
             Text(
@@ -639,9 +642,10 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
             Text(
               _currentDate.year.toString(),
               style: TextStyle(
-                fontSize: AppTypography.h1,
-                fontWeight: FontWeight.bold,
-              ),
+                 fontSize: AppTypography.h1,
+                 fontWeight: FontWeight.bold,
+                 color: Theme.of(context).colorScheme.onSurface,
+               ),
             ),
             IconButton(
               onPressed: _nextMonth,
@@ -671,17 +675,18 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
               },
               child: Container(
                 padding: EdgeInsets.all(15.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: Colors.grey[100]!),
+                 decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                   borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                 ),
                 child: Center(
                   child: Text(
                     monthName,
                     style: TextStyle(
-                      fontSize: AppTypography.bodyLarge,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -689,6 +694,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
             );
           },
         ),
+        SizedBox(height: 20.h),
       ],
     );
   }

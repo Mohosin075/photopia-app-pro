@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _navigateToServiceDetails(BuildContext context, ServiceItem service) {
-    Navigator.of(context).push(
+    Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         builder: (context) => ServiceDetailsScreen(service: service.toJson()),
       ),
@@ -153,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildInspirations(List<Inspiration>? items) {
     if (items == null || items.isEmpty) return const SizedBox.shrink();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +174,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.black87, Colors.black54],
+                    colors: isDark 
+                      ? [Theme.of(context).colorScheme.surface, Theme.of(context).colorScheme.surface.withOpacity(0.8)]
+                      : [Colors.black87, Colors.black54],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -201,9 +204,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     SizedBox(height: 4.h),
-                    TranslatedText(
+                      TranslatedText(
                       item.description ?? '',
-                      style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7) 
+                            : Colors.white70, 
+                        fontSize: 12.sp
+                      ),
                     ),
                   ],
                 ),
@@ -217,6 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildSuperPros(List<SuperPro>? items) {
     if (items == null || items.isEmpty) return const SizedBox.shrink();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,11 +244,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 width: 110.w,
                 margin: EdgeInsets.only(right: 12.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: isDark 
+                          ? Colors.black.withOpacity(0.2) 
+                          : Colors.black.withOpacity(0.04),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -254,12 +265,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: [
                         CircleAvatar(
                           radius: 30.r,
-                          backgroundColor: Colors.grey.shade200,
+                          backgroundColor: Theme.of(context).dividerColor.withOpacity(0.05),
                           backgroundImage: pro.user?.profile != null
                               ? CachedNetworkImageProvider(pro.user!.profile!)
                               : null,
                           child: pro.user?.profile == null
-                              ? Icon(Icons.person, color: Colors.grey)
+                              ? Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3))
                               : null,
                         ),
                         if (pro.isSuperPro == true)
@@ -268,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             decoration: BoxDecoration(
                               color: Colors.orange,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
+                              border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
                             ),
                             child: Icon(
                               Icons.star,
@@ -300,7 +311,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           pro.rating?.toStringAsFixed(1) ?? '5.0',
                           style: TextStyle(
                             fontSize: 12.sp,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                       ],
@@ -455,27 +466,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
+      value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Column(
           children: [
             // Sticky Header Section with Shadow and Top Padding for Status Bar
             Container(
               padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(15.r),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.08),
                     blurRadius: 12,
                     spreadRadius: 2,
                     offset: const Offset(0, 6),
@@ -529,7 +541,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Icon(
                               Icons.wifi_off_rounded,
                               size: 60.sp,
-                              color: Colors.grey.shade300,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                             ),
                             SizedBox(height: 16.h),
                             Text(
@@ -556,8 +568,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
 
                   return RefreshIndicator(
-                    color: Colors.black,
-                    backgroundColor: Colors.white,
+                    color: Theme.of(context).colorScheme.primary,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     onRefresh: () async {
                       await homeController.fetchHomeData();
                       context.read<CategoryController>().getAllCategories();

@@ -484,19 +484,19 @@ class _ProviderCreateListingScreenState
     bool inProgress = context.watch<ServiceController>().inProgress;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           widget.existingListing != null ? 'Edit Listing' : 'Create Listing',
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: AppTypography.h1,
             fontWeight: FontWeight.bold,
           ),
@@ -668,7 +668,7 @@ class _ProviderCreateListingScreenState
         style: TextStyle(
           fontSize: AppTypography.h2,
           fontWeight: FontWeight.bold,
-          color: Colors.black,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
@@ -682,7 +682,7 @@ class _ProviderCreateListingScreenState
         style: TextStyle(
           fontSize: AppTypography.bodySmall,
           fontWeight: FontWeight.w500,
-          color: Colors.black54,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
         ),
       ),
     );
@@ -696,10 +696,10 @@ class _ProviderCreateListingScreenState
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: errorText != null ? Colors.red : const Color(0xFFE0E0E0),
+          color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
         ),
       ),
       child: Column(
@@ -713,7 +713,7 @@ class _ProviderCreateListingScreenState
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 fontSize: AppTypography.bodyLarge,
               ),
               border: InputBorder.none,
@@ -722,6 +722,7 @@ class _ProviderCreateListingScreenState
                 vertical: 12.h,
               ),
             ),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           if (errorText != null)
             Padding(
@@ -746,18 +747,18 @@ class _ProviderCreateListingScreenState
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: errorText != null ? Colors.red : const Color(0xFFE0E0E0),
+              color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<CategoryModel>(
               value: _selectedCategory,
-              dropdownColor: Colors.white,
+              dropdownColor: Theme.of(context).colorScheme.surface,
               isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[400]),
+              icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               onChanged: (CategoryModel? newValue) {
                 setState(() {
                   _selectedCategory = newValue;
@@ -773,7 +774,7 @@ class _ProviderCreateListingScreenState
               ) {
                 return DropdownMenuItem<CategoryModel>(
                   value: value,
-                  child: Text(value.name),
+                  child: Text(value.name, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                 );
               }).toList(),
             ),
@@ -801,20 +802,20 @@ class _ProviderCreateListingScreenState
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           decoration: BoxDecoration(
-            color: _selectedCategory == null ? Colors.grey[50] : Colors.white,
+            color: _selectedCategory == null ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05) : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: errorText != null ? Colors.red : const Color(0xFFE0E0E0),
+              color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<CategoryModel>(
               value: _selectedSubCategory,
-              dropdownColor: Colors.white,
+              dropdownColor: Theme.of(context).colorScheme.surface,
               isExpanded: true,
-              disabledHint: const Text('Select a category first'),
-              hint: const Text('Select Sub-Category (Optional)'),
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[400]),
+              disabledHint: Text('Select a category first', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
+              hint: Text('Select Sub-Category (Optional)', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
+              icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               onChanged: _selectedCategory == null
                   ? null
                   : (CategoryModel? newValue) {
@@ -830,7 +831,7 @@ class _ProviderCreateListingScreenState
               ) {
                 return DropdownMenuItem<CategoryModel>(
                   value: value,
-                  child: Text(value.name),
+                  child: Text(value.name, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                 );
               }).toList(),
             ),
@@ -866,7 +867,7 @@ class _ProviderCreateListingScreenState
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
               color: errorText != null ? Colors.red : const Color(0xFFE0E0E0),
@@ -874,10 +875,10 @@ class _ProviderCreateListingScreenState
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              hint: const Text('Select Service Types'),
-              dropdownColor: Colors.white,
+              hint: Text('Select Service Types', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
+              dropdownColor: Theme.of(context).colorScheme.surface,
               isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[400]),
+              icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
               onChanged: (String? newValue) {
                 if (newValue != null &&
                     !_selectedServiceTypes.contains(newValue)) {
@@ -900,6 +901,7 @@ class _ProviderCreateListingScreenState
                               : '',
                         )
                         .join(' '),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   ),
                 );
               }).toList(),
@@ -930,7 +932,7 @@ class _ProviderCreateListingScreenState
                             : '',
                       )
                       .join(' '),
-                  style: TextStyle(fontSize: 12.sp),
+                  style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 deleteIcon: Icon(Icons.close, size: 16.sp),
                 onDeleted: () {
@@ -942,7 +944,7 @@ class _ProviderCreateListingScreenState
                     }
                   });
                 },
-                backgroundColor: const Color(0xFFF5F5F7),
+                backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r),
                   side: BorderSide.none,
@@ -964,23 +966,23 @@ class _ProviderCreateListingScreenState
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedLocationType,
-          dropdownColor: Colors.white,
+          dropdownColor: Theme.of(context).colorScheme.surface,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[400]),
+          icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
           onChanged: (String? newValue) {
             setState(() {
               _selectedLocationType = newValue!;
             });
           },
           items: _locationTypes.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(value: value, child: Text(value));
+            return DropdownMenuItem<String>(value: value, child: Text(value, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)));
           }).toList(),
         ),
       ),
@@ -1006,17 +1008,17 @@ class _ProviderCreateListingScreenState
               margin: EdgeInsets.only(right: model == models.last ? 0 : 8.w),
               padding: EdgeInsets.symmetric(vertical: 12.h),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.black : Colors.white,
+                color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(
-                  color: isSelected ? Colors.black : const Color(0xFFE0E0E0),
+                  color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 ),
               ),
               child: Text(
                 model,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black54,
+                  color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: AppTypography.bodyMedium,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -1090,9 +1092,9 @@ class _ProviderCreateListingScreenState
               margin: EdgeInsets.only(bottom: 20.h),
               padding: EdgeInsets.all(15.w),
               decoration: BoxDecoration(
-                color: const Color(0xFFF9F9F9),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: const Color(0xFFE0E0E0)),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1102,7 +1104,7 @@ class _ProviderCreateListingScreenState
                     children: [
                       Text(
                         'Package ${index + 1}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                       ),
                       if (_packageControllers.length > 1)
                         GestureDetector(
@@ -1162,7 +1164,7 @@ class _ProviderCreateListingScreenState
                 setState(() => _packageControllers.add(PackageControllers())),
             icon: const Icon(Icons.add),
             label: const Text('Add Another Package'),
-            style: TextButton.styleFrom(foregroundColor: Colors.black),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
           ),
         ],
       );
@@ -1181,10 +1183,10 @@ class _ProviderCreateListingScreenState
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(8.r),
             border: Border.all(
-              color: errorText != null ? Colors.red : const Color(0xFFE0E0E0),
+              color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             ),
           ),
           child: TextField(
@@ -1196,7 +1198,7 @@ class _ProviderCreateListingScreenState
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 fontSize: AppTypography.bodyMedium,
               ),
               border: InputBorder.none,
@@ -1205,6 +1207,7 @@ class _ProviderCreateListingScreenState
                 vertical: 10.h,
               ),
             ),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
         ),
         if (errorText != null)
@@ -1238,25 +1241,25 @@ class _ProviderCreateListingScreenState
 
     final dropdown = Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
       ),
       padding: EdgeInsets.symmetric(horizontal: 12.w),
       height: 48.h, // Match standard text field height roughly
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: Colors.white,
+          dropdownColor: Theme.of(context).colorScheme.surface,
           hint: Text(
             hint,
             style: TextStyle(
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               fontSize: AppTypography.bodyMedium,
             ),
           ),
           value: effectiveValue,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[400]),
+          icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
           onChanged: (String? newValue) {
             setState(() {
               if (newValue != null) {
@@ -1267,7 +1270,7 @@ class _ProviderCreateListingScreenState
           items: options.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text('$value Hour${value == '1' ? '' : 's'}'),
+              child: Text('$value Hour${value == '1' ? '' : 's'}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             );
           }).toList(),
         ),
@@ -1293,10 +1296,10 @@ class _ProviderCreateListingScreenState
   Widget _buildRadiusSlider() {
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
-        activeTrackColor: Colors.black,
-        inactiveTrackColor: const Color(0xFFF0F0F0),
-        thumbColor: Colors.black,
-        overlayColor: Colors.black.withOpacity(0.1),
+        activeTrackColor: Theme.of(context).colorScheme.onSurface,
+        inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        thumbColor: Theme.of(context).colorScheme.onSurface,
+        overlayColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
         trackHeight: 4.h,
       ),
       child: Slider(
@@ -1321,7 +1324,7 @@ class _ProviderCreateListingScreenState
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: _acceptOutsideRadius ? Colors.black : Colors.grey[400]!,
+                color: _acceptOutsideRadius ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               ),
             ),
             child: _acceptOutsideRadius
@@ -1329,8 +1332,8 @@ class _ProviderCreateListingScreenState
                     child: Container(
                       width: 10.w,
                       height: 10.w,
-                      decoration: const BoxDecoration(
-                        color: Colors.black,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onSurface,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -1347,7 +1350,7 @@ class _ProviderCreateListingScreenState
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.87),
                   ),
                 ),
                 SizedBox(height: 4.h),
@@ -1355,7 +1358,7 @@ class _ProviderCreateListingScreenState
                   'Additional travel fees may apply for bookings outside your service radius',
                   style: TextStyle(
                     fontSize: AppTypography.bodySmall,
-                    color: Colors.grey[400],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   ),
                 ),
               ],
@@ -1372,16 +1375,16 @@ class _ProviderCreateListingScreenState
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(color: const Color(0xFFE0E0E0)),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
             ),
             child: TextField(
               controller: _equipmentController,
               decoration: InputDecoration(
                 hintText: 'Canon EOS R5',
                 hintStyle: TextStyle(
-                  color: Colors.grey[400],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   fontSize: AppTypography.bodyLarge,
                 ),
                 border: InputBorder.none,
@@ -1390,6 +1393,7 @@ class _ProviderCreateListingScreenState
                   vertical: 12.h,
                 ),
               ),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
         ),
@@ -1406,13 +1410,13 @@ class _ProviderCreateListingScreenState
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Text(
               'Add',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 fontSize: AppTypography.bodyLarge,
                 fontWeight: FontWeight.bold,
               ),
@@ -1433,7 +1437,7 @@ class _ProviderCreateListingScreenState
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F7),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
               borderRadius: BorderRadius.circular(20.r),
             ),
             child: Row(
@@ -1443,13 +1447,13 @@ class _ProviderCreateListingScreenState
                   item,
                   style: TextStyle(
                     fontSize: AppTypography.bodySmall,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.87),
                   ),
                 ),
                 SizedBox(width: 4.w),
                 GestureDetector(
                   onTap: () => setState(() => _equipment.remove(item)),
-                  child: Icon(Icons.close, size: 14.sp, color: Colors.black54),
+                  child: Icon(Icons.close, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 ),
               ],
             ),
@@ -1469,10 +1473,10 @@ class _ProviderCreateListingScreenState
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 40.h),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(15.r),
               border: Border.all(
-                color: errorText != null ? Colors.red : const Color(0xFFE0E0E0),
+                color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 style: BorderStyle.solid,
               ),
             ),
@@ -1481,14 +1485,14 @@ class _ProviderCreateListingScreenState
                 Icon(
                   Icons.cloud_upload_outlined,
                   size: 40.sp,
-                  color: errorText != null ? Colors.red[300] : Colors.grey[400],
+                  color: errorText != null ? Colors.red[300] : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 ),
                 SizedBox(height: 12.h),
                 Text(
                   'Click to upload photos',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
-                    color: errorText != null ? Colors.red : Colors.black87,
+                    color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.87),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -1499,7 +1503,7 @@ class _ProviderCreateListingScreenState
                     fontSize: AppTypography.bodySmall,
                     color: errorText != null
                         ? Colors.red[300]
-                        : Colors.grey[400],
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   ),
                 ),
               ],
@@ -1583,7 +1587,7 @@ class _ProviderCreateListingScreenState
                       color: Colors.black54,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.close, color: Colors.white, size: 16.sp),
+                    child: Icon(Icons.close, color: Theme.of(context).colorScheme.surface, size: 16.sp),
                   ),
                 ),
               ),
@@ -1605,7 +1609,7 @@ class _ProviderCreateListingScreenState
                 onPressed: inProgress ? null : () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
                   minimumSize: Size(0, 50.h),
-                  side: const BorderSide(color: Color(0xFFE0E0E0)),
+                  side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
@@ -1613,7 +1617,7 @@ class _ProviderCreateListingScreenState
                 child: Text(
                   'Cancel',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: AppTypography.bodyLarge,
                   ),
                 ),
@@ -1625,9 +1629,9 @@ class _ProviderCreateListingScreenState
                 onPressed: (isReady && !inProgress) ? _publishListing : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isReady
-                      ? Colors.black
-                      : const Color(0xFFD1D5DB),
-                  disabledBackgroundColor: const Color(0xFFD1D5DB),
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                  disabledBackgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                   minimumSize: Size(0, 50.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
@@ -1639,7 +1643,7 @@ class _ProviderCreateListingScreenState
                     : Text(
                         widget.existingListing != null ? 'Update' : 'Publish',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           fontSize: AppTypography.bodyLarge,
                           fontWeight: FontWeight.bold,
                         ),

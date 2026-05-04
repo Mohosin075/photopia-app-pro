@@ -23,6 +23,7 @@ class HomeHeader extends StatelessWidget {
                 'assets/images/app_name.png',
                 height: 24.h,
                 fit: BoxFit.contain,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               Consumer<LocationController>(
                 builder: (context, controller, _) {
@@ -32,7 +33,7 @@ class HomeHeader extends StatelessWidget {
                       Icon(
                         Icons.location_on,
                         size: 14.sp.clamp(14, 16),
-                        color: Colors.grey,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                       ),
                       SizedBox(width: 4.w),
                       if (controller.isLoading)
@@ -40,7 +41,7 @@ class HomeHeader extends StatelessWidget {
                           width: 100.w,
                           height: 12.h,
                           decoration: BoxDecoration(
-                            color: Colors.grey[200],
+                            color: Theme.of(context).dividerColor.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(4).r,
                           ),
                           child: ClipRRect(
@@ -56,7 +57,7 @@ class HomeHeader extends StatelessWidget {
                           location,
                           style: TextStyle(
                             fontSize: 12.sp.clamp(12, 14),
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             fontWeight: FontWeight.w500,
                           ),
                           maxLines: 1,
@@ -82,7 +83,7 @@ class HomeHeader extends StatelessWidget {
                 final bool hasUnread = controller.unreadCount > 0;
                 return Stack(
                   children: [
-                    Icon(Icons.notifications_outlined, size: 20.sp),
+                    Icon(Icons.notifications_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface),
                     if (hasUnread)
                       Positioned(
                         right: 0,
