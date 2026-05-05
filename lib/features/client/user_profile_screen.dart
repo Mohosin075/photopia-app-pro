@@ -782,8 +782,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           context: context,
                           barrierDismissible: true,
                           builder: (ctx) => AlertDialog(
-                            backgroundColor: Colors.white,
-                            surfaceTintColor: Colors.white,
+                            backgroundColor: Theme.of(context).colorScheme.surface,
+                            surfaceTintColor: Theme.of(context).colorScheme.surface,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.r),
                             ),
@@ -809,27 +809,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   ),
                                   child: Icon(
                                     Icons.logout_rounded,
-                                    color: Colors.black,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     size: 26.sp,
                                   ),
                                 ),
                                 SizedBox(height: 12.h),
                                 Text(
-                                  'Log Out',
+                                  context.l10n.logOut,
                                   style: TextStyle(
                                     fontSize: 18.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                               ],
                             ),
                             content: Text(
-                              'Are you sure you want to log out of your account?',
+                              context.l10n.logOutConfirm,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 13.sp,
-                                color: Colors.grey[600],
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                 height: 1.4,
                               ),
                             ),
@@ -845,7 +845,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                           vertical: 12.h,
                                         ),
                                         side: BorderSide(
-                                          color: Colors.grey[300]!,
+                                          color: Theme.of(context).dividerColor.withOpacity(0.15),
                                         ),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
@@ -854,9 +854,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                         ),
                                       ),
                                       child: Text(
-                                        'Cancel',
+                                        context.l10n.cancel,
                                         style: TextStyle(
-                                          color: Colors.grey[700],
+                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                           fontWeight: FontWeight.w600,
                                           fontSize: 13.sp,
                                         ),
@@ -868,8 +868,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     child: ElevatedButton(
                                       onPressed: () => Navigator.pop(ctx, true),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.black,
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: Theme.of(context).colorScheme.error,
+                                        foregroundColor: Theme.of(context).colorScheme.onError,
                                         elevation: 0,
                                         padding: EdgeInsets.symmetric(
                                           vertical: 12.h,
@@ -881,7 +881,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                         ),
                                       ),
                                       child: Text(
-                                        'Log Out',
+                                        context.l10n.logOut,
                                         style: TextStyle(
                                           fontSize: 13.sp,
                                           fontWeight: FontWeight.w600,
@@ -913,9 +913,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 15.h),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(15).r,
-                    border: Border.all(color: Colors.red.withAlpha(80)),
+                    border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.3)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -924,18 +924,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         SizedBox(
                           height: 20.h,
                           width: 20.h,
-                          child: const CircularProgressIndicator(
-                            color: Colors.red,
+                          child: CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.error,
                             strokeWidth: 2,
                           ),
                         )
                       else ...[
-                        Icon(Icons.logout, color: Colors.red, size: 20.sp),
+                        Icon(Icons.logout, color: Theme.of(context).colorScheme.error, size: 20.sp),
                         SizedBox(width: 10.w),
                         Text(
-                          'Log Out',
+                          context.l10n.logOut,
                           style: TextStyle(
-                            color: Colors.red,
+                            color: Theme.of(context).colorScheme.error,
                             fontSize: AppTypography.bodyLarge,
                             fontWeight: FontWeight.bold,
                           ),

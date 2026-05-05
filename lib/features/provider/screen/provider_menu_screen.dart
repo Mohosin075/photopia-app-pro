@@ -266,7 +266,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                 style: TextStyle(
                   fontSize: 15.sp.clamp(14, 16),
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
             ),
@@ -596,8 +596,8 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                         children: [
                           Container(
                             padding: EdgeInsets.all(14.w),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFF5F5F5),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).dividerColor.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(

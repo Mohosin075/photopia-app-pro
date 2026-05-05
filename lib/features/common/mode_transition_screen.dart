@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:async';
 import 'package:photopia/controller/client/role_switch_controller.dart';
+import 'package:photopia/controller/provider/provider_onboarding_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/core/routes/app_routes.dart';
 
 class ModeTransitionScreen extends StatefulWidget {
   final String targetRole; // 'client' or 'professional'
@@ -70,9 +72,13 @@ class _ModeTransitionScreenState extends State<ModeTransitionScreen>
       }
 
       if (success && mounted) {
+        // Check if this is a first-time professional and onboarding is not done
+        final bool needsOnboarding = widget.targetRole == 'professional' &&
+            !ProviderOnboardingController.isOnboardingCompleted();
+
         Navigator.pushNamedAndRemoveUntil(
           context,
-          widget.targetRoute,
+          needsOnboarding ? AppRoutes.provider_onboarding : widget.targetRoute,
           (route) => false,
         );
       } else if (mounted) {
@@ -99,7 +105,7 @@ class _ModeTransitionScreenState extends State<ModeTransitionScreen>
         : context.l10n.switchingToClient;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 40.w),
         child: Center(
@@ -119,7 +125,7 @@ class _ModeTransitionScreenState extends State<ModeTransitionScreen>
                       child: Icon(
                         Icons.camera_alt_outlined,
                         size: 80.sp.clamp(60, 100),
-                        color: Colors.black,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   );
@@ -132,7 +138,7 @@ class _ModeTransitionScreenState extends State<ModeTransitionScreen>
                 style: TextStyle(
                   fontSize: 17.sp.clamp(15, 19),
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                   height: 1.4,
                 ),
               ),
@@ -201,8 +207,8 @@ class _LoadingDotState extends State<_LoadingDot>
       child: Container(
         width: 6.w,
         height: 6.w,
-        decoration: const BoxDecoration(
-          color: Colors.black,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onSurface,
           shape: BoxShape.circle,
         ),
       ),

@@ -331,9 +331,27 @@ class _SearchScreenState extends State<SearchScreen> {
                     style: TextStyle(fontSize: 16.sp, color: Colors.grey),
                   ),
                   SizedBox(height: 20.h),
-                  TextButton(
-                    onPressed: _clearSearch,
-                    child: const Text('Back to Categories'),
+                  GestureDetector(
+                    onTap: _clearSearch,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.arrow_back_ios_new,
+                          size: 16.sp,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(
+                          'Back to Categories',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -344,7 +362,7 @@ class _SearchScreenState extends State<SearchScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 12.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -357,9 +375,27 @@ class _SearchScreenState extends State<SearchScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    TextButton(
-                      onPressed: _clearSearch,
-                      child: const Text('Clear'),
+                    GestureDetector(
+                      onTap: _clearSearch,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.arrow_back_ios_new,
+                            size: 14.sp,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'Back',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

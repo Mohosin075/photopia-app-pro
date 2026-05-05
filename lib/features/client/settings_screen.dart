@@ -369,7 +369,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
         child: Row(
           children: [
-            Icon(icon, size: 22.sp, color: iconColor ?? const Color(0xFF374151)),
+            Icon(icon, size: 22.sp, color: iconColor ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
             SizedBox(width: 14.w),
             Expanded(
               child: Text(
@@ -398,7 +398,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       child: Row(
         children: [
-          Icon(icon, size: 22.sp, color: const Color(0xFF374151)),
+          Icon(icon, size: 22.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
           SizedBox(width: 14.w),
           Expanded(
             child: Text(

@@ -45,7 +45,7 @@ class MessageListItem extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFF2ECC71),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
+                        border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
                       ),
                     ),
                   ),
@@ -64,7 +64,7 @@ class MessageListItem extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15.sp.clamp(15,17),
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Text(
@@ -84,9 +84,9 @@ class MessageListItem extends StatelessWidget {
                           conversation.lastMessage,
                           style: TextStyle(
                             fontSize: 13.sp.clamp(13,15),
-                            color: (!conversation.isLastMessageFromMe && conversation.unreadCount > 0)
-                                ? Colors.black87
-                                : Colors.grey,
+                            color: (conversation.unreadCount > 0)
+                                ? Theme.of(context).colorScheme.onSurface
+                                : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             fontWeight: (!conversation.isLastMessageFromMe && conversation.unreadCount > 0)
                                 ? FontWeight.w600
                                 : FontWeight.normal,
@@ -99,14 +99,14 @@ class MessageListItem extends StatelessWidget {
                         Container(
                           margin: EdgeInsets.only(left: 8.w),
                           padding: EdgeInsets.all(6.r.clamp(4, 8)),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF1A1A1A),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
                             shape: BoxShape.circle,
                           ),
                           child: Text(
                             conversation.unreadCount.toString(),
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 10.sp.clamp(10, 12),
                               fontWeight: FontWeight.bold,
                             ),
