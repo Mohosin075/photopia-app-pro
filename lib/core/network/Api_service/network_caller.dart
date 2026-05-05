@@ -138,6 +138,9 @@ class NetworkCaller {
 
   // ─── Refresh Token ────────────────────────────────────────────────────────
 
+  /// Public wrapper to refresh the access token.
+  static Future<bool> refreshAccessToken() => _refreshAccessToken();
+
   /// Attempts to refresh the access token using the stored cookie.
   /// Returns true if successful.
   static Future<bool> _refreshAccessToken() async {

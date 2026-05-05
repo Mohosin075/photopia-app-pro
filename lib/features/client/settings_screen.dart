@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/features/client/payment_methods_screen.dart';
 import 'package:photopia/features/client/privacy_policy_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/theme_controller.dart';
@@ -14,7 +15,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   void _showComingSoon(String feature) {
@@ -22,8 +22,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       SnackBar(
         content: Text('$feature – ${context.l10n.comingSoon}'),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withOpacity(0.9),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
       ),
     );
   }
@@ -40,16 +44,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
         contentPadding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 8.h),
         actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
         title: Text(
           title,
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         content: Text(
           body,
-          style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.4),
+          style: TextStyle(
+            fontSize: 13.sp,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            height: 1.4,
+          ),
         ),
         actions: [
           Row(
@@ -59,12 +73,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: () => Navigator.pop(ctx),
                   style: OutlinedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 12.h),
-                    side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                    side: BorderSide(
+                      color: Theme.of(context).dividerColor.withOpacity(0.1),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
                   ),
                   child: Text(
                     context.l10n.cancelBtn,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontWeight: FontWeight.w600, fontSize: 13.sp),
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.sp,
+                    ),
                   ),
                 ),
               ),
@@ -80,11 +104,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: EdgeInsets.symmetric(vertical: 12.h),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
                   ),
                   child: Text(
                     confirmLabel,
-                    style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -108,7 +137,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 22.sp),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 22.sp,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -124,14 +157,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
         children: [
-
           // ── Account Section ───────────────────────────────────────────────
           _sectionLabel(l.settingsAccount),
           _card([
             _tile(
               icon: Icons.credit_card_outlined,
               title: l.settingsPaymentMethod,
-              onTap: () => _showComingSoon(l.settingsPaymentMethod),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PaymentMethodsScreen()),
+              ),
             ),
             _divider(),
             _tile(
@@ -179,7 +214,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _tile(
               icon: Icons.help_outline,
               title: l.settingsHelpSupport,
-              trailing: Icon(Icons.arrow_forward_ios, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+              trailing: Icon(
+                Icons.arrow_forward_ios,
+                size: 14.sp,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+              ),
               onTap: () => _showHelpSheet(),
             ),
           ]),
@@ -264,7 +303,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(height: 20.h),
             Text(
               l.settingsHelpSupport,
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             SizedBox(height: 20.h),
             _helpTile(
@@ -314,20 +357,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20.sp),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 20.sp,
+              ),
             ),
             SizedBox(width: 14.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                   SizedBox(height: 3.h),
-                  Text(subtitle, style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                  ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14.sp,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+            ),
           ],
         ),
       ),
@@ -337,20 +403,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // ── Small Builders ─────────────────────────────────────────────────────────
 
   Widget _sectionLabel(String label) => Padding(
-        padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
-        child: Text(
-          label.toUpperCase(),
-          style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), letterSpacing: 0.8),
-        ),
-      );
+    padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
+    child: Text(
+      label.toUpperCase(),
+      style: TextStyle(
+        fontSize: 11.sp,
+        fontWeight: FontWeight.w600,
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+        letterSpacing: 0.8,
+      ),
+    ),
+  );
 
   Widget _card(List<Widget> children) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: Column(children: children),
-      );
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surface,
+      borderRadius: BorderRadius.circular(16.r),
+    ),
+    child: Column(children: children),
+  );
 
   Widget _divider() => const Divider(height: 1, indent: 52);
 
@@ -369,7 +440,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
         child: Row(
           children: [
-            Icon(icon, size: 22.sp, color: iconColor ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+            Icon(
+              icon,
+              size: 22.sp,
+              color:
+                  iconColor ??
+                  Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
             SizedBox(width: 14.w),
             Expanded(
               child: Text(
@@ -381,7 +458,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            trailing ?? Icon(Icons.arrow_forward_ios, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+            trailing ??
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14.sp,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.3),
+                ),
           ],
         ),
       ),
@@ -398,12 +482,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       child: Row(
         children: [
-          Icon(icon, size: 22.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+          Icon(
+            icon,
+            size: 22.sp,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          ),
           SizedBox(width: 14.w),
           Expanded(
             child: Text(
               title,
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface),
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
           Switch.adaptive(

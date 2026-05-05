@@ -11,6 +11,51 @@ class CalenderAvailibilityController extends ChangeNotifier {
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
 
+  // Caching month calendar data to reduce load time
+  final Map<String, List<dynamic>> _calendarCache = {};
+
+  Future<List<dynamic>> getMonthCalendar(
+    String providerId,
+    int month,
+    int year,
+  ) async {
+    final cacheKey = '$providerId-$month-$year';
+    if (_calendarCache.containsKey(cacheKey)) {
+      debugPrint('⚡ Returning cached calendar for $cacheKey');
+      return _calendarCache[cacheKey]!;
+    }
+
+    _inProgress = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final String url = Urls.getMonthCalendar(providerId, month, year);
+      final NetworkResponse response = await NetworkCaller.getRequest(
+        url: url,
+        requireAuth: true,
+      );
+
+      _inProgress = false;
+      if (response.isSuccess && response.body != null) {
+        final List<dynamic> calendar = response.body!['data']['calendar'] ?? [];
+        _calendarCache[cacheKey] = calendar;
+        notifyListeners();
+        return calendar;
+      } else {
+        _errorMessage =
+            response.errorMessage ?? 'Failed to fetch month calendar';
+        notifyListeners();
+        return [];
+      }
+    } catch (e) {
+      _inProgress = false;
+      _errorMessage = 'An unexpected error occurred: $e';
+      notifyListeners();
+      return [];
+    }
+  }
+
   Future<bool> updateAvailability(Data availabilityData) async {
     _inProgress = true;
     _errorMessage = null;
@@ -26,7 +71,7 @@ class CalenderAvailibilityController extends ChangeNotifier {
       body.remove('createdAt');
       body.remove('updatedAt');
       body.remove('__v');
-      
+
       // As per analysis.txt and Postman screenshot, serviceId is not present
       body.remove('serviceId');
 
@@ -38,9 +83,7 @@ class CalenderAvailibilityController extends ChangeNotifier {
         bodyStr = "${bodyStr.substring(0, 500)}... [Truncated]";
       }
 
-      debugPrint(
-        '🚀 Sending Availability Update to ${Urls.calenderSettings}',
-      );
+      debugPrint('🚀 Sending Availability Update to ${Urls.calenderSettings}');
       debugPrint('📦 Body: $bodyStr');
 
       final NetworkResponse response = await NetworkCaller.postRequest(
@@ -67,14 +110,16 @@ class CalenderAvailibilityController extends ChangeNotifier {
     }
   }
 
-  Future<CalenderSettingsModel?> getAvailabilitySettings({String? providerId}) async {
+  Future<CalenderSettingsModel?> getAvailabilitySettings({
+    String? providerId,
+  }) async {
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final String url = providerId != null 
-          ? Urls.getProviderAvailability(providerId) 
+      final String url = providerId != null
+          ? Urls.getProviderAvailability(providerId)
           : Urls.calenderSettings;
 
       final NetworkResponse response = await NetworkCaller.getRequest(
@@ -98,40 +143,12 @@ class CalenderAvailibilityController extends ChangeNotifier {
       return null;
     }
   }
-  Future<List<dynamic>> getMonthCalendar(
-      String providerId, int month, int year) async {
-    _inProgress = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      final String url = Urls.getMonthCalendar(providerId, month, year);
-      final NetworkResponse response = await NetworkCaller.getRequest(
-        url: url,
-        requireAuth: true,
-      );
-
-      _inProgress = false;
-      if (response.isSuccess && response.body != null) {
-        notifyListeners();
-        // Assuming response.body['data']['calendar'] is the list
-        return response.body!['data']['calendar'] ?? [];
-      } else {
-        _errorMessage =
-            response.errorMessage ?? 'Failed to fetch month calendar';
-        notifyListeners();
-        return [];
-      }
-    } catch (e) {
-      _inProgress = false;
-      _errorMessage = 'An unexpected error occurred: $e';
-      notifyListeners();
-      return [];
-    }
-  }
 
   Future<List<String>> getTimeSlots(
-      String providerId, String date, int duration) async {
+    String providerId,
+    String date,
+    int duration,
+  ) async {
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();

@@ -49,6 +49,12 @@ class AuthController extends ChangeNotifier {
     activeRole = role;
   }
 
+  /// Update the access token manually (e.g., after role switch if backend sends a new one)
+  static Future<void> updateToken(String token) async {
+    await GetStorage().write(_tokenKey, token);
+    accessToken = token;
+  }
+
   /// Save userId to storage and update static variable
   static Future<void> saveUserId(String id) async {
     await GetStorage().write(_userIdKey, id);

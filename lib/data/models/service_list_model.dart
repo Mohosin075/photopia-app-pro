@@ -192,6 +192,27 @@ class ServiceItem {
   }
 
   factory ServiceItem.fromJson(Map<String, dynamic> json) {
+    String? currencyValue = json['currency']?.toString().trim().toUpperCase();
+
+    // Normalize currency symbols to ISO codes for API compatibility
+    if (currencyValue == null || currencyValue.isEmpty) {
+      currencyValue = 'EUR';
+    } else if (currencyValue == '€' || currencyValue == 'EUR') {
+      currencyValue = 'EUR';
+    } else if (currencyValue == r'$' || currencyValue == 'USD') {
+      currencyValue = 'USD';
+    } else if (currencyValue == '£' || currencyValue == 'GBP') {
+      currencyValue = 'GBP';
+    } else if (currencyValue == '৳' ||
+        currencyValue == 'BDT' ||
+        currencyValue == 'TK') {
+      currencyValue = 'BDT';
+    } else if (currencyValue == '₹' || currencyValue == 'INR') {
+      currencyValue = 'INR';
+    } else if (currencyValue == '¥' || currencyValue == 'JPY') {
+      currencyValue = 'JPY';
+    }
+
     return ServiceItem(
       sId: json['_id'],
       providerId: json['providerId'] is Map
@@ -202,9 +223,9 @@ class ServiceItem {
           ? CategoryModel.fromJson(json['category'])
           : null,
       subCategory: json['subCategory']?.toString(),
-      price: (json['price'] as num?)?.toInt(),
-      currency: json['currency'],
-      duration: json['duration']?.toString(),
+      price: (json['price'] as num?)?.toInt() ?? 0,
+      currency: currencyValue ?? 'EUR',
+      duration: json['duration']?.toString() ?? 'Flexible',
       location: json['location'] is Map
           ? LocationInfo.fromJson(json['location'])
           : null,
@@ -216,29 +237,28 @@ class ServiceItem {
                 ? (json['gallery'] as List).first
                 : null),
       ),
-      status: json['status']?.toString(),
+      status: json['status']?.toString() ?? 'active',
       isActive: json['isActive'] == true || json['isActive'] == 'true',
       isVerified: json['isVerified'] == true || json['isVerified'] == 'true',
       rating: double.tryParse(json['rating']?.toString() ?? '0.0') ?? 0.0,
       reviews: int.tryParse(json['reviews']?.toString() ?? '0') ?? 0,
-      description: json['description'],
-      tags: json['tags'] != null ? List<String>.from(json['tags']) : null,
+      description: json['description'] ?? '',
+      tags: json['tags'] != null ? List<String>.from(json['tags']) : [],
       equipment: json['equipment'] != null
           ? List<String>.from(json['equipment'])
-          : null,
+          : [],
       gallery: json['gallery'] != null
           ? (json['gallery'] as List)
                 .map((e) => _formatUrl(e))
                 .where((e) => e != null && e.isNotEmpty)
                 .toList()
-          : null,
-      responseTime: json['responseTime']?.toString(),
-      completedProjects: int.tryParse(
-        json['completedProjects']?.toString() ?? '',
-      ),
-      serviceType: json['serviceType']?.toString(),
+          : [],
+      responseTime: json['responseTime']?.toString() ?? 'N/A',
+      completedProjects:
+          int.tryParse(json['completedProjects']?.toString() ?? '0') ?? 0,
+      serviceType: json['serviceType']?.toString() ?? 'Photography',
       theme: json['theme']?.toString(),
-      pricingType: json['pricingType']?.toString(),
+      pricingType: json['pricingType']?.toString() ?? 'HOURLY',
       pricingModel: json['pricingModel'] is Map
           ? ServicePricingModel.fromJson(json['pricingModel'])
           : null,
@@ -246,13 +266,13 @@ class ServiceItem {
           ? (json['pricingRules'] as List)
                 .map((r) => PricingRule.fromJson(r))
                 .toList()
-          : null,
+          : [],
       cancellationPolicy: json['cancellationPolicy'] is Map
           ? CancellationPolicy.fromJson(json['cancellationPolicy'])
           : null,
-      travelFeePerKm: (json['travelFeePerKm'] as num?)?.toDouble(),
+      travelFeePerKm: (json['travelFeePerKm'] as num?)?.toDouble() ?? 0.0,
       allowOutsideRadius: json['allowOutsideRadius'] ?? false,
-      maxTravelFee: (json['maxTravelFee'] as num?)?.toDouble(),
+      maxTravelFee: (json['maxTravelFee'] as num?)?.toDouble() ?? 0.0,
       depositPercentage: (json['depositPercentage'] as num?)?.toInt() ?? 50,
     );
   }

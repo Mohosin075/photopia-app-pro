@@ -31,22 +31,20 @@ class BookingController extends ChangeNotifier {
         requireAuth: true,
       );
 
-      _isLoading = false;
       if (response.isSuccess && response.body != null) {
         final model = BookingModel.fromJson(response.body!);
         _bookings = model.data ?? [];
-        notifyListeners();
         return true;
       } else {
         _errorMessage = response.errorMessage ?? "Failed to fetch bookings";
-        notifyListeners();
         return false;
       }
     } catch (e) {
-      _isLoading = false;
       _errorMessage = "Error fetching bookings: $e";
-      notifyListeners();
       return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -74,44 +72,50 @@ class BookingController extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final Map<String, dynamic> body = {
-      "providerId": providerId,
-      "serviceId": serviceId,
-      "bookingDate": bookingDate,
-      "startTime": startTime,
-      "eventLocation": {
-        "address": address,
-        "city": city,
-        "country": country,
-        "coordinates": {"lat": lat, "lng": lng},
-        "distanceFromProviderKm": distanceFromProviderKm,
-      },
-      "clientName": clientName ?? "",
-      "clientEmail": clientEmail ?? "",
-      "clientPhone": clientPhone ?? "",
-    };
-
-    if (endTime != null && endTime.isNotEmpty) {
-      body["endTime"] = endTime;
-    }
-
-    if (packageName != null && packageName.isNotEmpty) {
-      body["packageName"] = packageName;
-    }
-
-    if (notes != null && notes.isNotEmpty) {
-      body["eventLocation"]["notes"] = notes;
-    }
-
-    if (eventType != null && eventType.isNotEmpty) {
-      body["eventType"] = eventType;
-    }
-
-    if (specialRequests != null && specialRequests.isNotEmpty) {
-      body["specialRequests"] = specialRequests;
-    }
-
     try {
+      final Map<String, dynamic> body = {
+        "serviceId": serviceId,
+        "providerId": providerId,
+        "bookingDate": bookingDate,
+        "startTime": startTime,
+        "endTime": endTime,
+        "packageName": packageName ?? "",
+        "eventLocation": {
+          "address": address,
+          "city": city,
+          "country": country,
+          "coordinates": {"lng": lng, "lat": lat},
+          "notes": notes,
+        },
+        "clientName": clientName ?? "",
+        "clientEmail": clientEmail ?? "",
+        "userEmail": clientEmail ?? "", // Required for checkout session
+        "email":
+            clientEmail ?? "", // Root email field often expected by backends
+        "user_email": clientEmail ?? "", // Snake case variant
+        "clientPhone": clientPhone ?? "",
+        "client": {
+          "name": clientName ?? "",
+          "email": clientEmail ?? "",
+          "phone": clientPhone ?? "",
+        },
+        "user": {"email": clientEmail ?? "", "userEmail": clientEmail ?? ""},
+        "payment": {"userEmail": clientEmail ?? "", "email": clientEmail ?? ""},
+        "paymentInfo": {
+          "userEmail": clientEmail ?? "",
+          "email": clientEmail ?? "",
+        },
+        "paymentData": {"userEmail": clientEmail ?? ""},
+        "customerEmail": clientEmail ?? "",
+        "customer_email": clientEmail ?? "",
+        "userEmail": clientEmail ?? "",
+        "eventType": eventType ?? "Photography Session",
+        "specialRequests": specialRequests ?? "",
+        "distanceFromProviderKm": distanceFromProviderKm,
+      };
+
+      debugPrint('📦 [BookingController] Request Body: $body');
+
       final response = await NetworkCaller.postRequest(
         url: Urls.createBooking,
         body: body,
@@ -127,25 +131,25 @@ class BookingController extends ChangeNotifier {
             data?['id']?.toString();
 
         debugPrint('✅ BookingController: Booking ID parsed: $_lastBookingId');
-
-        _isLoading = false;
-        notifyListeners();
         return _lastBookingId;
       } else {
         _errorMessage = response.errorMessage ?? "Failed to create booking";
-        _isLoading = false;
-        notifyListeners();
         return null;
       }
     } catch (e) {
       _errorMessage = e.toString();
+      return null;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return null;
     }
   }
 
   Future<bool> updateBookingStatus(String bookingId, String status) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
     try {
       final response = await NetworkCaller.patchRequest(
         url: Urls.updateBookingStatus(bookingId),
@@ -155,10 +159,17 @@ class BookingController extends ChangeNotifier {
       debugPrint(
         '📋 BookingController: Status update to "$status" → success: ${response.isSuccess}',
       );
+      if (!response.isSuccess) {
+        _errorMessage = response.errorMessage ?? "Failed to update status";
+      }
       return response.isSuccess;
     } catch (e) {
       debugPrint('❌ BookingController: Status update failed: $e');
+      _errorMessage = e.toString();
       return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -196,20 +207,17 @@ class BookingController extends ChangeNotifier {
       );
 
       if (response.isSuccess) {
-        _isLoading = false;
-        notifyListeners();
         return response.body?['data'];
       } else {
         _errorMessage = response.errorMessage ?? "Failed to calculate price";
-        _isLoading = false;
-        notifyListeners();
         return null;
       }
     } catch (e) {
       _errorMessage = e.toString();
+      return null;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return null;
     }
   }
 }

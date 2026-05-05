@@ -9,6 +9,8 @@ import 'package:photopia/controller/client/payment_controller.dart';
 import 'package:photopia/data/models/calender_availibility_model.dart';
 import 'package:provider/provider.dart';
 
+import 'package:photopia/data/models/payment_method_model.dart';
+
 class BookingConfirmationScreen extends StatefulWidget {
   final Map<String, dynamic>? service;
   final Map<String, dynamic>? package;
@@ -19,14 +21,13 @@ class BookingConfirmationScreen extends StatefulWidget {
       _BookingConfirmationScreenState();
 }
 
-class _BookingConfirmationScreenState
-    extends State<BookingConfirmationScreen> {
+class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   final PageController _pageController = PageController();
   int _pageIndex = 0;
   bool _isSuccess = false;
   bool _isLoadingAvailability = true;
+  PaymentMethodModel? _selectedPaymentMethod;
 
-  // Booking Data
   // Booking Data
   DateTime? _selectedDateTime;
   String _selectedTime = '';
@@ -38,14 +39,20 @@ class _BookingConfirmationScreenState
   String? _city;
   String? _country;
   String _specialRequests = '';
+  double _distanceFromProvider = 0.0;
   String _paymentMethod = 'Credit/Debit Card';
   String? _createdBookingId; // Track if booking was already created
 
+  // Track critical booking details to detect changes
+  String? _lastBookingKey;
+
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _specialRequestsController = TextEditingController();
+  final TextEditingController _specialRequestsController =
+      TextEditingController();
 
   @override
   void dispose() {
+    _pageController.dispose();
     _locationController.dispose();
     _specialRequestsController.dispose();
     super.dispose();
@@ -59,9 +66,23 @@ class _BookingConfirmationScreenState
   @override
   void initState() {
     super.initState();
+
+    // Start fetching availability immediately for speed
+    _buildAvailableDatesFallback();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _buildAvailableDatesFallback(); // Load fallback dates immediately
-      _fetchAvailability();
+      _fetchAvailability(); // Re-sync if needed but should be fast now
+      context.read<PaymentController>().fetchPaymentMethods().then((_) {
+        final methods = context.read<PaymentController>().paymentMethods;
+        if (methods.isNotEmpty) {
+          setState(() {
+            _selectedPaymentMethod = methods.firstWhere(
+              (m) => m.isDefault,
+              orElse: () => methods.first,
+            );
+          });
+        }
+      });
     });
   }
 
@@ -73,18 +94,24 @@ class _BookingConfirmationScreenState
 
     if (providerId != null) {
       final controller = context.read<CalenderAvailibilityController>();
-      
+
       try {
         // Run both calls in parallel for speed
         final results = await Future.wait([
           controller.getAvailabilitySettings(providerId: providerId),
-          controller.getMonthCalendar(providerId, DateTime.now().month, DateTime.now().year),
+          controller.getMonthCalendar(
+            providerId,
+            DateTime.now().month,
+            DateTime.now().year,
+          ),
         ]);
 
+        final settingsModel = results[0] as CalenderSettingsModel?;
         final calendarData = results[1] as List<dynamic>;
 
         if (mounted) {
           setState(() {
+            _availabilityData = settingsModel?.data;
             _apiAvailableDates = calendarData;
             _buildAvailableDatesFromApi();
           });
@@ -100,13 +127,17 @@ class _BookingConfirmationScreenState
   }
 
   String? _getProviderId() {
-    if (widget.service?['providerId'] is Map) {
-      return widget.service!['providerId']['_id']?.toString() ??
-          widget.service!['providerId']['id']?.toString();
+    final providerData =
+        widget.service?['providerId'] ?? widget.service?['provider'];
+    if (providerData is Map) {
+      return providerData['_id']?.toString() ?? providerData['id']?.toString();
     }
+    if (providerData != null) {
+      return providerData.toString();
+    }
+    // Fallback to top level if somehow nested differently
     return widget.service?['providerId']?.toString() ??
-        widget.service?['provider']?['_id']?.toString() ??
-        widget.service?['provider']?['id']?.toString();
+        widget.service?['provider']?.toString();
   }
 
   void _buildAvailableDatesFromApi() {
@@ -120,7 +151,7 @@ class _BookingConfirmationScreenState
           // Only show future/today dates
           final now = DateTime.now();
           final today = DateTime(now.year, now.month, now.day);
-          if (parsedDate.isAfter(today.subtract(const Duration(seconds: 1))) ) {
+          if (parsedDate.isAfter(today.subtract(const Duration(seconds: 1)))) {
             dates.add(parsedDate);
           }
         }
@@ -139,27 +170,29 @@ class _BookingConfirmationScreenState
     setState(() => _availableDates = dates);
   }
 
-
   void _onDateSelected(DateTime date) {
-    setState(() {
-      _selectedDateTime = date;
-      _selectedTime = '';
-    });
-    _fetchTimeSlotsFromApi(date);
+    if (_selectedDateTime != date) {
+      setState(() {
+        _selectedDateTime = date;
+        _selectedTime = '';
+        _createdBookingId = null; // Reset booking ID if date changes
+      });
+      _fetchTimeSlotsFromApi(date);
+    }
   }
 
   Future<void> _fetchTimeSlotsFromApi(DateTime date) async {
     setState(() => _isLoadingSlots = true);
-    
+
     final providerId = _getProviderId();
     if (providerId != null) {
       final controller = context.read<CalenderAvailibilityController>();
       final dateStr = DateFormat('yyyy-MM-dd').format(date);
-      
+
       final slots = await controller.getTimeSlots(
-        providerId, 
-        dateStr, 
-        _packageDurationInMinutes
+        providerId,
+        dateStr,
+        _packageDurationInMinutes,
       );
 
       if (mounted) {
@@ -175,17 +208,18 @@ class _BookingConfirmationScreenState
   }
 
   int get _packageDurationInMinutes {
-    final durationStr = (widget.package?['duration'] ?? widget.service?['duration'] ?? '')
-        .toString()
-        .toLowerCase();
+    final durationStr =
+        (widget.package?['duration'] ?? widget.service?['duration'] ?? '')
+            .toString()
+            .toLowerCase();
     if (durationStr.contains('4 hour')) return 240;
     if (durationStr.contains('8 hour')) return 480;
     if (durationStr.contains('full day')) return 600;
-    
+
     // Check if it's just a number of hours
     final int? hours = int.tryParse(durationStr.split(' ')[0]);
     if (hours != null) return hours * 60;
-    
+
     return 60; // Default to 1 hour
   }
 
@@ -283,11 +317,8 @@ class _BookingConfirmationScreenState
   }
 
   int get _currentStep {
-    if (_pageIndex == 0) return 0;
-    if (_pageIndex == 1) return 1;
-    if (_pageIndex == 2) return 2;
-    if (_pageIndex == 3) return 3;
-    return 4;
+    if (_pageIndex >= 0 && _pageIndex <= 3) return _pageIndex;
+    return 3; // Clamp for success screen or others
   }
 
   Widget _buildHeader() {
@@ -301,7 +332,11 @@ class _BookingConfirmationScreenState
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: Icon(Icons.arrow_back, size: 24.sp, color: Theme.of(context).colorScheme.onSurface),
+                icon: Icon(
+                  Icons.arrow_back,
+                  size: 24.sp,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 onPressed: () {
                   if (_pageIndex > 0) {
                     _pageController.previousPage(
@@ -317,7 +352,9 @@ class _BookingConfirmationScreenState
                 'Step ${_currentStep + 1} of 4',
                 style: TextStyle(
                   fontSize: 14.sp.clamp(14, 16),
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.5),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -363,12 +400,15 @@ class _BookingConfirmationScreenState
         children: [
           _buildStep1Tabs(),
           SizedBox(height: 25.h),
-          Text('Available Dates',
-              style: TextStyle(
-                  fontSize: 14.sp.clamp(14, 16),
-                  fontWeight: FontWeight.bold)),
+          Text(
+            'Available Dates',
+            style: TextStyle(
+              fontSize: 14.sp.clamp(14, 16),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           SizedBox(height: 15.h),
-          
+
           // Dates Grid - Animates on height change but stays in place
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
@@ -378,12 +418,12 @@ class _BookingConfirmationScreenState
               child: (_isLoadingAvailability && _availableDates.isEmpty)
                   ? SizedBox(
                       height: 180.h,
-                        child: const CircularProgressIndicator(strokeWidth: 2),
+                      child: const CircularProgressIndicator(strokeWidth: 2),
                     )
                   : _buildDateGrid(),
             ),
           ),
-          
+
           // Conditional Time Slots
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 400),
@@ -403,21 +443,26 @@ class _BookingConfirmationScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 15.h), // Reduced from 30.h
-                      Text('Time Slot',
-                          style: TextStyle(
-                              fontSize: 14.sp.clamp(14, 16),
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        'Time Slot',
+                        style: TextStyle(
+                          fontSize: 14.sp.clamp(14, 16),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       SizedBox(height: 12.h), // Adjusted spacing
                       Container(
                         constraints: BoxConstraints(minHeight: 100.h),
-                        child: _isLoadingSlots 
-                          ? SizedBox(
-                              height: 100.h,
-                              child: const Center(
-                                child: const CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                            )
-                          : _buildTimeSlotGrid(),
+                        child: _isLoadingSlots
+                            ? SizedBox(
+                                height: 100.h,
+                                child: const Center(
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              )
+                            : _buildTimeSlotGrid(),
                       ),
                     ],
                   )
@@ -435,14 +480,18 @@ class _BookingConfirmationScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Select Date & Time',
-              style: TextStyle(
-                  fontSize: 16.sp.clamp(16, 18),
-                  fontWeight: FontWeight.bold)),
+          Text(
+            'Select Date & Time',
+            style: TextStyle(
+              fontSize: 16.sp.clamp(16, 18),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           SizedBox(height: 8.h),
-          Text('Choose your preferred date and time slot',
-              style: TextStyle(
-                  fontSize: 13.sp.clamp(13, 14), color: Colors.grey)),
+          Text(
+            'Choose your preferred date and time slot',
+            style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Colors.grey),
+          ),
           SizedBox(height: 25.h),
           content,
           SizedBox(height: 30.h),
@@ -479,14 +528,20 @@ class _BookingConfirmationScreenState
                 duration: const Duration(milliseconds: 200),
                 padding: EdgeInsets.symmetric(vertical: 10.h),
                 decoration: BoxDecoration(
-                  color: isSelected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(10).r,
                 ),
                 child: Center(
                   child: Text(
                     tab,
                     style: TextStyle(
-                      color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.surface
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.4),
                       fontSize: 13.sp.clamp(13, 14),
                       fontWeight: isSelected
                           ? FontWeight.bold
@@ -529,7 +584,8 @@ class _BookingConfirmationScreenState
       itemCount: _availableDates.length,
       itemBuilder: (context, index) {
         final date = _availableDates[index];
-        final isSelected = _selectedDateTime != null &&
+        final isSelected =
+            _selectedDateTime != null &&
             _selectedDateTime!.year == date.year &&
             _selectedDateTime!.month == date.month &&
             _selectedDateTime!.day == date.day;
@@ -541,7 +597,9 @@ class _BookingConfirmationScreenState
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10).r,
               border: Border.all(
-                color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).dividerColor.withOpacity(0.1),
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).dividerColor.withOpacity(0.1),
                 width: isSelected ? 1.5 : 1,
               ),
             ),
@@ -552,7 +610,9 @@ class _BookingConfirmationScreenState
                   DateFormat('EEE').format(date), // Mon, Tue...
                   style: TextStyle(
                     fontSize: 10.sp,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.4),
                   ),
                 ),
                 Text(
@@ -578,8 +638,13 @@ class _BookingConfirmationScreenState
       return Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.h),
-          child: Text('No time slots available.',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 13.sp)),
+          child: Text(
+            'No time slots available.',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              fontSize: 13.sp,
+            ),
+          ),
         ),
       );
     }
@@ -598,7 +663,9 @@ class _BookingConfirmationScreenState
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(8).r,
               border: Border.all(
-                color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).dividerColor.withOpacity(0.1),
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).dividerColor.withOpacity(0.1),
               ),
             ),
             child: Center(
@@ -606,8 +673,7 @@ class _BookingConfirmationScreenState
                 time,
                 style: TextStyle(
                   fontSize: 12.sp.clamp(12, 13),
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
             ),
@@ -616,7 +682,6 @@ class _BookingConfirmationScreenState
       }).toList(),
     );
   }
-
 
   // ─── Steps 2-4 ────────────────────────────────────────────────────────────
 
@@ -633,14 +698,21 @@ class _BookingConfirmationScreenState
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Location Details',
-                      style: TextStyle(
-                          fontSize: 16.sp.clamp(16, 18),
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    'Location Details',
+                    style: TextStyle(
+                      fontSize: 16.sp.clamp(16, 18),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   SizedBox(height: 8.h),
-                  Text('Where should the session take place?',
-                      style: TextStyle(
-                          fontSize: 13.sp.clamp(13, 14), color: Colors.grey)),
+                  Text(
+                    'Where should the session take place?',
+                    style: TextStyle(
+                      fontSize: 13.sp.clamp(13, 14),
+                      color: Colors.grey,
+                    ),
+                  ),
                 ],
               ),
               Consumer<LocationController>(
@@ -648,7 +720,8 @@ class _BookingConfirmationScreenState
                   return IconButton(
                     onPressed: () async {
                       await locationCtrl.determinePosition();
-                      if (locationCtrl.currentAddress != "Error getting location" &&
+                      if (locationCtrl.currentAddress !=
+                              "Error getting location" &&
                           !locationCtrl.currentAddress.contains("denied")) {
                         setState(() {
                           _location = locationCtrl.currentAddress;
@@ -664,9 +737,15 @@ class _BookingConfirmationScreenState
                         ? SizedBox(
                             width: 20.sp,
                             height: 20.sp,
-                            child: const CircularProgressIndicator(strokeWidth: 2),
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
                           )
-                        : Icon(Icons.my_location_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28.sp),
+                        : Icon(
+                            Icons.my_location_outlined,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            size: 28.sp,
+                          ),
                   );
                 },
               ),
@@ -691,23 +770,24 @@ class _BookingConfirmationScreenState
           ),
           SizedBox(height: 10.h),
           Consumer<LocationController>(
-             builder: (context, locationCtrl, _) {
-               if (locationCtrl.currentAddress.contains("Off") || locationCtrl.currentAddress.contains("denied")) {
-                 return Row(
-                   children: [
-                     Icon(Icons.info_outline, size: 14.sp, color: Colors.orange),
-                     SizedBox(width: 5.w),
-                     Expanded(
-                       child: Text(
-                         "Tip: ${locationCtrl.currentAddress}. You can also type manually.",
-                         style: TextStyle(color: Colors.grey, fontSize: 11.sp),
-                       ),
-                     ),
-                   ],
-                 );
-               }
-               return const SizedBox.shrink();
-             },
+            builder: (context, locationCtrl, _) {
+              if (locationCtrl.currentAddress.contains("Off") ||
+                  locationCtrl.currentAddress.contains("denied")) {
+                return Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 14.sp, color: Colors.orange),
+                    SizedBox(width: 5.w),
+                    Expanded(
+                      child: Text(
+                        "Tip: ${locationCtrl.currentAddress}. You can also type manually.",
+                        style: TextStyle(color: Colors.grey, fontSize: 11.sp),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox.shrink();
+            },
           ),
           SizedBox(height: 25.h),
           _buildInputLabel('Special Requests (Optional)'),
@@ -725,10 +805,37 @@ class _BookingConfirmationScreenState
     );
   }
 
+  // Helper to get currency symbol for UI
+  String _getCurrencySymbol(String? code) {
+    if (code == null || code.isEmpty) return '€';
+    final normalized = code.toUpperCase();
+    switch (normalized) {
+      case 'EUR':
+        return '€';
+      case 'USD':
+        return '\$';
+      case 'GBP':
+        return '£';
+      case 'BDT':
+        return '৳';
+      case 'INR':
+        return '₹';
+      case 'JPY':
+        return '¥';
+      default:
+        return normalized;
+    }
+  }
+
   Widget _buildStep3() {
     final dateStr = _selectedDateTime != null
         ? DateFormat('EEEE, MMMM d, y').format(_selectedDateTime!)
         : 'No date selected';
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final currencySymbol = _getCurrencySymbol(
+      widget.package?['currency'] ?? widget.service?['currency'],
+    );
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -736,22 +843,30 @@ class _BookingConfirmationScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Review Booking',
-              style: TextStyle(
-                  fontSize: 16.sp.clamp(16, 18),
-                  fontWeight: FontWeight.bold)),
+          Text(
+            'Review Booking',
+            style: TextStyle(
+              fontSize: 16.sp.clamp(16, 18),
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
           SizedBox(height: 8.h),
-          Text('Please confirm your booking details',
-              style: TextStyle(
-                  fontSize: 13.sp.clamp(13, 14), color: Colors.grey)),
+          Text(
+            'Please confirm your booking details',
+            style: TextStyle(
+              fontSize: 13.sp.clamp(13, 14),
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
           SizedBox(height: 25.h),
           if (_hasDeposit) ...[
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.05),
+                color: Colors.orange.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12).r,
-                border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
               ),
               child: Row(
                 children: [
@@ -759,11 +874,13 @@ class _BookingConfirmationScreenState
                   SizedBox(width: 10.w),
                   Expanded(
                     child: Text(
-                      'Payment Notice: You will only be charged ${((_depositPercentage) * 100).toInt()}% of the total price today to confirm your booking.',
+                      'Payment Notice: You will only be charged ${(_depositPercentage * 100).toInt()}% of the total price today to confirm your booking.',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Colors.orange.shade900,
-                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? Colors.orange[200]
+                            : Colors.orange.shade900,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -775,36 +892,68 @@ class _BookingConfirmationScreenState
           Container(
             padding: EdgeInsets.all(20.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16).r,
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildReviewItem('Service',
-                    widget.service?['title'] ?? 'Photography Session'),
+                _buildReviewItem(
+                  'Service',
+                  widget.service?['title'] ?? 'Photography Session',
+                ),
                 if (widget.package != null)
-                  _buildReviewItem('Package', widget.package!['name'] ?? 'Custom'),
-                _buildReviewItem('Provider',
-                    widget.service?['providerId']?['name']?.toString() ?? 
-                    widget.service?['provider']?['name']?.toString() ??
-                    widget.service?['subtitle'] ?? 'Professional'),
-                const Divider(),
+                  _buildReviewItem(
+                    'Package',
+                    widget.package!['name'] ?? 'Custom',
+                  ),
+                _buildReviewItem(
+                  'Provider',
+                  widget.service?['providerId']?['name']?.toString() ??
+                      widget.service?['provider']?['name']?.toString() ??
+                      widget.service?['subtitle'] ??
+                      'Professional',
+                ),
+                Divider(color: theme.dividerColor.withOpacity(0.1)),
                 _buildReviewIconItem(Icons.calendar_today_outlined, dateStr),
                 if (_selectedTime.isNotEmpty)
-                  _buildReviewIconItem(Icons.access_time, '$_selectedTime - ${_calculateEndTime()}'),
-                _buildReviewIconItem(Icons.location_on_outlined,
-                    _location.isEmpty ? 'Not specified' : _location),
+                  _buildReviewIconItem(
+                    Icons.access_time,
+                    '$_selectedTime - ${_calculateEndTime()}',
+                  ),
+                _buildReviewIconItem(
+                  Icons.location_on_outlined,
+                  _location.isEmpty ? 'Not specified' : _location,
+                ),
                 if (_specialRequests.isNotEmpty) ...[
-                  const Divider(),
+                  Divider(color: theme.dividerColor.withOpacity(0.1)),
                   _buildReviewItem('Special Requests', _specialRequests),
                 ],
-                const Divider(),
-                _buildReviewItem('Final Service Total', '€${_packagePrice.toStringAsFixed(2)}'),
+                Divider(color: theme.dividerColor.withOpacity(0.1)),
+                _buildReviewItem(
+                  'Final Service Total',
+                  '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
+                ),
                 if (_hasDeposit) ...[
-                  _buildReviewItem('Payable Now (Deposit)', '€${_depositAmount.toStringAsFixed(2)}', color: Colors.green, isBold: true),
-                  _buildReviewItem('Remaining Balance', '€${_balanceAmount.toStringAsFixed(2)}', color: Colors.orange),
+                  _buildReviewItem(
+                    'Payable Now (Deposit)',
+                    '$currencySymbol${_depositAmount.toStringAsFixed(2)}',
+                    color: Colors.green,
+                    isBold: true,
+                  ),
+                  _buildReviewItem(
+                    'Remaining Balance',
+                    '$currencySymbol${_balanceAmount.toStringAsFixed(2)}',
+                    color: Colors.orange,
+                  ),
                 ],
               ],
             ),
@@ -827,7 +976,9 @@ class _BookingConfirmationScreenState
                       'Note: You only need to pay the deposit (50%) now to confirm. The rest is due later.',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Colors.orange.shade900,
+                        color: isDark
+                            ? Colors.orange[200]
+                            : Colors.orange.shade900,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -848,40 +999,51 @@ class _BookingConfirmationScreenState
     if (_selectedTime.isEmpty) return "";
     try {
       int durationHours = 1;
-      if (widget.service?['pricingType'] == 'DAILY') {
+      if (widget.service?['pricingType'] == 'DAILY' ||
+          widget.service?['pricingModel']?['type'] == 'DAILY') {
         durationHours = widget.service?['pricingModel']?['dailyHours'] ?? 8;
       } else {
-        final durationStr = (widget.package?['duration'] ?? widget.service?['duration'] ?? "1")
-            .toString()
-            .toLowerCase();
+        final durationStr =
+            (widget.package?['duration'] ?? widget.service?['duration'] ?? "1")
+                .toString()
+                .toLowerCase();
         durationHours = int.tryParse(durationStr.split(' ')[0]) ?? 1;
       }
 
-      final int startHour = int.tryParse(_selectedTime.split(':')[0]) ?? 9;
-      final int startMinute = int.tryParse(_selectedTime.split(':')[1]) ?? 0;
-      return "${(startHour + durationHours).toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}";
+      final parts = _selectedTime.split(':');
+      if (parts.length < 2) return "";
+
+      final int startHour = int.tryParse(parts[0]) ?? 9;
+      final int startMinute = int.tryParse(parts[1]) ?? 0;
+
+      int endHour = startHour + durationHours;
+      if (endHour >= 24) endHour = endHour % 24;
+
+      return "${endHour.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}";
     } catch (e) {
+      debugPrint("Error calculating end time: $e");
       return "";
     }
   }
 
   double get _packagePrice {
-    final priceStr = (widget.package?['price'] ?? widget.service?['price'] ?? '0')
-        .toString()
-        .replaceAll(',', '');
+    final priceStr =
+        (widget.package?['price'] ?? widget.service?['price'] ?? '0')
+            .toString()
+            .replaceAll(',', '');
     return double.tryParse(priceStr) ?? 0;
   }
 
   bool get _hasDeposit => _depositPercentage < 1.0;
 
   double get _depositPercentage {
-    // Force 50% for all services for now as per user's "automatic 50%" request, 
-    // unless specified otherwise in service data.
+    // Default to 50% as requested for automatic deposit
     final val = widget.service?['depositPercentage']?.toString();
     if (val != null) {
-      return double.tryParse(val) ?? 0.5;
+      final parsed = double.tryParse(val);
+      if (parsed != null && parsed > 0) return parsed;
     }
-    return 0.5; 
+    return 0.5;
   }
 
   double get _depositAmount {
@@ -898,7 +1060,11 @@ class _BookingConfirmationScreenState
   }
 
   Widget _buildStep4() {
-    const String currency = '€';
+    final currencySymbol = _getCurrencySymbol(
+      widget.package?['currency'] ?? widget.service?['currency'],
+    );
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -906,25 +1072,33 @@ class _BookingConfirmationScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Payment',
-              style: TextStyle(
-                  fontSize: 16.sp.clamp(16, 18),
-                  fontWeight: FontWeight.bold)),
+          Text(
+            'Payment',
+            style: TextStyle(
+              fontSize: 16.sp.clamp(16, 18),
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
           SizedBox(height: 8.h),
-          Text(_hasDeposit 
-              ? 'Secure your booking with a partial payment' 
-              : 'Complete your booking with payment',
-              style: TextStyle(
-                  fontSize: 13.sp.clamp(13, 14), color: Colors.grey)),
+          Text(
+            _hasDeposit
+                ? 'Secure your booking with a partial payment'
+                : 'Complete your booking with payment',
+            style: TextStyle(
+              fontSize: 13.sp.clamp(13, 14),
+              color: theme.colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ),
           SizedBox(height: 25.h),
-          
+
           if (_hasDeposit) ...[
             Container(
               padding: EdgeInsets.all(15.w),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.05),
+                color: Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12).r,
-                border: Border.all(color: Colors.blue.withOpacity(0.1)),
+                border: Border.all(color: Colors.blue.withOpacity(0.3)),
               ),
               child: Row(
                 children: [
@@ -935,7 +1109,7 @@ class _BookingConfirmationScreenState
                       'Automatic Deposit: You only need to pay ${(_depositPercentage * 100).toInt()}% of the total amount now. The remaining balance will be shown in your order history and can be settled later.',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Colors.blue.shade900,
+                        color: isDark ? Colors.blue[200] : Colors.blue.shade900,
                         fontWeight: FontWeight.w600,
                         height: 1.4,
                       ),
@@ -950,34 +1124,84 @@ class _BookingConfirmationScreenState
           Container(
             padding: EdgeInsets.all(20.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16).r,
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               children: [
-                _buildPriceRow('Service Total', '$currency${_packagePrice.toStringAsFixed(2)}'),
+                _buildPriceRow(
+                  'Service Total',
+                  '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
+                ),
                 if (_hasDeposit) ...[
-                  _buildPriceRow('Deposit Percentage', '${(_depositPercentage * 100).toInt()}%'),
-                  const Divider(),
-                  _buildPriceRow('Payable Now (Deposit)', '$currency${_depositAmount.toStringAsFixed(2)}', isBold: true),
-                  _buildPriceRow('Remaining Balance', '$currency${_balanceAmount.toStringAsFixed(2)}'),
+                  _buildPriceRow(
+                    'Deposit Percentage',
+                    '${(_depositPercentage * 100).toInt()}%',
+                  ),
+                  Divider(color: theme.dividerColor.withOpacity(0.1)),
+                  _buildPriceRow(
+                    'Payable Now (Deposit)',
+                    '$currencySymbol${_depositAmount.toStringAsFixed(2)}',
+                    isBold: true,
+                  ),
+                  _buildPriceRow(
+                    'Remaining Balance',
+                    '$currencySymbol${_balanceAmount.toStringAsFixed(2)}',
+                  ),
                 ] else ...[
-                  const Divider(),
-                  _buildPriceRow('Total', '$currency${_totalBookingAmount.toStringAsFixed(2)}', isBold: true),
+                  Divider(color: theme.dividerColor.withOpacity(0.1)),
+                  _buildPriceRow(
+                    'Total',
+                    '$currencySymbol${_totalBookingAmount.toStringAsFixed(2)}',
+                    isBold: true,
+                  ),
                 ],
               ],
             ),
           ),
           SizedBox(height: 25.h),
-          Text('Payment Method',
-              style: TextStyle(
-                  fontSize: 14.sp.clamp(14, 16),
-                  fontWeight: FontWeight.bold)),
+          Text(
+            'Payment Method',
+            style: TextStyle(
+              fontSize: 14.sp.clamp(14, 16),
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
           SizedBox(height: 15.h),
-          _buildPaymentOption(
-              'Credit/Debit Card', 'Visa, Mastercard, Amex',
-              Icons.credit_card_outlined),
+
+          Consumer<PaymentController>(
+            builder: (context, controller, child) {
+              final methods = controller.paymentMethods;
+
+              return Column(
+                children: [
+                  ...methods.map(
+                    (method) => Padding(
+                      padding: EdgeInsets.only(bottom: 12.h),
+                      child: _buildSavedCardOption(method),
+                    ),
+                  ),
+                  _buildPaymentOption(
+                    'Use a different card',
+                    'Pay with a new credit/debit card',
+                    Icons.add_card_outlined,
+                    isSelected: _selectedPaymentMethod == null,
+                    onTap: () => setState(() => _selectedPaymentMethod = null),
+                  ),
+                ],
+              );
+            },
+          ),
+
           SizedBox(height: 40.h),
           _buildBottomButton(),
           SizedBox(height: 20.h),
@@ -986,11 +1210,88 @@ class _BookingConfirmationScreenState
     );
   }
 
+  Widget _buildSavedCardOption(PaymentMethodModel method) {
+    final isSelected = _selectedPaymentMethod?.id == method.id;
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedPaymentMethod = method),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withOpacity(0.05)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.dividerColor.withOpacity(0.1),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.r),
+              decoration: BoxDecoration(
+                color:
+                    (method.brand.toLowerCase() == 'visa'
+                            ? Colors.blue
+                            : Colors.orange)
+                        .withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(
+                Icons.credit_card,
+                color: method.brand.toLowerCase() == 'visa'
+                    ? Colors.blue
+                    : Colors.orange,
+                size: 20.sp,
+              ),
+            ),
+            SizedBox(width: 15.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${method.brand.toUpperCase()} •••• ${method.last4}',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    'Expires ${method.expMonth}/${method.expYear}',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle,
+                color: theme.colorScheme.primary,
+                size: 20.sp,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSuccessStep() {
     final dateStr = _selectedDateTime != null
         ? DateFormat('EEEE, MMMM d, y').format(_selectedDateTime!)
         : 'N/A';
-    const currency = '€';
+    final currencySymbol = _getCurrencySymbol(
+      widget.package?['currency'] ?? widget.service?['currency'],
+    );
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -1004,27 +1305,32 @@ class _BookingConfirmationScreenState
               color: Color(0xFFE8F5E9),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.check,
-                color: const Color(0xFF4CAF50), size: 35.sp),
+            child: Icon(
+              Icons.check,
+              color: const Color(0xFF4CAF50),
+              size: 35.sp,
+            ),
           ),
           SizedBox(height: 20.h),
           Text(
             'Booking Confirmed!',
             style: TextStyle(
-                fontSize: 20.sp.clamp(18, 24),
-                fontWeight: FontWeight.bold),
+              fontSize: 20.sp.clamp(18, 24),
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: 10.h),
           Text(
             "Your session has been successfully booked.\nYou'll receive a confirmation email shortly.",
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 13.sp.clamp(12, 14),
-                color: Colors.grey,
-                height: 1.4),
+              fontSize: 13.sp.clamp(12, 14),
+              color: Colors.grey,
+              height: 1.4,
+            ),
           ),
           SizedBox(height: 30.h),
-          
+
           // --- Booking Summary Card ---
           Container(
             width: double.infinity,
@@ -1038,7 +1344,7 @@ class _BookingConfirmationScreenState
                   color: Colors.black.withOpacity(0.03),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
-                )
+                ),
               ],
             ),
             child: Column(
@@ -1047,38 +1353,73 @@ class _BookingConfirmationScreenState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('RECEIPT', 
+                    Text(
+                      'RECEIPT',
                       style: TextStyle(
-                        fontSize: 12.sp, 
-                        fontWeight: FontWeight.bold, 
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
                         color: Colors.blue.shade800,
                         letterSpacing: 1.2,
-                      )
+                      ),
                     ),
-                    Text('#${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}', 
-                      style: TextStyle(fontSize: 12.sp, color: Colors.grey)
+                    Text(
+                      '#${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+                      style: TextStyle(fontSize: 12.sp, color: Colors.grey),
                     ),
                   ],
                 ),
                 const Divider(height: 30),
-                _buildSummaryRow(Icons.camera_alt_outlined, 'Service', widget.service?['title'] ?? 'Photography'),
-                _buildSummaryRow(Icons.calendar_today_outlined, 'Date', dateStr),
-                _buildSummaryRow(Icons.access_time, 'Time', '$_selectedTime - ${_calculateEndTime()}'),
-                _buildSummaryRow(Icons.location_on_outlined, 'Location', _location.isEmpty ? 'Not specified' : _location),
+                _buildSummaryRow(
+                  Icons.camera_alt_outlined,
+                  'Service',
+                  widget.service?['title'] ?? 'Photography',
+                ),
+                _buildSummaryRow(
+                  Icons.calendar_today_outlined,
+                  'Date',
+                  dateStr,
+                ),
+                _buildSummaryRow(
+                  Icons.access_time,
+                  'Time',
+                  '$_selectedTime - ${_calculateEndTime()}',
+                ),
+                _buildSummaryRow(
+                  Icons.location_on_outlined,
+                  'Location',
+                  _location.isEmpty ? 'Not specified' : _location,
+                ),
                 const Divider(height: 30),
-                
+
                 // --- Payment Details in Card ---
-                _buildSummaryPriceRow('Total Price', '$currency${_packagePrice.toStringAsFixed(2)}'),
+                _buildSummaryPriceRow(
+                  'Total Price',
+                  '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
+                ),
                 if (_hasDeposit) ...[
-                  _buildSummaryPriceRow('Paid (Deposit)', '$currency${_depositAmount.toStringAsFixed(2)}', color: Colors.green, isBold: true),
-                  _buildSummaryPriceRow('Balance Due', '$currency${_balanceAmount.toStringAsFixed(2)}', color: Colors.orange),
+                  _buildSummaryPriceRow(
+                    'Paid (Deposit)',
+                    '$currencySymbol${_depositAmount.toStringAsFixed(2)}',
+                    color: Colors.green,
+                    isBold: true,
+                  ),
+                  _buildSummaryPriceRow(
+                    'Balance Due',
+                    '$currencySymbol${_balanceAmount.toStringAsFixed(2)}',
+                    color: Colors.orange,
+                  ),
                 ] else ...[
-                  _buildSummaryPriceRow('Amount Paid', '$currency${_packagePrice.toStringAsFixed(2)}', color: Colors.green, isBold: true),
+                  _buildSummaryPriceRow(
+                    'Amount Paid',
+                    '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
+                    color: Colors.green,
+                    isBold: true,
+                  ),
                 ],
               ],
             ),
           ),
-          
+
           SizedBox(height: 40.h),
           GestureDetector(
             onTap: () =>
@@ -1094,9 +1435,10 @@ class _BookingConfirmationScreenState
                 child: Text(
                   'Go to Home',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.sp.clamp(16, 18)),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp.clamp(16, 18),
+                  ),
                 ),
               ),
             ),
@@ -1119,9 +1461,19 @@ class _BookingConfirmationScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11.sp, color: Colors.grey)),
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 11.sp, color: Colors.grey),
+                ),
                 SizedBox(height: 2.h),
-                Text(value, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: Colors.black)),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1130,14 +1482,33 @@ class _BookingConfirmationScreenState
     );
   }
 
-  Widget _buildSummaryPriceRow(String label, String value, {Color color = Colors.black, bool isBold = false}) {
+  Widget _buildSummaryPriceRow(
+    String label,
+    String value, {
+    Color color = Colors.black,
+    bool isBold = false,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 13.sp, color: isBold ? Colors.black : Colors.grey[600], fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-          Text(value, style: TextStyle(fontSize: 14.sp, fontWeight: isBold ? FontWeight.bold : FontWeight.w600, color: color)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13.sp,
+              color: isBold ? Colors.black : Colors.grey[600],
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+              color: color,
+            ),
+          ),
         ],
       ),
     );
@@ -1156,19 +1527,27 @@ class _BookingConfirmationScreenState
       return;
     }
 
-    final providerId = widget.service?['providerId'] is Map
-        ? widget.service!['providerId']['_id']?.toString()
-        : widget.service?['providerId']?.toString();
+    final providerId = _getProviderId();
+    final serviceId = widget.service?['id'] ?? widget.service?['_id'];
 
-    final serviceId = widget.service?['_id'] ?? widget.service?['id'];
+    // Dynamic event type from service category
+    final eventType =
+        widget.service?['category']?['name']?.toString() ??
+        "Photography Session";
+
+    // Final booking time determination
+    String bookingStartTime = _selectedTime;
+    if (_selectedStep1Tab == 1) {
+      bookingStartTime = "09:00"; // Default for full day
+    }
 
     if (providerId == null ||
         serviceId == null ||
         _selectedDateTime == null ||
-        _selectedTime.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Missing booking details')),
-      );
+        bookingStartTime.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Missing booking details')));
       return;
     }
 
@@ -1177,7 +1556,7 @@ class _BookingConfirmationScreenState
         const SnackBar(content: Text('Please provide a location address')),
       );
       _pageController.animateToPage(
-        3, // Move back to Step 2 (Location Details)
+        1, // Move back to Step 2 (Location Details)
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );
@@ -1189,40 +1568,48 @@ class _BookingConfirmationScreenState
         "${DateFormat('yyyy-MM-dd').format(_selectedDateTime!)}T00:00:00.000Z";
 
     // Calculate endTime based on package or service duration
-    String endTime = "18:00";
-    if (_selectedTime.isNotEmpty) {
-      try {
-        int durationHours = 1;
-        
-        if (widget.service?['pricingType'] == 'DAILY') {
-           durationHours = widget.service?['pricingModel']?['dailyHours'] ?? 8;
-        } else {
-           // Extraction for PACKAGE or standard
-           final durationStr = (widget.package?['duration'] ?? widget.service?['duration'] ?? "1")
-              .toString()
-              .toLowerCase();
-           durationHours = int.tryParse(durationStr.split(' ')[0]) ?? 1;
-        }
-
-        final int startHour = int.tryParse(_selectedTime.split(':')[0]) ?? 9;
-        final int startMinute = int.tryParse(_selectedTime.split(':')[1]) ?? 0;
-        
-        final endHourNum = startHour + durationHours;
-        endTime = "${endHourNum.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}";
-      } catch (e) {
-        debugPrint("Error calculating endTime: $e");
-      }
+    String endTime = _calculateEndTime();
+    if (_selectedStep1Tab == 1 || widget.service?['pricingType'] == 'DAILY') {
+      endTime = "18:00"; // Standard for daily
     }
 
-    // 1. Create Booking only if not already created
-    String? bookingId = _createdBookingId;
-    
-    if (bookingId == null) {
-      bookingId = await context.read<BookingController>().createBooking(
+    // 1. Initial Step: Prepare Payment Sheet / Checkout
+    final paymentCtrl = context.read<PaymentController>();
+    final bookingCtrl = context.read<BookingController>();
+    bool paymentSuccess = false;
+
+    // Generate a key to check if booking details changed
+    final String currentBookingKey =
+        "$serviceId-$formattedDate-$bookingStartTime-$_location";
+    if (_lastBookingKey != currentBookingKey) {
+      _createdBookingId = null; // Data changed
+      _lastBookingKey = currentBookingKey;
+    }
+
+    // --- FINAL CUSTOM FLOW ---
+    if (_selectedPaymentMethod == null) {
+      // 🆕 FLOW 1: NEW CARD (Use different card)
+      // লজিক: আপনার রিকোয়েস্ট অনুযায়ী সরাসরি serviceId এবং amount দিয়ে পেমেন্ট হবে।
+      debugPrint('🆕 Flow: New Card (Payment Intent with serviceId FIRST)');
+
+      final bool initialized = await paymentCtrl.initPaymentSheet(
+        serviceId: serviceId.toString(), // Sending serviceId as requested
+        amount: _totalBookingAmount,
+        currency:
+            widget.package?['currency'] ?? widget.service?['currency'] ?? 'EUR',
+        userEmail: userProfile.email,
+      );
+
+      if (initialized && mounted) {
+        paymentSuccess = await paymentCtrl.presentPaymentSheet();
+
+        if (paymentSuccess && mounted) {
+          debugPrint('✅ Payment Successful! Now creating booking record...');
+          final String? bookingId = await bookingCtrl.createBooking(
             providerId: providerId,
             serviceId: serviceId.toString(),
             bookingDate: formattedDate,
-            startTime: _selectedTime,
+            startTime: bookingStartTime,
             endTime: endTime,
             packageName: widget.package?['name'],
             address: _location,
@@ -1233,55 +1620,75 @@ class _BookingConfirmationScreenState
             clientName: userProfile.fullName,
             clientEmail: userProfile.email,
             clientPhone: userProfile.phone,
-            eventType: "Photography Session",
+            eventType: eventType,
             specialRequests: _specialRequests,
             notes: _specialRequests,
+            distanceFromProviderKm: _distanceFromProvider,
           );
-      
-      if (bookingId != null) {
-        _createdBookingId = bookingId;
+          if (bookingId != null) {
+            _createdBookingId = bookingId;
+          } else {
+            paymentSuccess = false;
+            debugPrint(
+              '❌ ERROR: Payment succeeded but booking creation failed!',
+            );
+          }
+        }
+      }
+    } else {
+      // ✅ FLOW 2: SAVED CARD
+      debugPrint('💳 Flow: Saved Card (Booking first, then charge)');
+
+      String? bookingId = _createdBookingId;
+      if (bookingId == null) {
+        bookingId = await bookingCtrl.createBooking(
+          providerId: providerId,
+          serviceId: serviceId.toString(),
+          bookingDate: formattedDate,
+          startTime: bookingStartTime,
+          endTime: endTime,
+          packageName: widget.package?['name'],
+          address: _location,
+          city: _city ?? "Dhaka",
+          country: _country ?? "Bangladesh",
+          lat: _lat ?? 23.8103,
+          lng: _lng ?? 90.4125,
+          clientName: userProfile.fullName,
+          clientEmail: userProfile.email,
+          clientPhone: userProfile.phone,
+          eventType: eventType,
+          specialRequests: _specialRequests,
+          notes: _specialRequests,
+          distanceFromProviderKm: _distanceFromProvider,
+        );
+        if (bookingId != null) _createdBookingId = bookingId;
+      }
+
+      if (bookingId != null && mounted) {
+        paymentSuccess = await paymentCtrl.chargeSavedCard(
+          bookingId: bookingId,
+          paymentMethodId: _selectedPaymentMethod!.id,
+        );
       }
     }
 
-    if (bookingId != null && mounted) {
-      // ─── Payment Step ─────────────────────────────────────────────────────
-      final paymentCtrl = context.read<PaymentController>();
-      
-      final bool initialized = await paymentCtrl.initPaymentSheet(
-        bookingId: bookingId, 
-        amount: _totalBookingAmount, 
-        currency: widget.package?['currency'] ?? widget.service?['currency'] ?? 'EUR',
-      );
-
-      if (initialized && mounted) {
-        final bool paymentSuccess = await paymentCtrl.presentPaymentSheet();
-        
-        if (paymentSuccess && mounted) {
-          // ✅ Payment successful — move to success screen
-          debugPrint('🎉 Booking payment successful, order is now pending provider approval!');
-
-          if (mounted) {
-            _pageController.animateToPage(
-              4,
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeInOut,
-            );
-          }
-        } else if (mounted && paymentCtrl.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(paymentCtrl.errorMessage!)),
-          );
-        }
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(paymentCtrl.errorMessage ?? 'Payment initialization failed')),
+    if (paymentSuccess && mounted) {
+      // ✅ Success — move to success screen
+      debugPrint('🎉 Process complete, moving to success screen!');
+      if (mounted) {
+        _pageController.animateToPage(
+          4,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
         );
       }
     } else if (mounted) {
+      final error =
+          paymentCtrl.errorMessage ??
+          bookingCtrl.errorMessage ??
+          'Process failed';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(context.read<BookingController>().errorMessage ??
-                'Booking failed')),
+        SnackBar(content: Text(error), backgroundColor: Colors.redAccent),
       );
     }
   }
@@ -1293,17 +1700,17 @@ class _BookingConfirmationScreenState
           onTap: () {
             if (bookingCtrl.isLoading) return;
 
-            if (_pageIndex < 5) {
-              // 1. Validation for Step 1 (Date & Time)
-              if (_pageIndex < 3) {
+            if (_pageIndex < 4) {
+              // 1. Validation for Step 1 (Date & Time) - Index 0
+              if (_pageIndex == 0) {
                 if (_selectedDateTime == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Please select a date first')),
                   );
                   return;
                 }
-                // If in "Time Slots" tab, must select a time
-                if (_pageIndex == 0 && _selectedTime.isEmpty) {
+                // Only require time slot if NOT in "Full Day" mode
+                if (_selectedStep1Tab == 0 && _selectedTime.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Please select a time slot')),
                   );
@@ -1311,16 +1718,20 @@ class _BookingConfirmationScreenState
                 }
               }
 
-              // 2. Validation for Step 2 (Location)
+              // 2. Validation for Step 2 (Location) - Index 1
               if (_pageIndex == 1 && _location.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please provide a location address')),
+                  const SnackBar(
+                    content: Text('Please provide a location address'),
+                  ),
                 );
                 return;
               }
 
+              // 3. Step 3 (Review) - No specific validation needed before moving to Payment
+
               if (_pageIndex == 3) {
-                // Final review step -> call API and start payment
+                // Final payment step -> call API and start payment
                 _handleBooking();
               } else {
                 int nextPageIndex = _pageIndex + 1;
@@ -1343,9 +1754,11 @@ class _BookingConfirmationScreenState
               child: bookingCtrl.isLoading
                   ? const CircularProgressIndicator(color: Colors.white)
                   : Text(
-                      _pageIndex == 3 
-                        ? (_hasDeposit ? 'Pay 50% Deposit Now' : 'Pay & Confirm') 
-                        : 'Continue',
+                      _pageIndex == 3
+                          ? (_hasDeposit
+                                ? 'Pay 50% Deposit Now'
+                                : 'Pay & Confirm')
+                          : 'Continue',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.sp.clamp(16, 18),
@@ -1367,19 +1780,21 @@ class _BookingConfirmationScreenState
       child: Text(
         label,
         style: TextStyle(
-            fontSize: 13.sp.clamp(13, 14),
-            color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.w500),
+          fontSize: 13.sp.clamp(13, 14),
+          color: Theme.of(context).colorScheme.onSurface,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
 
-  Widget _buildTextField(
-      {required String hint,
-      IconData? icon,
-      int maxLines = 1,
-      TextEditingController? controller,
-      Function(String)? onChanged}) {
+  Widget _buildTextField({
+    required String hint,
+    IconData? icon,
+    int maxLines = 1,
+    TextEditingController? controller,
+    Function(String)? onChanged,
+  }) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
@@ -1387,66 +1802,91 @@ class _BookingConfirmationScreenState
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle:
-            TextStyle(fontSize: 13.sp.clamp(13, 14), color: Colors.grey.shade400),
-        prefixIcon:
-            icon != null ? Icon(icon, size: 20.sp, color: Colors.grey) : null,
+        hintStyle: TextStyle(
+          fontSize: 13.sp.clamp(13, 14),
+          color: Colors.grey.shade400,
+        ),
+        prefixIcon: icon != null
+            ? Icon(icon, size: 20.sp, color: Colors.grey)
+            : null,
         filled: true,
         fillColor: Theme.of(context).colorScheme.surface,
         contentPadding: EdgeInsets.all(16.w),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10).r,
-          borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+          borderSide: BorderSide(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10).r,
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
       ),
     );
   }
 
-
-  Widget _buildReviewItem(String label, String value, {bool isBold = false, Color color = Colors.black}) {
+  Widget _buildReviewItem(
+    String label,
+    String value, {
+    bool isBold = false,
+    Color? color,
+  }) {
+    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(bottom: 15.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: TextStyle(
-                  fontSize: 11.sp.clamp(11, 12), color: Colors.grey)),
+          Text(
+            label,
+            style: TextStyle(fontSize: 11.sp.clamp(11, 12), color: Colors.grey),
+          ),
           SizedBox(height: 4.h),
-          Text(value,
-              style: TextStyle(
-                  fontSize: 14.sp.clamp(14, 16),
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-                  color: color == Colors.black ? Theme.of(context).colorScheme.onSurface : color)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReviewIconItem(IconData icon, String text) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
-      child: Row(
-        children: [
-          Icon(icon, size: 18.sp.clamp(18, 20), color: Colors.grey),
-          SizedBox(width: 10.w),
-          Expanded(
-            child: Text(text,
-                style: TextStyle(
-                    fontSize: 13.sp.clamp(13, 14),
-                    fontWeight: FontWeight.w500)),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14.sp.clamp(14, 16),
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+              color: color ?? theme.colorScheme.onSurface,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPriceRow(String label, String value,
-      {bool isBold = false}) {
+  Widget _buildReviewIconItem(IconData icon, String text) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 18.sp.clamp(18, 20),
+            color: theme.colorScheme.onSurface.withOpacity(0.5),
+          ),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13.sp.clamp(13, 14),
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceRow(String label, String value, {bool isBold = false}) {
+    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Row(
@@ -1456,7 +1896,9 @@ class _BookingConfirmationScreenState
             label,
             style: TextStyle(
               fontSize: 13.sp.clamp(13, 14),
-              color: isBold ? Colors.black : Colors.grey,
+              color: isBold
+                  ? theme.colorScheme.onSurface
+                  : theme.colorScheme.onSurface.withOpacity(0.5),
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -1465,6 +1907,7 @@ class _BookingConfirmationScreenState
             style: TextStyle(
               fontSize: 13.sp.clamp(13, 15),
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ],
@@ -1473,17 +1916,28 @@ class _BookingConfirmationScreenState
   }
 
   Widget _buildPaymentOption(
-      String title, String subtitle, IconData icon) {
-    final isSelected = _paymentMethod == title;
+    String title,
+    String subtitle,
+    IconData icon, {
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
-      onTap: () => setState(() => _paymentMethod = title),
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected
+              ? theme.colorScheme.primary.withOpacity(0.05)
+              : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12).r,
           border: Border.all(
-            color: isSelected ? Colors.black : Colors.grey.shade200,
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.dividerColor.withOpacity(0.1),
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -1492,29 +1946,44 @@ class _BookingConfirmationScreenState
             Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: theme.colorScheme.onSurface.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(8).r,
               ),
-              child: Icon(icon, size: 20.sp, color: Colors.black),
+              child: Icon(
+                icon,
+                size: 20.sp,
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
             SizedBox(width: 15.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: TextStyle(
-                          fontSize: 14.sp.clamp(14, 16),
-                          fontWeight: FontWeight.bold)),
-                  Text(subtitle,
-                      style: TextStyle(
-                          fontSize: 11.sp.clamp(11, 12),
-                          color: Colors.grey)),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14.sp.clamp(14, 16),
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11.sp.clamp(11, 12),
+                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                  ),
                 ],
               ),
             ),
             if (isSelected)
-              Icon(Icons.check, size: 20.sp, color: Colors.black),
+              Icon(
+                Icons.check_circle,
+                size: 20.sp,
+                color: theme.colorScheme.primary,
+              ),
           ],
         ),
       ),

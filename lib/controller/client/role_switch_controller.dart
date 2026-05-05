@@ -27,6 +27,25 @@ class RoleSwitchController extends ChangeNotifier {
       if (response.isSuccess) {
         await AuthController.saveUserRole(targetRole);
 
+        // If the response contains a new token, update it
+        if (response.body != null && response.body!['data'] != null) {
+          final newToken = response.body!['data']['accessToken'];
+          if (newToken != null) {
+            debugPrint('🔑 RoleSwitchController: Updating access token');
+            await AuthController.updateToken(newToken);
+          } else {
+            // If no token in response, force a refresh to get a token with the new role
+            debugPrint(
+              '🔄 RoleSwitchController: No token in response, forcing refresh',
+            );
+            await NetworkCaller.refreshAccessToken();
+          }
+        } else {
+          // Force refresh if data is missing
+          debugPrint('🔄 RoleSwitchController: Missing data, forcing refresh');
+          await NetworkCaller.refreshAccessToken();
+        }
+
         // If professional and have specialties, update professional profile
         if (targetRole == 'professional' &&
             specialties != null &&
