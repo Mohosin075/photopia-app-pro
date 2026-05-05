@@ -54,12 +54,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -76,7 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   style: TextStyle(
                     fontSize: 24.sp.clamp(24, 28),
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
 
@@ -156,9 +159,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           if (mounted) {
                             final errorMessage =
                                 signUpController.errorMessage ?? '';
-                            if (errorMessage
-                                .toLowerCase()
-                                .contains('already exist')) {
+                            if (errorMessage.toLowerCase().contains(
+                              'already exist',
+                            )) {
                               CustomSnackBar.show(
                                 context: context,
                                 message: context.l10n.accountAlreadyExists,
@@ -192,19 +195,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // OR CONTINUE WITH
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
+                    Expanded(
+                      child: Divider(
+                        color: isDark ? Colors.white10 : Colors.grey.shade300,
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: Text(
                         context.l10n.orContinueWith,
                         style: TextStyle(
                           fontSize: AppTypography.bodySmall,
-                          color: Colors.grey.shade600,
+                          color: isDark ? Colors.white38 : Colors.grey.shade600,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
+                    Expanded(
+                      child: Divider(
+                        color: isDark ? Colors.white10 : Colors.grey.shade300,
+                      ),
+                    ),
                   ],
                 ),
 
@@ -248,7 +259,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         text: context.l10n.alreadyHaveAccount,
                         style: TextStyle(
                           fontSize: AppTypography.bodyMedium,
-                          color: Colors.black87,
+                          color: theme.colorScheme.onSurface.withOpacity(0.8),
                         ),
                         children: [
                           TextSpan(

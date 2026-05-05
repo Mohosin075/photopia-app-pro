@@ -61,6 +61,21 @@ class ProviderProfileController extends ChangeNotifier {
   int get reviewCount => _professionalProfile?.reviewCount ?? 0;
   int get projectsCount => _professionalProfile?.projects ?? 0;
   int get responseRate => _professionalProfile?.responseRate ?? 0;
+  int get responseTime => _professionalProfile?.responseTime ?? 0;
+  int get deliveryRate => _professionalProfile?.deliveryRate ?? 0;
+  int get satisfactionRate => _professionalProfile?.satisfactionRate ?? 0;
+  bool get isSuperPro => _professionalProfile?.isSuperPro ?? false;
+  
+  // Area of Intervention
+  String get mainCity => _professionalProfile?.areaOfIntervention?.mainCity ?? '';
+  String get department => _professionalProfile?.areaOfIntervention?.department ?? '';
+  String get radius => _professionalProfile?.areaOfIntervention?.radius ?? '';
+  bool get availableForTravel => _professionalProfile?.areaOfIntervention?.availableForTravel ?? false;
+  
+  // Experience Details
+  String get yearsOfExperience => _professionalProfile?.experienceDetails?.yearsOfExperience ?? '';
+  String get projectsCompleted => _professionalProfile?.experienceDetails?.projectsCompleted ?? '';
+  String get education => _professionalProfile?.experienceDetails?.education ?? '';
 
   List<String> get specializations => _professionalProfile?.specialties?.map((e) => e.toString()).toList() ?? [];
   List<String> get languages => _professionalProfile?.language?.map((e) => e.toString()).toList() ?? [];

@@ -28,6 +28,9 @@ class AuthTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -36,16 +39,16 @@ class AuthTextField extends StatelessWidget {
           style: TextStyle(
             fontSize: AppTypography.bodyMedium,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         SizedBox(height: AppSizes.spacingSmall),
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade50,
             borderRadius: BorderRadius.circular(AppSizes.borderRadius),
             border: Border.all(
-              color: Colors.grey.shade200,
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.shade200,
               width: 1,
             ),
           ),
@@ -55,15 +58,16 @@ class AuthTextField extends StatelessWidget {
             keyboardType: keyboardType,
             onChanged: onChanged,
             textAlignVertical: TextAlignVertical.center,
+            cursorColor: theme.colorScheme.primary,
             style: TextStyle(
               fontSize: AppTypography.bodyMedium,
-              color: Colors.black,
+              color: theme.colorScheme.onSurface,
             ),
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: TextStyle(
                 fontSize: AppTypography.bodyMedium,
-                color: Colors.grey.shade400,
+                color: isDark ? Colors.white38 : Colors.grey.shade400,
               ),
               border: InputBorder.none,
               isDense: true,
@@ -74,7 +78,7 @@ class AuthTextField extends StatelessWidget {
               suffixIcon: showValidationIcon && controller.text.isNotEmpty
                   ? Icon(
                       isValid ? Icons.check : null,
-                      color: Colors.grey.shade400,
+                      color: isDark ? Colors.white38 : Colors.grey.shade400,
                       size: 20.sp.clamp(20, 24),
                     )
                   : null,
@@ -103,13 +107,18 @@ class AuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: (isEnabled && !isLoading) ? onTap : null,
       child: Container(
         width: double.infinity,
         height: AppSizes.fieldHeight,
         decoration: BoxDecoration(
-          color: isEnabled ? const Color(0xFF1A1A1A) : Colors.grey.shade300,
+          color: isEnabled 
+              ? (isDark ? Colors.white : const Color(0xFF1A1A1A)) 
+              : (isDark ? Colors.white10 : Colors.grey.shade300),
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
         ),
         alignment: Alignment.center,
@@ -117,15 +126,17 @@ class AuthButton extends StatelessWidget {
             ? SizedBox(
                 height: 20.h,
                 width: 20.h,
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
+                child: CircularProgressIndicator(
+                  color: isDark ? Colors.black : Colors.white,
                   strokeWidth: 2,
                 ),
               )
             : Text(
                 text,
                 style: TextStyle(
-                  color: isEnabled ? Colors.white : Colors.grey.shade500,
+                  color: isEnabled 
+                      ? (isDark ? Colors.black : Colors.white) 
+                      : (isDark ? Colors.white24 : Colors.grey.shade500),
                   fontSize: AppTypography.bodyLarge,
                   fontWeight: FontWeight.w600,
                 ),
@@ -150,15 +161,18 @@ class SocialButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: AppSizes.fieldHeight,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
           border: Border.all(
-            color: Colors.grey.shade300,
+            color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.shade300,
             width: 1,
           ),
         ),
@@ -178,7 +192,7 @@ class SocialButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppTypography.bodyMedium,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ],

@@ -100,7 +100,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 24.sp),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 24.sp,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -147,7 +151,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                           context,
                           MaterialPageRoute(
                             builder: (context) => FullScreenImageViewer(
-                              imageUrl: (cover != null && cover.isNotEmpty) ? cover : null,
+                              imageUrl: (cover != null && cover.isNotEmpty)
+                                  ? cover
+                                  : null,
                               tag: 'banner_hero',
                             ),
                           ),
@@ -370,16 +376,29 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10).r,
         boxShadow: [
-          BoxShadow(color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.04), blurRadius: 12),
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+          ),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 22.sp, color: Theme.of(context).colorScheme.onSurface),
+          Icon(
+            icon,
+            size: 22.sp,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           Text(
             value,
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           Text(
             label,
@@ -396,7 +415,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(30).r,
-        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+        ),
       ),
       child: TabBar(
         controller: _tabController,
@@ -405,7 +426,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
           borderRadius: BorderRadius.circular(30).r,
         ),
         labelColor: Theme.of(context).colorScheme.onPrimary,
-        unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        unselectedLabelColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withOpacity(0.6),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         tabs: [
@@ -564,7 +587,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+                    border: Border.all(
+                      color: Theme.of(context).dividerColor.withOpacity(0.1),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -575,7 +600,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                           fileName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                       IconButton(
@@ -747,6 +774,75 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
             _buildAboutDetailItem(Icons.email_outlined, 'Email', email),
             _buildAboutDetailItem(Icons.phone_outlined, 'Phone', phone),
 
+            // Professional Details Section
+            if (prof?.experienceDetails != null ||
+                prof?.areaOfIntervention != null) ...[
+              SizedBox(height: 25.h),
+              Text(
+                'Professional Details',
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 15.h),
+              if (prof?.experienceDetails?.yearsOfExperience != null)
+                _buildAboutDetailItem(
+                  Icons.work_outline,
+                  'Experience',
+                  prof!.experienceDetails!.yearsOfExperience!,
+                ),
+              if (prof?.experienceDetails?.projectsCompleted != null)
+                _buildAboutDetailItem(
+                  Icons.task_alt,
+                  'Projects Completed',
+                  prof!.experienceDetails!.projectsCompleted!,
+                ),
+              if (prof?.experienceDetails?.education != null)
+                _buildAboutDetailItem(
+                  Icons.school_outlined,
+                  'Education',
+                  prof!.experienceDetails!.education!,
+                ),
+              if (prof?.areaOfIntervention?.mainCity != null)
+                _buildAboutDetailItem(
+                  Icons.location_city_outlined,
+                  'Service Area',
+                  '${prof!.areaOfIntervention!.mainCity!} (${prof!.areaOfIntervention!.radius ?? ''})',
+                ),
+              if (prof?.areaOfIntervention?.availableForTravel != null)
+                _buildAboutDetailItem(
+                  Icons.flight_takeoff_outlined,
+                  'Travel Availability',
+                  prof!.areaOfIntervention!.availableForTravel == true
+                      ? 'Available for Travel'
+                      : 'Not Available for Travel',
+                ),
+            ],
+
+            // Performance Stats Section
+            if (prof?.responseTime != null ||
+                prof?.deliveryRate != null ||
+                prof?.satisfactionRate != null) ...[
+              SizedBox(height: 25.h),
+              Text(
+                'Performance',
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 15.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (prof?.responseTime != null)
+                    _buildPerformanceStat('Response', '${prof!.responseTime}m'),
+                  if (prof?.deliveryRate != null)
+                    _buildPerformanceStat('Delivery', '${prof!.deliveryRate}%'),
+                  if (prof?.satisfactionRate != null)
+                    _buildPerformanceStat(
+                      'Satisfaction',
+                      '${prof!.satisfactionRate}%',
+                    ),
+                ],
+              ),
+            ],
+
             if (languages.isNotEmpty) ...[
               SizedBox(height: 25.h),
               Text(
@@ -799,9 +895,15 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+              border: Border.all(
+                color: Theme.of(context).dividerColor.withOpacity(0.1),
+              ),
             ),
-            child: Icon(icon, size: 20.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+            child: Icon(
+              icon,
+              size: 20.sp,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
           ),
           SizedBox(width: 15.w),
           Column(
@@ -826,21 +928,57 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
     );
   }
 
+  Widget _buildPerformanceStat(String label, String value) {
+    return Container(
+      width: 100.w,
+      padding: EdgeInsets.symmetric(vertical: 12.h),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11.sp,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildChip(String label) {
     return GestureDetector(
       onTap: () => _onHashtagTap(label),
       child: Chip(
         label: Text(
-          '#$label', 
+          '#$label',
           style: TextStyle(
             fontSize: 12.sp,
             color: Colors.blue[700],
             fontWeight: FontWeight.w600,
-          )
+          ),
         ),
         backgroundColor: Colors.blue.withOpacity(0.05),
         side: BorderSide(color: Colors.blue.withOpacity(0.2)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20).r),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20).r,
+        ),
       ),
     );
   }

@@ -1,0 +1,146 @@
+{
+    "statusCode": 200,
+    "success": true,
+    "message": "Professional profile retrieved successfully",
+    "data": {
+        "areaOfIntervention": {
+            "mainCity": "Dhaka",
+            "department": "123",
+            "radius": "50km",
+            "availableForTravel": true
+        },
+        "experienceDetails": {
+            "yearsOfExperience": "3-5 years",
+            "projectsCompleted": "10-50",
+            "education": "Self-taught"
+        },
+        "notificationPreferences": {
+            "emailNewRequests": true,
+            "smsUrgentRequests": true,
+            "newsletterPros": true,
+            "customerReviewReminder": true
+        },
+        "legalNotice": {
+            "acceptedTerms": true,
+            "privacyPolicy": true,
+            "gdprAuthorization": true
+        },
+        "categories": [],
+        "responseTime": 60,
+        "deliveryRate": 100,
+        "satisfactionRate": 100,
+        "isSuperPro": false,
+        "_id": "69a894c43dddb8394cbc42d2",
+        "user": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    0,
+                    0
+                ]
+            },
+            "settings": {
+                "pushNotification": true,
+                "emailNotification": true,
+                "locationService": true,
+                "profileStatus": "public"
+            },
+            "authentication": {
+                "oneTimeCode": "162972",
+                "latestRequestAt": "2026-03-04T18:07:54.983Z",
+                "expiresAt": "2026-03-04T18:12:54.983Z",
+                "requestCount": 1,
+                "authType": "createAccount",
+                "restrictionLeftAt": null,
+                "resetPassword": false,
+                "wrongLoginAttempts": 0
+            },
+            "isStripeConnected": false,
+            "_id": "69a874fb3dddb8394cbc4293",
+            "name": "Nazmul islam Rimon",
+            "email": "cijosi7843@him6.com",
+            "profile": "/images/1775861732777-bwq25b.jpg",
+            "interest": [],
+            "status": "active",
+            "verified": true,
+            "subscribe": false,
+            "trialUsed": false,
+            "password": "$2b$10$uTje.hduaQ.hxB9wr10R9eVb45HENtQeoc1FGXh6BxtbXxl/5ZR.u",
+            "roles": [
+                "user",
+                "professional"
+            ],
+            "activeRole": "professional",
+            "timezone": "UTC",
+            "isOnboardingComplete": false,
+            "createdAt": "2026-03-04T18:07:55.072Z",
+            "updatedAt": "2026-05-05T16:41:47.408Z",
+            "__v": 0,
+            "phone": "0147895296",
+            "description": "Capturing moments with creativity and precision — professional photography and videograpTurning moments into memories through cinematic visuals and stunning photography.hy that tells your story beautifully.",
+            "stripeCustomerId": "cus_UHtlrHbYmzmO45",
+            "subscriptionExpiresAt": "2026-04-16T20:41:41.000Z",
+            "subscriptionStatus": "trialing",
+            "subscriptionTier": "premium",
+            "deviceToken": "ckeWEKYXR-aqUOT8dTu-bC:APA91bEC5oeQFP0QOpVWRERXqRzwjXo1px2remFSY_TqDn3aZLqDqDGD3O-W9qT4ZGqATtyhIbNANzCTLPyKfX__nLsWd6ejTBbBihhkj3RfumQ6UW_OjHE",
+            "isOnline": true,
+            "lastActive": "2026-05-05T16:17:36.015Z",
+            "id": "69a874fb3dddb8394cbc4293"
+        },
+        "specialties": [
+            "Wedding",
+            "Event",
+            "Portrait",
+            "Real Estate",
+            "Travel",
+            "Fashion",
+            "Corporate",
+            "Product",
+            "Street",
+            "Documentary"
+        ],
+        "portfolio": [
+            "/portfolio/1774737096226-izi5hp.jpg",
+            "/portfolio/1774737110344-u7a4iv.jpg",
+            "/portfolio/1774888019727-tqdnrf.jpg",
+            "/portfolio/1774892119755-2gv87y.jpg"
+        ],
+        "language": [
+            "English"
+        ],
+        "isVerified": false,
+        "rating": 0,
+        "reviewCount": 0,
+        "createdAt": "2026-03-04T20:23:32.417Z",
+        "updatedAt": "2026-05-05T16:26:37.914Z",
+        "__v": 0,
+        "bio": "I am professionla photographer",
+        "coverPhoto": "/coverPhoto/1775843600957-2y10e9.png",
+        "profileViews": 0,
+        "projects": 0,
+        "responseRate": 95,
+        "stripeAccountId": "acct_1TK1WpK2fO14o1EC",
+        "stripeOnboardingComplete": true,
+        "documents": [
+            "/documents/1775843612857-7hz8bp.pdf"
+        ],
+        "dateOfBirth": "1995-01-01T00:00:00.000Z",
+        "miniBio": "dkjfakdlsflasdfjd",
+        "primaryDomain": [
+            "Photography",
+            "Videography",
+            "Editing"
+        ],
+        "id": "69a894c43dddb8394cbc42d2",
+        "statistics": {
+            "bookings": {
+                "count": 0,
+                "thisWeek": 0
+            },
+            "revenue": {
+                "amount": 0,
+                "percentageChange": 0
+            }
+        }
+    }
+}

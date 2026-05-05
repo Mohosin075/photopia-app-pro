@@ -77,8 +77,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -95,7 +98,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   child: Icon(
                     Icons.arrow_back,
                     size: 24.sp.clamp(24, 28),
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
 
@@ -107,7 +110,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   style: TextStyle(
                     fontSize: 24.sp.clamp(24, 28),
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
 
@@ -119,7 +122,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   style: TextStyle(
                     fontSize: 18.sp.clamp(18, 20),
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
 

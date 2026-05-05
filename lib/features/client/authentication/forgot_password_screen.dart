@@ -61,8 +61,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -78,7 +81,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: Icon(
                     Icons.arrow_back,
                     size: 24.sp.clamp(24, 28),
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
 
@@ -90,7 +93,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   style: TextStyle(
                     fontSize: 24.sp.clamp(24, 28),
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
 
@@ -101,7 +104,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   context.l10n.forgotPasswordSubtitle,
                   style: TextStyle(
                     fontSize: AppTypography.bodyMedium,
-                    color: Colors.grey.shade600,
+                    color: isDark ? Colors.white38 : Colors.grey.shade600,
                     height: 1.5,
                   ),
                 ),
@@ -145,7 +148,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         text: context.l10n.didntReceiveCode,
                         style: TextStyle(
                           fontSize: AppTypography.bodyMedium,
-                          color: Colors.black87,
+                          color: theme.colorScheme.onSurface.withOpacity(0.8),
                         ),
                         children: [
                           TextSpan(

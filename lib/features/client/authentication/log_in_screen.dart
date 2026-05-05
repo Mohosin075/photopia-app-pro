@@ -59,12 +59,15 @@ class _LogInScreenState extends State<LogInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -80,7 +83,7 @@ class _LogInScreenState extends State<LogInScreen> {
                   style: TextStyle(
                     fontSize: 24.sp.clamp(24, 28),
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
 
@@ -225,19 +228,19 @@ class _LogInScreenState extends State<LogInScreen> {
                 // OR CONTINUE WITH
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
+                    Expanded(child: Divider(color: isDark ? Colors.white10 : Colors.grey.shade300)),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: Text(
                         context.l10n.orContinueWith,
                         style: TextStyle(
                           fontSize: AppTypography.bodySmall,
-                          color: Colors.grey.shade600,
+                          color: isDark ? Colors.white38 : Colors.grey.shade600,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
+                    Expanded(child: Divider(color: isDark ? Colors.white10 : Colors.grey.shade300)),
                   ],
                 ),
 
@@ -287,7 +290,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         text: context.l10n.noAccount,
                         style: TextStyle(
                           fontSize: AppTypography.bodyMedium,
-                          color: Colors.black87,
+                          color: theme.colorScheme.onSurface.withOpacity(0.8),
                         ),
                         children: [
                           TextSpan(

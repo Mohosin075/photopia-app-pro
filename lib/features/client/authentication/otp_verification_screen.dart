@@ -89,8 +89,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -105,7 +108,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 child: Icon(
                   Icons.arrow_back,
                   size: 24.sp.clamp(24, 28),
-                  color: Colors.black,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
 
@@ -117,7 +120,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 style: TextStyle(
                   fontSize: 24.sp.clamp(24, 28),
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
 
@@ -129,7 +132,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 style: TextStyle(
                   fontSize: 18.sp.clamp(18, 20),
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
 
@@ -139,7 +142,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 context.l10n.enterCodeSentTo(widget.email),
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
-                  color: Colors.grey.shade600,
+                  color: isDark ? Colors.white38 : Colors.grey.shade600,
                   height: 1.5,
                 ),
               ),
@@ -179,7 +182,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       text: context.l10n.didntReceiveCode,
                       style: TextStyle(
                         fontSize: AppTypography.bodyMedium,
-                        color: Colors.black87,
+                        color: theme.colorScheme.onSurface.withOpacity(0.8),
                       ),
                       children: [
                         TextSpan(
@@ -203,16 +206,19 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   Widget _buildOtpBox(int index) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: 45.w.clamp(40, 60),
       height: 55.h.clamp(45, 65),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: _otpControllers[index].text.isNotEmpty
-              ? const Color(0xFF1A1A1A)
-              : Colors.grey.shade300,
+              ? (isDark ? Colors.white : const Color(0xFF1A1A1A))
+              : (isDark ? Colors.white10 : Colors.grey.shade300),
           width: 1.5,
         ),
       ),
@@ -222,10 +228,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
         maxLength: 1,
+        cursorColor: theme.colorScheme.primary,
         style: TextStyle(
           fontSize: 24.sp.clamp(24, 28),
           fontWeight: FontWeight.bold,
-          color: Colors.black,
+          color: theme.colorScheme.onSurface,
         ),
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         decoration: const InputDecoration(
