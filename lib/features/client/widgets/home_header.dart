@@ -20,10 +20,14 @@ class HomeHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Image.asset(
-                'assets/images/app_name.png',
+                Theme.of(context).brightness == Brightness.dark
+                    ? 'assets/images/app_name_dark.png'
+                    : 'assets/images/app_name_light.png',
                 height: 24.h,
                 fit: BoxFit.contain,
-                color: Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
               ),
               Consumer<LocationController>(
                 builder: (context, controller, _) {

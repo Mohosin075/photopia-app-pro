@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:photopia/controller/client/booking_controller.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/core/network/urls.dart';
 import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/data/models/booking_model.dart';
+import 'package:photopia/data/models/booking_model.dart' hide Provider;
 import 'package:photopia/features/client/widgets/auth_profile_image.dart';
 import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/data/models/chat_message_model.dart';
 import 'package:photopia/features/client/chat_screen.dart';
 import 'package:photopia/core/services/translation_service.dart';
+import 'package:photopia/controller/client/payment_controller.dart';
+import 'package:photopia/core/constants/app_sizes.dart';
+import 'package:provider/provider.dart';
 
 class ClientBookingDetailsScreen extends StatelessWidget {
   final Booking booking;
@@ -45,9 +49,201 @@ class ClientBookingDetailsScreen extends StatelessWidget {
             SizedBox(height: 20.h),
             _buildServiceDetails(context),
             SizedBox(height: 30.h),
+            if (booking.status?.toLowerCase() == 'pending' && booking.paymentStatus?.toLowerCase() == 'pending') ...[
+              _buildPayButton(context),
+              SizedBox(height: 15.h),
+            ],
             _buildContactButton(context),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPayButton(BuildContext context) {
+    return Consumer<PaymentController>(
+      builder: (context, paymentController, child) {
+        final hasModifications =
+            booking.customOptions != null && booking.customOptions!.isNotEmpty;
+
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: Column(
+            children: [
+              if (hasModifications)
+                Padding(
+                  padding: EdgeInsets.only(bottom: 15.h),
+                  child: Container(
+                    padding: EdgeInsets.all(12.w),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(color: Colors.amber.withOpacity(0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.auto_awesome,
+                            color: Colors.amber[700], size: 18.sp),
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: TranslatedText(
+                            'The professional has updated the offer with new options.',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Colors.amber[900],
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: SizedBox(
+                      height: 45.h,
+                      child: ElevatedButton(
+                        onPressed: paymentController.isLoading
+                            ? null
+                            : () async {
+                                if (hasModifications) {
+                                  // Always just accept the offer if modified, payment happens at the end
+                                  final bookingController = Provider.of<BookingController>(context, listen: false);
+                                  final success = await bookingController.acceptModifiedOffer(booking.sId ?? '');
+                                  if (success) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Offer Accepted Successfully!')),
+                                      );
+                                      Navigator.pop(context);
+                                    }
+                                  } else {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(bookingController.errorMessage ?? 'Failed to accept offer')),
+                                      );
+                                    }
+                                  }
+                                } else {
+                                  // Initial deposit payment for non-modified bookings
+                                  final amountToPay = (booking.totalPrice ?? 0) * 0.5;
+                                  final success = await paymentController.initPaymentSheet(
+                                    bookingId: booking.sId,
+                                    amount: amountToPay,
+                                    currency: booking.currency ?? 'EUR',
+                                  );
+
+                                  if (success) {
+                                    final paymentSuccess = await paymentController.presentPaymentSheet();
+                                    if (paymentSuccess) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Payment Successful!')),
+                                        );
+                                        Navigator.pop(context);
+                                      }
+                                    }
+                                  } else {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(paymentController.errorMessage ?? 'Payment failed')),
+                                      );
+                                    }
+                                  }
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color(0xFF2E7D32), // Premium Green
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: paymentController.isLoading
+                            ? SizedBox(
+                                height: 18.h,
+                                width: 18.h,
+                                child: const CircularProgressIndicator(
+                                    color: Colors.white, strokeWidth: 2),
+                              )
+                            : FittedBox(
+                                child: TranslatedText(
+                                  hasModifications
+                                      ? 'Accept Offer'
+                                      : 'Pay Deposit',
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                  if (hasModifications) ...[
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      flex: 1,
+                      child: SizedBox(
+                        height: 45.h,
+                        child: OutlinedButton(
+                          onPressed: () => _showDeclineDialog(context),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.red.withOpacity(0.3)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: FittedBox(
+                            child: TranslatedText(
+                              'Decline',
+                              style: TextStyle(
+                                color: Colors.red[400],
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeclineDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: TranslatedText('Decline Modified Offer?'),
+        content: TranslatedText('Are you sure you want to decline this modified offer? You can contact the professional to negotiate further.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: TranslatedText('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              Navigator.pop(context);
+            },
+            child: TranslatedText('Decline', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }
@@ -97,7 +293,18 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                 builder: (context) {
                   String? profileUrl = provider?.profile;
                   if (profileUrl != null && !profileUrl.startsWith('http')) {
-                    profileUrl = '${Urls.baseUrl}$profileUrl';
+                    String path = profileUrl;
+                    if (path.startsWith('uploads/')) {
+                      path = path.replaceFirst('uploads/', '');
+                    } else if (path.startsWith('/uploads/')) {
+                      path = path.replaceFirst('/uploads/', '');
+                    }
+                    
+                    final String base = Urls.baseUrl.endsWith('/')
+                        ? Urls.baseUrl.substring(0, Urls.baseUrl.length - 1)
+                        : Urls.baseUrl;
+                    final String finalPath = path.startsWith('/') ? path : '/$path';
+                    profileUrl = '$base$finalPath';
                   }
                   return AuthProfileImage(
                     imageUrl: profileUrl,
@@ -207,6 +414,36 @@ class ClientBookingDetailsScreen extends StatelessWidget {
           _buildInfoRow(context, Icons.calendar_today_outlined, 'Date', booking.bookingDate?.split('T')[0] ?? 'N/A'),
           _buildInfoRow(context, Icons.access_time, 'Time', '${booking.startTime ?? ''} - ${booking.endTime ?? ''}'),
           _buildInfoRow(context, Icons.location_on_outlined, 'Location', service?.location?.address ?? 'Location not set'),
+          if (booking.customOptions != null && booking.customOptions!.isNotEmpty) ...[
+            SizedBox(height: 16.h),
+            const Divider(),
+            SizedBox(height: 16.h),
+            TranslatedText(
+              'Add-ons',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            ...booking.customOptions!.map((option) => Padding(
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TranslatedText(
+                    option.name ?? '',
+                    style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                  ),
+                  Text(
+                    '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${option.price?.toStringAsFixed(0) ?? '0'}',
+                    style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface),
+                  ),
+                ],
+              ),
+            )).toList(),
+          ],
           SizedBox(height: 10.h),
           const Divider(),
           SizedBox(height: 16.h),
@@ -221,13 +458,26 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
-              Text(
-                '${booking.currency ?? '€'}${booking.totalPrice?.toStringAsFixed(0) ?? '0'}',
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+              Builder(
+                builder: (context) {
+                  String price = '0';
+                  final pricing = booking.pricingDetails;
+                  
+                  if (pricing != null && pricing.baseRate != null && pricing.baseRate != 0) {
+                    price = pricing.baseRate!.toStringAsFixed(0);
+                  } else {
+                    price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
+                  }
+
+                  return Text(
+                    '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}$price',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  );
+                }
               ),
             ],
           ),
@@ -305,7 +555,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
   Widget _buildContactButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 55.h,
+      height: AppSizes.fieldHeight,
       child: ElevatedButton(
         onPressed: () {
           final provider = booking.providerId;
@@ -333,7 +583,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.r),
+            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
           ),
           elevation: 0,
         ),

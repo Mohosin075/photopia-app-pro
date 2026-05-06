@@ -63,9 +63,24 @@ class _AuthProfileImageState extends State<AuthProfileImage> {
       final String? token =
           AuthController.accessToken ?? GetStorage().read('user_token');
 
-      final String baseFullUrl = widget.imageUrl!.startsWith('http')
-          ? widget.imageUrl!
-          : '${Urls.baseUrl}${widget.imageUrl}';
+      String path = widget.imageUrl!;
+      String baseFullUrl;
+      if (!path.startsWith('http')) {
+        // Remove duplicate uploads if it exists in the path
+        if (path.startsWith('uploads/')) {
+          path = path.replaceFirst('uploads/', '');
+        } else if (path.startsWith('/uploads/')) {
+          path = path.replaceFirst('/uploads/', '');
+        }
+        
+        final String base = Urls.baseUrl.endsWith('/')
+            ? Urls.baseUrl.substring(0, Urls.baseUrl.length - 1)
+            : Urls.baseUrl;
+        final String finalPath = path.startsWith('/') ? path : '/$path';
+        baseFullUrl = '$base$finalPath';
+      } else {
+        baseFullUrl = path;
+      }
 
       // Bypass cache by appending timestamp
       final String fullUrl =

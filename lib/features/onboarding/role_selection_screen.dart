@@ -35,9 +35,14 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
             children: [
               // Logo
               Image.asset(
-                'assets/images/app_name.png',
+                Theme.of(context).brightness == Brightness.dark
+                    ? 'assets/images/app_name_dark.png'
+                    : 'assets/images/app_name_light.png',
                 height: 35.h,
                 fit: BoxFit.contain,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
               ),
               SizedBox(height: 40.h),
               Text(

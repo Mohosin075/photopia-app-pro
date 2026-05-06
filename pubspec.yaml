@@ -105,7 +105,8 @@ flutter:
     - assets/images/img6.png
     - assets/images/img7.jpg
     - assets/images/img8.jpg
-    - assets/images/app_name.png
+    - assets/images/app_name_light.png
+    - assets/images/app_name_dark.png
     - assets/images/calendar_icon.png
     - assets/images/client_favorite_icon.png
     - assets/images/client_home_icon.png

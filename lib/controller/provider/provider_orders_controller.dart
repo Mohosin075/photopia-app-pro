@@ -104,6 +104,26 @@ class ProviderOrdersController extends ChangeNotifier {
     return false;
   }
 
+  Future<bool> modifyOffer(String bookingId, Map<String, dynamic> body) async {
+    _isUpdating = true;
+    notifyListeners();
+
+    final response = await NetworkCaller.patchRequest(
+      url: Urls.modifyOffer(bookingId),
+      body: body,
+    );
+
+    _isUpdating = false;
+    notifyListeners();
+
+    if (response.isSuccess) {
+      // Refresh pending orders
+      getMyOrders(status: 'pending');
+      return true;
+    }
+    return false;
+  }
+
   void reset() {
     _inProgress = false;
     _isUpdating = false;

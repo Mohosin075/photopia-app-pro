@@ -15,9 +15,7 @@ class AppLocalizations {
 
   Future<String> translateDynamic(String text) async {
     if (!_isFr) return text;
-    // You can import TranslationService here if needed, 
-    // but better to keep it decoupled or use a callback.
-    return text; // Placeholder for now to avoid circular dependency
+    return text;
   }
 
   // ── Navigation ────────────────────────────────────────────────────────────
@@ -144,6 +142,7 @@ class AppLocalizations {
   String favoriteProvidersCount(int count) => _isFr ? 'Prestataires ($count)' : 'Providers ($count)';
   String get noFavoritePosts => _isFr ? 'Aucune annonce favorite pour le moment' : 'No favorite posts yet';
   String get noFavoriteProviders => _isFr ? 'Aucun prestataire favori pour le moment' : 'No favorite providers yet';
+  
   // ── Provider Navigation ───────────────────────────────────────────────────
   String get providerNavOrders => _isFr ? 'Commandes' : 'Orders';
   String get providerNavCalendar => _isFr ? 'Calendrier' : 'Calendar';
@@ -421,6 +420,22 @@ class AppLocalizations {
   String get settingsDeleteConfirm => _isFr ? 'Cette action est irréversible. Toutes vos données seront définitivement supprimées.' : 'This action is irreversible. All your data will be permanently deleted.';
   String get settingsDelete => _isFr ? 'Supprimer' : 'Delete';
   String get comingSoon => _isFr ? 'bientôt disponible' : 'coming soon';
+  
+  // Extra keys for profile
+  String get loading => _isFr ? 'Chargement...' : 'Loading...';
+  String get detectingLocation => _isFr ? 'Détection de l\'emplacement...' : 'Detecting location...';
+  String get customLocation => _isFr ? 'Emplacement personnalisé' : 'Custom Location';
+  String get unknownProvider => _isFr ? 'Prestataire inconnu' : 'Unknown Provider';
+  String get performanceStats => _isFr ? 'Statistiques de performance' : 'Performance Stats';
+  String get deliveryLabel => _isFr ? 'Livraison' : 'Delivery';
+  String get satisfactionLabel => _isFr ? 'Satisfaction' : 'Satisfaction';
+  String get availableForTravel => _isFr ? 'Disponible pour voyager' : 'Travel';
+  String get experience => _isFr ? 'Expérience' : 'Experience';
+  String get education => _isFr ? 'Éducation' : 'Education';
+  String get serviceArea => _isFr ? 'Zone de service' : 'Service Area';
+  String get cropProfilePicture => _isFr ? 'Recadrer la photo de profil' : 'Crop Profile Picture';
+  String get cropCoverPhoto => _isFr ? 'Recadrer la photo de couverture' : 'Crop Cover Photo';
+  String get enterNameHint => _isFr ? 'Entrez le nom' : 'Enter name';
 }
 
 // ── Delegate ──────────────────────────────────────────────────────────────────

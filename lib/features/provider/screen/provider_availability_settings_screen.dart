@@ -8,6 +8,7 @@ import 'package:photopia/controller/client/user_profile_controller.dart';
 import 'package:photopia/data/models/calender_availibility_model.dart';
 import 'package:photopia/controller/provider/service_controller.dart';
 import 'package:photopia/controller/provider/provider_profile_controller.dart';
+import 'package:photopia/core/constants/app_sizes.dart';
 
 class ProviderAvailabilitySettingsScreen extends StatefulWidget {
   const ProviderAvailabilitySettingsScreen({super.key});
@@ -374,13 +375,18 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      minimumSize: Size(double.infinity, 55.h),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                      minimumSize: Size(double.infinity, AppSizes.fieldHeight),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+                      ),
                       elevation: 0,
                     ),
                     child: Text(
                       'Save All Changes',
-                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   SizedBox(height: 30.h),

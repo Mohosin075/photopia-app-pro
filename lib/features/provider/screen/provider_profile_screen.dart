@@ -1214,40 +1214,40 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               if (controller.yearsOfExperience.isNotEmpty)
                 _buildDetailRow(
                   Icons.work_outline,
-                  'Experience',
+                  context.l10n.experience,
                   controller.yearsOfExperience,
                 ),
               if (controller.projectsCompleted.isNotEmpty)
                 _buildDetailRow(
                   Icons.task_alt,
-                  'Projects',
+                  context.l10n.projectsLabel,
                   controller.projectsCompleted,
                 ),
               if (controller.education.isNotEmpty)
                 _buildDetailRow(
                   Icons.school_outlined,
-                  'Education',
+                  context.l10n.education,
                   controller.education,
                 ),
               if (controller.mainCity.isNotEmpty)
                 _buildDetailRow(
                   Icons.location_city_outlined,
-                  'Service Area',
+                  context.l10n.serviceArea,
                   '${controller.mainCity} (${controller.radius})',
                 ),
               _buildDetailRow(
                 Icons.flight_takeoff_outlined,
-                'Travel',
+                context.l10n.availableForTravel,
                 controller.availableForTravel
-                    ? 'Available for Travel'
-                    : 'Not Available',
+                    ? context.l10n.yes
+                    : context.l10n.no,
               ),
             ],
           ),
         ),
         SizedBox(height: 25.h),
         Text(
-          'Performance Stats',
+          context.l10n.performanceStats,
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
@@ -1258,10 +1258,10 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildPerformanceStat('Response', '${controller.responseTime}m'),
-            _buildPerformanceStat('Delivery', '${controller.deliveryRate}%'),
+            _buildPerformanceStat(context.l10n.responseTimeLabel, '${controller.responseTime}m'),
+            _buildPerformanceStat(context.l10n.deliveryLabel, '${controller.deliveryRate}%'),
             _buildPerformanceStat(
-              'Satisfaction',
+              context.l10n.satisfactionLabel,
               '${controller.satisfactionRate}%',
             ),
           ],

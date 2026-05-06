@@ -469,8 +469,28 @@ class BookingDetailsScreen extends StatelessWidget {
             ),
           ),
         ),
-        if (isPending) ...[
-          SizedBox(height: 20.h),
+        if (isPending && (currentBooking['paymentStatus']?.toString().toLowerCase() == 'pending')) ...[
+          SizedBox(height: 15.h),
+          SizedBox(
+            width: double.infinity,
+            height: 50.h,
+            child: OutlinedButton.icon(
+              onPressed: () => _showModifyOfferDialog(context, currentBooking),
+              icon: Icon(Icons.edit_note, size: 20.sp),
+              label: Text(
+                'Modify Offer',
+                style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 15.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -480,6 +500,15 @@ class BookingDetailsScreen extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  void _showModifyOfferDialog(BuildContext context, Map<String, dynamic> currentBooking) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _ModifyOfferSheet(booking: currentBooking),
     );
   }
 
@@ -642,6 +671,260 @@ class BookingDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ModifyOfferSheet extends StatefulWidget {
+  final Map<String, dynamic> booking;
+  const _ModifyOfferSheet({required this.booking});
+
+  @override
+  State<_ModifyOfferSheet> createState() => _ModifyOfferSheetState();
+}
+
+class _ModifyOfferSheetState extends State<_ModifyOfferSheet> {
+  late TextEditingController _packageNameController;
+  late TextEditingController _baseRateController;
+  final List<Map<String, dynamic>> _customOptions = [];
+  final List<TextEditingController> _nameControllers = [];
+  final List<TextEditingController> _priceControllers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final pricing = widget.booking['pricingDetails'] ?? {};
+    _packageNameController = TextEditingController(text: widget.booking['packageName'] ?? '');
+    _baseRateController = TextEditingController(text: (pricing['baseRate'] ?? 0).toString());
+    
+    if (widget.booking['customOptions'] != null) {
+      for (var option in (widget.booking['customOptions'] as List)) {
+        _customOptions.add({'name': option['name']?.toString() ?? '', 'price': option['price'] ?? 0.0});
+        _nameControllers.add(TextEditingController(text: option['name']?.toString() ?? ''));
+        _priceControllers.add(TextEditingController(text: option['price']?.toString() ?? '0'));
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _packageNameController.dispose();
+    _baseRateController.dispose();
+    for (var c in _nameControllers) {
+      c.dispose();
+    }
+    for (var c in _priceControllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _addOption() {
+    setState(() {
+      _customOptions.add({'name': '', 'price': 0.0});
+      _nameControllers.add(TextEditingController());
+      _priceControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeOption(int index) {
+    setState(() {
+      _customOptions.removeAt(index);
+      _nameControllers[index].dispose();
+      _nameControllers.removeAt(index);
+      _priceControllers[index].dispose();
+      _priceControllers.removeAt(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, MediaQuery.of(context).viewInsets.bottom + 20.h),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Modify Offer',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h),
+            _buildLabel('Package Name'),
+            TextField(
+              controller: _packageNameController,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              decoration: _buildInputDecoration('Enter package name'),
+            ),
+            SizedBox(height: 15.h),
+            _buildLabel('Base Rate (€)'),
+            TextField(
+              controller: _baseRateController,
+              keyboardType: TextInputType.number,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              decoration: _buildInputDecoration('Enter base rate'),
+            ),
+            SizedBox(height: 25.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildLabel('Custom Options'),
+                TextButton.icon(
+                  onPressed: _addOption,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add Option'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            ...List.generate(_customOptions.length, (index) {
+              return Padding(
+                padding: EdgeInsets.only(bottom: 10.h),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        controller: _nameControllers[index],
+                        onChanged: (val) => _customOptions[index]['name'] = val,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13.sp),
+                        decoration: _buildInputDecoration('Option name'),
+                      ),
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: TextField(
+                        controller: _priceControllers[index],
+                        keyboardType: TextInputType.number,
+                        onChanged: (val) => _customOptions[index]['price'] = double.tryParse(val) ?? 0.0,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13.sp),
+                        decoration: _buildInputDecoration('Price'),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => _removeOption(index),
+                      icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            SizedBox(height: 30.h),
+            Consumer<ProviderOrdersController>(
+              builder: (context, controller, child) {
+                return SizedBox(
+                  width: double.infinity,
+                  height: 50.h,
+                  child: ElevatedButton(
+                    onPressed: controller.isUpdating ? null : () async {
+                      // Filter out custom options with empty names before sending
+                      final filteredOptions = _customOptions
+                          .where((opt) => opt['name'] != null && opt['name'].toString().trim().isNotEmpty)
+                          .toList();
+
+                      final body = {
+                        'packageName': _packageNameController.text,
+                        'baseRate': double.tryParse(_baseRateController.text) ?? 0.0,
+                        'customOptions': filteredOptions,
+                      };
+                      
+                      final success = await controller.modifyOffer(
+                        widget.booking['_id'] ?? widget.booking['id'],
+                        body,
+                      );
+                      
+                      if (mounted) {
+                        if (success) {
+                          Navigator.pop(context); // Close sheet
+                          Navigator.pop(context); // Go back to orders list
+                          CustomSnackBar.show(
+                            context: context,
+                            message: 'Offer modified successfully!',
+                          );
+                        } else {
+                          CustomSnackBar.show(
+                            context: context,
+                            message: controller.errorMessage,
+                            isError: true,
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                      elevation: 0,
+                    ),
+                    child: controller.isUpdating 
+                      ? SizedBox(
+                          height: 20.h,
+                          width: 20.h,
+                          child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text(
+                          'Update Offer',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
+                        ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String label) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _buildInputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13.sp),
+      contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.r),
+        borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.r),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+      ),
+      filled: true,
+      fillColor: Theme.of(context).colorScheme.surface,
     );
   }
 }

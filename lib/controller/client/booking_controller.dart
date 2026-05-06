@@ -173,6 +173,36 @@ class BookingController extends ChangeNotifier {
     }
   }
 
+  Future<bool> acceptModifiedOffer(String bookingId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Typically we update status to 'confirmed' or 'accepted' or a specific modify status
+      // For now, let's use the status update endpoint to signify acceptance
+      final response = await NetworkCaller.patchRequest(
+        url: Urls.updateBookingStatus(bookingId),
+        body: {"status": "accepted"},
+        requireAuth: true,
+      );
+      
+      if (response.isSuccess) {
+        debugPrint('✅ BookingController: Modified offer accepted successfully');
+        return true;
+      } else {
+        _errorMessage = response.errorMessage ?? "Failed to accept offer";
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<Map<String, dynamic>?> calculateBookingPrice({
     required String serviceId,
     required String bookingDate,

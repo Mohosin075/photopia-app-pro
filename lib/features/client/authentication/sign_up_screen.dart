@@ -72,7 +72,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 32.h.clamp(32, 40)),
-
+                // Logo
+                Center(
+                  child: Image.asset(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? 'assets/images/app_name_dark.png'
+                        : 'assets/images/app_name_light.png',
+                    height: 40.h,
+                    fit: BoxFit.contain,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                ),
+                SizedBox(height: 40.h),
                 // Title
                 Text(
                   context.l10n.createAccount,

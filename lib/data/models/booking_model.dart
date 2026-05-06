@@ -86,6 +86,7 @@ class Booking {
   String? pricingType;
   PricingDetails? pricingDetails;
   Package? package;
+  List<CustomOption>? customOptions;
   String? createdAt;
   String? updatedAt;
 
@@ -105,6 +106,7 @@ class Booking {
     this.pricingType,
     this.pricingDetails,
     this.package,
+    this.customOptions,
     this.createdAt,
     this.updatedAt,
   });
@@ -140,6 +142,12 @@ class Booking {
     package = json['package'] != null
         ? Package.fromJson(json['package'])
         : null;
+    if (json['customOptions'] != null) {
+      customOptions = <CustomOption>[];
+      json['customOptions'].forEach((v) {
+        customOptions!.add(CustomOption.fromJson(v));
+      });
+    }
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
   }
@@ -162,6 +170,9 @@ class Booking {
     if (pricingDetails != null)
       data['pricingDetails'] = pricingDetails!.toJson();
     if (package != null) data['package'] = package!.toJson();
+    if (customOptions != null) {
+      data['customOptions'] = customOptions!.map((v) => v.toJson()).toList();
+    }
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
     return data;
@@ -170,18 +181,33 @@ class Booking {
 
 class PricingDetails {
   double? clientTotal;
+  double? baseRate;
+  double? subtotal;
+  double? commission;
   String? currency;
 
-  PricingDetails({this.clientTotal, this.currency});
+  PricingDetails({
+    this.clientTotal,
+    this.baseRate,
+    this.subtotal,
+    this.commission,
+    this.currency,
+  });
 
   PricingDetails.fromJson(Map<String, dynamic> json) {
     clientTotal = (json['clientTotal'] as num?)?.toDouble();
+    baseRate = (json['baseRate'] as num?)?.toDouble();
+    subtotal = (json['subtotal'] as num?)?.toDouble();
+    commission = (json['commission'] as num?)?.toDouble();
     currency = json['currency'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['clientTotal'] = clientTotal;
+    data['baseRate'] = baseRate;
+    data['subtotal'] = subtotal;
+    data['commission'] = commission;
     data['currency'] = currency;
     return data;
   }
@@ -265,18 +291,26 @@ class Provider {
 class User {
   String? sId;
   String? name;
+  String? profile;
 
-  User({this.sId, this.name});
+  User({this.sId, this.name, this.profile});
 
   User.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     name = json['name'];
+    profile =
+        json['profile'] ??
+        json['profile_image'] ??
+        json['image'] ??
+        json['avatar'] ??
+        json['profile_pic'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['_id'] = sId;
     data['name'] = name;
+    data['profile'] = profile;
     return data;
   }
 }
@@ -315,6 +349,25 @@ class Location {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['address'] = address;
     data['city'] = city;
+    return data;
+  }
+}
+
+class CustomOption {
+  String? name;
+  double? price;
+
+  CustomOption({this.name, this.price});
+
+  CustomOption.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    price = (json['price'] as num?)?.toDouble();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['price'] = price;
     return data;
   }
 }

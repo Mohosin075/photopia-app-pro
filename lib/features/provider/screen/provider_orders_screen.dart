@@ -76,9 +76,14 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Image.asset(
-                        'assets/images/app_name.png',
+                        Theme.of(context).brightness == Brightness.dark
+                            ? 'assets/images/app_name_dark.png'
+                            : 'assets/images/app_name_light.png',
                         height: 24.h,
                         fit: BoxFit.contain,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                   ),
@@ -474,7 +479,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
           time: order['startTime'] ?? context.l10n.notAvailable,
           location: location['address'] ?? context.l10n.locationNA,
           price: price,
-          imageUrl: client['profile'] ?? client['profileImage'] ?? client['image'] ?? client['avatar'] ?? '',
+          imageUrl: client['profile'] ?? client['profile_pic'] ?? client['profile_image'] ?? client['profileImage'] ?? client['image'] ?? client['avatar'] ?? '',
           booking: order,
         );
       },

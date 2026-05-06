@@ -43,7 +43,6 @@ import 'package:photopia/core/notification/notification_service.dart';
 import 'package:photopia/controller/category_controller.dart';
 import 'package:photopia/core/theme/app_theme.dart';
 
-
 class Photopia extends StatefulWidget {
   const Photopia({super.key});
 
@@ -73,7 +72,9 @@ class _PhotopiaState extends State<Photopia> {
             ChangeNotifierProvider(create: (_) => LanguageController()),
             ChangeNotifierProvider(create: (_) => FavoritesController()),
             ChangeNotifierProvider(create: (_) => ProviderProfileController()),
-            ChangeNotifierProvider(create: (_) => ProviderOnboardingController()),
+            ChangeNotifierProvider(
+              create: (_) => ProviderOnboardingController(),
+            ),
             ChangeNotifierProvider(create: (_) => AuthController()),
             ChangeNotifierProvider(create: (_) => SignUpController()),
             ChangeNotifierProvider(create: (_) => SignInController()),
@@ -112,7 +113,7 @@ class _PhotopiaState extends State<Photopia> {
                 debugShowCheckedModeBanner: false,
                 useInheritedMediaQuery: true,
                 locale: langController.locale,
-                supportedLocales: const [Locale('en'), Locale('fr')],
+                supportedLocales: const [Locale('en'), Locale('es')],
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,

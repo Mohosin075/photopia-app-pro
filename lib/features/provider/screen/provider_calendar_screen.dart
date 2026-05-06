@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:photopia/core/constants/app_typography.dart';
 import 'package:photopia/features/provider/screen/provider_availability_settings_screen.dart';
+import 'package:photopia/features/provider/screen/booking_details_screen.dart';
 import 'package:photopia/controller/provider/calender_availibility_controller.dart';
 import 'package:photopia/controller/client/user_profile_controller.dart';
 import 'package:photopia/data/models/calender_availibility_model.dart';
@@ -169,6 +170,20 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
           ),
         ],
       ),
+      floatingActionButton: _selectedViewIndex == 1 && _selectedDate != null
+          ? FloatingActionButton.extended(
+              onPressed: () => _showDateActionSheet(context),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              icon: Icon(Icons.block, color: Theme.of(context).colorScheme.onPrimary),
+              label: Text(
+                DateFormat('MMM d').format(_selectedDate!),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : null,
     );
   }
 
@@ -325,6 +340,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                     location: booking['eventLocation']?['address'] ?? context.l10n.locationNA,
                     cost: '€${pricing?['subtotal'] ?? '0'}',
                     status: booking['status'] ?? 'pending',
+                    bookingData: booking,
                   ),
                 );
               }).toList(),
@@ -411,6 +427,112 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
     );
   }
 
+  void _showDateActionSheet(BuildContext context) {
+    final date = _selectedDate!;
+    final formattedDate = DateFormat('MMMM d, yyyy').format(date);
+    final isWorking = _isDayWorking(date);
+
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.all(24.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.calendar_today, size: 20.sp, color: Theme.of(context).colorScheme.primary),
+                SizedBox(width: 10.w),
+                Text(
+                  formattedDate,
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8.h),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: isWorking ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Text(
+                isWorking ? 'Currently: Available' : 'Currently: Blocked',
+                style: TextStyle(
+                  color: isWorking ? Colors.green : Colors.red,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.block, color: Colors.red, size: 20.sp),
+              ),
+              title: Text(
+                'Block This Day',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
+              ),
+              subtitle: Text('Mark as unavailable for clients', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProviderAvailabilitySettingsScreen(),
+                  ),
+                ).then((_) => _fetchAvailabilityData());
+              },
+            ),
+            const Divider(),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.check_circle_outline, color: Colors.green, size: 20.sp),
+              ),
+              title: Text(
+                'Mark as Available',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
+              ),
+              subtitle: Text('Open this day for bookings', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProviderAvailabilitySettingsScreen(),
+                  ),
+                ).then((_) => _fetchAvailabilityData());
+              },
+            ),
+            SizedBox(height: 10.h),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildScheduleItem({
     required String title,
     required String client,
@@ -418,8 +540,18 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
     required String location,
     required String cost,
     required String status,
+    Map<String, dynamic>? bookingData,
   }) {
-    return Container(
+    return GestureDetector(
+      onTap: bookingData != null ? () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookingDetailsScreen(booking: bookingData),
+          ),
+        );
+      } : null,
+      child: Container(
       padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
          color: Theme.of(context).colorScheme.surface,
@@ -525,6 +657,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
             ],
           ),
         ],
+        ),
       ),
     );
   }

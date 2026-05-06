@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/controller/client/booking_controller.dart';
 import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/data/models/booking_model.dart';
+import 'package:photopia/data/models/booking_model.dart' hide Provider;
+import 'package:provider/provider.dart';
 import 'package:photopia/features/client/widgets/auth_profile_image.dart';
 import 'package:photopia/core/network/urls.dart';
-import 'package:provider/provider.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/features/client/client_booking_details_screen.dart';
 import 'package:photopia/core/services/translation_service.dart';
@@ -296,9 +296,19 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           Builder(
                             builder: (context) {
                               String? profileUrl = booking.providerId?.profile;
-                              if (profileUrl != null &&
-                                  !profileUrl.startsWith('http')) {
-                                profileUrl = '${Urls.baseUrl}$profileUrl';
+                              if (profileUrl != null && !profileUrl.startsWith('http')) {
+                                String path = profileUrl;
+                                if (path.startsWith('uploads/')) {
+                                  path = path.replaceFirst('uploads/', '');
+                                } else if (path.startsWith('/uploads/')) {
+                                  path = path.replaceFirst('/uploads/', '');
+                                }
+                                
+                                final String base = Urls.baseUrl.endsWith('/')
+                                    ? Urls.baseUrl.substring(0, Urls.baseUrl.length - 1)
+                                    : Urls.baseUrl;
+                                final String finalPath = path.startsWith('/') ? path : '/$path';
+                                profileUrl = '$base$finalPath';
                               }
                               debugPrint(
                                 "👤 Provider Name: ${booking.providerId?.name}",
@@ -353,13 +363,26 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     ),
                   ],
                 ),
-                Text(
-                  '${booking.currency ?? booking.pricingDetails?.currency ?? '€'}${booking.totalPrice?.toStringAsFixed(0) ?? '0'}',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                Builder(
+                  builder: (context) {
+                    String price = '0';
+                    final pricing = booking.pricingDetails;
+                    
+                    if (pricing != null && pricing.baseRate != null && pricing.baseRate != 0) {
+                      price = pricing.baseRate!.toStringAsFixed(0);
+                    } else {
+                      price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
+                    }
+
+                    return Text(
+                      '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}$price',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    );
+                  }
                 ),
               ],
             ),
@@ -378,6 +401,42 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 ),
               ],
             ),
+            if (booking.customOptions != null && 
+                booking.customOptions!.isNotEmpty && 
+                (booking.paymentStatus?.toLowerCase() == 'paid' || booking.paymentStatus?.toLowerCase() == 'completed')) ...[
+              SizedBox(height: 12.h),
+              SizedBox(
+                width: double.infinity,
+                height: 32.h,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final bookingController = Provider.of<BookingController>(context, listen: false);
+                    final success = await bookingController.acceptModifiedOffer(booking.sId ?? '');
+                    if (success) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Offer Accepted Successfully!')),
+                        );
+                        bookingController.getMyBookings(); // Refresh list
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    elevation: 0,
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: Text(
+                    'Accept Modified Offer',
+                    style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
