@@ -1593,7 +1593,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
       debugPrint('🆕 Flow: New Card (Payment Intent with serviceId FIRST)');
 
       final bool initialized = await paymentCtrl.initPaymentSheet(
-        serviceId: serviceId.toString(), // Sending serviceId as requested
+        bookingId: serviceId.toString(), // Sending serviceId as requested
         amount: _totalBookingAmount,
         currency:
             widget.package?['currency'] ?? widget.service?['currency'] ?? 'EUR',

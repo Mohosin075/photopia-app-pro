@@ -28,25 +28,9 @@ class PaymentController extends ChangeNotifier {
     try {
       // 1. Call backend to create PaymentIntent
       final Map<String, dynamic> body = {
+        'bookingId': bookingId,
         'amount': amount.toInt(),
-        'currency': currency.toLowerCase(),
       };
-
-      // Backend expects 'bookingId' key for validation.
-      // If we are in New Card flow, we send serviceId under this key as a workaround.
-      if (bookingId != null) {
-        body['bookingId'] = bookingId;
-      } else if (serviceId != null) {
-        body['bookingId'] = serviceId; // Mapping serviceId to bookingId key
-      }
-
-      if (userEmail != null) {
-        body['userEmail'] = userEmail;
-        body['email'] = userEmail;
-        body['user_email'] = userEmail;
-        body['customerEmail'] = userEmail;
-        body['payment'] = {'userEmail': userEmail, 'email': userEmail};
-      }
 
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.createPaymentIntent,
