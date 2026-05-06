@@ -803,8 +803,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               children: [
                                 Container(
                                   padding: EdgeInsets.all(14.w),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFF5F5F5),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).dividerColor.withOpacity(0.1),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(

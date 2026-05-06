@@ -56,6 +56,25 @@ class ProviderOnboardingController extends ChangeNotifier {
     await GetStorage().remove(_onboardingKey);
   }
 
+  static Future<bool> checkOnboardingStatusFromServer() async {
+    try {
+      final response = await NetworkCaller.getRequest(url: Urls.professionalProfile);
+      if (response.isSuccess) {
+        final data = response.body?['data'];
+        if (data != null) {
+          final primaryDomain = data['primaryDomain'] as List?;
+          // If primaryDomain is not null and not empty, it means they already filled at least step 1
+          if (primaryDomain != null && primaryDomain.isNotEmpty) {
+            return true;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error checking onboarding status from server: $e');
+    }
+    return false;
+  }
+
   // ── Validation ───────────────────────────────────────────────────────────
   bool get isStep1Valid => dateOfBirth != null && primaryDomain.isNotEmpty;
   bool get isStep5Valid => acceptedTerms && privacyPolicy && gdprAuthorization;

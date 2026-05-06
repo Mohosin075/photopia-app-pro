@@ -72,15 +72,30 @@ class _ModeTransitionScreenState extends State<ModeTransitionScreen>
       }
 
       if (success && mounted) {
-        // Check if this is a first-time professional and onboarding is not done
-        final bool needsOnboarding = widget.targetRole == 'professional' &&
-            !ProviderOnboardingController.isOnboardingCompleted();
+        bool needsOnboarding = false;
 
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          needsOnboarding ? AppRoutes.provider_onboarding : widget.targetRoute,
-          (route) => false,
-        );
+        // Check if this is a professional and onboarding is not done locally
+        if (widget.targetRole == 'professional') {
+          if (!ProviderOnboardingController.isOnboardingCompleted()) {
+            // Verify with the server in case they logged in on a new device
+            final bool serverCompleted =
+                await ProviderOnboardingController.checkOnboardingStatusFromServer();
+            if (serverCompleted) {
+              await ProviderOnboardingController.markOnboardingCompleted();
+              needsOnboarding = false;
+            } else {
+              needsOnboarding = true;
+            }
+          }
+        }
+
+        if (mounted) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            needsOnboarding ? AppRoutes.provider_onboarding : widget.targetRoute,
+            (route) => false,
+          );
+        }
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

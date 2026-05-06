@@ -32,11 +32,11 @@ class GuestDialogHelper {
                 width: 280.w,
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.1),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -47,14 +47,14 @@ class GuestDialogHelper {
                   children: [
                     Container(
                       padding: EdgeInsets.all(12.w),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F7FA),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).dividerColor.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.lock_person_rounded,
                         size: 28.sp,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -63,7 +63,7 @@ class GuestDialogHelper {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                         letterSpacing: 0.5,
                       ),
                       textAlign: TextAlign.center,
@@ -74,7 +74,7 @@ class GuestDialogHelper {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         height: 1.4,
                       ),
                     ),
@@ -88,13 +88,13 @@ class GuestDialogHelper {
                               padding: EdgeInsets.symmetric(vertical: 10.h),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12.r),
-                                side: BorderSide(color: Colors.grey[300]!),
+                                side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.15)),
                               ),
                             ),
                             child: Text(
                               "Cancel",
                               style: TextStyle(
-                                color: Colors.grey[700],
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                 fontSize: 13.sp,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -115,8 +115,8 @@ class GuestDialogHelper {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
                               elevation: 0,
                               padding: EdgeInsets.symmetric(vertical: 10.h),
                               shape: RoundedRectangleBorder(
@@ -150,14 +150,14 @@ class GuestDialogHelper {
                         text: TextSpan(
                           text: "Already have an account? ",
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             fontSize: 11.sp,
                           ),
                           children: [
                             TextSpan(
                               text: "Log In",
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11.sp,
                               ),
