@@ -4,6 +4,7 @@ class CategoryModel {
   final String? description;
   final String? image;
   final String? icon;
+  final String? theme; // Added theme support as per guideline
   final String? parent; // Parent category ID
   final String type; // 'category' or 'subcategory'
   final bool isPopular;
@@ -15,6 +16,7 @@ class CategoryModel {
     this.description,
     this.image,
     this.icon,
+    this.theme,
     this.parent,
     required this.type,
     this.isPopular = false,
@@ -28,6 +30,7 @@ class CategoryModel {
       description: json['description'],
       image: json['image'],
       icon: json['icon'],
+      theme: json['theme'], // Added theme mapping
       parent: json['parent'] is Map ? json['parent']['_id'] : json['parent'],
       type: json['type'] ?? 'category',
       isPopular: json['isPopular'] ?? false,
@@ -42,12 +45,14 @@ class CategoryModel {
       'description': description,
       'image': image,
       'icon': icon,
+      'theme': theme, // Added theme mapping
       'parent': parent,
       'type': type,
       'isPopular': isPopular,
       'isActive': isActive,
     };
   }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

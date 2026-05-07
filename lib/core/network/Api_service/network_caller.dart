@@ -467,6 +467,7 @@ class NetworkCaller {
   // DELETE Request
   static Future<NetworkResponse> deleteRequest({
     required String url,
+    Map<String, dynamic>? body,
     bool requireAuth = true,
     String? token,
     bool addBearer = true,
@@ -479,9 +480,13 @@ class NetworkCaller {
         addBearer: addBearer,
       );
 
-      _logRequest('DELETE', url, {}, headers);
+      _logRequest('DELETE', url, body ?? {}, headers);
 
-      final Response response = await _client.delete(uri, headers: headers);
+      final Response response = await _client.delete(
+        uri,
+        headers: headers,
+        body: body != null ? jsonEncode(body) : null,
+      );
 
       if (response.statusCode == 401 && requireAuth) {
         final refreshed = await _refreshAccessToken();
@@ -490,6 +495,7 @@ class NetworkCaller {
           final retryResponse = await _client.delete(
             uri,
             headers: retryHeaders,
+            body: body != null ? jsonEncode(body) : null,
           );
           return _handleResponse(retryResponse, url, 'DELETE');
         } else {
@@ -507,6 +513,7 @@ class NetworkCaller {
           final retryResponse = await _client.delete(
             uri,
             headers: retryHeaders,
+            body: body != null ? jsonEncode(body) : null,
           );
           return _handleResponse(retryResponse, url, 'DELETE');
         }

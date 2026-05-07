@@ -1578,6 +1578,19 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     final bookingCtrl = context.read<BookingController>();
     bool paymentSuccess = false;
 
+    // Check if user has email (required for Stripe)
+    if (userProfile.email == null || userProfile.email!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'User email is required for payment. Please update your profile.',
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     // Generate a key to check if booking details changed
     final String currentBookingKey =
         "$serviceId-$formattedDate-$bookingStartTime-$_location";
@@ -1637,7 +1650,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
       }
     } else {
       // ✅ FLOW 2: SAVED CARD
-      debugPrint('💳 Flow: Saved Card (Booking first, then charge)');
+      debugPrint('💳 Flow: Saved Card (Step 1: Create Booking)');
 
       String? bookingId = _createdBookingId;
       if (bookingId == null) {
@@ -1661,13 +1674,18 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           notes: _specialRequests,
           distanceFromProviderKm: _distanceFromProvider,
         );
-        if (bookingId != null) _createdBookingId = bookingId;
+        if (bookingId != null) {
+          _createdBookingId = bookingId;
+        }
       }
 
+      // Step 2: Charge the card using the separate payment API
       if (bookingId != null && mounted) {
+        debugPrint('💳 Flow: Saved Card (Step 2: Charge Card via Payment API)');
         paymentSuccess = await paymentCtrl.chargeSavedCard(
           bookingId: bookingId,
-          paymentMethodId: _selectedPaymentMethod!.id,
+          amount: _depositAmount, // Sending the 50% deposit amount
+          userEmail: userProfile.email,
         );
       }
     }

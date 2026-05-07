@@ -67,6 +67,7 @@ class BookingController extends ChangeNotifier {
     String? specialRequests,
     double distanceFromProviderKm = 0,
     String? notes,
+    String? paymentMethodId, // Added to handle direct payment during booking
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -80,6 +81,7 @@ class BookingController extends ChangeNotifier {
         "startTime": startTime,
         "endTime": endTime,
         "packageName": packageName ?? "",
+        "paymentMethodId": paymentMethodId, // Pass it if available
         "eventLocation": {
           "address": address,
           "city": city,
@@ -89,26 +91,22 @@ class BookingController extends ChangeNotifier {
         },
         "clientName": clientName ?? "",
         "clientEmail": clientEmail ?? "",
-        "userEmail": clientEmail ?? "", // Required for checkout session
-        "email":
-            clientEmail ?? "", // Root email field often expected by backends
-        "user_email": clientEmail ?? "", // Snake case variant
+        "userEmail":
+            clientEmail, // Changed from clientEmail ?? "" to allow null if it's truly null, or just send it
+        "email": clientEmail,
+        "user_email": clientEmail,
         "clientPhone": clientPhone ?? "",
         "client": {
           "name": clientName ?? "",
           "email": clientEmail ?? "",
           "phone": clientPhone ?? "",
         },
-        "user": {"email": clientEmail ?? "", "userEmail": clientEmail ?? ""},
-        "payment": {"userEmail": clientEmail ?? "", "email": clientEmail ?? ""},
-        "paymentInfo": {
-          "userEmail": clientEmail ?? "",
-          "email": clientEmail ?? "",
-        },
-        "paymentData": {"userEmail": clientEmail ?? ""},
-        "customerEmail": clientEmail ?? "",
-        "customer_email": clientEmail ?? "",
-        "userEmail": clientEmail ?? "",
+        "user": {"email": clientEmail, "userEmail": clientEmail},
+        "payment": {"userEmail": clientEmail, "email": clientEmail},
+        "paymentInfo": {"userEmail": clientEmail, "email": clientEmail},
+        "paymentData": {"userEmail": clientEmail},
+        "customerEmail": clientEmail,
+        "customer_email": clientEmail,
         "eventType": eventType ?? "Photography Session",
         "specialRequests": specialRequests ?? "",
         "distanceFromProviderKm": distanceFromProviderKm,
@@ -186,7 +184,7 @@ class BookingController extends ChangeNotifier {
         body: {"status": "accepted"},
         requireAuth: true,
       );
-      
+
       if (response.isSuccess) {
         debugPrint('✅ BookingController: Modified offer accepted successfully');
         return true;

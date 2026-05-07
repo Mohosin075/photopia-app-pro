@@ -31,6 +31,7 @@ import 'package:photopia/controller/provider/statistics_controller.dart';
 import 'package:photopia/controller/location_controller.dart';
 import 'package:photopia/controller/client/notification_controller.dart';
 import 'package:photopia/controller/client/payment_controller.dart';
+import 'package:photopia/controller/client/delete_account_controller.dart';
 import 'package:photopia/controller/provider/subscription_controller.dart';
 import 'package:photopia/controller/language_controller.dart';
 import 'package:photopia/controller/theme_controller.dart';
@@ -98,6 +99,7 @@ class _PhotopiaState extends State<Photopia> {
             ChangeNotifierProvider(create: (_) => LocationController()),
             ChangeNotifierProvider(create: (_) => ReviewController()),
             ChangeNotifierProvider(create: (_) => WalletController()),
+            ChangeNotifierProvider(create: (_) => DeleteAccountController()),
             ChangeNotifierProvider(create: (_) => ChatController()),
             ChangeNotifierProvider(create: (_) => BookingController()),
             ChangeNotifierProvider(create: (_) => StatisticsController()),

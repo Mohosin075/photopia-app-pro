@@ -11,7 +11,7 @@ import 'package:photopia/features/client/widgets/auth_profile_image.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:photopia/core/utils/image_utils.dart';
 import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
 import 'package:photopia/core/widgets/document_viewer_screen.dart';
 import 'package:file_picker/file_picker.dart';
@@ -253,45 +253,39 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
 
   Future<void> _pickPortfolioImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70,
-      maxWidth: 800,
-      maxHeight: 800,
-    );
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
+      final processedFile = await ImageUtils.fixImageOrientation(
+        File(image.path),
+      );
       setState(() {
-        _tempPortfolio.add(File(image.path));
+        _tempPortfolio.add(processedFile);
       });
     }
   }
 
   Future<void> _pickProfilePhoto() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70,
-      maxWidth: 500,
-      maxHeight: 500,
-    );
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
+      final processedFile = await ImageUtils.fixImageOrientation(
+        File(image.path),
+      );
       setState(() {
-        _profilePhoto = File(image.path);
+        _profilePhoto = processedFile;
       });
     }
   }
 
   Future<void> _pickCoverPhoto() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70,
-      maxWidth: 1200,
-      maxHeight: 800,
-    );
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
+      final processedFile = await ImageUtils.fixImageOrientation(
+        File(image.path),
+      );
       setState(() {
-        _coverPhoto = File(image.path);
+        _coverPhoto = processedFile;
       });
     }
   }
@@ -1258,8 +1252,14 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildPerformanceStat(context.l10n.responseTimeLabel, '${controller.responseTime}m'),
-            _buildPerformanceStat(context.l10n.deliveryLabel, '${controller.deliveryRate}%'),
+            _buildPerformanceStat(
+              context.l10n.responseTimeLabel,
+              '${controller.responseTime}m',
+            ),
+            _buildPerformanceStat(
+              context.l10n.deliveryLabel,
+              '${controller.deliveryRate}%',
+            ),
             _buildPerformanceStat(
               context.l10n.satisfactionLabel,
               '${controller.satisfactionRate}%',

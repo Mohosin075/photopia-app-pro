@@ -19,15 +19,39 @@ class CategoryController extends ChangeNotifier {
   List<CategoryModel> _popularCategories = [];
   List<CategoryModel> get popularCategories => _popularCategories;
 
+  String? _selectedTheme;
+  String? get selectedTheme => _selectedTheme;
+
+  final List<String> _themes = [
+    'PHOTOGRAPHY',
+    'VIDEOGRAPHY',
+    'EDITING & POST-PRODUCTION',
+  ];
+  List<String> get themes => _themes;
+
   String? _selectedCategoryId;
   String? get selectedCategoryId => _selectedCategoryId;
 
   String? _selectedSubCategoryId;
   String? get selectedSubCategoryId => _selectedSubCategoryId;
 
-  // Root categories (type == 'category')
-  List<CategoryModel> get rootCategories =>
-      _categories.where((c) => c.type == 'category').toList();
+  // Root categories (type == 'category') filtered by theme if selected
+  List<CategoryModel> get rootCategories {
+    var list = _categories.where((c) => c.type == 'category').toList();
+    if (_selectedTheme != null) {
+      list = list.where((c) => c.theme == _selectedTheme).toList();
+    }
+    return list;
+  }
+
+  // Select a theme and reset category/subcategory
+  void selectTheme(String? theme) {
+    _selectedTheme = theme;
+    _selectedCategoryId = null;
+    _selectedSubCategoryId = null;
+    _subCategories = [];
+    notifyListeners();
+  }
 
   // Select a category and fetch its subcategories
   Future<void> selectCategory(String? categoryId) async {

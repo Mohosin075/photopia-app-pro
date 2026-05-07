@@ -5,6 +5,9 @@ import 'package:photopia/features/client/payment_methods_screen.dart';
 import 'package:photopia/features/client/privacy_policy_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/theme_controller.dart';
+import 'package:photopia/controller/client/delete_account_controller.dart';
+import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopia/core/widgets/custom_snacbar.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const String name = '/settings';
@@ -38,90 +41,189 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String confirmLabel,
     required Color confirmColor,
     required VoidCallback onConfirmed,
+    bool showPasswordField = false,
   }) {
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        contentPadding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 8.h),
-        actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
           ),
-        ),
-        content: Text(
-          body,
-          style: TextStyle(
-            fontSize: 13.sp,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-            height: 1.4,
+          contentPadding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 8.h),
+          actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
-        ),
-        actions: [
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                    side: BorderSide(
-                      color: Theme.of(context).dividerColor.withOpacity(0.1),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  body,
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
+                    height: 1.4,
                   ),
-                  child: Text(
-                    context.l10n.cancelBtn,
-                    style: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.7),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13.sp,
+                ),
+                if (showPasswordField) ...[
+                  SizedBox(height: 20.h),
+                  TextFormField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      hintText: 'Enter your password',
+                      hintStyle: TextStyle(fontSize: 13.sp),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 12.h,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide(
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.1),
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Password is required';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      side: BorderSide(
+                        color: Theme.of(context).dividerColor.withOpacity(0.1),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    child: Text(
+                      context.l10n.cancelBtn,
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.sp,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    onConfirmed();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: confirmColor,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                  child: Text(
-                    confirmLabel,
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Consumer<DeleteAccountController>(
+                    builder: (context, controller, child) {
+                      return ElevatedButton(
+                        onPressed: controller.isLoading
+                            ? null
+                            : () {
+                                if (showPasswordField) {
+                                  if (formKey.currentState!.validate()) {
+                                    onConfirmedWithPassword(
+                                      passwordController.text,
+                                      ctx,
+                                    );
+                                  }
+                                } else {
+                                  Navigator.pop(ctx);
+                                  onConfirmed();
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: confirmColor,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                        child: controller.isLoading
+                            ? SizedBox(
+                                height: 16.h,
+                                width: 16.h,
+                                child: const CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                confirmLabel,
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      );
+                    },
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void onConfirmedWithPassword(
+    String password,
+    BuildContext dialogContext,
+  ) async {
+    final controller = context.read<DeleteAccountController>();
+    final success = await controller.deleteAccount(password);
+
+    if (success) {
+      if (mounted) {
+        Navigator.pop(dialogContext);
+        CustomSnackBar.show(
+          context: context,
+          message: 'Account deleted successfully',
+          isError: false,
+        );
+        // Force logout and navigate to onboarding/sign-in
+        await AuthController.forceLogout();
+      }
+    } else {
+      if (mounted) {
+        CustomSnackBar.show(
+          context: context,
+          message: controller.errorMessage ?? 'Failed to delete account',
+          isError: true,
+        );
+      }
+    }
   }
 
   // ── Build ──────────────────────────────────────────────────────────────────
@@ -264,7 +366,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 body: l.settingsDeleteConfirm,
                 confirmLabel: l.settingsDelete,
                 confirmColor: Colors.red,
-                onConfirmed: () => _showComingSoon(l.settingsDeleteAccount),
+                showPasswordField: true, // Enable password confirmation
+                onConfirmed: () {}, // Handled by onConfirmedWithPassword
               ),
             ),
           ]),

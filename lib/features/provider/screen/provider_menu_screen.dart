@@ -19,6 +19,8 @@ import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 
+import 'package:photopia/features/client/settings_screen.dart';
+
 class ProviderMenuScreen extends StatefulWidget {
   const ProviderMenuScreen({super.key});
 
@@ -116,6 +118,20 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                     SizedBox(height: 12.h.clamp(8, 16)),
 
                     _buildMenuItem(
+                      icon: Icons.settings_outlined,
+                      title: context.l10n.settings,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 12.h.clamp(8, 16)),
+
+                    _buildMenuItem(
                       icon: Icons.help_outline,
                       title: context.l10n.helpAndSupport,
                       onTap: () async {
@@ -175,7 +191,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                       'Photopia Pro v1.0.4',
                       style: TextStyle(
                         fontSize: 12.sp.clamp(11, 13),
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.5),
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -198,7 +216,10 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
@@ -227,7 +248,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                       controller.profileTagline,
                       style: TextStyle(
                         fontSize: 13.sp.clamp(12, 14),
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -286,7 +309,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                 icon: Icons.calendar_today,
                 label: context.l10n.bookingsTitle,
                 value: controller.bookingsCount.toString(),
-                subtitle: context.l10n.bookingsThisWeek(controller.bookingsThisWeek),
+                subtitle: context.l10n.bookingsThisWeek(
+                  controller.bookingsThisWeek,
+                ),
               ),
             ),
             SizedBox(width: 12.w),
@@ -295,7 +320,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                 icon: Icons.euro,
                 label: context.l10n.revenueTitle,
                 value: '€${_formatLargeNumber(controller.revenueAmount)}',
-                subtitle: context.l10n.revenueVsLastMonth(controller.revenueChange),
+                subtitle: context.l10n.revenueVsLastMonth(
+                  controller.revenueChange,
+                ),
               ),
             ),
           ],
@@ -308,7 +335,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                 icon: Icons.trending_up,
                 label: context.l10n.profileViewsTitle,
                 value: _formatLargeNumber(controller.profileViews.toDouble()),
-                subtitle: context.l10n.thisWeek, // API doesn't have weekly views % yet
+                subtitle: context
+                    .l10n
+                    .thisWeek, // API doesn't have weekly views % yet
               ),
             ),
             SizedBox(width: 12.w),
@@ -346,7 +375,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -357,13 +388,19 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 16.sp.clamp(14, 18), color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+              Icon(
+                icon,
+                size: 16.sp.clamp(14, 18),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
               SizedBox(width: 6.w),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12.sp.clamp(11, 13),
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],
@@ -483,7 +520,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.3)
+                  : Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -491,7 +530,11 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 22.sp.clamp(20, 24), color: Theme.of(context).colorScheme.onSurface),
+            Icon(
+              icon,
+              size: 22.sp.clamp(20, 24),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             SizedBox(width: 12.w),
             Expanded(
               child: Text(
@@ -552,7 +595,11 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.camera_alt_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 20.sp),
+            Icon(
+              Icons.camera_alt_outlined,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 20.sp,
+            ),
             SizedBox(width: 12.w),
             Text(
               context.l10n.switchToClient,
@@ -597,7 +644,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                           Container(
                             padding: EdgeInsets.all(14.w),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).dividerColor.withOpacity(0.1),
+                              color: Theme.of(
+                                context,
+                              ).dividerColor.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -622,7 +671,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.6),
                           height: 1.4,
                         ),
                       ),
@@ -634,7 +685,11 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                                 onPressed: () => Navigator.pop(ctx, false),
                                 style: OutlinedButton.styleFrom(
                                   padding: EdgeInsets.symmetric(vertical: 12.h),
-                                  side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+                                  side: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).dividerColor.withOpacity(0.1),
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12.r),
                                   ),
@@ -642,7 +697,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                                 child: Text(
                                   context.l10n.cancel,
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withOpacity(0.7),
                                     fontWeight: FontWeight.w600,
                                     fontSize: 13.sp,
                                   ),
@@ -654,8 +711,12 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                               child: ElevatedButton(
                                 onPressed: () => Navigator.pop(ctx, true),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.error,
-                                  foregroundColor: Theme.of(context).colorScheme.onError,
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.error,
+                                  foregroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.onError,
                                   elevation: 0,
                                   padding: EdgeInsets.symmetric(vertical: 12.h),
                                   shape: RoundedRectangleBorder(
@@ -699,7 +760,9 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(15).r,
-              border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.3)),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.error.withOpacity(0.3),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -714,7 +777,11 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                     ),
                   )
                 else ...[
-                  Icon(Icons.logout, color: Theme.of(context).colorScheme.error, size: 20.sp),
+                  Icon(
+                    Icons.logout,
+                    color: Theme.of(context).colorScheme.error,
+                    size: 20.sp,
+                  ),
                   SizedBox(width: 10.w),
                   Text(
                     context.l10n.logOut,

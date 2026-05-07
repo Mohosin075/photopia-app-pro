@@ -50,6 +50,7 @@ class MyListingController extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
+        debugPrint('❌ MyListing Error: ${response.statusCode} - ${response.errorMessage}');
         _errorMessage = response.errorMessage ?? "Failed to load listings";
         _isProgress = false;
         notifyListeners();

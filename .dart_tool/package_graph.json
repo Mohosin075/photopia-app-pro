@@ -9,6 +9,7 @@
       "dependencies": [
         "cached_network_image",
         "chewie",
+        "country_picker",
         "cupertino_icons",
         "device_info_plus",
         "device_preview",
@@ -72,6 +73,15 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "country_picker",
+      "version": "2.0.27",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "universal_io"
       ]
     },
     {
@@ -541,6 +551,15 @@
         "stream_channel",
         "string_scanner",
         "term_glyph"
+      ]
+    },
+    {
+      "name": "universal_io",
+      "version": "2.3.1",
+      "dependencies": [
+        "collection",
+        "meta",
+        "typed_data"
       ]
     },
     {
@@ -1428,6 +1447,13 @@
       ]
     },
     {
+      "name": "typed_data",
+      "version": "1.4.0",
+      "dependencies": [
+        "collection"
+      ]
+    },
+    {
       "name": "convert",
       "version": "3.1.2",
       "dependencies": [
@@ -1599,13 +1625,6 @@
         "cross_file",
         "file_selector_platform_interface",
         "flutter"
-      ]
-    },
-    {
-      "name": "typed_data",
-      "version": "1.4.0",
-      "dependencies": [
-        "collection"
       ]
     },
     {

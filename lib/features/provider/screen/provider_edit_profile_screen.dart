@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/core/constants/app_typography.dart';
 import 'dart:ui';
 import 'dart:io';
+import 'package:photopia/core/utils/image_utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
@@ -58,10 +59,14 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
             : const CropAspectRatio(ratioX: 16, ratioY: 9),
         uiSettings: [
           AndroidUiSettings(
-            toolbarTitle: isProfile ? 'Crop Profile Picture' : 'Crop Cover Photo',
+            toolbarTitle: isProfile
+                ? 'Crop Profile Picture'
+                : 'Crop Cover Photo',
             toolbarColor: Colors.black,
             toolbarWidgetColor: Colors.white,
-            initAspectRatio: isProfile ? CropAspectRatioPreset.square : CropAspectRatioPreset.ratio16x9,
+            initAspectRatio: isProfile
+                ? CropAspectRatioPreset.square
+                : CropAspectRatioPreset.ratio16x9,
             lockAspectRatio: true,
           ),
           IOSUiSettings(
@@ -72,11 +77,14 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       );
 
       if (croppedFile != null) {
+        final processedFile = await ImageUtils.fixImageOrientation(
+          File(croppedFile.path),
+        );
         setState(() {
           if (isProfile) {
-            _profilePhoto = File(croppedFile.path);
+            _profilePhoto = processedFile;
           } else {
-            _coverPhoto = File(croppedFile.path);
+            _coverPhoto = processedFile;
           }
         });
       }
@@ -88,7 +96,8 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
     final navigator = Navigator.of(context);
 
     // Mandatory profile picture check
-    if ((controller.profileImage == null || controller.profileImage!.isEmpty) && _profilePhoto == null) {
+    if ((controller.profileImage == null || controller.profileImage!.isEmpty) &&
+        _profilePhoto == null) {
       if (mounted) {
         CustomSnackBar.show(
           context: context,
@@ -177,29 +186,39 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                     height: 220.h,
                     fit: BoxFit.cover,
                   )
-                : (controller.coverPhoto != null && controller.coverPhoto!.isNotEmpty)
-                    ? CustomNetworkImage(
-                        width: double.infinity,
-                        height: 220.h,
-                        imageUrl: controller.coverPhoto!,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        height: 220.h,
-                        width: double.infinity,
-                        color: Colors.grey[900],
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.image_not_supported, color: Colors.grey, size: 32.sp),
-                            SizedBox(height: 8.h),
-                            Text(
-                               'No cover photo',
-                               style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 12.sp),
-                             ),
-                          ],
+                : (controller.coverPhoto != null &&
+                      controller.coverPhoto!.isNotEmpty)
+                ? CustomNetworkImage(
+                    width: double.infinity,
+                    height: 220.h,
+                    imageUrl: controller.coverPhoto!,
+                    fit: BoxFit.cover,
+                  )
+                : Container(
+                    height: 220.h,
+                    width: double.infinity,
+                    color: Colors.grey[900],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey,
+                          size: 32.sp,
                         ),
-                      ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          'No cover photo',
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.5),
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
           ),
         ),
         // Camera overlay for banner
@@ -336,10 +355,16 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: Colors.grey.shade200,
-                                    border: Border.all(color: Colors.white, width: 3),
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 3,
+                                    ),
                                   ),
                                   child: ClipOval(
-                                    child: Image.file(_profilePhoto!, fit: BoxFit.cover),
+                                    child: Image.file(
+                                      _profilePhoto!,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 )
                               : AuthProfileImage(
@@ -351,13 +376,13 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                             right: 0,
                             child: Container(
                               padding: EdgeInsets.all(4.w),
-                               decoration: BoxDecoration(
-                                 color: Theme.of(context).colorScheme.surface,
-                                 shape: BoxShape.circle,
-                               ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                shape: BoxShape.circle,
+                              ),
                               child: Icon(
                                 Icons.camera_alt,
-                                 color: Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 size: 12.sp,
                               ),
                             ),
@@ -400,10 +425,14 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                         ),
                         SizedBox(height: 6.h),
                         SubscriptionBadge(
-                          isSubscribed: controller.userProfile?.isSubscribed ?? false,
+                          isSubscribed:
+                              controller.userProfile?.isSubscribed ?? false,
                           fontSize: 10.5.sp,
                           iconSize: 12.sp,
-                          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14.w,
+                            vertical: 5.h,
+                          ),
                         ),
                       ],
                     ),
@@ -439,7 +468,9 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
         borderRadius: BorderRadius.circular(10).r,
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.04),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -448,15 +479,19 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Icon(icon, size: 22.sp, color: Theme.of(context).colorScheme.onSurface),
+          Icon(
+            icon,
+            size: 22.sp,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: TextStyle(
                 fontSize: AppTypography.h1,
-                 fontWeight: FontWeight.bold,
-                 color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -464,8 +499,8 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-               fontSize: AppTypography.bodySmall,
-               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              fontSize: AppTypography.bodySmall,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               height: 1,
               fontWeight: FontWeight.w500,
             ),
@@ -491,16 +526,18 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           SizedBox(height: 12.h),
           Container(
             decoration: BoxDecoration(
-               borderRadius: BorderRadius.circular(12.r),
-               border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              ),
             ),
             child: TextField(
               controller: _aboutController,
               maxLines: 4,
-               style: TextStyle(
-                 fontSize: AppTypography.bodyLarge,
-                 color: Theme.of(context).colorScheme.onSurface,
-               ),
+              style: TextStyle(
+                fontSize: AppTypography.bodyLarge,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(12.w),
@@ -568,8 +605,12 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
               ),
             ),
             GestureDetector(
-               onTap: () => _showAddDialog(title, onAdd),
-               child: Icon(Icons.add, size: 22.sp, color: Theme.of(context).colorScheme.onSurface),
+              onTap: () => _showAddDialog(title, onAdd),
+              child: Icon(
+                Icons.add,
+                size: 22.sp,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -589,9 +630,19 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
     final textController = TextEditingController();
 
     const List<String> _availableLanguages = [
-      'English', 'French', 'Spanish', 'German', 'Arabic',
-      'Bengali', 'Portuguese', 'Italian', 'Dutch',
-      'Chinese', 'Japanese', 'Korean', 'Hindi',
+      'English',
+      'French',
+      'Spanish',
+      'German',
+      'Arabic',
+      'Bengali',
+      'Portuguese',
+      'Italian',
+      'Dutch',
+      'Chinese',
+      'Japanese',
+      'Korean',
+      'Hindi',
     ];
     String? _selectedLanguage;
     final isLanguage = title == 'Languages';
@@ -600,33 +651,47 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-           backgroundColor: Theme.of(context).colorScheme.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
           title: Text('Add $title'),
           content: isLanguage
               ? Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
-                   decoration: BoxDecoration(
-                     color: Theme.of(context).scaffoldBackgroundColor,
-                     borderRadius: BorderRadius.circular(10.r),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
                       value: _selectedLanguage,
                       hint: Text(
-                         'Select a language',
-                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 14.sp),
+                        'Select a language',
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.4),
+                          fontSize: 14.sp,
+                        ),
                       ),
-                       icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
-                       dropdownColor: Theme.of(context).colorScheme.surface,
+                      icon: Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.5),
+                      ),
+                      dropdownColor: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(10.r),
                       items: _availableLanguages
                           .where((lang) => !_tempLanguages.contains(lang))
-                          .map((lang) => DropdownMenuItem(
-                                value: lang,
-                                child: Text(lang),
-                              ))
+                          .map(
+                            (lang) => DropdownMenuItem(
+                              value: lang,
+                              child: Text(lang),
+                            ),
+                          )
                           .toList(),
                       onChanged: (val) {
                         setDialogState(() => _selectedLanguage = val);
@@ -640,24 +705,37 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                 ),
           actions: [
             TextButton(
-               onPressed: () => Navigator.pop(context),
-               child: Text('Cancel', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
             ),
             TextButton(
-               onPressed: () {
-                 if (isLanguage) {
-                   if (_selectedLanguage != null) {
-                     onAdd(_selectedLanguage!);
-                     Navigator.pop(context);
-                   }
-                 } else {
-                   if (textController.text.isNotEmpty) {
-                     onAdd(textController.text);
-                     Navigator.pop(context);
-                   }
-                 }
-               },
-               child: Text('Add', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+              onPressed: () {
+                if (isLanguage) {
+                  if (_selectedLanguage != null) {
+                    onAdd(_selectedLanguage!);
+                    Navigator.pop(context);
+                  }
+                } else {
+                  if (textController.text.isNotEmpty) {
+                    onAdd(textController.text);
+                    Navigator.pop(context);
+                  }
+                }
+              },
+              child: Text(
+                'Add',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -668,10 +746,12 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
   Widget _buildEditChip(String label, VoidCallback onRemove) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-       decoration: BoxDecoration(
+      decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -679,14 +759,18 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           Text(
             label,
             style: TextStyle(
-               fontSize: AppTypography.bodySmall,
-               color: Theme.of(context).colorScheme.onSurface,
+              fontSize: AppTypography.bodySmall,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(width: 6.w),
           GestureDetector(
-             onTap: onRemove,
-             child: Icon(Icons.close, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+            onTap: onRemove,
+            child: Icon(
+              Icons.close,
+              size: 14.sp,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
           ),
         ],
       ),
@@ -716,14 +800,22 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
               },
               child: Row(
                 children: [
-                   Icon(Icons.add, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                  Icon(
+                    Icons.add,
+                    size: 14.sp,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.5),
+                  ),
                   SizedBox(width: 4.w),
                   Text(
                     'Add Photo',
                     style: TextStyle(
-                       fontSize: 12.sp,
-                       fontWeight: FontWeight.bold,
-                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],

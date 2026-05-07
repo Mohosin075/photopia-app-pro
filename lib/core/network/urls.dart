@@ -11,6 +11,7 @@ class Urls {
   static const String verifyOtp = '$_rootUrl/api/v1/auth/verify-account';
   static const String forgotPassword = '$_rootUrl/api/v1/auth/forget-password';
   static const String resetPassword = '$_rootUrl/api/v1/auth/reset-password';
+  static const String deleteAccount = '$_rootUrl/api/v1/auth/delete-account';
   //user profile api
   static const String userProfile = '$_rootUrl/api/v1/users/profile';
   static String getUserById(String id) => '$_rootUrl/api/v1/users/$id';

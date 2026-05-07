@@ -29,7 +29,10 @@ class PaymentController extends ChangeNotifier {
       // 1. Call backend to create PaymentIntent
       final Map<String, dynamic> body = {
         'bookingId': bookingId,
-        'amount': amount.toInt(),
+        'serviceId': serviceId,
+        'amount': (amount * 100).toInt(), // Stripe expects amount in cents
+        'currency': currency.toLowerCase(),
+        'userEmail': userEmail, // Ensure this is at root level
       };
 
       final NetworkResponse response = await NetworkCaller.postRequest(
@@ -227,7 +230,8 @@ class PaymentController extends ChangeNotifier {
   /// Charges a saved payment method directly
   Future<bool> chargeSavedCard({
     required String bookingId,
-    required String paymentMethodId,
+    required double amount,
+    String? userEmail,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -238,8 +242,8 @@ class PaymentController extends ChangeNotifier {
         url: Urls.createCheckoutSession,
         body: {
           'bookingId': bookingId,
-          'paymentMethodId': paymentMethodId,
-          'confirm': true, // Tell backend to charge immediately
+          'amount': amount,
+          'userEmail': userEmail, // Required by your backend validation
         },
       );
 

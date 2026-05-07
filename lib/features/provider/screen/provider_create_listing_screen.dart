@@ -2,9 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photopia/core/utils/image_utils.dart';
 import 'package:photopia/core/constants/app_typography.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:photopia/core/network/urls.dart';
+import 'package:photopia/core/constants/location_data.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:photopia/controller/category_controller.dart';
 import 'package:photopia/controller/provider/service_controller.dart';
 import 'package:photopia/data/models/category_model.dart';
@@ -60,6 +63,9 @@ class _ProviderCreateListingScreenState
 
   final List<String> _locationTypes = ['On-site', 'Remote', 'Studio'];
 
+  String? _selectedCountry;
+  String? _selectedCity;
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +81,8 @@ class _ProviderCreateListingScreenState
       _locationController.text = listing.location?.city ?? '';
       _addressController.text = listing.location?.address ?? '';
       _countryController.text = listing.location?.country ?? '';
+      _selectedCountry = listing.location?.country;
+      _selectedCity = listing.location?.city;
       _durationController.text = listing.duration ?? '';
 
       if (listing.tags != null && listing.tags!.isNotEmpty) {
@@ -174,6 +182,11 @@ class _ProviderCreateListingScreenState
                 orElse: () => rootCategories.first,
               );
 
+              // Set the theme in controller if available from the selected category
+              if (_selectedCategory?.theme != null) {
+                categoryController.selectTheme(_selectedCategory!.theme);
+              }
+
               // Use the new selectCategory logic to fetch subcategories
               categoryController.selectCategory(_selectedCategory?.id).then((
                 _,
@@ -231,13 +244,15 @@ class _ProviderCreateListingScreenState
   }
 
   Future<void> _pickImages() async {
-    final List<XFile> images = await _picker.pickMultiImage(
-      imageQuality: 70, // Compresses image to 70% quality
-      maxWidth: 1080, // Limits width to 1080px for faster uploads
-    );
+    final List<XFile> images = await _picker.pickMultiImage();
     if (images.isNotEmpty) {
+      final List<File> originalFiles = images.map((x) => File(x.path)).toList();
+      final List<File> processedImages = await ImageUtils.fixImagesOrientation(
+        originalFiles,
+      );
+
       setState(() {
-        _selectedImages.addAll(images.map((image) => File(image.path)));
+        _selectedImages.addAll(processedImages);
       });
     }
   }
@@ -269,8 +284,16 @@ class _ProviderCreateListingScreenState
       errors['title'] = "Title is required";
       isValid = false;
     }
+    if (context.read<CategoryController>().selectedTheme == null) {
+      errors['theme'] = "Theme is required";
+      isValid = false;
+    }
     if (_selectedCategory == null) {
       errors['category'] = "Category is required";
+      isValid = false;
+    }
+    if (_selectedSubCategory == null) {
+      errors['subCategory'] = "Sub-Category is required";
       isValid = false;
     }
     if (_selectedServiceTypes.isEmpty) {
@@ -318,8 +341,10 @@ class _ProviderCreateListingScreenState
         final pkg = _packageControllers[i];
         if (pkg.name.text.trim().isEmpty ||
             pkg.price.text.trim().isEmpty ||
-            pkg.duration.text.trim().isEmpty) {
-          errors['package_$i'] = "Package requires name, price, and duration";
+            pkg.duration.text.trim().isEmpty ||
+            pkg.description.text.trim().isEmpty) {
+          errors['package_$i'] =
+              "Package requires name, price, duration, and description";
           isValid = false;
         }
       }
@@ -490,7 +515,10 @@ class _ProviderCreateListingScreenState
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -519,7 +547,7 @@ class _ProviderCreateListingScreenState
                   ),
                   children: [
                     _buildSectionTitle('Basic Information'),
-                    _buildLabel('Listing Title'),
+                    _buildLabel('Listing Title', isRequired: true),
                     _buildTextField(
                       _titleController,
                       'e.g. Professional Portrait Shoot',
@@ -530,7 +558,10 @@ class _ProviderCreateListingScreenState
                               .fieldErrors['title'],
                     ),
                     SizedBox(height: 15.h),
-                    _buildLabel('Category'),
+                    _buildLabel('Theme', isRequired: true),
+                    _buildThemeDropdown(errorText: _localFieldErrors['theme']),
+                    SizedBox(height: 15.h),
+                    _buildLabel('Category', isRequired: true),
                     _buildCategoryDropdown(
                       errorText:
                           _localFieldErrors['category'] ??
@@ -539,7 +570,7 @@ class _ProviderCreateListingScreenState
                               .fieldErrors['category'],
                     ),
                     SizedBox(height: 15.h),
-                    _buildLabel('Sub-Category'),
+                    _buildLabel('Sub-Category', isRequired: true),
                     _buildSubCategoryDropdown(
                       errorText:
                           _localFieldErrors['subCategory'] ??
@@ -548,7 +579,7 @@ class _ProviderCreateListingScreenState
                               .fieldErrors['subCategory'],
                     ),
                     SizedBox(height: 15.h),
-                    _buildLabel('Service Type'),
+                    _buildLabel('Service Type', isRequired: true),
                     _buildServiceTypeDropdown(
                       errorText:
                           _localFieldErrors['serviceType'] ??
@@ -557,7 +588,7 @@ class _ProviderCreateListingScreenState
                               .fieldErrors['serviceType'],
                     ),
                     SizedBox(height: 15.h),
-                    _buildLabel('Description'),
+                    _buildLabel('Description', isRequired: true),
                     _buildTextField(
                       _descriptionController,
                       'Tell clients about your service (min 10 characters)...',
@@ -580,13 +611,11 @@ class _ProviderCreateListingScreenState
 
                     SizedBox(height: 30.h),
                     _buildSectionTitle('Location & Radius'),
-                    _buildLabel('Location Type'),
+                    _buildLabel('Location Type', isRequired: true),
                     _buildLocationTypeDropdown(),
                     SizedBox(height: 15.h),
-                    _buildLabel('Country'),
-                    _buildTextField(
-                      _countryController,
-                      'e.g. Germany',
+                    _buildLabel('Country', isRequired: true),
+                    _buildCountryDropdown(
                       errorText:
                           _localFieldErrors['country'] ??
                           context
@@ -594,10 +623,8 @@ class _ProviderCreateListingScreenState
                               .fieldErrors['location.country'],
                     ),
                     SizedBox(height: 15.h),
-                    _buildLabel('City'),
-                    _buildTextField(
-                      _locationController,
-                      'e.g. Berlin',
+                    _buildLabel('City', isRequired: true),
+                    _buildCityDropdown(
                       errorText:
                           _localFieldErrors['city'] ??
                           context
@@ -623,7 +650,7 @@ class _ProviderCreateListingScreenState
                     SizedBox(height: 30.h),
                     _buildSectionTitle('More Details'),
                     if (_selectedPricingModel != 'By Service') ...[
-                      _buildLabel('Duration (Hours)'),
+                      _buildLabel('Duration (Hours)', isRequired: true),
                       _buildDurationDropdown(
                         _durationController,
                         hint: 'Select duration',
@@ -674,15 +701,24 @@ class _ProviderCreateListingScreenState
     );
   }
 
-  Widget _buildLabel(String label) {
+  Widget _buildLabel(String label, {bool isRequired = false}) {
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: AppTypography.bodySmall,
-          fontWeight: FontWeight.w500,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+      child: RichText(
+        text: TextSpan(
+          text: label,
+          style: TextStyle(
+            fontSize: AppTypography.bodySmall,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          ),
+          children: [
+            if (isRequired)
+              const TextSpan(
+                text: ' *',
+                style: TextStyle(color: Colors.red),
+              ),
+          ],
         ),
       ),
     );
@@ -699,7 +735,9 @@ class _ProviderCreateListingScreenState
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+          color: errorText != null
+              ? Colors.red
+              : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
         ),
       ),
       child: Column(
@@ -737,10 +775,7 @@ class _ProviderCreateListingScreenState
     );
   }
 
-  Widget _buildCategoryDropdown({String? errorText}) {
-    final categoryController = context.watch<CategoryController>();
-    final rootCategories = categoryController.rootCategories;
-
+  Widget _buildThemeDropdown({String? errorText}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -750,7 +785,86 @@ class _ProviderCreateListingScreenState
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              color: errorText != null
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: context.watch<CategoryController>().selectedTheme,
+              dropdownColor: Theme.of(context).colorScheme.surface,
+              isExpanded: true,
+              hint: Text(
+                'Select Theme',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                ),
+              ),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              ),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedCategory = null;
+                  _selectedSubCategory = null;
+                  if (newValue != null) _localFieldErrors.remove('theme');
+                });
+                context.read<CategoryController>().selectTheme(newValue);
+              },
+              items: context
+                  .read<CategoryController>()
+                  .themes
+                  .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 13.sp,
+                        ),
+                      ),
+                    );
+                  })
+                  .toList(),
+            ),
+          ),
+        ),
+        if (errorText != null)
+          Padding(
+            padding: EdgeInsets.only(left: 4.w, top: 4.h),
+            child: Text(
+              errorText,
+              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryDropdown({String? errorText}) {
+    final categoryController = context.watch<CategoryController>();
+    final rootCategories = categoryController.rootCategories;
+    final selectedTheme = categoryController.selectedTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: selectedTheme == null
+                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05)
+                : Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: errorText != null
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             ),
           ),
           child: DropdownButtonHideUnderline(
@@ -758,23 +872,54 @@ class _ProviderCreateListingScreenState
               value: _selectedCategory,
               dropdownColor: Theme.of(context).colorScheme.surface,
               isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
-              onChanged: (CategoryModel? newValue) {
-                setState(() {
-                  _selectedCategory = newValue;
-                  _selectedSubCategory = null;
-                  if (newValue != null) _localFieldErrors.remove('category');
-                });
-                if (newValue != null) {
-                  categoryController.selectCategory(newValue.id);
-                }
-              },
+              disabledHint: Text(
+                'Select a theme first',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                  fontSize: 13.sp,
+                ),
+              ),
+              hint: Text(
+                'Select Category',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                  fontSize: 13.sp,
+                ),
+              ),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              ),
+              onChanged: selectedTheme == null
+                  ? null
+                  : (CategoryModel? newValue) {
+                      setState(() {
+                        _selectedCategory = newValue;
+                        _selectedSubCategory = null;
+                        if (newValue != null) {
+                          _localFieldErrors.remove('category');
+                        }
+                      });
+                      if (newValue != null) {
+                        categoryController.selectCategory(newValue.id);
+                      }
+                    },
               items: rootCategories.map<DropdownMenuItem<CategoryModel>>((
                 CategoryModel value,
               ) {
                 return DropdownMenuItem<CategoryModel>(
                   value: value,
-                  child: Text(value.name, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                  child: Text(
+                    value.name,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 13.sp,
+                    ),
+                  ),
                 );
               }).toList(),
             ),
@@ -802,10 +947,14 @@ class _ProviderCreateListingScreenState
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           decoration: BoxDecoration(
-            color: _selectedCategory == null ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05) : Theme.of(context).colorScheme.surface,
+            color: _selectedCategory == null
+                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05)
+                : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              color: errorText != null
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             ),
           ),
           child: DropdownButtonHideUnderline(
@@ -813,9 +962,28 @@ class _ProviderCreateListingScreenState
               value: _selectedSubCategory,
               dropdownColor: Theme.of(context).colorScheme.surface,
               isExpanded: true,
-              disabledHint: Text('Select a category first', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
-              hint: Text('Select Sub-Category (Optional)', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
-              icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+              disabledHint: Text(
+                'Select a category first',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                  fontSize: 13.sp,
+                ),
+              ),
+              hint: Text(
+                'Select Sub-Category (Optional)',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                  fontSize: 13.sp,
+                ),
+              ),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              ),
               onChanged: _selectedCategory == null
                   ? null
                   : (CategoryModel? newValue) {
@@ -831,7 +999,182 @@ class _ProviderCreateListingScreenState
               ) {
                 return DropdownMenuItem<CategoryModel>(
                   value: value,
-                  child: Text(value.name, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                  child: Text(
+                    value.name,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 13.sp,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+        if (errorText != null)
+          Padding(
+            padding: EdgeInsets.only(left: 4.w, top: 4.h),
+            child: Text(
+              errorText,
+              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildCountryDropdown({String? errorText}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () {
+            showCountryPicker(
+              context: context,
+              showPhoneCode: false,
+              onSelect: (Country country) {
+                setState(() {
+                  _selectedCountry = country.name;
+                  _selectedCity = null;
+                  _countryController.text = country.name;
+                  _locationController.text = '';
+                  _localFieldErrors.remove('country');
+                });
+              },
+              countryListTheme: CountryListThemeData(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.r),
+                  topRight: Radius.circular(20.r),
+                ),
+                inputDecoration: InputDecoration(
+                  hintText: 'Search country',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                    borderSide: BorderSide(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.1),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(
+                color: errorText != null
+                    ? Colors.red
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _selectedCountry ?? 'Select Country',
+                  style: TextStyle(
+                    color: _selectedCountry == null
+                        ? Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.4)
+                        : Theme.of(context).colorScheme.onSurface,
+                    fontSize: 13.sp,
+                  ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (errorText != null)
+          Padding(
+            padding: EdgeInsets.only(left: 4.w, top: 4.h),
+            child: Text(
+              errorText,
+              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildCityDropdown({String? errorText}) {
+    final cities = _selectedCountry != null
+        ? LocationData.getCities(_selectedCountry!)
+        : <String>[];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: _selectedCountry == null
+                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05)
+                : Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: errorText != null
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _selectedCity,
+              dropdownColor: Theme.of(context).colorScheme.surface,
+              isExpanded: true,
+              disabledHint: Text(
+                'Select country first',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                  fontSize: 13.sp,
+                ),
+              ),
+              hint: Text(
+                'Select City',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                  fontSize: 13.sp,
+                ),
+              ),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              ),
+              onChanged: _selectedCountry == null
+                  ? null
+                  : (String? newValue) {
+                      setState(() {
+                        _selectedCity = newValue;
+                        _locationController.text = newValue ?? '';
+                        _localFieldErrors.remove('city');
+                      });
+                    },
+              items: cities.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 13.sp,
+                    ),
+                  ),
                 );
               }).toList(),
             ),
@@ -875,10 +1218,20 @@ class _ProviderCreateListingScreenState
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              hint: Text('Select Service Types', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4))),
+              hint: Text(
+                'Select Service Types',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                ),
+              ),
               dropdownColor: Theme.of(context).colorScheme.surface,
               isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              ),
               onChanged: (String? newValue) {
                 if (newValue != null &&
                     !_selectedServiceTypes.contains(newValue)) {
@@ -901,7 +1254,9 @@ class _ProviderCreateListingScreenState
                               : '',
                         )
                         .join(' '),
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                 );
               }).toList(),
@@ -932,7 +1287,10 @@ class _ProviderCreateListingScreenState
                             : '',
                       )
                       .join(' '),
-                  style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
                 deleteIcon: Icon(Icons.close, size: 16.sp),
                 onDeleted: () {
@@ -944,7 +1302,9 @@ class _ProviderCreateListingScreenState
                     }
                   });
                 },
-                backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacity(0.05),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r),
                   side: BorderSide.none,
@@ -968,21 +1328,34 @@ class _ProviderCreateListingScreenState
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedLocationType,
           dropdownColor: Theme.of(context).colorScheme.surface,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+          ),
           onChanged: (String? newValue) {
             setState(() {
               _selectedLocationType = newValue!;
             });
           },
           items: _locationTypes.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(value: value, child: Text(value, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)));
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            );
           }).toList(),
         ),
       ),
@@ -1008,17 +1381,27 @@ class _ProviderCreateListingScreenState
               margin: EdgeInsets.only(right: model == models.last ? 0 : 8.w),
               padding: EdgeInsets.symmetric(vertical: 12.h),
               decoration: BoxDecoration(
-                color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.surface,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(
-                  color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.1),
                 ),
               ),
               child: Text(
                 model,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.surface
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: AppTypography.bodyMedium,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -1092,9 +1475,15 @@ class _ProviderCreateListingScreenState
               margin: EdgeInsets.only(bottom: 20.h),
               padding: EdgeInsets.all(15.w),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacity(0.02),
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.1),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1104,7 +1493,10 @@ class _ProviderCreateListingScreenState
                     children: [
                       Text(
                         'Package ${index + 1}',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                       if (_packageControllers.length > 1)
                         GestureDetector(
@@ -1122,6 +1514,7 @@ class _ProviderCreateListingScreenState
                   _buildPackageField(
                     controllers.name,
                     'Package Name (e.g. Basic)',
+                    isRequired: true,
                     errorText: _localFieldErrors['package_$index'],
                   ),
                   SizedBox(height: 10.h),
@@ -1132,6 +1525,7 @@ class _ProviderCreateListingScreenState
                           controllers.price,
                           'Price (EUR)',
                           isNumber: true,
+                          isRequired: true,
                         ),
                       ),
                       SizedBox(width: 10.w),
@@ -1139,6 +1533,7 @@ class _ProviderCreateListingScreenState
                         child: _buildDurationDropdown(
                           controllers.duration,
                           hint: 'Duration',
+                          isRequired: true,
                         ),
                       ),
                     ],
@@ -1148,6 +1543,7 @@ class _ProviderCreateListingScreenState
                     controllers.description,
                     'Description (Short)',
                     maxLines: 2,
+                    isRequired: true,
                   ),
                   SizedBox(height: 10.h),
                   _buildPackageField(
@@ -1164,7 +1560,9 @@ class _ProviderCreateListingScreenState
                 setState(() => _packageControllers.add(PackageControllers())),
             icon: const Icon(Icons.add),
             label: const Text('Add Another Package'),
-            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       );
@@ -1177,16 +1575,22 @@ class _ProviderCreateListingScreenState
     bool isNumber = false,
     int maxLines = 1,
     String? errorText,
+    bool isRequired = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (isRequired) ...[
+          _buildLabel(hint.split('(').first.trim(), isRequired: true),
+        ],
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(8.r),
             border: Border.all(
-              color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              color: errorText != null
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             ),
           ),
           child: TextField(
@@ -1226,13 +1630,9 @@ class _ProviderCreateListingScreenState
     TextEditingController controller, {
     required String hint,
     String? errorText,
+    bool isRequired = false,
   }) {
-    final options = [
-      '1',
-      '2',
-      '3',
-      '4',
-    ];
+    final options = ['1', '2', '3', '4'];
 
     // Safety check: ensure selected value is in options or handles null
     String? effectiveValue = options.contains(controller.text)
@@ -1243,7 +1643,9 @@ class _ProviderCreateListingScreenState
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        ),
       ),
       padding: EdgeInsets.symmetric(horizontal: 12.w),
       height: 48.h, // Match standard text field height roughly
@@ -1259,7 +1661,10 @@ class _ProviderCreateListingScreenState
           ),
           value: effectiveValue,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+          ),
           onChanged: (String? newValue) {
             setState(() {
               if (newValue != null) {
@@ -1270,7 +1675,12 @@ class _ProviderCreateListingScreenState
           items: options.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text('$value Hour${value == '1' ? '' : 's'}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+              child: Text(
+                '$value Hour${value == '1' ? '' : 's'}',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
             );
           }).toList(),
         ),
@@ -1280,6 +1690,7 @@ class _ProviderCreateListingScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (isRequired) ...[_buildLabel(hint, isRequired: true)],
         dropdown,
         if (errorText != null)
           Padding(
@@ -1297,7 +1708,9 @@ class _ProviderCreateListingScreenState
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
         activeTrackColor: Theme.of(context).colorScheme.onSurface,
-        inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        inactiveTrackColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withOpacity(0.1),
         thumbColor: Theme.of(context).colorScheme.onSurface,
         overlayColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
         trackHeight: 4.h,
@@ -1324,7 +1737,9 @@ class _ProviderCreateListingScreenState
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: _acceptOutsideRadius ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                color: _acceptOutsideRadius
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               ),
             ),
             child: _acceptOutsideRadius
@@ -1350,7 +1765,9 @@ class _ProviderCreateListingScreenState
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
                     fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.87),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.87),
                   ),
                 ),
                 SizedBox(height: 4.h),
@@ -1358,7 +1775,9 @@ class _ProviderCreateListingScreenState
                   'Additional travel fees may apply for bookings outside your service radius',
                   style: TextStyle(
                     fontSize: AppTypography.bodySmall,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.4),
                   ),
                 ),
               ],
@@ -1377,14 +1796,18 @@ class _ProviderCreateListingScreenState
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              ),
             ),
             child: TextField(
               controller: _equipmentController,
               decoration: InputDecoration(
                 hintText: 'Canon EOS R5',
                 hintStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
                   fontSize: AppTypography.bodyLarge,
                 ),
                 border: InputBorder.none,
@@ -1447,13 +1870,21 @@ class _ProviderCreateListingScreenState
                   item,
                   style: TextStyle(
                     fontSize: AppTypography.bodySmall,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.87),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.87),
                   ),
                 ),
                 SizedBox(width: 4.w),
                 GestureDetector(
                   onTap: () => setState(() => _equipment.remove(item)),
-                  child: Icon(Icons.close, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                  child: Icon(
+                    Icons.close,
+                    size: 14.sp,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
               ],
             ),
@@ -1467,6 +1898,7 @@ class _ProviderCreateListingScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildLabel('Upload Photos', isRequired: true),
         GestureDetector(
           onTap: _pickImages,
           child: Container(
@@ -1476,7 +1908,9 @@ class _ProviderCreateListingScreenState
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(15.r),
               border: Border.all(
-                color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                color: errorText != null
+                    ? Colors.red
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 style: BorderStyle.solid,
               ),
             ),
@@ -1485,14 +1919,22 @@ class _ProviderCreateListingScreenState
                 Icon(
                   Icons.cloud_upload_outlined,
                   size: 40.sp,
-                  color: errorText != null ? Colors.red[300] : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  color: errorText != null
+                      ? Colors.red[300]
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.4),
                 ),
                 SizedBox(height: 12.h),
                 Text(
                   'Click to upload photos',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
-                    color: errorText != null ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.87),
+                    color: errorText != null
+                        ? Colors.red
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.87),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -1503,7 +1945,9 @@ class _ProviderCreateListingScreenState
                     fontSize: AppTypography.bodySmall,
                     color: errorText != null
                         ? Colors.red[300]
-                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.4),
                   ),
                 ),
               ],
@@ -1587,7 +2031,11 @@ class _ProviderCreateListingScreenState
                       color: Colors.black54,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.close, color: Theme.of(context).colorScheme.surface, size: 16.sp),
+                    child: Icon(
+                      Icons.close,
+                      color: Theme.of(context).colorScheme.surface,
+                      size: 16.sp,
+                    ),
                   ),
                 ),
               ),
@@ -1609,7 +2057,11 @@ class _ProviderCreateListingScreenState
                 onPressed: inProgress ? null : () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
                   minimumSize: Size(0, 50.h),
-                  side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+                  side: BorderSide(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.1),
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
@@ -1630,8 +2082,12 @@ class _ProviderCreateListingScreenState
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isReady
                       ? Theme.of(context).colorScheme.onSurface
-                      : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
-                  disabledBackgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.2),
+                  disabledBackgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.1),
                   minimumSize: Size(0, 50.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),

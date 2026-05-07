@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:image/image.dart' as img;
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+import 'package:photopia/core/utils/image_utils.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:photopia/controller/client/user_profile_controller.dart';
 import 'package:photopia/core/constants/app_typography.dart';
@@ -83,8 +80,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (croppedFile != null) {
+        final processedFile = await ImageUtils.fixImageOrientation(
+          File(croppedFile.path),
+        );
         setState(() {
-          _selectedImage = File(croppedFile.path);
+          _selectedImage = processedFile;
         });
       }
     }
@@ -134,7 +134,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -163,9 +166,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 height: 120.w,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface.withOpacity(0.05),
                                   border: Border.all(
-                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.5),
                                     width: 2,
                                   ),
                                 ),
@@ -258,7 +265,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                       child: controller.isUpdateInProgress
-                          ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary)
+                          ? CircularProgressIndicator(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            )
                           : Text(
                               'Save Changes',
                               style: TextStyle(
@@ -296,14 +305,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           fontSize: 14.sp,
           fontWeight: FontWeight.w500,
         ),
-        prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+        prefixIcon: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15).r,
-          borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+          borderSide: BorderSide(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15).r,
-          borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+          borderSide: BorderSide(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15).r,
