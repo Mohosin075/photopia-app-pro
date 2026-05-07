@@ -171,15 +171,39 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         ],
       ),
       floatingActionButton: _selectedViewIndex == 1 && _selectedDate != null
-          ? FloatingActionButton.extended(
-              onPressed: () => _showDateActionSheet(context),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              icon: Icon(Icons.block, color: Theme.of(context).colorScheme.onPrimary),
-              label: Text(
-                DateFormat('MMM d').format(_selectedDate!),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.w600,
+          ? GestureDetector(
+              onTap: () => _showDateActionSheet(context),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  borderRadius: BorderRadius.circular(50.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.edit_calendar_outlined,
+                      color: Theme.of(context).colorScheme.surface,
+                      size: 18.sp,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      DateFormat('MMM d').format(_selectedDate!),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.surface,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             )
