@@ -22,116 +22,124 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
+  bool _isFirebaseAvailable = false;
 
   Future<void> init() async {
     if (_isInitialized) return;
     debugPrint("🔔 NotificationService: Initializing...");
 
-    // 1. Request Permission
-    final NotificationSettings settings = await _fcm.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
-    );
-    debugPrint(
-      "🔔 NotificationService: Permission Status: ${settings.authorizationStatus}",
-    );
-
-    // 2. Initialize Local Notifications
-    debugPrint("🔔 NotificationService: Setting up Local Notifications...");
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const DarwinInitializationSettings iosSettings =
-        DarwinInitializationSettings();
-    const InitializationSettings initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
-
-    // Create the high importance channel for Android 8.0+
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
-      description:
-          'This channel is used for important notifications.', // description
-      importance: Importance.max,
-    );
-
-    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-        _localNotifications
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
-
-    if (androidImplementation != null) {
-      await androidImplementation.createNotificationChannel(channel);
-      debugPrint(
-        "🔔 NotificationService: Android Notification Channel Created: ${channel.id}",
-      );
-    }
-
-    await _localNotifications.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        debugPrint(
-          "🔔 NotificationService: Notification Tap Payload: ${response.payload}",
-        );
-        if (response.payload != null) {
-          _handleNavigation(response.payload!);
-        }
-      },
-    );
-
-    // 3. Handle Foreground Messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint("🔔 NotificationService: Foreground message received!");
-      debugPrint(
-        "🔔 NotificationService: Title: ${message.notification?.title}",
-      );
-      debugPrint("🔔 NotificationService: Body: ${message.notification?.body}");
-      debugPrint("🔔 NotificationService: Data: ${message.data}");
-      _showLocalNotification(message);
-    });
-
-    // 4. Handle Notification Clicks (Background State)
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint(
-        "🔔 NotificationService: Notification clicked while in background",
-      );
-      if (message.data['actionUrl'] != null) {
-        _handleNavigation(message.data['actionUrl']);
-      }
-    });
-
-    // 5. Handle Initial Message (Terminated State)
     try {
-      RemoteMessage? initialMessage = await _fcm.getInitialMessage();
-      if (initialMessage != null) {
+      // 1. Request Permission
+      final NotificationSettings settings = await _fcm.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
+      debugPrint(
+        "🔔 NotificationService: Permission Status: ${settings.authorizationStatus}",
+      );
+
+      // 2. Initialize Local Notifications
+      debugPrint("🔔 NotificationService: Setting up Local Notifications...");
+      const AndroidInitializationSettings androidSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const DarwinInitializationSettings iosSettings =
+          DarwinInitializationSettings();
+      const InitializationSettings initSettings = InitializationSettings(
+        android: androidSettings,
+        iOS: iosSettings,
+      );
+
+      // Create the high importance channel for Android 8.0+
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'high_importance_channel', // id
+        'High Importance Notifications', // title
+        description:
+            'This channel is used for important notifications.', // description
+        importance: Importance.max,
+      );
+
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _localNotifications
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
+
+      if (androidImplementation != null) {
+        await androidImplementation.createNotificationChannel(channel);
         debugPrint(
-          "🔔 NotificationService: App launched from terminated state via notification",
+          "🔔 NotificationService: Android Notification Channel Created: ${channel.id}",
         );
-        if (initialMessage.data['actionUrl'] != null) {
-          _handleNavigation(initialMessage.data['actionUrl']);
+      }
+
+      await _localNotifications.initialize(
+        initSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+          debugPrint(
+            "🔔 NotificationService: Notification Tap Payload: ${response.payload}",
+          );
+          if (response.payload != null) {
+            _handleNavigation(response.payload!);
+          }
+        },
+      );
+
+      // 3. Handle Foreground Messages
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        debugPrint("🔔 NotificationService: Foreground message received!");
+        debugPrint(
+          "🔔 NotificationService: Title: ${message.notification?.title}",
+        );
+        debugPrint("🔔 NotificationService: Body: ${message.notification?.body}");
+        debugPrint("🔔 NotificationService: Data: ${message.data}");
+        _showLocalNotification(message);
+      });
+
+      // 4. Handle Notification Clicks (Background State)
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        debugPrint(
+          "🔔 NotificationService: Notification clicked while in background",
+        );
+        if (message.data['actionUrl'] != null) {
+          _handleNavigation(message.data['actionUrl']);
         }
+      });
+
+      // 5. Handle Initial Message (Terminated State)
+      try {
+        RemoteMessage? initialMessage = await _fcm.getInitialMessage();
+        if (initialMessage != null) {
+          debugPrint(
+            "🔔 NotificationService: App launched from terminated state via notification",
+          );
+          if (initialMessage.data['actionUrl'] != null) {
+            _handleNavigation(initialMessage.data['actionUrl']);
+          }
+        }
+      } catch (e) {
+        debugPrint("🔔 NotificationService: Error getting initial message: $e");
       }
+
+      // 6. Token Management
+      _fcm.onTokenRefresh.listen((token) {
+        debugPrint("🔔 NotificationService: FCM Token Refreshed: $token");
+        if (AuthController.isLoggedIn) {
+          _sendTokenToBackend(token);
+        }
+      });
+
+      _isInitialized = true;
+      _isFirebaseAvailable = true;
+      debugPrint("🔔 NotificationService: Initialization Complete ✅");
+
+      // Sync token if logged in
+      await getTokenAndSendToBackend();
     } catch (e) {
-      debugPrint("🔔 NotificationService: Error getting initial message: $e");
+      _isInitialized = true;
+      _isFirebaseAvailable = false;
+      debugPrint("🔔 NotificationService: Initialization failed: $e");
     }
-
-    // 6. Token Management
-    _fcm.onTokenRefresh.listen((token) {
-      debugPrint("🔔 NotificationService: FCM Token Refreshed: $token");
-      if (AuthController.isLoggedIn) {
-        _sendTokenToBackend(token);
-      }
-    });
-
-    _isInitialized = true;
-    debugPrint("🔔 NotificationService: Initialization Complete ✅");
-
-    // Sync token if logged in
-    await getTokenAndSendToBackend();
   }
 
   Future<void> getTokenAndSendToBackend() async {
@@ -139,6 +147,13 @@ class NotificationService {
     if (!AuthController.isLoggedIn) {
       debugPrint(
         "🔔 NotificationService: Token sync skipped: User is NOT logged in.",
+      );
+      return;
+    }
+
+    if (!_isFirebaseAvailable) {
+      debugPrint(
+        "🔔 NotificationService: Token sync skipped: Firebase not initialized.",
       );
       return;
     }

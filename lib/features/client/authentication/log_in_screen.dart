@@ -176,26 +176,10 @@ class _LogInScreenState extends State<LogInScreen> {
                         debugPrint('🏁 Login result: $result');
                         if (result) {
                           if (mounted) {
-                            debugPrint('✅ Login successful, traversing to active role app...');
+                            debugPrint('✅ Login successful, preparing navigation...');
                             
-                            // Fetch profile explicitly if AuthController.activeRole isn't fully reliable via login payload (or it's cached)
-                            String? resolvedRole = AuthController.activeRole;
-                            try {
-                               final profileResp = await NetworkCaller.getRequest(url: Urls.userProfile);
-                               if (profileResp.isSuccess && profileResp.body != null) {
-                                  resolvedRole = profileResp.body!['data']?['activeRole']?.toString() 
-                                              ?? profileResp.body!['data']?['role']?.toString() 
-                                              ?? resolvedRole;
-                                  if (resolvedRole != null) {
-                                    await AuthController.saveUserRole(resolvedRole);
-                                  }
-                               }
-                            } catch (_) {}
-
-                            if (!mounted || !AuthController.isLoggedIn) return;
-
-                            // Route explicitly based on the dynamic activeRole returned directly by the server API
-                            final activeRole = resolvedRole ?? (widget.userRole == 'provider' ? 'professional' : 'user');
+                            // Determine active role immediately from AuthController
+                            final activeRole = AuthController.activeRole ?? (widget.userRole == 'provider' ? 'professional' : 'user');
                             
                             CustomSnackBar.show(
                               context: context,
@@ -203,9 +187,7 @@ class _LogInScreenState extends State<LogInScreen> {
                               isError: false,
                             );
 
-                            // Sync FCM token after login
-                            NotificationService.instance.getTokenAndSendToBackend();
-
+                            // Navigate IMMEDIATELY
                             if (activeRole == 'professional') {
                               Navigator.pushNamedAndRemoveUntil(
                                 context,
@@ -219,6 +201,26 @@ class _LogInScreenState extends State<LogInScreen> {
                                 (route) => false,
                               );
                             }
+
+                            // Perform background tasks after navigation start
+                            Future.microtask(() async {
+                              // 1. Sync FCM token
+                              NotificationService.instance.getTokenAndSendToBackend();
+
+                              // 2. Refresh profile in background to ensure role is up to date for next app launch
+                              try {
+                                final profileResp = await NetworkCaller.getRequest(url: Urls.userProfile);
+                                if (profileResp.isSuccess && profileResp.body != null) {
+                                  final resolvedRole = profileResp.body!['data']?['activeRole']?.toString() 
+                                              ?? profileResp.body!['data']?['role']?.toString();
+                                  if (resolvedRole != null) {
+                                    await AuthController.saveUserRole(resolvedRole);
+                                  }
+                                }
+                              } catch (e) {
+                                debugPrint('⚠️ Background profile refresh failed: $e');
+                              }
+                            });
                           }
                         } else {
                           if (mounted) {
