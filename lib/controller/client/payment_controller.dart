@@ -32,7 +32,10 @@ class PaymentController extends ChangeNotifier {
         'serviceId': serviceId,
         'amount': (amount * 100).toInt(), // Stripe expects amount in cents
         'currency': currency.toLowerCase(),
-        'userEmail': userEmail, // Ensure this is at root level
+        'userEmail': userEmail,
+        'email': userEmail,
+        'customerEmail': userEmail,
+        'user_email': userEmail,
       };
 
       final NetworkResponse response = await NetworkCaller.postRequest(
@@ -231,6 +234,7 @@ class PaymentController extends ChangeNotifier {
   Future<bool> chargeSavedCard({
     required String bookingId,
     required double amount,
+    required String paymentMethodId,
     String? userEmail,
   }) async {
     _isLoading = true;
@@ -239,16 +243,26 @@ class PaymentController extends ChangeNotifier {
 
     try {
       final response = await NetworkCaller.postRequest(
-        url: Urls.createCheckoutSession,
+        url: Urls.createPaymentIntent,
         body: {
           'bookingId': bookingId,
-          'amount': amount,
-          'userEmail': userEmail, // Required by your backend validation
+          'amount': (amount * 100).toInt(), // Cents
+          'paymentMethodId': paymentMethodId,
+          'userEmail': userEmail,
+          'email': userEmail,
+          'customerEmail': userEmail,
+          'user_email': userEmail,
         },
       );
 
       if (response.isSuccess) {
-        return true;
+        final status = response.body?['data']?['status'];
+        if (status == 'succeeded') {
+          return true;
+        } else {
+          _errorMessage = "Payment status: $status";
+          return false;
+        }
       } else {
         _errorMessage = response.errorMessage ?? "Failed to charge saved card";
         return false;

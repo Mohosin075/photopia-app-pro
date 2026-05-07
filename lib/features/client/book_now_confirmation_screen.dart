@@ -1673,6 +1673,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           specialRequests: _specialRequests,
           notes: _specialRequests,
           distanceFromProviderKm: _distanceFromProvider,
+          paymentMethodId: _selectedPaymentMethod?.id, // Passing paymentMethodId here
         );
         if (bookingId != null) {
           _createdBookingId = bookingId;
@@ -1685,6 +1686,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         paymentSuccess = await paymentCtrl.chargeSavedCard(
           bookingId: bookingId,
           amount: _depositAmount, // Sending the 50% deposit amount
+          paymentMethodId: _selectedPaymentMethod!.id,
           userEmail: userProfile.email,
         );
       }
