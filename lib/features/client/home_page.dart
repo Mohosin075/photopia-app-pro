@@ -13,6 +13,8 @@ import 'package:photopia/features/client/widgets/horizontal_project_card.dart';
 import 'package:photopia/features/client/category_details_screen.dart';
 import 'package:photopia/features/client/service_details_screen.dart';
 import 'package:photopia/features/client/search_result_screen.dart';
+import 'package:photopia/features/client/home_see_all_screen.dart';
+import 'package:photopia/features/client/home_see_all_pros_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
 import 'package:provider/provider.dart';
@@ -75,13 +77,14 @@ class _MyHomePageState extends State<MyHomePage> {
     required String title,
     required List<ServiceItem> items,
     bool showAvailability = false,
+    VoidCallback? onSeeAll,
   }) {
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: title, onSeeAllTap: () {}),
+        SectionHeader(title: title, onSeeAllTap: onSeeAll ?? () {}),
         SizedBox(
           height: 280.h,
           child: ListView.builder(
@@ -122,7 +125,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: context.l10n.recentlyViewed, onSeeAllTap: () {}),
+        SectionHeader(
+          title: context.l10n.recentlyViewed, 
+          onSeeAllTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeSeeAllScreen(
+                  title: context.l10n.recentlyViewed,
+                  services: validServices,
+                ),
+              ),
+            );
+          },
+        ),
         SizedBox(
           height: 280.h,
           child: ListView.builder(
@@ -230,7 +246,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: context.l10n.superPros, onSeeAllTap: () {}),
+        SectionHeader(
+          title: context.l10n.superPros, 
+          onSeeAllTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeSeeAllProsScreen(
+                  title: context.l10n.superPros,
+                  pros: items,
+                ),
+              ),
+            );
+          },
+        ),
         SizedBox(
           height: 140.h,
           child: ListView.builder(
@@ -599,6 +628,17 @@ class _MyHomePageState extends State<MyHomePage> {
                             _buildHorizontalServiceSection(
                               title: context.l10n.originalProjects,
                               items: data.originalProjects!,
+                              onSeeAll: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeSeeAllScreen(
+                                      title: context.l10n.originalProjects,
+                                      services: data.originalProjects!,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
 
                           SizedBox(height: 10.h),
@@ -619,6 +659,17 @@ class _MyHomePageState extends State<MyHomePage> {
                               title: context.l10n.availableRightNow,
                               items: data.availableNow!,
                               showAvailability: true,
+                              onSeeAll: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeSeeAllScreen(
+                                      title: context.l10n.availableRightNow,
+                                      services: data.availableNow!,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
 
                           SizedBox(height: 10.h),

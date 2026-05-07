@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:photopia/controller/theme_controller.dart';
 import 'package:photopia/controller/client/delete_account_controller.dart';
 import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopia/controller/client/change_password_controller.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -35,6 +36,131 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showChangePassword() {
+    final oldPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool obscureOld = true;
+    bool obscureNew = true;
+    bool obscureConfirm = true;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          title: Text(
+            context.l10n.settingsChangePassword,
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: oldPasswordController,
+                    obscureText: obscureOld,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    decoration: InputDecoration(
+                      labelText: 'Current Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(obscureOld ? Icons.visibility_off : Icons.visibility),
+                        onPressed: () => setDialogState(() => obscureOld = !obscureOld),
+                      ),
+                    ),
+                    validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                  ),
+                  SizedBox(height: 16.h),
+                  TextFormField(
+                    controller: newPasswordController,
+                    obscureText: obscureNew,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    decoration: InputDecoration(
+                      labelText: 'New Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(obscureNew ? Icons.visibility_off : Icons.visibility),
+                        onPressed: () => setDialogState(() => obscureNew = !obscureNew),
+                      ),
+                    ),
+                    validator: (v) => (v == null || v.length < 6) ? 'Min 6 characters' : null,
+                  ),
+                  SizedBox(height: 16.h),
+                  TextFormField(
+                    controller: confirmPasswordController,
+                    obscureText: obscureConfirm,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    decoration: InputDecoration(
+                      labelText: 'Confirm New Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(obscureConfirm ? Icons.visibility_off : Icons.visibility),
+                        onPressed: () => setDialogState(() => obscureConfirm = !obscureConfirm),
+                      ),
+                    ),
+                    validator: (v) => v != newPasswordController.text ? 'Passwords do not match' : null,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(context.l10n.cancelBtn),
+            ),
+            Consumer<ChangePasswordController>(
+              builder: (context, controller, _) {
+                return ElevatedButton(
+                  onPressed: controller.isLoading
+                      ? null
+                      : () async {
+                          if (formKey.currentState!.validate()) {
+                            final success = await controller.changePassword(
+                              oldPassword: oldPasswordController.text,
+                              newPassword: newPasswordController.text,
+                            );
+                            if (success && mounted) {
+                              Navigator.pop(ctx);
+                              CustomSnackBar.show(
+                                context: context,
+                                message: 'Password changed successfully',
+                                isError: false,
+                              );
+                            } else if (mounted) {
+                              CustomSnackBar.show(
+                                context: context,
+                                message: controller.errorMessage ?? 'Failed to change password',
+                                isError: true,
+                              );
+                            }
+                          }
+                        },
+                  child: controller.isLoading
+                      ? SizedBox(
+                          height: 20.h,
+                          width: 20.h,
+                          child: const CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Update'),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _confirmDangerAction({
     required String title,
     required String body,
@@ -42,6 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required Color confirmColor,
     required VoidCallback onConfirmed,
     bool showPasswordField = false,
+    Future<void> Function(String, BuildContext)? onConfirmedWithPasswordCallback,
   }) {
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
@@ -148,9 +275,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onPressed: controller.isLoading
                             ? null
                             : () {
-                                if (showPasswordField) {
+                                if (showPasswordField && onConfirmedWithPasswordCallback != null) {
                                   if (formKey.currentState!.validate()) {
-                                    onConfirmedWithPassword(
+                                    onConfirmedWithPasswordCallback(
                                       passwordController.text,
                                       ctx,
                                     );
@@ -197,7 +324,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void onConfirmedWithPassword(
+  Future<void> _handleDeleteAccount(
     String password,
     BuildContext dialogContext,
   ) async {
@@ -212,7 +339,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           message: 'Account deleted successfully',
           isError: false,
         );
-        // Force logout and navigate to onboarding/sign-in
         await AuthController.forceLogout();
       }
     } else {
@@ -220,6 +346,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
         CustomSnackBar.show(
           context: context,
           message: controller.errorMessage ?? 'Failed to delete account',
+          isError: true,
+        );
+      }
+    }
+  }
+
+  Future<void> _handleDeactivateAccount(
+    String password,
+    BuildContext dialogContext,
+  ) async {
+    final controller = context.read<DeleteAccountController>();
+    final success = await controller.deactivateAccount(password);
+
+    if (success) {
+      if (mounted) {
+        Navigator.pop(dialogContext);
+        CustomSnackBar.show(
+          context: context,
+          message: 'Account deactivated successfully',
+          isError: false,
+        );
+        await AuthController.forceLogout();
+      }
+    } else {
+      if (mounted) {
+        CustomSnackBar.show(
+          context: context,
+          message: controller.errorMessage ?? 'Failed to deactivate account',
           isError: true,
         );
       }
@@ -274,7 +428,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _tile(
               icon: Icons.lock_reset_outlined,
               title: l.settingsChangePassword,
-              onTap: () => _showComingSoon(l.settingsChangePassword),
+              onTap: _showChangePassword,
             ),
           ]),
 
@@ -352,7 +506,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 body: l.settingsDeactivateConfirm,
                 confirmLabel: l.settingsDeactivate,
                 confirmColor: Colors.orange[700]!,
-                onConfirmed: () => _showComingSoon(l.settingsDeactivateAccount),
+                showPasswordField: true,
+                onConfirmed: () {},
+                onConfirmedWithPasswordCallback: _handleDeactivateAccount,
               ),
             ),
             _divider(),
@@ -366,8 +522,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 body: l.settingsDeleteConfirm,
                 confirmLabel: l.settingsDelete,
                 confirmColor: Colors.red,
-                showPasswordField: true, // Enable password confirmation
-                onConfirmed: () {}, // Handled by onConfirmedWithPassword
+                showPasswordField: true,
+                onConfirmed: () {},
+                onConfirmedWithPasswordCallback: _handleDeleteAccount,
               ),
             ),
           ]),

@@ -94,6 +94,8 @@ class Listing {
   bool? isActive;
   String? pricingType;
   ListingPricingModel? pricingModel;
+  int? totalView;
+  int? totalBooking;
 
   Listing({
     this.sId,
@@ -109,6 +111,8 @@ class Listing {
     this.isActive,
     this.pricingType,
     this.pricingModel,
+    this.totalView,
+    this.totalBooking,
   });
 
   Listing.fromJson(Map<String, dynamic> json) {
@@ -137,6 +141,8 @@ class Listing {
     status = json['status'];
     isActive = json['isActive'];
     pricingType = json['pricingType'];
+    totalView = json['totalView'] ?? json['totalViews'] ?? json['views'] ?? json['viewsCount'] ?? json['total_view'] ?? 0;
+    totalBooking = json['totalBooking'] ?? json['totalBookings'] ?? json['bookings'] ?? json['bookingsCount'] ?? json['total_booking'] ?? json['orderCount'] ?? 0;
     pricingModel = json['pricingModel'] != null
         ? new ListingPricingModel.fromJson(json['pricingModel'])
         : null;
@@ -162,6 +168,8 @@ class Listing {
     data['status'] = this.status;
     data['isActive'] = this.isActive;
     data['pricingType'] = this.pricingType;
+    data['totalView'] = this.totalView;
+    data['totalBooking'] = this.totalBooking;
     if (this.pricingModel != null) {
       data['pricingModel'] = this.pricingModel!.toJson();
     }

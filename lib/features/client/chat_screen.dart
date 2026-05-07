@@ -15,6 +15,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:photopia/core/widgets/document_viewer_screen.dart';
+import 'package:photopia/features/client/provider_profile_screen.dart';
+import 'package:photopia/controller/auth_controller.dart';
 
 class ChatScreen extends StatefulWidget {
   final Conversation conversation;
@@ -276,35 +278,77 @@ class _ChatScreenState extends State<ChatScreen> {
         icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
         onPressed: () => Navigator.pop(context),
       ),
-      title: Row(
-        children: [
-          CircleAvatar(
-            radius: 20.r,
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            backgroundImage: widget.conversation.avatarUrl.isNotEmpty
-                ? (widget.conversation.avatarUrl.startsWith('assets/')
-                    ? AssetImage(widget.conversation.avatarUrl) as ImageProvider
-                    : NetworkImage(widget.conversation.avatarUrl))
-                : null,
-            child: widget.conversation.avatarUrl.isEmpty
-                ? Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 24.sp)
-                : null,
-          ),
-          SizedBox(width: 12.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.conversation.name,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.bold),
+      title: InkWell(
+        onTap: () {
+          final activeRole = AuthController.activeRole;
+          final receiverId = widget.conversation.receiverId;
+          
+          debugPrint("🚀 [CHAT] Header Clicked. Role: $activeRole, ReceiverId: $receiverId");
+
+          if (receiverId == null || receiverId.isEmpty) {
+            debugPrint("⚠️ [CHAT] Navigation aborted: receiverId is null or empty");
+            return;
+          }
+
+          if (activeRole == 'client' || activeRole == 'user') {
+            // Client viewing Provider
+            debugPrint("🚀 [CHAT] Navigating to ProviderProfileScreen (Client View)");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProviderProfileScreen(
+                  provider: {
+                    '_id': receiverId,
+                    'id': receiverId,
+                    'name': widget.conversation.name,
+                    'avatar': widget.conversation.avatarUrl,
+                  },
+                ),
               ),
-              Text(
-                widget.conversation.isOnline ? 'Online' : 'Offline',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11.sp),
+            );
+          } else if (activeRole == 'professional' || activeRole == 'provider') {
+            // Provider viewing Client
+            debugPrint("🚀 [CHAT] Provider viewing client. No client-view screen found yet.");
+            // We could add a generic profile view here if implemented
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.h),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20.r,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                backgroundImage: widget.conversation.avatarUrl.isNotEmpty
+                    ? (widget.conversation.avatarUrl.startsWith('assets/')
+                        ? AssetImage(widget.conversation.avatarUrl) as ImageProvider
+                        : NetworkImage(widget.conversation.avatarUrl))
+                    : null,
+                child: widget.conversation.avatarUrl.isEmpty
+                    ? Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 24.sp)
+                    : null,
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.conversation.name,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15.sp, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      widget.conversation.isOnline ? 'Online' : 'Offline',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11.sp),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

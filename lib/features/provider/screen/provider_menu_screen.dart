@@ -20,6 +20,7 @@ import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 
 import 'package:photopia/features/client/settings_screen.dart';
+import 'package:photopia/features/client/payment_methods_screen.dart';
 
 class ProviderMenuScreen extends StatefulWidget {
   const ProviderMenuScreen({super.key});
@@ -176,7 +177,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                         }
                       },
                     ),
-                    SizedBox(height: 24.h.clamp(20, 28)),
+                    SizedBox(height: 12.h.clamp(8, 16)),
 
                     // Switch to Client Button
                     _buildSwitchButton(context),

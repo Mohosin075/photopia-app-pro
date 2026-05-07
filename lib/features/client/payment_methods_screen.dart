@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/auth_controller.dart';
 import 'package:photopia/controller/client/payment_controller.dart';
-import 'package:photopia/controller/client/role_switch_controller.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:photopia/data/models/payment_method_model.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +23,6 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isProfessional = AuthController.activeRole == 'professional';
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -34,80 +30,36 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
       ),
-      body: Column(
-        children: [
-          if (isProfessional)
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(12.w),
-              color: Colors.orange.withOpacity(0.1),
-              child: Row(
-                children: [
-                  const Icon(Icons.info_outline, color: Colors.orange),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Text(
-                      'Please switch to Client mode to add or manage payment methods.',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.orange[900],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: _switchToClient,
-                    child: const Text('Switch Now'),
-                  ),
-                ],
-              ),
-            ),
-          Expanded(
-            child: Consumer<PaymentController>(
-              builder: (context, controller, child) {
-                if (controller.isLoading && controller.paymentMethods.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+      body: Consumer<PaymentController>(
+        builder: (context, controller, child) {
+          if (controller.isLoading && controller.paymentMethods.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                if (controller.paymentMethods.isEmpty) {
-                  return _buildEmptyState(controller, isProfessional);
-                }
+          if (controller.paymentMethods.isEmpty) {
+            return _buildEmptyState(controller);
+          }
 
-                return ListView.separated(
-                  padding: EdgeInsets.all(16.w),
-                  itemCount: controller.paymentMethods.length + 1,
-                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                  itemBuilder: (context, index) {
-                    if (index == controller.paymentMethods.length) {
-                      return _buildAddButton(controller, isProfessional);
-                    }
-                    return _buildPaymentMethodCard(
-                      controller.paymentMethods[index],
-                      controller,
-                      isProfessional,
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+          return ListView.separated(
+            padding: EdgeInsets.all(16.w),
+            itemCount: controller.paymentMethods.length + 1,
+            separatorBuilder: (context, index) => SizedBox(height: 12.h),
+            itemBuilder: (context, index) {
+              if (index == controller.paymentMethods.length) {
+                return _buildAddButton(controller);
+              }
+              return _buildPaymentMethodCard(
+                controller.paymentMethods[index],
+                controller,
+              );
+            },
+          );
+        },
       ),
     );
   }
 
-  Future<void> _switchToClient() async {
-    final success = await context.read<RoleSwitchController>().switchRole(
-      'user',
-    );
-    if (success && mounted) {
-      setState(() {}); // Refresh UI state
-      context.read<PaymentController>().fetchPaymentMethods();
-      CustomSnackBar.show(context: context, message: 'Switched to Client mode');
-    }
-  }
-
-  Widget _buildEmptyState(PaymentController controller, bool isProfessional) {
+  Widget _buildEmptyState(PaymentController controller) {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(32.w),
@@ -131,31 +83,27 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               style: TextStyle(color: Colors.grey[600]),
             ),
             SizedBox(height: 32.h),
-            _buildAddButton(controller, isProfessional),
+            _buildAddButton(controller),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAddButton(PaymentController controller, bool isProfessional) {
+  Widget _buildAddButton(PaymentController controller) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return ElevatedButton.icon(
-      onPressed: isProfessional ? null : () => _addNewCard(controller),
+      onPressed: () => _addNewCard(controller),
       icon: Icon(
         Icons.add,
-        color: isProfessional
-            ? Colors.white54
-            : (isDark ? Colors.black : Colors.white),
+        color: isDark ? Colors.black : Colors.white,
       ),
       label: Text(
         'Add New Card',
         style: TextStyle(
-          color: isProfessional
-              ? Colors.white54
-              : (isDark ? Colors.black : Colors.white),
+          color: isDark ? Colors.black : Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -164,9 +112,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
         ),
-        backgroundColor: isProfessional
-            ? Colors.grey.withOpacity(0.3)
-            : (isDark ? Colors.white : Colors.black),
+        backgroundColor: isDark ? Colors.white : Colors.black,
         elevation: 0,
       ),
     );
@@ -175,7 +121,6 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   Widget _buildPaymentMethodCard(
     PaymentMethodModel method,
     PaymentController controller,
-    bool isProfessional,
   ) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -359,28 +304,20 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           children: [
             if (!method.isDefault)
               TextButton.icon(
-                onPressed: isProfessional
-                    ? null
-                    : () => _setDefault(method.id, controller),
+                onPressed: () => _setDefault(method.id, controller),
                 icon: Icon(Icons.star_outline, size: 18.sp),
                 label: const Text('Set Default'),
                 style: TextButton.styleFrom(
-                  foregroundColor: isProfessional
-                      ? Colors.grey
-                      : theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.primary,
                 ),
               ),
             SizedBox(width: 12.w),
             TextButton.icon(
-              onPressed: isProfessional
-                  ? null
-                  : () => _deleteMethod(method.id, controller),
+              onPressed: () => _deleteMethod(method.id, controller),
               icon: Icon(Icons.delete_outline, size: 18.sp),
               label: const Text('Remove Card'),
               style: TextButton.styleFrom(
-                foregroundColor: isProfessional
-                    ? Colors.grey
-                    : Colors.redAccent,
+                foregroundColor: Colors.redAccent,
               ),
             ),
           ],

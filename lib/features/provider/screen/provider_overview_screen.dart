@@ -287,7 +287,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               ),
               SizedBox(width: 4.w),
               Text(
-                context.l10n.viewsCount(189), // Not in model yet
+                context.l10n.viewsCount(listing.totalView ?? 0),
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
                   color: Theme.of(context).colorScheme.onSurface,
@@ -299,7 +299,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                   context.read<BottomNavController>().setIndex(0);
                 },
                 child: Text(
-                  context.l10n.bookingsCount(8), // Not in model yet
+                  context.l10n.bookingsCount(listing.totalBooking ?? 0),
                   style: TextStyle(
                     fontSize: AppTypography.bodyMedium,
                     color: Theme.of(context).colorScheme.primary,

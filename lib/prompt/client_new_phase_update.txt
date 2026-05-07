@@ -1,0 +1,150 @@
+Adjustment to be made on the Photopya platform 
+
+General 
+-	Change the name, Photopia is now spelled Photopya 
+-	Bug on the app : at each time I click on return on my phone it left the application, can we just go back to the previous screen please. A page history when you are on the client side and a page history when you are on the professional side must exist.
+-	There are 3 areas: 
+o	Photography (categories and subcategories can be found at the end of the document)
+o	Videography (categories and subcategories can be found at the end of the document)
+o	Editing & post-production (categories and subcategories can be found at the end of the document)
+
+User:
+-	An obligation for creators to put a photo should exist 
+-	Can't click the banner or profile picture to enlarge it 
+-	Impossible to click on the hashtags on the profile to be taken to a search dedicated to this hashtags which would be split into profile or service
+-	Unable to add a document to messages
+-	Search page:
+o	Once you enter a category, add a return button :"←" somewhere at the top left of the screen to go back to the main search page where we can see all the other categories.
+-	Profile Space:
+o	Button setting does not work 
+o	View all:
+	What does "speciality" mean? Withdraw Speciality on the client side
+o	"Privacy & Security": does not work 
+o	"Language" : Add "french" as a language option
+o	Order history : Add possibility to download invoices for client
+o	Help & Support
+	Contact 
+	FAQ
+o	Settings: 
+	Toggle to enable/disable dark mode
+	Change password
+	Deactivate account
+	Delete account
+	Payment method
+•	Add payment method 
+•	Modify payment method
+•	Delete Payment method 
+	Terms of Service
+o	Switch to professional mode:
+	Questions should be asked to find out which category the user falls into (photographer, videographer, editor)
+Template to follow for the questions: some steps are not mandatory, so you have to add a mention at the bottom to pass this step
+ 
+
+SECTION 1: Personal Information (REQUIRED)
+Field	Type
+Full name * (separate first and last name)	Text
+Email *	Email
+Phone * (choose the number code)	Such
+Country *	List
+City *	List
+Address (optional)	Text
+Date of birth * (minimum age 16 years)	Date
+
+SECTION 2: Domain (REQUIRED)
+
+Field	Type	Options
+Primary domain	Multiple choice 	Photography / Videography / Editing
+
+
+SECTION 3: Categories by Domain. 1 page per chosen domain: (optional)
+Photography	Videography	Mounting
+See category list 	See category list	See category list
+
+SECTION 4: Area of intervention: (optional)
+Field	Type
+Main city	Text 
+Department	Choice
+Radius of intervention	Choice: 10km / 30km / 50km / 100km / whole France
+Available for travel	Yes / No
+
+SECTION 5 Experience: (optional)
+Field	Type
+Years of experience	Choice: <1 year / 1-3 years / 3-5 years / 5-10 years / >10 years
+Number of projects completed	Choice: <10 / 10-50 / 50-100 / >100
+Education	Choice: Self-taught / School / Professional training
+
+
+
+
+
+
+
+
+SECTION 6: Portfolio and Visibility (optional)
+Field	Type
+Mini organic	Text (500 characters max)
+External portfolio link	URL
+Number of photos to display	Upload (min 3, max 20)
+
+
+SECTION 7 Profile Picture: (required)
+Field	Type
+Profile picture	Mandatory upload
+
+SECTION 8: Notification Preferences (required)
+Field	Type
+Email new requests	Yes / No
+SMS urgent requests	Yes / No
+Newsletter pros	Yes / No
+Customer review reminder	Yes / No
+
+
+
+
+
+SECTION 9: Legal Notice (Required)
+Field	Type
+Accepted Terms of Use	Required checkbox
+Privacy Policy	Required checkbox
+GDPR Authorization	Required checkbox
+
+
+Professional:
+-	Orders:
+o	Pending: The professional should be able to change the price and the features of the listing. For example, the professional have a listing with a project. The client wants the basic formula but he want to add only one option, the pro should be able to change the formula in the pending section after talking with the client. This is very important because it allows the professional to change the formula for only one customer
+-	Calendar:
+o	If we click on the reservation, it does not take us back to the latter 
+o	You can't click on a date in the calendar to create an event 
+-	Listings:
+o	Theme: you need the 3 types of service and the possibility of putting several of them 
+o	Create listings:
+	Duration: not clear at all, we don't know how long / better to let the creator indicate the duration in the description
+	Country: we need a list 
+	City: Dropdown also 
+	Adress : should be optional 
+	It would be interesting to put an asterisk on the mandatory concepts to be filled in 
+	Bug to make the publication available: all information is mandatory 
+	When the professional create the listing:  
+•	Listing title
+•	Theme
+•	Category
+•	Sub category 
+•	PLEASE FOLLOW THIS ORDER because now its not the good order
+-	Menu
+o	Help & Support
+	Contact 
+	FAQ
+o	Add Settings: 
+	Toggle to enable/disable dark mode
+	Change password
+	Desactivate account
+	Delete account
+	Payment and remittance 
+•	Payment
+o	Add payment method 
+o	Modify payment method
+o	Delete Payment method 
+•	Payment 
+o	Add a bank account
+	Terms of Service
+

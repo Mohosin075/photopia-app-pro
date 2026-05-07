@@ -36,4 +36,32 @@ class DeleteAccountController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> deactivateAccount(String password) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await NetworkCaller.patchRequest(
+        url: Urls.deactivateProfile,
+        body: {
+          'password': password,
+        },
+      );
+
+      if (response.isSuccess) {
+        return true;
+      } else {
+        _errorMessage = response.errorMessage ?? 'Failed to deactivate account';
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
