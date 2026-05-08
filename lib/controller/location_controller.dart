@@ -37,7 +37,7 @@ class LocationController extends ChangeNotifier {
       bool serviceEnabled;
       LocationPermission permission;
 
-      // Test if location services are enabled.
+      // 1. Check if location services are enabled.
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         _currentAddress = "Location Services Off (Turn on GPS)";
@@ -46,6 +46,7 @@ class LocationController extends ChangeNotifier {
         return;
       }
 
+      // 2. Check and request permissions.
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -64,14 +65,34 @@ class LocationController extends ChangeNotifier {
         return;
       }
 
-      // When we reach here, permissions are granted and we can
-      // continue accessing the position of the device.
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+      // 3. Try to get last known position first (fastest)
+      Position? position = await Geolocator.getLastKnownPosition();
+      
+      // 4. If last known is null or old, get current position with timeout
+      if (position == null) {
+        debugPrint("Location: No last known position, fetching current...");
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.medium, // Medium is often faster and sufficient
+          timeLimit: const Duration(seconds: 10),
+        );
+      } else {
+        debugPrint("Location: Using last known position: ${position.latitude}, ${position.longitude}");
+        // Trigger a background update for accuracy if needed, but return the fast one first
+        Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 15),
+        ).then((pos) {
+           debugPrint("Location: Background update received: ${pos.latitude}, ${pos.longitude}");
+           _getAddressFromLatLng(pos);
+        }).catchError((e) {
+           debugPrint("Location: Background update failed: $e");
+           return position!; // Return the fast one anyway
+        });
+      }
 
       await _getAddressFromLatLng(position);
     } catch (e) {
-      _currentAddress = "Error getting location";
+      _currentAddress = "Location unavailable";
       debugPrint("Location Error: $e");
     } finally {
       _isLoading = false;
