@@ -48,7 +48,7 @@ class BookingController extends ChangeNotifier {
     }
   }
 
-  Future<String?> createBooking({
+  Future<Map<String, dynamic>?> createBooking({
     required String providerId,
     required String serviceId,
     required String bookingDate,
@@ -67,7 +67,8 @@ class BookingController extends ChangeNotifier {
     String? specialRequests,
     double distanceFromProviderKm = 0,
     String? notes,
-    String? paymentMethodId, // Added to handle direct payment during booking
+    String? paymentMethodId,
+    String? paymentIntentId, // Added this
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -81,7 +82,10 @@ class BookingController extends ChangeNotifier {
         "startTime": startTime,
         "endTime": endTime,
         "packageName": packageName ?? "",
-        "paymentMethodId": paymentMethodId, // Pass it if available
+        "paymentMethodId": paymentMethodId,
+        "paymentIntentId": paymentIntentId, // Pass it here
+        "isPaid": true,
+        "paymentStatus": "Paid",
         "eventLocation": {
           "address": address,
           "city": city,
@@ -91,22 +95,28 @@ class BookingController extends ChangeNotifier {
         },
         "clientName": clientName ?? "",
         "clientEmail": clientEmail ?? "",
-        "userEmail":
-            clientEmail, // Changed from clientEmail ?? "" to allow null if it's truly null, or just send it
-        "email": clientEmail,
-        "user_email": clientEmail,
         "clientPhone": clientPhone ?? "",
         "client": {
           "name": clientName ?? "",
           "email": clientEmail ?? "",
+          "userEmail": clientEmail, // Added here
           "phone": clientPhone ?? "",
         },
-        "user": {"email": clientEmail, "userEmail": clientEmail},
-        "payment": {"userEmail": clientEmail, "email": clientEmail},
-        "paymentInfo": {"userEmail": clientEmail, "email": clientEmail},
-        "paymentData": {"userEmail": clientEmail},
-        "customerEmail": clientEmail,
-        "customer_email": clientEmail,
+        "user": {
+          "email": clientEmail, 
+          "userEmail": clientEmail
+        },
+        "payment": {
+          "userEmail": clientEmail, 
+          "email": clientEmail
+        },
+        "paymentInfo": {
+          "userEmail": clientEmail, 
+          "email": clientEmail
+        },
+        "paymentData": {
+          "userEmail": clientEmail
+        },
         "eventType": eventType ?? "Photography Session",
         "specialRequests": specialRequests ?? "",
         "distanceFromProviderKm": distanceFromProviderKm,
@@ -121,7 +131,7 @@ class BookingController extends ChangeNotifier {
 
       if (response.isSuccess) {
         final data = response.body?['data'];
-        // API returns: { "data": { "booking": { "_id": "..." } } }
+        
         _lastBookingId =
             data?['booking']?['_id']?.toString() ??
             data?['booking']?['id']?.toString() ??
@@ -129,7 +139,8 @@ class BookingController extends ChangeNotifier {
             data?['id']?.toString();
 
         debugPrint('✅ BookingController: Booking ID parsed: $_lastBookingId');
-        return _lastBookingId;
+        return data; // Return full data containing both booking and payment objects
+
       } else {
         _errorMessage = response.errorMessage ?? "Failed to create booking";
         return null;

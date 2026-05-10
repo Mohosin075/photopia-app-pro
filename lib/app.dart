@@ -33,6 +33,7 @@ import 'package:photopia/controller/location_controller.dart';
 import 'package:photopia/controller/client/notification_controller.dart';
 import 'package:photopia/controller/client/payment_controller.dart';
 import 'package:photopia/controller/client/delete_account_controller.dart';
+import 'package:photopia/controller/client/search_history_controller.dart';
 import 'package:photopia/controller/provider/subscription_controller.dart';
 import 'package:photopia/controller/language_controller.dart';
 import 'package:photopia/controller/theme_controller.dart';
@@ -109,6 +110,7 @@ class _PhotopiaState extends State<Photopia> {
             ChangeNotifierProvider(create: (_) => PaymentController()),
             ChangeNotifierProvider(create: (_) => SubscriptionController()),
             ChangeNotifierProvider(create: (_) => ThemeController()),
+            ChangeNotifierProvider(create: (_) => SearchHistoryController()),
           ],
           child: Consumer2<LanguageController, ThemeController>(
             builder: (context, langController, themeController, child) {
@@ -117,7 +119,7 @@ class _PhotopiaState extends State<Photopia> {
                 debugShowCheckedModeBanner: false,
                 useInheritedMediaQuery: true,
                 locale: langController.locale,
-                supportedLocales: const [Locale('en'), Locale('es')],
+                supportedLocales: const [Locale('en'), Locale('fr')],
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,
@@ -128,9 +130,6 @@ class _PhotopiaState extends State<Photopia> {
                 darkTheme: AppTheme.darkTheme,
                 themeMode: themeController.themeMode,
 
-                builder: (context, child) {
-                  return child!;
-                },
                 routes: AppRoutes.routes,
                 home: _getInitialScreen(),
               );

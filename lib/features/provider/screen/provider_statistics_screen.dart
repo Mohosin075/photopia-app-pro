@@ -10,6 +10,7 @@ import 'package:photopia/features/provider/screen/provider_subscription_screen.d
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
 
 class ProviderStatisticsScreen extends StatefulWidget {
   const ProviderStatisticsScreen({super.key});
@@ -73,7 +74,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
           ],
         ),
       ),
-      body: RefreshIndicator(
+      body: AppRefresher(
         onRefresh: _handleRefresh,
         color: Theme.of(context).colorScheme.onSurface,
         backgroundColor: Theme.of(context).colorScheme.surface,

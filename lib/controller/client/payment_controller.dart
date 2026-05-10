@@ -14,7 +14,7 @@ class PaymentController extends ChangeNotifier {
   List<PaymentMethodModel> get paymentMethods => _paymentMethods;
 
   /// Initializes the Stripe Payment Sheet by calling the backend
-  Future<bool> initPaymentSheet({
+  Future<dynamic> initPaymentSheet({
     String? bookingId,
     String? serviceId, // Added serviceId for pre-booking intent
     required double amount,
@@ -29,13 +29,7 @@ class PaymentController extends ChangeNotifier {
       // 1. Call backend to create PaymentIntent
       final Map<String, dynamic> body = {
         'bookingId': bookingId,
-        'serviceId': serviceId,
-        'amount': (amount * 100).toInt(), // Stripe expects amount in cents
-        'currency': currency.toLowerCase(),
-        'userEmail': userEmail,
-        'email': userEmail,
-        'customerEmail': userEmail,
-        'user_email': userEmail,
+        'amount': amount,
       };
 
       final NetworkResponse response = await NetworkCaller.postRequest(
@@ -67,7 +61,7 @@ class PaymentController extends ChangeNotifier {
           ),
         );
 
-        return true;
+        return response.body?['data']?['paymentIntentId'] ?? true;
       } else {
         _errorMessage = response.errorMessage ?? "Failed to initialize payment";
         return false;
@@ -231,7 +225,7 @@ class PaymentController extends ChangeNotifier {
   }
 
   /// Charges a saved payment method directly
-  Future<bool> chargeSavedCard({
+  Future<dynamic> chargeSavedCard({
     required String bookingId,
     required double amount,
     required String paymentMethodId,
@@ -246,19 +240,30 @@ class PaymentController extends ChangeNotifier {
         url: Urls.createPaymentIntent,
         body: {
           'bookingId': bookingId,
-          'amount': (amount * 100).toInt(), // Cents
+          'amount': amount,
           'paymentMethodId': paymentMethodId,
-          'userEmail': userEmail,
-          'email': userEmail,
-          'customerEmail': userEmail,
-          'user_email': userEmail,
         },
       );
 
       if (response.isSuccess) {
-        final status = response.body?['data']?['status'];
+        debugPrint('📦 [chargeSavedCard] Full Body: ${response.body}');
+        final status = response.body?['data']?['status']?.toString();
+        debugPrint('🔍 [chargeSavedCard] Extracted Status: $status');
+        
         if (status == 'succeeded') {
-          return true;
+          final pId = response.body?['data']?['paymentIntentId'];
+          debugPrint('✅ [chargeSavedCard] Payment ID: $pId');
+          return pId ?? true;
+        } else if (status == 'requires_action') {
+          // Handle 3D Secure / SCA if required
+          final clientSecret = response.body?['data']?['clientSecret'];
+          if (clientSecret != null) {
+            await Stripe.instance.confirmPayment(
+              paymentIntentClientSecret: clientSecret,
+            );
+            return true;
+          }
+          return false;
         } else {
           _errorMessage = "Payment status: $status";
           return false;

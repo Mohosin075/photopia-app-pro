@@ -23,10 +23,13 @@ class ChatController extends ChangeNotifier {
   IO.Socket? _socket;
   String? _currentActiveChatId;
 
+  List<ChatRoom> _filteredChats = [];
+  bool _isSearching = false;
+
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
   ChatData? get chatData => _chatData;
-  List<ChatRoom> get chats => _chatData?.chats ?? [];
+  List<ChatRoom> get chats => _isSearching ? _filteredChats : (_chatData?.chats ?? []);
   List<ChatMessage> get messages => _messages;
 
   void reset() {
@@ -646,5 +649,19 @@ class ChatController extends ChangeNotifier {
       notifyListeners();
     }
     return null;
+  }
+
+  void searchChats(String query) {
+    if (query.isEmpty) {
+      _isSearching = false;
+      _filteredChats = [];
+    } else {
+      _isSearching = true;
+      _filteredChats = (_chatData?.chats ?? []).where((chat) {
+        final otherUser = chat.toConversation(AuthController.userId ?? '').name.toLowerCase();
+        return otherUser.contains(query.toLowerCase());
+      }).toList();
+    }
+    notifyListeners();
   }
 }

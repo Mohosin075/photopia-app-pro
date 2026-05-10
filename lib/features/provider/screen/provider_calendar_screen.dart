@@ -550,9 +550,70 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                 ).then((_) => _fetchAvailabilityData());
               },
             ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.event_note, color: Colors.blue, size: 20.sp),
+              ),
+              title: Text(
+                'Manual Reservation',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
+              ),
+              subtitle: Text('Add a personal booking or event', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showManualReservationDialog(context);
+              },
+            ),
+            const Divider(),
             SizedBox(height: 10.h),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showManualReservationDialog(BuildContext context) {
+    final titleController = TextEditingController();
+    final timeController = TextEditingController(text: '10:00 AM');
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: const Text('Manual Reservation'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(labelText: 'Event Title (e.g. Private Shoot)'),
+            ),
+            SizedBox(height: 10.h),
+            TextField(
+              controller: timeController,
+              decoration: const InputDecoration(labelText: 'Time'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              // TODO: Save this to backend or local storage
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Reservation added successfully!')),
+              );
+              Navigator.pop(ctx);
+            },
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }

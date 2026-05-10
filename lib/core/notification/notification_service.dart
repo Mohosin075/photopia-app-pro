@@ -17,7 +17,16 @@ class NotificationService {
   static final NotificationService instance = NotificationService._internal();
   NotificationService._internal();
 
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  FirebaseMessaging? _fcmInstance;
+  FirebaseMessaging get _fcm {
+    try {
+      return _fcmInstance ??= FirebaseMessaging.instance;
+    } catch (e) {
+      debugPrint("⚠️ NotificationService: Firebase not initialized yet.");
+      rethrow;
+    }
+  }
+
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
@@ -29,6 +38,14 @@ class NotificationService {
     debugPrint("🔔 NotificationService: Initializing...");
 
     try {
+      // Check if Firebase is actually initialized
+      if (Firebase.apps.isEmpty) {
+        debugPrint("🔔 NotificationService: No Firebase apps found. Skipping initialization.");
+        _isInitialized = true;
+        _isFirebaseAvailable = false;
+        return;
+      }
+
       // 1. Request Permission
       final NotificationSettings settings = await _fcm.requestPermission(
         alert: true,

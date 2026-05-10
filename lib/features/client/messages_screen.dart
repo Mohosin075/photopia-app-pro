@@ -8,6 +8,8 @@ import 'package:photopia/features/client/chat_screen.dart';
 import 'package:photopia/controller/auth_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopia/core/utils/app_transitions.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -55,7 +57,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     return _buildEmptyState();
                   }
 
-                  return RefreshIndicator(
+                  return AppRefresher(
                     onRefresh: () => chatController.getChats(),
                     color: Theme.of(context).colorScheme.primary,
                     backgroundColor: Theme.of(context).colorScheme.surface,
@@ -150,34 +152,46 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
       child: Container(
-        height: 40.h.clamp(40, 45),
+        height: 44.h.clamp(40, 48),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12).r,
-          border: Border(
-            bottom: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+          borderRadius: BorderRadius.circular(15).r,
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+            width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.2 : 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: TextField(
           controller: _searchController,
-          textAlignVertical: TextAlignVertical.center,
+          onChanged: (value) {
+            context.read<ChatController>().searchChats(value);
+          },
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
-            fontSize: 14.sp.clamp(14, 16),
+            fontSize: 14.sp,
           ),
           decoration: InputDecoration(
             hintText: context.l10n.searchConversations,
-            isCollapsed: true,
             hintStyle: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-              fontSize: 14.sp.clamp(14, 16),
+              fontSize: 14.sp,
             ),
-            prefixIcon: Icon(Icons.search,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 20.sp.clamp(18, 24)),
+            prefixIcon: Icon(
+              Icons.search_rounded,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              size: 22.sp,
+            ),
             border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(vertical: 10.h),
+            contentPadding: EdgeInsets.symmetric(vertical: 12.h),
           ),
         ),
       ),
@@ -198,9 +212,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
           conversation: conversation,
           onTap: () {
             Navigator.of(context, rootNavigator: true).push(
-              MaterialPageRoute(
-                builder: (context) =>
-                    ChatScreen(conversation: conversation),
+              AppTransitions.createPremiumRoute(
+                ChatScreen(conversation: conversation),
               ),
             );
           },

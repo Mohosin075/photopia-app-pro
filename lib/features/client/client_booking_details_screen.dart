@@ -54,7 +54,41 @@ class ClientBookingDetailsScreen extends StatelessWidget {
               SizedBox(height: 15.h),
             ],
             _buildContactButton(context),
+            if (booking.paymentStatus?.toLowerCase() == 'paid' || booking.status?.toLowerCase() == 'completed') ...[
+              SizedBox(height: 12.h),
+              _buildDownloadInvoiceButton(context),
+            ],
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDownloadInvoiceButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: AppSizes.fieldHeight,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Downloading invoice...')),
+          );
+          // TODO: Implement actual invoice download logic
+        },
+        icon: Icon(Icons.download, size: 20.sp, color: Theme.of(context).colorScheme.primary),
+        label: Text(
+          'Download Invoice',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: Theme.of(context).colorScheme.primary),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+          ),
         ),
       ),
     );

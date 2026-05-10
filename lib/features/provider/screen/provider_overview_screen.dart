@@ -14,6 +14,8 @@ import 'package:provider/provider.dart';
 import 'package:photopia/data/models/my_listing_model.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopia/core/utils/app_transitions.dart';
 
 class ProviderOverviewScreen extends StatefulWidget {
   const ProviderOverviewScreen({super.key});
@@ -78,9 +80,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
 
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProviderCreateListingScreen(),
-                    ),
+                    AppTransitions.createPremiumRoute(const ProviderCreateListingScreen()),
                   );
                 },
                 icon: Icon(Icons.add, size: 18.sp, color: Theme.of(context).colorScheme.onPrimary),
@@ -120,7 +120,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
 
           final listings = _getFilteredListings(controller.listings);
 
-          return RefreshIndicator(
+          return AppRefresher(
             onRefresh: () async {
               HapticFeedback.lightImpact();
               await controller.getMyListings();
@@ -322,8 +322,8 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => ProviderListingDetailsScreen(
+                      AppTransitions.createPremiumRoute(
+                        ProviderListingDetailsScreen(
                           listingId: listing.sId ?? '',
                         ),
                       ),
@@ -350,8 +350,8 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
 
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => ProviderCreateListingScreen(
+                        AppTransitions.createPremiumRoute(
+                          ProviderCreateListingScreen(
                             existingListing: fullListing,
                           ),
                         ),

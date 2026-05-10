@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class SearchFilterScreen extends StatefulWidget {
   const SearchFilterScreen({super.key});
@@ -56,7 +57,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Search Filter',
+          context.l10n.navSearch,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18.sp.clamp(18, 20),
@@ -70,18 +71,18 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Location'),
+            _buildSectionTitle(context.l10n.location),
             SizedBox(height: 10.h),
             _buildTextField(
               controller: _locationController,
-              hint: 'Search location...',
+              hint: context.l10n.searchLocationHint,
               prefixIcon: Icons.location_on_outlined,
             ),
             SizedBox(height: 20.h),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [_buildSectionTitle('Radius: ${_radius.toInt()} km')],
+              children: [_buildSectionTitle(context.l10n.radius(_radius.toInt()))],
             ),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
@@ -104,7 +105,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
             SizedBox(height: 20.h),
 
             _buildSectionTitle(
-              'Budget: €${_budgetRange.start.round()} - €${_budgetRange.end.round()}',
+              context.l10n.budget(_budgetRange.start.round(), _budgetRange.end.round()),
             ),
             SizedBox(height: 10.h),
             SliderTheme(
@@ -134,7 +135,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
             ),
             SizedBox(height: 25.h),
 
-            _buildSectionTitle('Type of Service'),
+            _buildSectionTitle(context.l10n.typeOfService),
             SizedBox(height: 10.h),
             Wrap(
               spacing: 8.w,
@@ -159,7 +160,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
             ),
             SizedBox(height: 25.h),
 
-            _buildSectionTitle('Equipment Used'),
+            _buildSectionTitle(context.l10n.equipmentUsed),
             SizedBox(height: 10.h),
             Wrap(
               spacing: 8.w,
@@ -210,7 +211,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                       ),
                     ),
                     child: Text(
-                      'Clear All',
+                      context.l10n.clearAll,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16.sp.clamp(16, 18),
@@ -244,7 +245,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                       ),
                     ),
                     child: Text(
-                      'Apply Filters',
+                      context.l10n.applyFilters,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: 16.sp.clamp(16, 18),

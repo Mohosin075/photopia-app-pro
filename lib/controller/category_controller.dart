@@ -41,6 +41,8 @@ class CategoryController extends ChangeNotifier {
     if (_selectedTheme != null) {
       list = list.where((c) => c.theme == _selectedTheme).toList();
     }
+    // Sort alphabetically by name
+    list.sort((a, b) => (a.name ?? '').compareTo(b.name ?? ''));
     return list;
   }
 
@@ -136,6 +138,10 @@ class CategoryController extends ChangeNotifier {
         _subCategories = listData
             .map((json) => CategoryModel.fromJson(json))
             .toList();
+        
+        // Sort alphabetically
+        _subCategories.sort((a, b) => (a.name ?? '').compareTo(b.name ?? ''));
+        
         notifyListeners();
       }
     } catch (e) {

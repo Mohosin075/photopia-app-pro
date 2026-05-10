@@ -8,8 +8,6 @@ import 'package:photopia/features/client/user_profile_screen.dart';
 import 'package:photopia/features/client/favorites_screen.dart';
 import 'package:photopia/features/client/messages_screen.dart';
 import 'package:photopia/features/client/search_screen.dart';
-import 'package:photopia/features/client/authentication/log_in_screen.dart';
-import 'package:photopia/features/client/authentication/sign_up_screen.dart';
 import 'package:photopia/controller/auth_controller.dart';
 import 'package:photopia/controller/client/service_list_controller.dart';
 import 'package:photopia/core/utils/guest_dialog_helper.dart';
@@ -26,20 +24,10 @@ class BottomNavigationScreen extends StatefulWidget {
   State<BottomNavigationScreen> createState() => _BottomNavigationScreenState();
 }
 
-class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Initialize notification service
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      NotificationService.instance.init();
-    });
-  }
-
+class _BottomNavigationScreenState extends State<BottomNavigationScreen> with TickerProviderStateMixin {
   int _selectedIndex = 0;
   DateTime? _lastBackPressTime;
 
-  // Use keys for each navigator to maintain state and allow internal navigation
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
@@ -48,8 +36,15 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
     GlobalKey<NavigatorState>(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService.instance.init();
+    });
+  }
+
   void _onItemTapped(int index) {
-    // Guest check for restricted tabs: Messages (1), Favorites (3)
     if (index == 1 || index == 3 || index == 4) {
       if (!AuthController.isLoggedIn) {
         GuestDialogHelper.showGuestDialog(context);
@@ -58,10 +53,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
     }
 
     if (_selectedIndex == index) {
-      // If tapping the already selected tab, pop to the first route
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
-
-      // Refresh Home data if already on Home and tapping again
       if (index == 0) {
         context.read<ServiceListController>().getAllServices(refresh: true);
       }
@@ -70,17 +62,19 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         _selectedIndex = index;
       });
 
-      // Refresh bookings if switching to Profile tab
       if (index == 4) {
         context.read<BookingController>().getMyBookings();
       }
     }
+    
+    // Haptic feedback for better UX
+    HapticFeedback.lightImpact();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Detect if keyboard is visible
     bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return PopScope(
       canPop: false,
@@ -91,22 +85,18 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
             _navigatorKeys[_selectedIndex].currentState;
 
         if (currentNavigator != null && currentNavigator.canPop()) {
-          // Go back within the current tab's inner screens
           currentNavigator.pop();
         } else if (_selectedIndex != 0) {
-          // If not on Home tab, go back to Home tab root
           setState(() {
             _selectedIndex = 0;
           });
         } else {
-          // Already on root of Home tab — double back to exit
           final now = DateTime.now();
           final isDoubleBack = _lastBackPressTime != null &&
               now.difference(_lastBackPressTime!) <
                   const Duration(seconds: 2);
 
           if (isDoubleBack) {
-            // Exit the app
             SystemNavigator.pop();
           } else {
             _lastBackPressTime = now;
@@ -130,78 +120,65 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         }
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: false, // Prevent push up
+        resizeToAvoidBottomInset: false,
         body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          _buildTabNavigator(0, const MyHomePage()),
-          _buildTabNavigator(1, const MessagesScreen()),
-
-          //now i change this screen when client change any UI so i update that
-          _buildTabNavigator(2, const SearchScreen()),
-
-          //now i change this screen when client change any UI so i update that
-          _buildTabNavigator(3, const FavoritesScreen()),
-          _buildTabNavigator(4, const UserProfileScreen()),
-        ],
-
-      ),
-      bottomNavigationBar: isKeyboardVisible
-          ? const SizedBox.shrink()
-          : Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.black.withOpacity(0.3) 
-                        : Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
-                  ),
-                ],
-              ),
-              child: SafeArea(
-
-                top: false,
-                child: SizedBox(
-                  height: 65.h,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _buildNavItem(
+          index: _selectedIndex,
+          children: [
+            _buildTabNavigator(0, const MyHomePage()),
+            _buildTabNavigator(1, const MessagesScreen()),
+            _buildTabNavigator(2, const SearchScreen()),
+            _buildTabNavigator(3, const FavoritesScreen()),
+            _buildTabNavigator(4, const UserProfileScreen()),
+          ],
+        ),
+        bottomNavigationBar: isKeyboardVisible
+            ? const SizedBox.shrink()
+            : Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.06),
+                      blurRadius: 20,
+                      spreadRadius: 0,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  top: false,
+                  child: Container(
+                    height: 70.h,
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildNavItem(
                           index: 0,
                           iconAsset: 'assets/images/client_home_icon.png',
                           label: context.l10n.navHome,
                         ),
-                      ),
-                      Expanded(
-                        child: _buildNavItem(
+                        _buildNavItem(
                           index: 1,
                           iconAsset: 'assets/images/message_icon.png',
                           label: context.l10n.navMessages,
                         ),
-                      ),
-                      Expanded(child: _buildSearchButton()),
-                      Expanded(
-                        child: _buildNavItem(
+                        _buildSearchButton(),
+                        _buildNavItem(
                           index: 3,
                           iconAsset: 'assets/images/client_favorite_icon.png',
                           label: context.l10n.navFavorites,
                         ),
-                      ),
-                      Expanded(
-                        child: _buildNavItem(
+                        _buildNavItem(
                           index: 4,
                           iconAsset: 'assets/images/client_profile_icon.png',
                           label: context.l10n.navProfile,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
       ),
     );
   }
@@ -217,37 +194,36 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
 
   Widget _buildSearchButton() {
     bool isSelected = _selectedIndex == 2;
-    return Transform.translate(
-      offset: Offset(0, -28.h),
-      child: GestureDetector(
-        onTap: () => _onItemTapped(2),
-        child: Container(
-          width: 56.w,
-          height: 56.w,
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark 
-                ? Colors.white 
-                : const Color(0xFF1A1A1A),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Theme.of(context).colorScheme.surface, 
-              width: 4,
+    return GestureDetector(
+      onTap: () => _onItemTapped(2),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.elasticOut,
+        width: isSelected ? 58.w : 52.w,
+        height: isSelected ? 58.w : 52.w,
+        transform: Matrix4.translationValues(0, -25.h, 0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark 
+              ? Colors.white 
+              : const Color(0xFF1A1A1A),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black).withOpacity(0.2),
+              blurRadius: 12,
+              spreadRadius: isSelected ? 4 : 0,
+              offset: const Offset(0, 6),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+          ],
+          border: Border.all(
+            color: Theme.of(context).colorScheme.surface, 
+            width: 4,
           ),
-          child: Icon(
-            Icons.search,
-            color: isSelected 
-                ? (Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white)
-                : (Theme.of(context).brightness == Brightness.dark ? Colors.black87 : Colors.white.withOpacity(0.8)),
-            size: 26.sp,
-          ),
+        ),
+        child: Icon(
+          Icons.search,
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
+          size: isSelected ? 28.sp : 24.sp,
         ),
       ),
     );
@@ -255,48 +231,57 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
 
   Widget _buildNavItem({
     required int index,
-    IconData? icon,
     String? iconAsset,
     required String label,
   }) {
     bool isSelected = _selectedIndex == index;
 
-    return GestureDetector(
-      onTap: () => _onItemTapped(index),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (iconAsset != null)
-            Image.asset(
-              iconAsset,
-              width: 24.w,
-              height: 24.w,
-              color: isSelected 
-                  ? Theme.of(context).colorScheme.onSurface 
-                  : Colors.grey[400],
-            )
-          else
-            Icon(
-              icon,
-              size: 24.sp,
-              color: isSelected 
-                  ? Theme.of(context).colorScheme.onSurface 
-                  : Colors.grey[400],
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedScale(
+              scale: isSelected ? 1.2 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: Image.asset(
+                iconAsset!,
+                width: 22.w,
+                height: 22.w,
+                color: isSelected 
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.grey[400],
+              ),
             ),
-          SizedBox(height: 4.h),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: isSelected 
-                  ? Theme.of(context).colorScheme.onSurface 
-                  : Colors.grey[400],
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            SizedBox(height: 6.h),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: isSelected 
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.grey[500],
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                letterSpacing: 0.2,
+              ),
+              child: Text(label),
             ),
-          ),
-        ],
+            if (isSelected)
+              Container(
+                margin: EdgeInsets.only(top: 4.h),
+                width: 4.w,
+                height: 4.w,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,8 @@ import 'package:photopia/features/client/chat_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:photopia/controller/client/chat_controller.dart';
 import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class ProviderMessageScreen extends StatefulWidget {
   const ProviderMessageScreen({super.key});
@@ -55,8 +57,8 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
                     return _buildEmptyState();
                   }
 
-                  return RefreshIndicator(
-                    onRefresh: () => controller.getChats(),
+                  return AppRefresher(
+                    onRefresh: () async => controller.getChats(),
                     color: Theme.of(context).colorScheme.primary,
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     child: _buildConversationList(controller),
@@ -78,7 +80,7 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
           Icon(Icons.message_outlined, size: 64.sp, color: Theme.of(context).dividerColor.withOpacity(0.1)),
           SizedBox(height: 16.h),
           Text(
-            'No messages yet',
+            context.l10n.noMessagesYet,
             style: TextStyle(
               fontSize: 16.sp,
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
@@ -103,7 +105,7 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
           ),
           SizedBox(width: 12.w),
           Text(
-            'Messages',
+            context.l10n.navMessages,
             style: TextStyle(
               fontSize: 20.sp.clamp(20, 22),
               fontWeight: FontWeight.bold,
@@ -117,30 +119,47 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
       child: Container(
-        height: 40.h.clamp(40, 45),
+        height: 48.h,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12).r,
-          border: Border(
-            bottom: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+          borderRadius: BorderRadius.circular(24.r),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+            width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: TextField(
           controller: _searchController,
+          onChanged: (value) {
+            context.read<ChatController>().searchChats(value);
+          },
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
-            fontSize: 14.sp.clamp(14, 16),
+            fontSize: 14.sp,
           ),
           decoration: InputDecoration(
-            hintText: 'Search conversations...',
+            hintText: context.l10n.searchConversations,
             hintStyle: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-              fontSize: 14.sp.clamp(14, 16),
+              fontSize: 14.sp,
             ),
-            prefixIcon: Icon(Icons.search,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 20.sp.clamp(18, 24)),
+            prefixIcon: Padding(
+              padding: EdgeInsets.only(left: 15.w, right: 10.w),
+              child: Icon(
+                Icons.search_rounded,
+                color: Theme.of(context).colorScheme.primary,
+                size: 22.sp,
+              ),
+            ),
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(vertical: 12.h),
           ),

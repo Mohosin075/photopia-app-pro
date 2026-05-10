@@ -2,10 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopia/features/client/search_filter_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:photopia/controller/client/search_history_controller.dart';
+import 'package:photopia/core/localization/app_localizations.dart';
 
 class SearchHeader extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;
-  const SearchHeader({super.key, this.onFilterApplied});
+  final VoidCallback? onFocus;
+  const SearchHeader({super.key, this.onFilterApplied, this.onFocus});
 
   @override
   State<SearchHeader> createState() => _SearchHeaderState();
@@ -13,13 +17,37 @@ class SearchHeader extends StatefulWidget {
 
 class _SearchHeaderState extends State<SearchHeader> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   Timer? _debounce;
+  bool _showClearButton = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onTextChanged);
+    _focusNode.addListener(_onFocusChanged);
+  }
 
   @override
   void dispose() {
     _debounce?.cancel();
+    _searchController.removeListener(_onTextChanged);
     _searchController.dispose();
+    _focusNode.removeListener(_onFocusChanged);
+    _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _showClearButton = _searchController.text.isNotEmpty;
+    });
+  }
+
+  void _onFocusChanged() {
+    if (_focusNode.hasFocus && widget.onFocus != null) {
+      widget.onFocus!();
+    }
   }
 
   void _onSearchChanged(String value) {
@@ -31,6 +59,16 @@ class _SearchHeaderState extends State<SearchHeader> {
     });
   }
 
+  void _submitSearch(String value) {
+    if (value.trim().isNotEmpty) {
+      context.read<SearchHistoryController>().addSearchTerm(value);
+    }
+    if (widget.onFilterApplied != null) {
+      widget.onFilterApplied!({'searchTerm': value});
+    }
+    _focusNode.unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -39,7 +77,7 @@ class _SearchHeaderState extends State<SearchHeader> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
-            'Search',
+            context.l10n.search,
             style: TextStyle(
               fontSize: 20.sp.clamp(20, 22),
               fontWeight: FontWeight.bold,
@@ -59,14 +97,28 @@ class _SearchHeaderState extends State<SearchHeader> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12).r,
-                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                    border: Border.all(
+                      color: _focusNode.hasFocus 
+                          ? Theme.of(context).colorScheme.primary 
+                          : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                      width: _focusNode.hasFocus ? 1.5 : 1,
+                    ),
+                    boxShadow: _focusNode.hasFocus ? [
+                      BoxShadow(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      )
+                    ] : null,
                   ),
                   child: TextField(
                     controller: _searchController,
+                    focusNode: _focusNode,
                     textAlignVertical: TextAlignVertical.center,
                     onChanged: _onSearchChanged,
+                    textInputAction: TextInputAction.search,
                     decoration: InputDecoration(
-                      hintText: 'Search photographers, services...',
+                      hintText: context.l10n.searchHint,
                       hintStyle: TextStyle(
                         color: Colors.grey.withOpacity(0.6),
                         fontSize: 12.sp.clamp(12, 13),
@@ -75,10 +127,25 @@ class _SearchHeaderState extends State<SearchHeader> {
                         padding: EdgeInsets.only(left: 12.w, right: 4.w),
                         child: Icon(
                           Icons.search,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                          color: _focusNode.hasFocus 
+                              ? Theme.of(context).colorScheme.primary 
+                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                           size: 20.sp.clamp(20, 22),
                         ),
                       ),
+                      suffixIcon: _showClearButton ? IconButton(
+                        icon: Icon(
+                          Icons.cancel,
+                          size: 18.sp,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        ),
+                        onPressed: () {
+                          _searchController.clear();
+                          if (widget.onFilterApplied != null) {
+                            widget.onFilterApplied!({'searchTerm': ''});
+                          }
+                        },
+                      ) : null,
                       prefixIconConstraints: BoxConstraints(
                         minWidth: 35.w,
                         minHeight: 40.h,
@@ -87,11 +154,7 @@ class _SearchHeaderState extends State<SearchHeader> {
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
                     ),
-                    onSubmitted: (value) {
-                      if (widget.onFilterApplied != null) {
-                        widget.onFilterApplied!({'searchTerm': value});
-                      }
-                    },
+                    onSubmitted: _submitSearch,
                   ),
                 ),
               ),
@@ -106,7 +169,6 @@ class _SearchHeaderState extends State<SearchHeader> {
                 ),
                 child: IconButton(
                   onPressed: () async {
-                    // Navigate to filter screen and wait for result
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -114,7 +176,6 @@ class _SearchHeaderState extends State<SearchHeader> {
                       ),
                     );
                     if (result != null && widget.onFilterApplied != null) {
-                      // Include the current search term in the filter map
                       result['searchTerm'] = _searchController.text;
                       widget.onFilterApplied!(result);
                     }

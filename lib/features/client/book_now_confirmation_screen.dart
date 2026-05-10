@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:photopia/controller/provider/calender_availibility_controller.dart';
 import 'package:photopia/controller/location_controller.dart';
 import 'package:photopia/controller/client/booking_controller.dart';
@@ -1293,6 +1294,9 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
       widget.package?['currency'] ?? widget.service?['currency'],
     );
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.all(25.w),
@@ -1301,13 +1305,13 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           SizedBox(height: 10.h),
           Container(
             padding: EdgeInsets.all(15.w),
-            decoration: const BoxDecoration(
-              color: Color(0xFFE8F5E9),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.green.withOpacity(0.15) : const Color(0xFFE8F5E9),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.check,
-              color: const Color(0xFF4CAF50),
+              color: isDark ? Colors.greenAccent : const Color(0xFF4CAF50),
               size: 35.sp,
             ),
           ),
@@ -1317,6 +1321,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             style: TextStyle(
               fontSize: 20.sp.clamp(18, 24),
               fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 10.h),
@@ -1325,7 +1330,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13.sp.clamp(12, 14),
-              color: Colors.grey,
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
               height: 1.4,
             ),
           ),
@@ -1336,12 +1341,12 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(20.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16).r,
-              border: Border.all(color: Colors.grey.shade100),
+              border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withOpacity(isDark ? 0.3 : 0.03),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -1450,12 +1455,13 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   }
 
   Widget _buildSummaryRow(IconData icon, String label, String value) {
+    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(bottom: 15.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16.sp, color: Colors.grey[400]),
+          Icon(icon, size: 16.sp, color: theme.colorScheme.onSurface.withOpacity(0.4)),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
@@ -1463,7 +1469,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(fontSize: 11.sp, color: Colors.grey),
+                  style: TextStyle(fontSize: 11.sp, color: theme.colorScheme.onSurface.withOpacity(0.5)),
                 ),
                 SizedBox(height: 2.h),
                 Text(
@@ -1471,7 +1477,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -1485,9 +1491,10 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   Widget _buildSummaryPriceRow(
     String label,
     String value, {
-    Color color = Colors.black,
+    Color? color,
     bool isBold = false,
   }) {
+    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: Row(
@@ -1497,7 +1504,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             label,
             style: TextStyle(
               fontSize: 13.sp,
-              color: isBold ? Colors.black : Colors.grey[600],
+              color: isBold ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withOpacity(0.6),
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -1506,7 +1513,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             style: TextStyle(
               fontSize: 14.sp,
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-              color: color,
+              color: color ?? theme.colorScheme.onSurface,
             ),
           ),
         ],
@@ -1602,59 +1609,11 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     // --- FINAL CUSTOM FLOW ---
     if (_selectedPaymentMethod == null) {
       // 🆕 FLOW 1: NEW CARD (Use different card)
-      // লজিক: আপনার রিকোয়েস্ট অনুযায়ী সরাসরি serviceId এবং amount দিয়ে পেমেন্ট হবে।
-      debugPrint('🆕 Flow: New Card (Payment Intent with serviceId FIRST)');
-
-      final bool initialized = await paymentCtrl.initPaymentSheet(
-        bookingId: serviceId.toString(), // Sending serviceId as requested
-        amount: _totalBookingAmount,
-        currency:
-            widget.package?['currency'] ?? widget.service?['currency'] ?? 'EUR',
-        userEmail: userProfile.email,
-      );
-
-      if (initialized && mounted) {
-        paymentSuccess = await paymentCtrl.presentPaymentSheet();
-
-        if (paymentSuccess && mounted) {
-          debugPrint('✅ Payment Successful! Now creating booking record...');
-          final String? bookingId = await bookingCtrl.createBooking(
-            providerId: providerId,
-            serviceId: serviceId.toString(),
-            bookingDate: formattedDate,
-            startTime: bookingStartTime,
-            endTime: endTime,
-            packageName: widget.package?['name'],
-            address: _location,
-            city: _city ?? "Dhaka",
-            country: _country ?? "Bangladesh",
-            lat: _lat ?? 23.8103,
-            lng: _lng ?? 90.4125,
-            clientName: userProfile.fullName,
-            clientEmail: userProfile.email,
-            clientPhone: userProfile.phone,
-            eventType: eventType,
-            specialRequests: _specialRequests,
-            notes: _specialRequests,
-            distanceFromProviderKm: _distanceFromProvider,
-          );
-          if (bookingId != null) {
-            _createdBookingId = bookingId;
-          } else {
-            paymentSuccess = false;
-            debugPrint(
-              '❌ ERROR: Payment succeeded but booking creation failed!',
-            );
-          }
-        }
-      }
-    } else {
-      // ✅ FLOW 2: SAVED CARD
-      debugPrint('💳 Flow: Saved Card (Step 1: Create Booking)');
-
+      debugPrint('🆕 Flow: New Card (Step 1: Create Booking FIRST)');
+      
       String? bookingId = _createdBookingId;
       if (bookingId == null) {
-        bookingId = await bookingCtrl.createBooking(
+        final bookingData = await bookingCtrl.createBooking(
           providerId: providerId,
           serviceId: serviceId.toString(),
           bookingDate: formattedDate,
@@ -1673,22 +1632,92 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           specialRequests: _specialRequests,
           notes: _specialRequests,
           distanceFromProviderKm: _distanceFromProvider,
-          paymentMethodId: _selectedPaymentMethod?.id, // Passing paymentMethodId here
+          paymentIntentId: "pending_mobile_flow", // Dummy ID to bypass backend checkout session
         );
-        if (bookingId != null) {
+        
+        if (bookingData != null) {
+          bookingId = bookingData['booking']?['_id'] ?? bookingData['_id'];
           _createdBookingId = bookingId;
+        } else {
+          paymentSuccess = false;
+          debugPrint('❌ ERROR: Booking creation failed!');
+          return;
         }
       }
 
-      // Step 2: Charge the card using the separate payment API
-      if (bookingId != null && mounted) {
-        debugPrint('💳 Flow: Saved Card (Step 2: Charge Card via Payment API)');
-        paymentSuccess = await paymentCtrl.chargeSavedCard(
-          bookingId: bookingId,
-          amount: _depositAmount, // Sending the 50% deposit amount
-          paymentMethodId: _selectedPaymentMethod!.id,
-          userEmail: userProfile.email,
+      debugPrint('🆕 Flow: New Card (Step 2: Init Payment Sheet)');
+      final dynamic paymentResult = await paymentCtrl.initPaymentSheet(
+        bookingId: bookingId, // Sending real bookingId
+        amount: _totalBookingAmount,
+        currency:
+            widget.package?['currency'] ?? widget.service?['currency'] ?? 'EUR',
+        userEmail: userProfile.email,
+      );
+
+      if (paymentResult != false && mounted) {
+        paymentSuccess = await paymentCtrl.presentPaymentSheet();
+
+        if (paymentSuccess && mounted) {
+          debugPrint('✅ Payment Successful!');
+        } else {
+          paymentSuccess = false;
+        }
+      } else {
+        paymentSuccess = false;
+      }
+    } else {
+      // ✅ FLOW 2: SAVED CARD
+      debugPrint('💳 Flow: Saved Card (Step 1: Create Booking FIRST)');
+      
+      String? bookingId = _createdBookingId;
+      if (bookingId == null) {
+        final bookingData = await bookingCtrl.createBooking(
+          providerId: providerId,
+          serviceId: serviceId.toString(),
+          bookingDate: formattedDate,
+          startTime: bookingStartTime,
+          endTime: endTime,
+          packageName: widget.package?['name'],
+          address: _location,
+          city: _city ?? "Dhaka",
+          country: _country ?? "Bangladesh",
+          lat: _lat ?? 23.8103,
+          lng: _lng ?? 90.4125,
+          clientName: userProfile.fullName,
+          clientEmail: userProfile.email,
+          clientPhone: userProfile.phone,
+          eventType: eventType,
+          specialRequests: _specialRequests,
+          notes: _specialRequests,
+          distanceFromProviderKm: _distanceFromProvider,
+          paymentIntentId: "pending_mobile_flow", // Dummy ID to bypass backend checkout session
         );
+        
+        if (bookingData != null) {
+          bookingId = bookingData['booking']?['_id'] ?? bookingData['_id'];
+          _createdBookingId = bookingId;
+        } else {
+          paymentSuccess = false;
+          debugPrint('❌ ERROR: Booking creation failed!');
+          return;
+        }
+      }
+
+      debugPrint('💳 Flow: Saved Card (Step 2: Charge Card via Payment API)');
+      final dynamic paymentResult = await paymentCtrl.chargeSavedCard(
+        bookingId: bookingId!, 
+        amount: _depositAmount,
+        paymentMethodId: _selectedPaymentMethod!.id,
+        userEmail: userProfile.email,
+      );
+
+      debugPrint('🔍 Payment Result: $paymentResult');
+
+      if (paymentResult != null && paymentResult != false && mounted) {
+        paymentSuccess = true;
+        debugPrint('✅ Payment Successful!');
+      } else {
+        paymentSuccess = false;
       }
     }
 
@@ -1721,7 +1750,6 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             if (bookingCtrl.isLoading) return;
 
             if (_pageIndex < 4) {
-              // 1. Validation for Step 1 (Date & Time) - Index 0
               if (_pageIndex == 0) {
                 if (_selectedDateTime == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1729,7 +1757,6 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   );
                   return;
                 }
-                // Only require time slot if NOT in "Full Day" mode
                 if (_selectedStep1Tab == 0 && _selectedTime.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Please select a time slot')),
@@ -1738,7 +1765,6 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 }
               }
 
-              // 2. Validation for Step 2 (Location) - Index 1
               if (_pageIndex == 1 && _location.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(

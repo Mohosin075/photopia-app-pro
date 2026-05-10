@@ -29,6 +29,8 @@ import 'package:photopia/controller/language_controller.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/core/services/translation_service.dart';
 import 'package:photopia/features/client/settings_screen.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopia/core/utils/app_transitions.dart';
 
 class UserProfileScreen extends StatefulWidget {
   static const String name = '/user_profile';
@@ -155,7 +157,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
           final user = controller.userProfile;
 
-          return RefreshIndicator(
+          return AppRefresher(
             onRefresh: () async {
               await controller.getUserProfile();
               if (mounted) {
@@ -393,9 +395,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const OrderHistoryScreen(),
-                    ),
+                    AppTransitions.createPremiumRoute(const OrderHistoryScreen()),
                   );
                 },
                 child: Text(
@@ -533,12 +533,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   context.l10n.orderHistory,
                   badge: bookingController.bookings.length.toString(),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OrderHistoryScreen(),
-                      ),
-                    );
+                  Navigator.push(
+                    context,
+                    AppTransitions.createPremiumRoute(const OrderHistoryScreen()),
+                  );
                   },
                 ),
                 _buildMenuItem(
@@ -546,24 +544,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   context.l10n.notifications,
                   badge: notificationController.unreadCount.toString(),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NotificationScreen(),
-                      ),
-                    );
+                  Navigator.push(
+                    context,
+                    AppTransitions.createPremiumRoute(const NotificationScreen()),
+                  );
                   },
                 ),
                 _buildMenuItem(
                   Icons.lock_outline,
                   context.l10n.privacyPolicy,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PrivacyPolicyScreen(),
-                      ),
-                    );
+                  Navigator.push(
+                    context,
+                    AppTransitions.createPremiumRoute(const PrivacyPolicyScreen()),
+                  );
                   },
                 ),
                 _buildMenuItem(
@@ -622,12 +616,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   context.l10n.settings,
                   isLast: true,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SettingsScreen(),
-                      ),
-                    );
+                  Navigator.push(
+                    context,
+                    AppTransitions.createPremiumRoute(const SettingsScreen()),
+                  );
                   },
                 ),
               ],

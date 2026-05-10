@@ -12,6 +12,7 @@ import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/data/models/chat_message_model.dart';
 import 'package:photopia/features/client/chat_screen.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
 
 class ProviderOrdersScreen extends StatefulWidget {
   const ProviderOrdersScreen({super.key});
@@ -208,10 +209,10 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
   Widget _buildTodayTab(ProviderOrdersController controller) {
     final todayOrders = controller.todayOrders;
     
-    return RefreshIndicator(
+    return AppRefresher(
       color: Theme.of(context).colorScheme.primary,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      onRefresh: () => controller.getMyOrders(filterType: 'today'),
+      onRefresh: () async => controller.getMyOrders(filterType: 'today'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       itemCount: todayOrders.isEmpty ? 1 : todayOrders.length + 1,
@@ -303,10 +304,10 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
   Widget _buildUpcomingTab(ProviderOrdersController controller) {
     final upcomingOrders = controller.upcomingOrders;
     
-    return RefreshIndicator(
+    return AppRefresher(
       color: Theme.of(context).colorScheme.primary,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      onRefresh: () => controller.getMyOrders(filterType: 'upcoming'),
+      onRefresh: () async => controller.getMyOrders(filterType: 'upcoming'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       itemCount: upcomingOrders.isEmpty ? 1 : upcomingOrders.length + 1,
@@ -395,10 +396,10 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
   Widget _buildPendingTab(ProviderOrdersController controller) {
     final pendingOrders = controller.pendingOrders;
     
-    return RefreshIndicator(
+    return AppRefresher(
       color: Theme.of(context).colorScheme.primary,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      onRefresh: () => controller.getMyOrders(status: 'pending'),
+      onRefresh: () async => controller.getMyOrders(status: 'pending'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       itemCount: pendingOrders.isEmpty ? 1 : pendingOrders.length + 1,

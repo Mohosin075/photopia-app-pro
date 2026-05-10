@@ -18,6 +18,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/features/client/search_screen.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
   final bool showSpecializations;
@@ -340,7 +341,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                 ),
             ],
           ),
-          body: RefreshIndicator(
+          body: AppRefresher(
             onRefresh: () async => _loadProfileData(),
             color: Theme.of(context).colorScheme.primary,
             backgroundColor: Theme.of(context).colorScheme.surface,
@@ -1032,14 +1033,31 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             return Stack(
               children: [
                 Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10).r,
-                    child: item is File
-                        ? Image.file(item, fit: BoxFit.cover)
-                        : CustomNetworkImage(
-                            imageUrl: item.toString(),
-                            fit: BoxFit.cover,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FullScreenImageViewer(
+                            imageUrl: item is String ? item : null,
+                            filePath: item is File ? item.path : null,
+                            tag: 'portfolio_$index',
                           ),
+                        ),
+                      );
+                    },
+                    child: Hero(
+                      tag: 'portfolio_$index',
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10).r,
+                        child: item is File
+                            ? Image.file(item, fit: BoxFit.cover)
+                            : CustomNetworkImage(
+                                imageUrl: item.toString(),
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                    ),
                   ),
                 ),
                 if (_isEditing)

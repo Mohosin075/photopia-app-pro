@@ -8,6 +8,8 @@ import 'package:photopia/controller/theme_controller.dart';
 import 'package:photopia/controller/client/delete_account_controller.dart';
 import 'package:photopia/controller/auth_controller.dart';
 import 'package:photopia/controller/client/change_password_controller.dart';
+import 'package:photopia/controller/language_controller.dart';
+import 'package:photopia/controller/language_controller.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -449,6 +451,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           SizedBox(height: 16.h),
 
+          // ── Language Section ──────────────────────────────────────────────
+          _sectionLabel(l.language),
+          _card([
+            Consumer<LanguageController>(
+              builder: (context, langController, _) {
+                return _tile(
+                  icon: Icons.language_outlined,
+                  title: l.selectLanguage,
+                  trailing: Text(
+                    langController.isFrench ? 'Français' : 'English',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13.sp,
+                    ),
+                  ),
+                  onTap: () => _showLanguagePicker(langController),
+                );
+              },
+            ),
+          ]),
+
+          SizedBox(height: 16.h),
+
           // ── Legal & Help Section ──────────────────────────────────────────
           _sectionLabel(l.settingsLegal),
           _card([
@@ -532,6 +558,71 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SizedBox(height: 32.h),
         ],
       ),
+    );
+  }
+
+  // ── Language Picker ────────────────────────────────────────────────────────
+
+  void _showLanguagePicker(LanguageController controller) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (ctx) => Container(
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              context.l10n.selectLanguage,
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            _languageOption(
+              label: 'English',
+              isSelected: !controller.isFrench,
+              onTap: () {
+                controller.setEnglish();
+                Navigator.pop(ctx);
+              },
+            ),
+            _languageOption(
+              label: 'Français',
+              isSelected: controller.isFrench,
+              onTap: () {
+                controller.setFrench();
+                Navigator.pop(ctx);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _languageOption({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      onTap: onTap,
+      title: Text(
+        label,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      trailing: isSelected
+          ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary)
+          : null,
     );
   }
 

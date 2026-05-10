@@ -23,6 +23,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photopia/controller/category_controller.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/core/services/translation_service.dart';
+import 'package:photopia/core/utils/app_transitions.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -61,15 +63,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _navigateToCategoryDetails(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const CategoryDetailsScreen()),
+      AppTransitions.createPremiumRoute(const CategoryDetailsScreen()),
     );
   }
 
   void _navigateToServiceDetails(BuildContext context, ServiceItem service) {
     Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(
-        builder: (context) => ServiceDetailsScreen(service: service.toJson()),
-      ),
+      AppTransitions.createPremiumRoute(ServiceDetailsScreen(service: service.toJson())),
     );
   }
 
@@ -130,8 +130,8 @@ class _MyHomePageState extends State<MyHomePage> {
           onSeeAllTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => HomeSeeAllScreen(
+              AppTransitions.createPremiumRoute(
+                HomeSeeAllScreen(
                   title: context.l10n.recentlyViewed,
                   services: validServices,
                 ),
@@ -251,8 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
           onSeeAllTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => HomeSeeAllProsScreen(
+              AppTransitions.createPremiumRoute(
+                HomeSeeAllProsScreen(
                   title: context.l10n.superPros,
                   pros: items,
                 ),
@@ -596,7 +596,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     return Center(child: Text(context.l10n.noData));
                   }
 
-                  return RefreshIndicator(
+                  return AppRefresher(
                     color: Theme.of(context).colorScheme.primary,
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     onRefresh: () async {
@@ -631,8 +631,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               onSeeAll: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) => HomeSeeAllScreen(
+                                  AppTransitions.createPremiumRoute(
+                                    HomeSeeAllScreen(
                                       title: context.l10n.originalProjects,
                                       services: data.originalProjects!,
                                     ),
@@ -662,8 +662,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               onSeeAll: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) => HomeSeeAllScreen(
+                                  AppTransitions.createPremiumRoute(
+                                    HomeSeeAllScreen(
                                       title: context.l10n.availableRightNow,
                                       services: data.availableNow!,
                                     ),

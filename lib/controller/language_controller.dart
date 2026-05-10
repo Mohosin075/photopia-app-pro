@@ -14,9 +14,9 @@ class LanguageController extends ChangeNotifier {
   Locale get locale => _locale;
 
   String get languageName =>
-      _locale.languageCode == 'es' ? 'Spanish' : 'English';
+      _locale.languageCode == 'fr' ? 'French' : 'English';
 
-  bool get isSpanish => _locale.languageCode == 'es';
+  bool get isFrench => _locale.languageCode == 'fr';
 
   void _loadSavedLocale() {
     final saved = _storage.read<String>(_storageKey);
@@ -33,5 +33,5 @@ class LanguageController extends ChangeNotifier {
   }
 
   void setEnglish() => setLanguage('en');
-  void setSpanish() => setLanguage('es');
+  void setFrench() => setLanguage('fr');
 }

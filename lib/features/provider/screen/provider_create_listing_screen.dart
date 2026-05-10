@@ -13,6 +13,7 @@ import 'package:photopia/controller/provider/service_controller.dart';
 import 'package:photopia/data/models/category_model.dart';
 import 'package:photopia/data/models/provider_service_model.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
 
 class ProviderCreateListingScreen extends StatefulWidget {
   final Data? existingListing;
@@ -532,11 +533,11 @@ class _ProviderCreateListingScreenState
       ),
       body: _isLoadingCategories
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
+          : AppRefresher(
               onRefresh: () async {
                 await _fetchCategories();
               },
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.primary,
               child: Form(
                 key: _formKey,
                 child: ListView(

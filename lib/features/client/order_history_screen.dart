@@ -9,6 +9,8 @@ import 'package:photopia/core/network/urls.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/features/client/client_booking_details_screen.dart';
 import 'package:photopia/core/services/translation_service.dart';
+import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopia/core/utils/app_transitions.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   static const String name = '/order_history';
@@ -79,7 +81,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 );
 
                 if (filteredBookings.isEmpty) {
-                  return RefreshIndicator(
+                  return AppRefresher(
                     onRefresh: () => controller.getMyBookings(),
                     color: Theme.of(context).colorScheme.primary,
                     child: SingleChildScrollView(
@@ -110,7 +112,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   );
                 }
 
-                return RefreshIndicator(
+                return AppRefresher(
                   onRefresh: () => controller.getMyBookings(),
                   color: Theme.of(context).colorScheme.primary,
                   child: ListView.builder(
@@ -215,9 +217,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => ClientBookingDetailsScreen(booking: booking),
-          ),
+          AppTransitions.createPremiumRoute(ClientBookingDetailsScreen(booking: booking)),
         );
       },
       child: Container(
