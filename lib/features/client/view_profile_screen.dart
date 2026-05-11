@@ -5,53 +5,100 @@ import 'package:photopia/core/constants/app_typography.dart';
 import 'package:photopia/core/routes/app_routes.dart';
 import 'package:photopia/features/client/widgets/auth_profile_image.dart';
 import 'package:provider/provider.dart';
+import 'package:photopia/core/network/Api_service/network_caller.dart';
+import 'package:photopia/core/network/urls.dart';
+import 'package:photopia/data/models/user_profile_model.dart';
 
-class ViewProfileScreen extends StatelessWidget {
+class ViewProfileScreen extends StatefulWidget {
   static const String name = '/view_profile';
-  const ViewProfileScreen({super.key});
+  final String? userId;
+
+  const ViewProfileScreen({super.key, this.userId});
+
+  @override
+  State<ViewProfileScreen> createState() => _ViewProfileScreenState();
+}
+
+class _ViewProfileScreenState extends State<ViewProfileScreen> {
+  UserProfileModel? _fetchedUser;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.userId != null) {
+      _fetchOtherUserProfile();
+    }
+  }
+
+  Future<void> _fetchOtherUserProfile() async {
+    if (widget.userId == null) return;
+    
+    setState(() => _isLoading = true);
+    try {
+      final response = await NetworkCaller.getRequest(
+        url: Urls.getUserById(widget.userId!),
+        requireAuth: true,
+      );
+
+      if (response.isSuccess && response.body?['data'] != null) {
+        setState(() {
+          _fetchedUser = UserProfileModel.fromJson(response.body?['data']);
+        });
+      }
+    } catch (e) {
+      debugPrint("❌ [VIEW PROFILE] Error fetching user: $e");
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'View Profile',
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20.sp.clamp(20, 22),
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 10.w),
-            child: TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.edit_profile);
-              },
-              child: Text(
-                'Edit',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
+          if (widget.userId == null)
+            Padding(
+              padding: EdgeInsets.only(right: 10.w),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, AppRoutes.edit_profile);
+                },
+                child: Text(
+                  'Edit',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
       body: Consumer<UserProfileController>(
         builder: (context, controller, _) {
-          final user = controller.userProfile;
+          final user = _fetchedUser ?? controller.userProfile;
+          if (_isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
           if (user == null) {
             return const Center(child: Text("No Profile Data"));
           }

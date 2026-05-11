@@ -16,6 +16,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:photopia/core/widgets/document_viewer_screen.dart';
 import 'package:photopia/features/client/provider_profile_screen.dart';
+import 'package:photopia/features/client/view_profile_screen.dart';
 import 'package:photopia/controller/auth_controller.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -306,10 +307,17 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             );
-          } else if (activeRole == 'professional' || activeRole == 'provider') {
+          } else {
             // Provider viewing Client
-            debugPrint("🚀 [CHAT] Provider viewing client. No client-view screen found yet.");
-            // We could add a generic profile view here if implemented
+            debugPrint("🚀 [CHAT] Provider viewing client: $receiverId");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ViewProfileScreen(
+                  userId: receiverId,
+                ),
+              ),
+            );
           }
         },
         child: Padding(

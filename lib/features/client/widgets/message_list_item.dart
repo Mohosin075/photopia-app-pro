@@ -31,9 +31,21 @@ class MessageListItem extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 22.r.clamp(20, 26),
-                  backgroundImage: conversation.avatarUrl.startsWith('assets/')
-                      ? AssetImage(conversation.avatarUrl) as ImageProvider
-                      : NetworkImage(conversation.avatarUrl),
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.grey[800] 
+                      : Colors.grey[200],
+                  backgroundImage: conversation.avatarUrl.isNotEmpty
+                      ? (conversation.avatarUrl.startsWith('assets/')
+                          ? AssetImage(conversation.avatarUrl) as ImageProvider
+                          : NetworkImage(conversation.avatarUrl))
+                      : null,
+                  child: conversation.avatarUrl.isEmpty
+                      ? Icon(
+                          Icons.person,
+                          size: 24.sp,
+                          color: Colors.grey[400],
+                        )
+                      : null,
                 ),
                 if (conversation.isOnline)
                   Positioned(
