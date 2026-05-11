@@ -89,6 +89,9 @@ class Booking {
   List<CustomOption>? customOptions;
   String? createdAt;
   String? updatedAt;
+  double? depositPercentage;
+  double? depositAmount;
+  double? balanceAmount;
 
   Booking({
     this.sId,
@@ -109,6 +112,9 @@ class Booking {
     this.customOptions,
     this.createdAt,
     this.updatedAt,
+    this.depositPercentage,
+    this.depositAmount,
+    this.balanceAmount,
   });
 
   Booking.fromJson(Map<String, dynamic> json) {
@@ -150,6 +156,9 @@ class Booking {
     }
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    depositPercentage = (json['depositPercentage'] as num?)?.toDouble();
+    depositAmount = (json['depositAmount'] as num?)?.toDouble();
+    balanceAmount = (json['balanceAmount'] as num?)?.toDouble();
   }
 
   Map<String, dynamic> toJson() {
@@ -175,6 +184,9 @@ class Booking {
     }
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
+    data['depositPercentage'] = depositPercentage;
+    data['depositAmount'] = depositAmount;
+    data['balanceAmount'] = balanceAmount;
     return data;
   }
 }

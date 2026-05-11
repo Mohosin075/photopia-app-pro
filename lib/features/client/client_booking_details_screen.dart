@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:photopia/controller/client/booking_controller.dart';
 import 'package:photopia/core/localization/app_localizations.dart';
 import 'package:photopia/core/network/urls.dart';
@@ -28,7 +29,10 @@ class ClientBookingDetailsScreen extends StatelessWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -49,12 +53,21 @@ class ClientBookingDetailsScreen extends StatelessWidget {
             SizedBox(height: 20.h),
             _buildServiceDetails(context),
             SizedBox(height: 30.h),
-            if (booking.status?.toLowerCase() == 'pending' && booking.paymentStatus?.toLowerCase() == 'pending') ...[
+            if (booking.status?.toLowerCase() == 'pending' &&
+                booking.paymentStatus?.toLowerCase() == 'pending') ...[
               _buildPayButton(context),
               SizedBox(height: 15.h),
             ],
+            if (booking.paymentStatus?.toLowerCase() == 'deposit_paid' &&
+                booking.balanceAmount != null &&
+                booking.balanceAmount! > 0) ...[
+              _buildPayRemainingButton(context),
+              SizedBox(height: 15.h),
+            ],
             _buildContactButton(context),
-            if (booking.paymentStatus?.toLowerCase() == 'paid' || booking.status?.toLowerCase() == 'completed') ...[
+            if (booking.paymentStatus?.toLowerCase() == 'paid' ||
+                booking.paymentStatus?.toLowerCase() == 'fully_paid' ||
+                booking.status?.toLowerCase() == 'completed') ...[
               SizedBox(height: 12.h),
               _buildDownloadInvoiceButton(context),
             ],
@@ -75,7 +88,11 @@ class ClientBookingDetailsScreen extends StatelessWidget {
           );
           // TODO: Implement actual invoice download logic
         },
-        icon: Icon(Icons.download, size: 20.sp, color: Theme.of(context).colorScheme.primary),
+        icon: Icon(
+          Icons.download,
+          size: 20.sp,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         label: Text(
           'Download Invoice',
           style: TextStyle(
@@ -116,8 +133,11 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.auto_awesome,
-                            color: Colors.amber[700], size: 18.sp),
+                        Icon(
+                          Icons.auto_awesome,
+                          color: Colors.amber[700],
+                          size: 18.sp,
+                        ),
                         SizedBox(width: 10.w),
                         Expanded(
                           child: TranslatedText(
@@ -146,53 +166,89 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                             : () async {
                                 if (hasModifications) {
                                   // Always just accept the offer if modified, payment happens at the end
-                                  final bookingController = Provider.of<BookingController>(context, listen: false);
-                                  final success = await bookingController.acceptModifiedOffer(booking.sId ?? '');
+                                  final bookingController =
+                                      Provider.of<BookingController>(
+                                        context,
+                                        listen: false,
+                                      );
+                                  final success = await bookingController
+                                      .acceptModifiedOffer(booking.sId ?? '');
                                   if (success) {
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Offer Accepted Successfully!')),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Offer Accepted Successfully!',
+                                          ),
+                                        ),
                                       );
                                       Navigator.pop(context);
                                     }
                                   } else {
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(bookingController.errorMessage ?? 'Failed to accept offer')),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            bookingController.errorMessage ??
+                                                'Failed to accept offer',
+                                          ),
+                                        ),
                                       );
                                     }
                                   }
                                 } else {
                                   // Initial deposit payment for non-modified bookings
-                                  final amountToPay = (booking.totalPrice ?? 0) * 0.5;
-                                  final success = await paymentController.initPaymentSheet(
-                                    bookingId: booking.sId,
-                                    amount: amountToPay,
-                                    currency: booking.currency ?? 'EUR',
-                                  );
+                                  final amountToPay =
+                                      (booking.totalPrice ?? 0) * 0.5;
+                                  final success = await paymentController
+                                      .initPaymentSheet(
+                                        bookingId: booking.sId,
+                                        amount: amountToPay,
+                                        currency: booking.currency ?? 'EUR',
+                                      );
 
                                   if (success) {
-                                    final paymentSuccess = await paymentController.presentPaymentSheet();
+                                    final paymentSuccess =
+                                        await paymentController
+                                            .presentPaymentSheet();
                                     if (paymentSuccess) {
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Payment Successful!')),
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Payment Successful!',
+                                            ),
+                                          ),
                                         );
                                         Navigator.pop(context);
                                       }
                                     }
                                   } else {
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(paymentController.errorMessage ?? 'Payment failed')),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            paymentController.errorMessage ??
+                                                'Payment failed',
+                                          ),
+                                        ),
                                       );
                                     }
                                   }
                                 }
                               },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFF2E7D32), // Premium Green
+                          backgroundColor: const Color(
+                            0xFF2E7D32,
+                          ), // Premium Green
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
@@ -204,7 +260,9 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                                 height: 18.h,
                                 width: 18.h,
                                 child: const CircularProgressIndicator(
-                                    color: Colors.white, strokeWidth: 2),
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
                               )
                             : FittedBox(
                                 child: TranslatedText(
@@ -229,7 +287,9 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                         child: OutlinedButton(
                           onPressed: () => _showDeclineDialog(context),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.red.withOpacity(0.3)),
+                            side: BorderSide(
+                              color: Colors.red.withOpacity(0.3),
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
@@ -258,13 +318,122 @@ class ClientBookingDetailsScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildPayRemainingButton(BuildContext context) {
+    return Consumer2<PaymentController, BookingController>(
+      builder: (context, paymentController, bookingController, child) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: SizedBox(
+            width: double.infinity,
+            height: 45.h,
+            child: ElevatedButton(
+              onPressed:
+                  paymentController.isLoading || bookingController.isLoading
+                  ? null
+                  : () async {
+                      final paymentData = await bookingController.payBalance(
+                        bookingId: booking.sId ?? '',
+                      );
+
+                      if (paymentData != null) {
+                        final clientSecret =
+                            paymentData['clientSecret'] ??
+                            paymentData['client_secret'];
+                        final ephemeralKey =
+                            paymentData['ephemeralKey'] ??
+                            paymentData['ephemeral_key'];
+                        final customerId =
+                            paymentData['customerId'] ??
+                            paymentData['customer_id'];
+
+                        if (clientSecret != null) {
+                          await Stripe.instance.initPaymentSheet(
+                            paymentSheetParameters: SetupPaymentSheetParameters(
+                              paymentIntentClientSecret: clientSecret,
+                              customerEphemeralKeySecret: ephemeralKey,
+                              customerId: customerId,
+                              merchantDisplayName: 'Photopia',
+                              style: ThemeMode.light,
+                            ),
+                          );
+
+                          final paymentSuccess = await paymentController
+                              .presentPaymentSheet();
+                          if (paymentSuccess) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Balance Paid Successfully!'),
+                                ),
+                              );
+                              Navigator.pop(context);
+                            }
+                          }
+                        } else if (paymentData['status'] == 'succeeded') {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Balance Paid Successfully!'),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          }
+                        }
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                bookingController.errorMessage ??
+                                    'Failed to pay balance',
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2E7D32),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                elevation: 0,
+              ),
+              child: paymentController.isLoading || bookingController.isLoading
+                  ? SizedBox(
+                      height: 18.h,
+                      width: 18.h,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : FittedBox(
+                      child: TranslatedText(
+                        'Pay Remaining',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _showDeclineDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: TranslatedText('Decline Modified Offer?'),
-        content: TranslatedText('Are you sure you want to decline this modified offer? You can contact the professional to negotiate further.'),
+        content: TranslatedText(
+          'Are you sure you want to decline this modified offer? You can contact the professional to negotiate further.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -275,7 +444,10 @@ class ClientBookingDetailsScreen extends StatelessWidget {
               Navigator.pop(ctx);
               Navigator.pop(context);
             },
-            child: TranslatedText('Decline', style: TextStyle(color: Colors.red)),
+            child: TranslatedText(
+              'Decline',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -291,10 +463,14 @@ class ClientBookingDetailsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.02),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.02,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -306,15 +482,41 @@ class ClientBookingDetailsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: TranslatedText(
-                  'Professional Info',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TranslatedText(
+                    'Professional Info',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
+                    ),
                   ),
-                ),
+                  if (booking.depositPercentage != null) ...[
+                    SizedBox(height: 4.h),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          size: 14.sp,
+                          color: Colors.green,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          'Deposit Paid: ${((booking.depositPercentage ?? 1.0) * 100).toInt()}%',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.green.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
               ),
               SizedBox(width: 8.w),
               _buildStatusBadge(status),
@@ -333,17 +535,16 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                     } else if (path.startsWith('/uploads/')) {
                       path = path.replaceFirst('/uploads/', '');
                     }
-                    
+
                     final String base = Urls.baseUrl.endsWith('/')
                         ? Urls.baseUrl.substring(0, Urls.baseUrl.length - 1)
                         : Urls.baseUrl;
-                    final String finalPath = path.startsWith('/') ? path : '/$path';
+                    final String finalPath = path.startsWith('/')
+                        ? path
+                        : '/$path';
                     profileUrl = '$base$finalPath';
                   }
-                  return AuthProfileImage(
-                    imageUrl: profileUrl,
-                    size: 60.w,
-                  );
+                  return AuthProfileImage(imageUrl: profileUrl, size: 60.w);
                 },
               ),
               SizedBox(width: 16.w),
@@ -364,7 +565,9 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       'Booking ID: #${booking.bookingId ?? booking.sId?.substring(0, 8)}',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.5),
                       ),
                     ),
                   ],
@@ -391,7 +594,9 @@ class ClientBookingDetailsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -434,7 +639,9 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       package?.name ?? 'Standard Package',
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -445,10 +652,26 @@ class ClientBookingDetailsScreen extends StatelessWidget {
           SizedBox(height: 20.h),
           const Divider(),
           SizedBox(height: 16.h),
-          _buildInfoRow(context, Icons.calendar_today_outlined, 'Date', booking.bookingDate?.split('T')[0] ?? 'N/A'),
-          _buildInfoRow(context, Icons.access_time, 'Time', '${booking.startTime ?? ''} - ${booking.endTime ?? ''}'),
-          _buildInfoRow(context, Icons.location_on_outlined, 'Location', service?.location?.address ?? 'Location not set'),
-          if (booking.customOptions != null && booking.customOptions!.isNotEmpty) ...[
+          _buildInfoRow(
+            context,
+            Icons.calendar_today_outlined,
+            'Date',
+            booking.bookingDate?.split('T')[0] ?? 'N/A',
+          ),
+          _buildInfoRow(
+            context,
+            Icons.access_time,
+            'Time',
+            '${booking.startTime ?? ''} - ${booking.endTime ?? ''}',
+          ),
+          _buildInfoRow(
+            context,
+            Icons.location_on_outlined,
+            'Location',
+            service?.location?.address ?? 'Location not set',
+          ),
+          if (booking.customOptions != null &&
+              booking.customOptions!.isNotEmpty) ...[
             SizedBox(height: 16.h),
             const Divider(),
             SizedBox(height: 16.h),
@@ -461,22 +684,35 @@ class ClientBookingDetailsScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 8.h),
-            ...booking.customOptions!.map((option) => Padding(
-              padding: EdgeInsets.only(bottom: 8.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TranslatedText(
-                    option.name ?? '',
-                    style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+            ...booking.customOptions!
+                .map(
+                  (option) => Padding(
+                    padding: EdgeInsets.only(bottom: 8.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TranslatedText(
+                          option.name ?? '',
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                        ),
+                        Text(
+                          '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${option.price?.toStringAsFixed(0) ?? '0'}',
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${option.price?.toStringAsFixed(0) ?? '0'}',
-                    style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface),
-                  ),
-                ],
-              ),
-            )).toList(),
+                )
+                .toList(),
           ],
           SizedBox(height: 10.h),
           const Divider(),
@@ -489,15 +725,19 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               Builder(
                 builder: (context) {
                   String price = '0';
                   final pricing = booking.pricingDetails;
-                  
-                  if (pricing != null && pricing.baseRate != null && pricing.baseRate != 0) {
+
+                  if (pricing != null &&
+                      pricing.baseRate != null &&
+                      pricing.baseRate != 0) {
                     price = pricing.baseRate!.toStringAsFixed(0);
                   } else {
                     price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
@@ -511,26 +751,110 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   );
-                }
+                },
               ),
             ],
+          ),
+          Builder(
+            builder: (context) {
+              String price = '0';
+              final pricing = booking.pricingDetails;
+
+              if (pricing != null &&
+                  pricing.baseRate != null &&
+                  pricing.baseRate != 0) {
+                price = pricing.baseRate!.toStringAsFixed(0);
+              } else {
+                price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
+              }
+
+              double? displayPaid = booking.depositAmount;
+              double? displayRemaining = booking.balanceAmount;
+              double dDepositPercent = booking.depositPercentage ?? 1.0;
+
+              if (displayPaid != null &&
+                  displayRemaining != null &&
+                  displayRemaining > 0) {
+                return Column(
+                  children: [
+                    SizedBox(height: 12.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TranslatedText(
+                          'Paid (Deposit ${((dDepositPercent) * 100).toInt()}%)',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: const Color(0xFF4CAF50),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${displayPaid.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: const Color(0xFF4CAF50),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TranslatedText(
+                          'Remaining Balance',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${displayRemaining.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox();
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, IconData icon, String label, String value) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
         children: [
-          Icon(icon, size: 16.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+          Icon(
+            icon,
+            size: 16.sp,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+          ),
           SizedBox(width: 12.w),
           Expanded(
             child: TranslatedText(
               label,
-              style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              ),
             ),
           ),
           SizedBox(width: 12.w),

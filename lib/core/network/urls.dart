@@ -141,6 +141,8 @@ class Urls {
 
   static String modifyOffer(String id) =>
       '$_rootUrl/api/v1/booking/$id/modify-offer';
+  static String payBalance(String id) =>
+      '$_rootUrl/api/v1/booking/$id/pay-balance';
 
   //public api
   static const String termsAndConditions =

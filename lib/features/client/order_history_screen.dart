@@ -54,7 +54,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -95,14 +98,18 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                             Icon(
                               Icons.shopping_bag_outlined,
                               size: 60.sp,
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.1),
                             ),
                             SizedBox(height: 16.h),
                             Text(
                               context.l10n.noOrdersFound,
                               style: TextStyle(
                                 fontSize: 16.sp,
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.4),
                               ),
                             ),
                           ],
@@ -163,7 +170,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 child: Text(
                   filter,
                   style: TextStyle(
-                    color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onSurface,
                     fontWeight: isSelected
                         ? FontWeight.bold
                         : FontWeight.normal,
@@ -182,12 +191,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     final l = context.l10n;
     if (_selectedFilter == l.filterAllOrders) return bookings;
     String apiStatus = 'upcoming';
-    if (_selectedFilter == l.statusCompleted) apiStatus = 'completed';
-    else if (_selectedFilter == l.statusCancelled) apiStatus = 'cancelled';
-    else if (_selectedFilter == l.filterUpcoming) apiStatus = 'upcoming';
-    return bookings
-        .where((b) => b.status?.toLowerCase() == apiStatus)
-        .toList();
+    if (_selectedFilter == l.statusCompleted)
+      apiStatus = 'completed';
+    else if (_selectedFilter == l.statusCancelled)
+      apiStatus = 'cancelled';
+    else if (_selectedFilter == l.filterUpcoming)
+      apiStatus = 'upcoming';
+    return bookings.where((b) => b.status?.toLowerCase() == apiStatus).toList();
   }
 
   Widget _buildOrderCard(Booking booking) {
@@ -217,7 +227,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       onTap: () {
         Navigator.push(
           context,
-          AppTransitions.createPremiumRoute(ClientBookingDetailsScreen(booking: booking)),
+          AppTransitions.createPremiumRoute(
+            ClientBookingDetailsScreen(booking: booking),
+          ),
         );
       },
       child: Container(
@@ -228,7 +240,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.03),
+              color: Colors.black.withOpacity(
+                Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.03,
+              ),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -247,18 +261,33 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           width: 80.w,
                           height: 80.w,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            width: 80.w,
-                            height: 80.w,
-                            color: Theme.of(context).dividerColor.withOpacity(0.05),
-                            child: Icon(Icons.image, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                width: 80.w,
+                                height: 80.w,
+                                color: Theme.of(
+                                  context,
+                                ).dividerColor.withOpacity(0.05),
+                                child: Icon(
+                                  Icons.image,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface.withOpacity(0.2),
+                                ),
+                              ),
                         )
                       : Container(
                           width: 80.w,
                           height: 80.w,
-                          color: Theme.of(context).dividerColor.withOpacity(0.05),
-                          child: Icon(Icons.image, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.05),
+                          child: Icon(
+                            Icons.image,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.2),
+                          ),
                         ),
                 ),
                 SizedBox(width: 15.w),
@@ -271,7 +300,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         children: [
                           Expanded(
                             child: TranslatedText(
-                              booking.serviceId?.title ?? context.l10n.serviceTitleDefault,
+                              booking.serviceId?.title ??
+                                  context.l10n.serviceTitleDefault,
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
@@ -284,10 +314,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       ),
                       SizedBox(height: 4.h),
                       TranslatedText(
-                        booking.package?.name ?? context.l10n.standardPackageDefault,
+                        booking.package?.name ??
+                            context.l10n.standardPackageDefault,
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                       SizedBox(height: 8.h),
@@ -296,18 +329,24 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           Builder(
                             builder: (context) {
                               String? profileUrl = booking.providerId?.profile;
-                              if (profileUrl != null && !profileUrl.startsWith('http')) {
+                              if (profileUrl != null &&
+                                  !profileUrl.startsWith('http')) {
                                 String path = profileUrl;
                                 if (path.startsWith('uploads/')) {
                                   path = path.replaceFirst('uploads/', '');
                                 } else if (path.startsWith('/uploads/')) {
                                   path = path.replaceFirst('/uploads/', '');
                                 }
-                                
+
                                 final String base = Urls.baseUrl.endsWith('/')
-                                    ? Urls.baseUrl.substring(0, Urls.baseUrl.length - 1)
+                                    ? Urls.baseUrl.substring(
+                                        0,
+                                        Urls.baseUrl.length - 1,
+                                      )
                                     : Urls.baseUrl;
-                                final String finalPath = path.startsWith('/') ? path : '/$path';
+                                final String finalPath = path.startsWith('/')
+                                    ? path
+                                    : '/$path';
                                 profileUrl = '$base$finalPath';
                               }
                               debugPrint(
@@ -322,7 +361,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           ),
                           SizedBox(width: 8.w),
                           Text(
-                            booking.providerId?.name ?? context.l10n.providerNameDefault,
+                            booking.providerId?.name ??
+                                context.l10n.providerNameDefault,
                             style: TextStyle(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.w500,
@@ -347,75 +387,146 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     Icon(
                       Icons.calendar_today_outlined,
                       size: 14.sp,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.3),
                     ),
                     SizedBox(width: 6.w),
                     Text(
                       formattedDate,
-                      style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
+                      ),
                     ),
                     SizedBox(width: 15.w),
-                    Icon(Icons.access_time, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                    Icon(
+                      Icons.access_time,
+                      size: 14.sp,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.3),
+                    ),
                     SizedBox(width: 6.w),
                     Text(
                       booking.startTime ?? '00:00',
-                      style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
+                      ),
                     ),
                   ],
                 ),
-                Builder(
-                  builder: (context) {
-                    String price = '0';
-                    final pricing = booking.pricingDetails;
-                    
-                    if (pricing != null && pricing.baseRate != null && pricing.baseRate != 0) {
-                      price = pricing.baseRate!.toStringAsFixed(0);
-                    } else {
-                      price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
-                    }
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Builder(
+              builder: (context) {
+                String price = '0';
+                final pricing = booking.pricingDetails;
 
-                    return Text(
+                if (pricing != null &&
+                    pricing.baseRate != null &&
+                    pricing.baseRate != 0) {
+                  price = pricing.baseRate!.toStringAsFixed(0);
+                } else {
+                  price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
+                }
+
+                double? displayPaid = booking.depositAmount;
+                double? displayRemaining = booking.balanceAmount;
+                double dDepositPercent = booking.depositPercentage ?? 1.0;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
                       '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}$price',
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                    );
-                  }
-                ),
-              ],
+                    ),
+                    if (displayPaid != null &&
+                        displayRemaining != null &&
+                        displayRemaining > 0) ...[
+                      SizedBox(height: 4.h),
+                      Text(
+                        'Paid: ${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${displayPaid.toStringAsFixed(0)} (${(dDepositPercent * 100).toInt()}%)',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: const Color(0xFF4CAF50),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'Remaining: ${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${displayRemaining.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ],
+                );
+              },
             ),
             SizedBox(height: 8.h),
             Row(
               children: [
-                Icon(Icons.location_on_outlined, size: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 14.sp,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.3),
+                ),
                 SizedBox(width: 6.w),
                 Expanded(
                   child: Text(
-                    booking.serviceId?.location?.address ?? context.l10n.locationNotSet,
-                    style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                    booking.serviceId?.location?.address ??
+                        context.l10n.locationNotSet,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-            if (booking.customOptions != null && 
-                booking.customOptions!.isNotEmpty && 
-                (booking.paymentStatus?.toLowerCase() == 'paid' || booking.paymentStatus?.toLowerCase() == 'completed')) ...[
+            if (booking.customOptions != null &&
+                booking.customOptions!.isNotEmpty &&
+                (booking.paymentStatus?.toLowerCase() == 'paid' ||
+                    booking.paymentStatus?.toLowerCase() == 'completed')) ...[
               SizedBox(height: 12.h),
               SizedBox(
                 width: double.infinity,
                 height: 32.h,
                 child: ElevatedButton(
                   onPressed: () async {
-                    final bookingController = Provider.of<BookingController>(context, listen: false);
-                    final success = await bookingController.acceptModifiedOffer(booking.sId ?? '');
+                    final bookingController = Provider.of<BookingController>(
+                      context,
+                      listen: false,
+                    );
+                    final success = await bookingController.acceptModifiedOffer(
+                      booking.sId ?? '',
+                    );
                     if (success) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Offer Accepted Successfully!')),
+                          const SnackBar(
+                            content: Text('Offer Accepted Successfully!'),
+                          ),
                         );
                         bookingController.getMyBookings(); // Refresh list
                       }
@@ -432,7 +543,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   ),
                   child: Text(
                     'Accept Modified Offer',
-                    style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -441,7 +555,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         ),
       ),
     );
-
   }
 
   Widget _buildStatusBadge(String status) {

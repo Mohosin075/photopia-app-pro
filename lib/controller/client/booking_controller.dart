@@ -259,4 +259,39 @@ class BookingController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<Map<String, dynamic>?> payBalance({
+    required String bookingId,
+    String? paymentMethodId,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final Map<String, dynamic> body = {};
+      if (paymentMethodId != null) {
+        body['paymentMethodId'] = paymentMethodId;
+      }
+
+      final response = await NetworkCaller.postRequest(
+        url: Urls.payBalance(bookingId),
+        body: body,
+        requireAuth: true,
+      );
+
+      if (response.isSuccess) {
+        return response.body?['data'];
+      } else {
+        _errorMessage = response.errorMessage ?? "Failed to pay balance";
+        return null;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      return null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
