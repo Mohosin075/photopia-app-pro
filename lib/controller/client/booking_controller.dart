@@ -82,10 +82,11 @@ class BookingController extends ChangeNotifier {
         "startTime": startTime,
         "endTime": endTime,
         "packageName": packageName ?? "",
-        "paymentMethodId": paymentMethodId,
-        "paymentIntentId": paymentIntentId, // Pass it here
-        "isPaid": true,
-        "paymentStatus": "Paid",
+        if (paymentMethodId != null) "paymentMethodId": paymentMethodId,
+        if (paymentMethodId == null && paymentIntentId != null) 
+           "paymentIntentId": paymentIntentId,
+        "isPaid": false,
+        "paymentStatus": "pending",
         "eventLocation": {
           "address": address,
           "city": city,

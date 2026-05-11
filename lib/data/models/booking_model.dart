@@ -196,6 +196,9 @@ class PricingDetails {
   double? baseRate;
   double? subtotal;
   double? commission;
+  double? platformCommissionClient;
+  double? platformCommissionProvider;
+  double? providerEarnings;
   String? currency;
 
   PricingDetails({
@@ -203,6 +206,9 @@ class PricingDetails {
     this.baseRate,
     this.subtotal,
     this.commission,
+    this.platformCommissionClient,
+    this.platformCommissionProvider,
+    this.providerEarnings,
     this.currency,
   });
 
@@ -211,6 +217,11 @@ class PricingDetails {
     baseRate = (json['baseRate'] as num?)?.toDouble();
     subtotal = (json['subtotal'] as num?)?.toDouble();
     commission = (json['commission'] as num?)?.toDouble();
+    platformCommissionClient =
+        (json['platformCommissionClient'] as num?)?.toDouble();
+    platformCommissionProvider =
+        (json['platformCommissionProvider'] as num?)?.toDouble();
+    providerEarnings = (json['providerEarnings'] as num?)?.toDouble();
     currency = json['currency'];
   }
 
@@ -220,6 +231,9 @@ class PricingDetails {
     data['baseRate'] = baseRate;
     data['subtotal'] = subtotal;
     data['commission'] = commission;
+    data['platformCommissionClient'] = platformCommissionClient;
+    data['platformCommissionProvider'] = platformCommissionProvider;
+    data['providerEarnings'] = providerEarnings;
     data['currency'] = currency;
     return data;
   }

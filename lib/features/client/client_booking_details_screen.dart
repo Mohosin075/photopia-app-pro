@@ -717,44 +717,90 @@ class ClientBookingDetailsScreen extends StatelessWidget {
           SizedBox(height: 10.h),
           const Divider(),
           SizedBox(height: 16.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TranslatedText(
-                'Total Amount',
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
-                ),
-              ),
               Builder(
                 builder: (context) {
-                  String price = '0';
                   final pricing = booking.pricingDetails;
+                  double subtotal = pricing?.subtotal ?? 0;
+                  double platformFee = (pricing?.clientTotal ?? 0) - subtotal;
+                  if (platformFee < 0) platformFee = 0;
+                  
+                  double total = pricing?.clientTotal ?? booking.totalPrice ?? 0;
+                  String currency = (booking.currency == 'EUR') ? '€' : (booking.currency ?? '€');
 
-                  if (pricing != null &&
-                      pricing.baseRate != null &&
-                      pricing.baseRate != 0) {
-                    price = pricing.baseRate!.toStringAsFixed(0);
-                  } else {
-                    price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
-                  }
-
-                  return Text(
-                    '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}$price',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TranslatedText(
+                            'Subtotal',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                            ),
+                          ),
+                          Text(
+                            '$currency${subtotal.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (platformFee > 0) ...[
+                        SizedBox(height: 4.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TranslatedText(
+                              'Platform Fee (10%)',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                              ),
+                            ),
+                            Text(
+                              '$currency${platformFee.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                      SizedBox(height: 8.h),
+                      const Divider(),
+                      SizedBox(height: 8.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TranslatedText(
+                            'Total Payable',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          Text(
+                            '$currency${total.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   );
                 },
               ),
-            ],
-          ),
           Builder(
             builder: (context) {
               String price = '0';

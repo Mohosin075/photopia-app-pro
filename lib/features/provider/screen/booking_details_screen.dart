@@ -210,7 +210,12 @@ class BookingDetailsScreen extends StatelessWidget {
       final pricingDetails = currentBooking['pricingDetails'];
       final String? packageName = currentBooking['packageName'];
       
-      if (pricingDetails != null && pricingDetails['baseRate'] != null && pricingDetails['baseRate'] != 0) {
+      // Priority 1: Subtotal (What the provider sees)
+      if (pricingDetails != null && pricingDetails['subtotal'] != null && pricingDetails['subtotal'] != 0) {
+        price = pricingDetails['subtotal'].toString();
+      } 
+      // Priority 2: Base Rate
+      else if (pricingDetails != null && pricingDetails['baseRate'] != null && pricingDetails['baseRate'] != 0) {
         price = pricingDetails['baseRate'].toString();
       } else if (packageName != null && service['pricingModel'] != null && service['pricingModel']['packages'] != null) {
         final List packages = service['pricingModel']['packages'];
@@ -221,9 +226,7 @@ class BookingDetailsScreen extends StatelessWidget {
       }
       
       if (price == '0' || price == '0.0') {
-        if (pricingDetails != null && pricingDetails['subtotal'] != null && pricingDetails['subtotal'] != 0) {
-          price = pricingDetails['subtotal'].toString();
-        } else if (currentBooking['totalAmount'] != null && currentBooking['totalAmount'] != 0) {
+        if (currentBooking['totalAmount'] != null && currentBooking['totalAmount'] != 0) {
           price = currentBooking['totalAmount'].toString();
         } else {
           price = service['price']?.toString() ?? '0';
@@ -267,46 +270,64 @@ class BookingDetailsScreen extends StatelessWidget {
           const Divider(),
           SizedBox(height: 10.h),
           
-          // Total Price Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total Price',
-                style: TextStyle(
-                  fontSize: 14.sp.clamp(13, 15),
-                  color: Colors.grey[600],
-                ),
-              ),
-              Text(
-                '€$displayPrice',
-                style: TextStyle(
-                  fontSize: 18.sp.clamp(16, 20),
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ],
+          // Price Breakdown for Provider
+          Builder(
+            builder: (context) {
+              final pricing = currentBooking['pricingDetails'];
+              double subtotal = 0;
+              if (pricing != null && pricing['subtotal'] != null) {
+                subtotal = double.tryParse(pricing['subtotal'].toString()) ?? 0;
+              }
+              
+              double commission = 0;
+              if (pricing != null && pricing['platformCommissionProvider'] != null) {
+                commission = double.tryParse(pricing['platformCommissionProvider'].toString()) ?? 0;
+              }
+              
+              double earnings = 0;
+              if (pricing != null && pricing['providerEarnings'] != null) {
+                earnings = double.tryParse(pricing['providerEarnings'].toString()) ?? (subtotal - commission);
+              } else {
+                earnings = subtotal - commission;
+              }
+
+              double displayPaid = double.tryParse(currentBooking['depositAmount']?.toString() ?? '0') ?? (subtotal * dDepositPercent);
+              double displayRemaining = double.tryParse(currentBooking['balanceAmount']?.toString() ?? '0') ?? (subtotal - displayPaid);
+              
+              // Note: If displayRemaining is more than earnings, it means the client owes more than what provider gets (because of platform fee)
+              // But for the provider, we show what they will actually receive.
+              double providerRemaining = earnings - (currentBooking['isPaid'] == true ? earnings : 0); // Simplification
+
+              return Column(
+                children: [
+                  _buildPaymentDetailRow(context, 'Booking Subtotal', '€${subtotal.toStringAsFixed(0)}'),
+                  if (commission > 0)
+                    _buildPaymentDetailRow(context, 'Platform Commission (5%)', '-€${commission.toStringAsFixed(0)}', color: Colors.redAccent),
+                  const Divider(),
+                  _buildPaymentDetailRow(
+                    context, 
+                    'Your Total Earnings', 
+                    '€${earnings.toStringAsFixed(0)}', 
+                    isBold: true,
+                    color: Theme.of(context).colorScheme.primary
+                  ),
+                  SizedBox(height: 12.h),
+                  _buildPaymentDetailRow(
+                    context,
+                    'Paid (Deposit)', 
+                    '€${displayPaid.toStringAsFixed(0)}',
+                    color: const Color(0xFF4CAF50),
+                  ),
+                  _buildPaymentDetailRow(
+                    context,
+                    'Client Remaining', 
+                    '€${displayRemaining.toStringAsFixed(0)}',
+                    color: Colors.grey[600],
+                  ),
+                ],
+              );
+            },
           ),
-          
-          // Payment Breakdown (Deposit & Balance)
-          if (currentBooking['depositPercentage'] != null && currentBooking['depositPercentage'] < 1.0) ...[
-            SizedBox(height: 12.h),
-            _buildPaymentDetailRow(
-              context,
-              'Paid (Deposit ${((dDepositPercent) * 100).toInt()}%)', 
-              '€${displayPaid.toStringAsFixed(2)}',
-              color: const Color(0xFF4CAF50),
-            ),
-            SizedBox(height: 8.h),
-            _buildPaymentDetailRow(
-              context,
-              'Remaining Balance', 
-              '€${displayRemaining.toStringAsFixed(2)}',
-              color: Colors.redAccent,
-              isBold: true,
-            ),
-          ],
         ],
       ),
     );

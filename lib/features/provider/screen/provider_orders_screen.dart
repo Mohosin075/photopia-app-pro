@@ -262,8 +262,12 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         final pricingDetails = order['pricingDetails'];
         final String? packageName = order['packageName'];
         
-        // Priority 1: Base Rate (What the user saw during booking)
-        if (pricingDetails != null && pricingDetails['baseRate'] != null && pricingDetails['baseRate'] != 0) {
+        // Priority 1: Subtotal (What the provider sees)
+        if (pricingDetails != null && pricingDetails['subtotal'] != null && pricingDetails['subtotal'] != 0) {
+          price = pricingDetails['subtotal'].toString();
+        } 
+        // Priority 2: Base Rate
+        else if (pricingDetails != null && pricingDetails['baseRate'] != null && pricingDetails['baseRate'] != 0) {
           price = pricingDetails['baseRate'].toString();
         } 
         // Priority 2: Package Matching
@@ -277,9 +281,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         
         // Fallbacks
         if (price == '0' || price == '0.0') {
-          if (pricingDetails != null && pricingDetails['subtotal'] != null && pricingDetails['subtotal'] != 0) {
-            price = pricingDetails['subtotal'].toString();
-          } else if (order['totalAmount'] != null && order['totalAmount'] != 0) {
+          if (order['totalAmount'] != null && order['totalAmount'] != 0) {
             price = order['totalAmount'].toString();
           } else {
             price = service['price']?.toString() ?? '0';
@@ -355,8 +357,12 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         final pricingDetails = order['pricingDetails'];
         final String? packageName = order['packageName'];
         
-        // Priority 1: Base Rate (What the user saw during booking)
-        if (pricingDetails != null && pricingDetails['baseRate'] != null && pricingDetails['baseRate'] != 0) {
+        // Priority 1: Subtotal (What the provider sees)
+        if (pricingDetails != null && pricingDetails['subtotal'] != null && pricingDetails['subtotal'] != 0) {
+          price = pricingDetails['subtotal'].toString();
+        } 
+        // Priority 2: Base Rate
+        else if (pricingDetails != null && pricingDetails['baseRate'] != null && pricingDetails['baseRate'] != 0) {
           price = pricingDetails['baseRate'].toString();
         } 
         // Priority 2: Package Matching
@@ -370,9 +376,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         
         // Fallbacks
         if (price == '0' || price == '0.0') {
-          if (pricingDetails != null && pricingDetails['subtotal'] != null && pricingDetails['subtotal'] != 0) {
-            price = pricingDetails['subtotal'].toString();
-          } else if (order['totalAmount'] != null && order['totalAmount'] != 0) {
+          if (order['totalAmount'] != null && order['totalAmount'] != 0) {
             price = order['totalAmount'].toString();
           } else {
             price = service['price']?.toString() ?? '0';
@@ -448,8 +452,12 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         final pricingDetails = order['pricingDetails'];
         final String? packageName = order['packageName'];
         
-        // Priority 1: Base Rate (What the user saw during booking)
-        if (pricingDetails != null && pricingDetails['baseRate'] != null && pricingDetails['baseRate'] != 0) {
+        // Priority 1: Subtotal (What the provider sees)
+        if (pricingDetails != null && pricingDetails['subtotal'] != null && pricingDetails['subtotal'] != 0) {
+          price = pricingDetails['subtotal'].toString();
+        } 
+        // Priority 2: Base Rate
+        else if (pricingDetails != null && pricingDetails['baseRate'] != null && pricingDetails['baseRate'] != 0) {
           price = pricingDetails['baseRate'].toString();
         } 
         // Priority 2: Package Matching

@@ -430,9 +430,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 final pricing = booking.pricingDetails;
 
                 if (pricing != null &&
-                    pricing.baseRate != null &&
-                    pricing.baseRate != 0) {
-                  price = pricing.baseRate!.toStringAsFixed(0);
+                    pricing.clientTotal != null &&
+                    pricing.clientTotal != 0) {
+                  price = pricing.clientTotal!.toStringAsFixed(0);
                 } else {
                   price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
                 }

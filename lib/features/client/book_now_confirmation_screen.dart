@@ -1607,117 +1607,111 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     }
 
     // --- FINAL CUSTOM FLOW ---
-    if (_selectedPaymentMethod == null) {
-      // 🆕 FLOW 1: NEW CARD (Use different card)
-      debugPrint('🆕 Flow: New Card (Step 1: Create Booking FIRST)');
-      
-      String? bookingId = _createdBookingId;
-      if (bookingId == null) {
-        final bookingData = await bookingCtrl.createBooking(
-          providerId: providerId,
-          serviceId: serviceId.toString(),
-          bookingDate: formattedDate,
-          startTime: bookingStartTime,
-          endTime: endTime,
-          packageName: widget.package?['name'],
-          address: _location,
-          city: _city ?? "Dhaka",
-          country: _country ?? "Bangladesh",
-          lat: _lat ?? 23.8103,
-          lng: _lng ?? 90.4125,
-          clientName: userProfile.fullName,
-          clientEmail: userProfile.email,
-          clientPhone: userProfile.phone,
-          eventType: eventType,
-          specialRequests: _specialRequests,
-          notes: _specialRequests,
-          distanceFromProviderKm: _distanceFromProvider,
-          paymentIntentId: "pending_mobile_flow", // Dummy ID to bypass backend checkout session
-        );
-        
-        if (bookingData != null) {
-          bookingId = bookingData['booking']?['_id'] ?? bookingData['_id'];
-          _createdBookingId = bookingId;
-        } else {
-          paymentSuccess = false;
-          debugPrint('❌ ERROR: Booking creation failed!');
-          return;
-        }
-      }
-
-      debugPrint('🆕 Flow: New Card (Step 2: Init Payment Sheet)');
-      final dynamic paymentResult = await paymentCtrl.initPaymentSheet(
-        bookingId: bookingId, // Sending real bookingId
-        amount: _totalBookingAmount,
-        currency:
-            widget.package?['currency'] ?? widget.service?['currency'] ?? 'EUR',
-        userEmail: userProfile.email,
+    // --- UNIFIED FLOW (New or Saved Card) ---
+    debugPrint('🚀 Flow: Starting Booking & Payment');
+    
+    String? bookingId = _createdBookingId;
+    dynamic bookingData;
+    
+    if (bookingId == null) {
+      debugPrint('Step 1: Create Booking FIRST');
+      bookingData = await bookingCtrl.createBooking(
+        providerId: providerId,
+        serviceId: serviceId.toString(),
+        bookingDate: formattedDate,
+        startTime: bookingStartTime,
+        endTime: endTime,
+        packageName: widget.package?['name'],
+        address: _location,
+        city: _city ?? "Dhaka",
+        country: _country ?? "Bangladesh",
+        lat: _lat ?? 23.8103,
+        lng: _lng ?? 90.4125,
+        clientName: userProfile.fullName,
+        clientEmail: userProfile.email,
+        clientPhone: userProfile.phone,
+        eventType: eventType,
+        specialRequests: _specialRequests,
+        notes: _specialRequests,
+        distanceFromProviderKm: _distanceFromProvider,
+        paymentMethodId: _selectedPaymentMethod?.id, 
+        paymentIntentId: "pending_mobile_flow", 
       );
-
-      if (paymentResult != false && mounted) {
-        paymentSuccess = await paymentCtrl.presentPaymentSheet();
-
-        if (paymentSuccess && mounted) {
-          debugPrint('✅ Payment Successful!');
-        } else {
-          paymentSuccess = false;
-        }
+      
+      if (bookingData != null) {
+        bookingId = bookingData['booking']?['_id'] ?? bookingData['_id'];
+        _createdBookingId = bookingId;
       } else {
         paymentSuccess = false;
+        debugPrint('❌ ERROR: Booking creation failed!');
+        return;
       }
+    }
+
+    // --- CHECK FOR OFF-SESSION PAYMENT SUCCESS ---
+    final bool isPaidAutomatically = 
+        bookingData?['isPaid'] == true || 
+        bookingData?['booking']?['isPaid'] == true ||
+        bookingData?['paymentStatus']?.toString().toLowerCase() == 'paid' ||
+        bookingData?['booking']?['paymentStatus']?.toString().toLowerCase() == 'paid';
+
+    debugPrint('🔍 Booking Response: isPaid=$isPaidAutomatically, paymentStatus=${bookingData?['paymentStatus'] ?? bookingData?['booking']?['paymentStatus']}');
+
+    if (isPaidAutomatically) {
+      debugPrint('✅ Payment successful automatically (Off-session)');
+      paymentSuccess = true;
     } else {
-      // ✅ FLOW 2: SAVED CARD
-      debugPrint('💳 Flow: Saved Card (Step 1: Create Booking FIRST)');
+      debugPrint('Step 2: Check for Payment Secrets');
+      final paymentInfo = bookingData?['payment'] ?? bookingData?['booking']?['payment'];
+      final String? paymentStatus = paymentInfo?['status']?.toString().toLowerCase();
       
-      String? bookingId = _createdBookingId;
-      if (bookingId == null) {
-        final bookingData = await bookingCtrl.createBooking(
-          providerId: providerId,
-          serviceId: serviceId.toString(),
-          bookingDate: formattedDate,
-          startTime: bookingStartTime,
-          endTime: endTime,
-          packageName: widget.package?['name'],
-          address: _location,
-          city: _city ?? "Dhaka",
-          country: _country ?? "Bangladesh",
-          lat: _lat ?? 23.8103,
-          lng: _lng ?? 90.4125,
-          clientName: userProfile.fullName,
-          clientEmail: userProfile.email,
-          clientPhone: userProfile.phone,
-          eventType: eventType,
-          specialRequests: _specialRequests,
-          notes: _specialRequests,
-          distanceFromProviderKm: _distanceFromProvider,
-          paymentIntentId: "pending_mobile_flow", // Dummy ID to bypass backend checkout session
+      debugPrint('🔍 Payment Info Found: ${paymentInfo != null}, ClientSecret Found: ${paymentInfo?['clientSecret'] != null}, Status: $paymentStatus');
+      
+      if (paymentStatus == 'succeeded') {
+        debugPrint('✅ Payment already succeeded in booking response!');
+        paymentSuccess = true;
+      } else if (paymentInfo != null && paymentInfo['clientSecret'] != null) {
+        final String clientSecret = paymentInfo['clientSecret'];
+        final String? ephemeralKey = paymentInfo['ephemeralKey'];
+        final String? customerId = paymentInfo['customerId'];
+
+        final initSuccess = await paymentCtrl.initPaymentSheetWithSecrets(
+          clientSecret: clientSecret,
+          ephemeralKey: ephemeralKey,
+          customerId: customerId,
         );
-        
-        if (bookingData != null) {
-          bookingId = bookingData['booking']?['_id'] ?? bookingData['_id'];
-          _createdBookingId = bookingId;
+
+        if (initSuccess) {
+          debugPrint('Step 3: Present Payment Sheet (Confirmation required)');
+          paymentSuccess = await paymentCtrl.presentPaymentSheet();
         } else {
           paymentSuccess = false;
-          debugPrint('❌ ERROR: Booking creation failed!');
-          return;
         }
-      }
-
-      debugPrint('💳 Flow: Saved Card (Step 2: Charge Card via Payment API)');
-      final dynamic paymentResult = await paymentCtrl.chargeSavedCard(
-        bookingId: bookingId!, 
-        amount: _depositAmount,
-        paymentMethodId: _selectedPaymentMethod!.id,
-        userEmail: userProfile.email,
-      );
-
-      debugPrint('🔍 Payment Result: $paymentResult');
-
-      if (paymentResult != null && paymentResult != false && mounted) {
-        paymentSuccess = true;
-        debugPrint('✅ Payment Successful!');
       } else {
-        paymentSuccess = false;
+        // Fallback: manually init if backend didn't return secret in booking call
+        final double payableAmount = paymentInfo?['amount']?.toDouble() ?? _totalBookingAmount;
+        
+        final dynamic initResult = await paymentCtrl.initPaymentSheet(
+          bookingId: bookingId,
+          amount: payableAmount,
+          currency: widget.package?['currency'] ?? widget.service?['currency'] ?? 'EUR',
+          userEmail: userProfile.email,
+          paymentMethodId: _selectedPaymentMethod?.id,
+        );
+        
+        if (initResult != false) {
+          final String? manualStatus = initResult is Map ? initResult['status']?.toString().toLowerCase() : null;
+          
+          if (manualStatus == 'succeeded') {
+            debugPrint('✅ Payment already succeeded in manual init!');
+            paymentSuccess = true;
+          } else {
+            debugPrint('Step 3: Present Payment Sheet (Manual Init)');
+            paymentSuccess = await paymentCtrl.presentPaymentSheet();
+          }
+        } else {
+          paymentSuccess = false;
+        }
       }
     }
 
