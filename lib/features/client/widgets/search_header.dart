@@ -51,10 +51,15 @@ class _SearchHeaderState extends State<SearchHeader> {
   }
 
   void _onSearchChanged(String value) {
+    final trimmed = value.trim().toLowerCase();
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (widget.onFilterApplied != null) {
-        widget.onFilterApplied!({'searchTerm': value});
+      if (trimmed.isEmpty) {
+        if (widget.onFilterApplied != null) {
+          widget.onFilterApplied!({'searchTerm': ''});
+        }
+      } else if (trimmed.length >= 2 && widget.onFilterApplied != null) {
+        widget.onFilterApplied!({'searchTerm': trimmed});
       }
     });
   }

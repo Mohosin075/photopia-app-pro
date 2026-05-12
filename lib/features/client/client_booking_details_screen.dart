@@ -58,12 +58,6 @@ class ClientBookingDetailsScreen extends StatelessWidget {
               _buildPayButton(context),
               SizedBox(height: 15.h),
             ],
-            if (booking.paymentStatus?.toLowerCase() == 'deposit_paid' &&
-                booking.balanceAmount != null &&
-                booking.balanceAmount! > 0) ...[
-              _buildPayRemainingButton(context),
-              SizedBox(height: 15.h),
-            ],
             _buildContactButton(context),
             if (booking.paymentStatus?.toLowerCase() == 'paid' ||
                 booking.paymentStatus?.toLowerCase() == 'fully_paid' ||
@@ -201,43 +195,54 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                                     }
                                   }
                                 } else {
-                                  // Initial deposit payment for non-modified bookings
-                                  final amountToPay =
-                                      (booking.totalPrice ?? 0) * 0.5;
-                                  final success = await paymentController
+                                  // Full payment for pending bookings
+                                  final totalAmount =
+                                      booking.pricingDetails?.clientTotal ??
+                                      booking.totalPrice ??
+                                      0;
+                                  final dynamic result = await paymentController
                                       .initPaymentSheet(
                                         bookingId: booking.sId,
-                                        amount: amountToPay,
+                                        amount: totalAmount,
                                         currency: booking.currency ?? 'EUR',
                                       );
 
-                                  if (success) {
-                                    final paymentSuccess =
-                                        await paymentController
-                                            .presentPaymentSheet();
-                                    if (paymentSuccess) {
+                                  if (result != false) {
+                                    // Check if already paid from response
+                                    final String? status = result is Map
+                                        ? result['status']?.toString().toLowerCase()
+                                        : null;
+                                    if (status == 'succeeded') {
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Payment Successful!')),
+                                        );
+                                        Navigator.pop(context);
+                                      }
+                                    } else {
+                                      final paymentSuccess =
+                                          await paymentController.presentPaymentSheet();
+                                      if (paymentSuccess && context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Payment Successful!')),
+                                        );
+                                        Navigator.pop(context);
+                                      } else if (!paymentSuccess && context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
                                             content: Text(
-                                              'Payment Successful!',
+                                              paymentController.errorMessage ?? 'Payment failed',
                                             ),
                                           ),
                                         );
-                                        Navigator.pop(context);
                                       }
                                     }
                                   } else {
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
+                                      ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            paymentController.errorMessage ??
-                                                'Payment failed',
+                                            paymentController.errorMessage ?? 'Payment failed',
                                           ),
                                         ),
                                       );
@@ -268,7 +273,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                                 child: TranslatedText(
                                   hasModifications
                                       ? 'Accept Offer'
-                                      : 'Pay Deposit',
+                                      : 'Pay Now',
                                   style: TextStyle(
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.bold,
@@ -495,27 +500,6 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       ).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
-                  if (booking.depositPercentage != null) ...[
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.check_circle_outline,
-                          size: 14.sp,
-                          color: Colors.green,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          'Deposit Paid: ${((booking.depositPercentage ?? 1.0) * 100).toInt()}%',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Colors.green.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                 ],
               ),
               SizedBox(width: 8.w),
@@ -801,78 +785,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                   );
                 },
               ),
-          Builder(
-            builder: (context) {
-              String price = '0';
-              final pricing = booking.pricingDetails;
-
-              if (pricing != null &&
-                  pricing.baseRate != null &&
-                  pricing.baseRate != 0) {
-                price = pricing.baseRate!.toStringAsFixed(0);
-              } else {
-                price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
-              }
-
-              double? displayPaid = booking.depositAmount;
-              double? displayRemaining = booking.balanceAmount;
-              double dDepositPercent = booking.depositPercentage ?? 1.0;
-
-              if (displayPaid != null &&
-                  displayRemaining != null &&
-                  displayRemaining > 0) {
-                return Column(
-                  children: [
-                    SizedBox(height: 12.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TranslatedText(
-                          'Paid (Deposit ${((dDepositPercent) * 100).toInt()}%)',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: const Color(0xFF4CAF50),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${displayPaid.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            color: const Color(0xFF4CAF50),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TranslatedText(
-                          'Remaining Balance',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${displayRemaining.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              }
-              return const SizedBox();
-            },
-          ),
+        const SizedBox(),
         ],
       ),
     );

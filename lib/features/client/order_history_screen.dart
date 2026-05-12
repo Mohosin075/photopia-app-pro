@@ -437,10 +437,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
                 }
 
-                double? displayPaid = booking.depositAmount;
-                double? displayRemaining = booking.balanceAmount;
-                double dDepositPercent = booking.depositPercentage ?? 1.0;
-
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -452,27 +448,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                    if (displayPaid != null &&
-                        displayRemaining != null &&
-                        displayRemaining > 0) ...[
-                      SizedBox(height: 4.h),
-                      Text(
-                        'Paid: ${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${displayPaid.toStringAsFixed(0)} (${(dDepositPercent * 100).toInt()}%)',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: const Color(0xFF4CAF50),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        'Remaining: ${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}${displayRemaining.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: Colors.redAccent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
                   ],
                 );
               },

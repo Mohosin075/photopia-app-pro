@@ -355,143 +355,148 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // Widget _buildStylesTags(BuildContext context, List<String>? styles) {
-  //   if (styles == null || styles.isEmpty) return const SizedBox.shrink();
+  Widget _buildStylesTags(BuildContext context, List<String>? styles) {
+    if (styles == null || styles.isEmpty) return const SizedBox.shrink();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-  //   return Padding(
-  //     padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Text(
-  //           'Explore Styles',
-  //           style: TextStyle(
-  //             fontSize: 16.sp,
-  //             fontWeight: FontWeight.bold,
-  //           ),
-  //         ),
-  //         SizedBox(height: 10.h),
-  //         Wrap(
-  //           spacing: 8.w,
-  //           runSpacing: 8.h,
-  //           children: styles.map((style) {
-  //             return Material(
-  //               color: Colors.transparent,
-  //               child: InkWell(
-  //                 borderRadius: BorderRadius.circular(20.r),
-  //                 onTap: () {
-  //                   Navigator.of(context).push(
-  //                     MaterialPageRoute(
-  //                       builder: (context) => SearchResultScreen(
-  //                         filters: {'theme': style},
-  //                       ),
-  //                     ),
-  //                   );
-  //                 },
-  //                 child: Container(
-  //                   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-  //                   decoration: BoxDecoration(
-  //                     color: Colors.grey.shade100,
-  //                     borderRadius: BorderRadius.circular(20.r),
-  //                     border: Border.all(color: Colors.grey.shade300),
-  //                   ),
-  //                   child: Text(
-  //                     style,
-  //                     style: TextStyle(
-  //                       fontSize: 13.sp,
-  //                       color: Colors.black87,
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             );
-  //           }).toList(),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Explore Styles',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 8.h,
+            children: styles.map((style) {
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20.r),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => SearchResultScreen(
+                          filters: {'theme': style},
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(20.r),
+                      border: Border.all(
+                        color: isDark ? Colors.white.withOpacity(0.15) : Colors.grey.shade300,
+                      ),
+                    ),
+                    child: Text(
+                      style,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
 
-  // Widget _buildPopularLocations(BuildContext context, List<PopularLocation>? locs) {
-  //   if (locs == null || locs.isEmpty) return const SizedBox.shrink();
+  Widget _buildPopularLocations(BuildContext context, List<PopularLocation>? locs) {
+    if (locs == null || locs.isEmpty) return const SizedBox.shrink();
 
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       SectionHeader(title: 'Top Cities', onSeeAllTap: (){}),
-  //       SizedBox(
-  //         height: 140.h,
-  //         child: ListView.builder(
-  //           padding: EdgeInsets.symmetric(horizontal: 16.w),
-  //           scrollDirection: Axis.horizontal,
-  //           physics: const BouncingScrollPhysics(),
-  //           itemCount: locs.length,
-  //           itemBuilder: (context, index) {
-  //             final loc = locs[index];
-  //             return GestureDetector(
-  //               onTap: () {
-  //                 Navigator.of(context).push(
-  //                   MaterialPageRoute(
-  //                     builder: (context) => SearchResultScreen(
-  //                       // Backend usually filters exact city matches via 'city'
-  //                       filters: {'city': loc.id},
-  //                     ),
-  //                   ),
-  //                 );
-  //               },
-  //               child: Container(
-  //                 width: 140.w,
-  //                 margin: EdgeInsets.only(right: 12.w),
-  //                 decoration: BoxDecoration(
-  //                   borderRadius: BorderRadius.circular(16.r),
-  //                   color: Colors.grey.shade200,
-  //                   image: loc.image != null ? DecorationImage(
-  //                     image: CachedNetworkImageProvider(loc.image!),
-  //                     fit: BoxFit.cover,
-  //                   ) : null,
-  //                 ),
-  //                 child: Container(
-  //                   decoration: BoxDecoration(
-  //                     borderRadius: BorderRadius.circular(16.r),
-  //                     gradient: LinearGradient(
-  //                       begin: Alignment.topCenter,
-  //                       end: Alignment.bottomCenter,
-  //                       colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-  //                     ),
-  //                   ),
-  //                   padding: EdgeInsets.all(12.w),
-  //                   alignment: Alignment.bottomLeft,
-  //                   child: Column(
-  //                     mainAxisSize: MainAxisSize.min,
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       Text(
-  //                         loc.id ?? 'City',
-  //                         style: TextStyle(
-  //                           color: Colors.white,
-  //                           fontSize: 14.sp,
-  //                           fontWeight: FontWeight.bold,
-  //                         ),
-  //                         maxLines: 1,
-  //                       ),
-  //                       Text(
-  //                         '${loc.count ?? 0} Pros',
-  //                         style: TextStyle(
-  //                           color: Colors.white70,
-  //                           fontSize: 11.sp,
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'Top Cities', onSeeAllTap: () {}),
+        SizedBox(
+          height: 140.h,
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: locs.length,
+            itemBuilder: (context, index) {
+              final loc = locs[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => SearchResultScreen(
+                        filters: {'city': loc.id},
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 140.w,
+                  margin: EdgeInsets.only(right: 12.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16.r),
+                    color: Colors.grey.shade200,
+                    image: loc.image != null
+                        ? DecorationImage(
+                            image: CachedNetworkImageProvider(loc.image!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.r),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                      ),
+                    ),
+                    padding: EdgeInsets.all(12.w),
+                    alignment: Alignment.bottomLeft,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.id ?? 'City',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          '${loc.count ?? 0} Pros',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -684,18 +689,21 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                          // Trending Projects / Subcategories
-                          // Assuming we map subcategories textually or map them to visual blocks
-                          // Or we fallback to styles
-                          // _buildStylesTags(context, data.styles),
-                          SizedBox(height: 10.h),
+                          // Explore Styles
+                          if (data.styles != null && data.styles!.isNotEmpty)
+                            Column(
+                              children: [
+                                _buildStylesTags(context, data.styles),
+                                SizedBox(height: 10.h),
+                              ],
+                            ),
 
                           // Popular Locations
                           if (data.popularLocations != null &&
                               data.popularLocations!.isNotEmpty)
                             Column(
                               children: [
-                                //  _buildPopularLocations(context, data.popularLocations),
+                                _buildPopularLocations(context, data.popularLocations),
                                 SizedBox(height: 10.h),
                               ],
                             ),

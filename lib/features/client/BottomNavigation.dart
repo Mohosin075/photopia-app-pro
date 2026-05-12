@@ -185,7 +185,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
                     ),
                   ),
                   Positioned(
-                    bottom: ScreenUtil().bottomBarHeight + 35.h,
+                    bottom: ScreenUtil().bottomBarHeight + 30.h,
                     child: _buildSearchButton(),
                   ),
                 ],

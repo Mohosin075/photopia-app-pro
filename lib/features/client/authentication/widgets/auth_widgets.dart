@@ -4,7 +4,7 @@ import 'package:photopia/core/constants/app_typography.dart';
 import 'package:photopia/core/constants/app_sizes.dart';
 
 /// Reusable custom text field for authentication screens
-class AuthTextField extends StatelessWidget {
+class AuthTextField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
   final String hintText;
@@ -27,6 +27,13 @@ class AuthTextField extends StatelessWidget {
   });
 
   @override
+  State<AuthTextField> createState() => _AuthTextFieldState();
+}
+
+class _AuthTextFieldState extends State<AuthTextField> {
+  bool _obscureText = true;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -35,7 +42,7 @@ class AuthTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          widget.label,
           style: TextStyle(
             fontSize: AppTypography.bodyMedium,
             fontWeight: FontWeight.w600,
@@ -53,10 +60,10 @@ class AuthTextField extends StatelessWidget {
             ),
           ),
           child: TextField(
-            controller: controller,
-            obscureText: isPassword,
-            keyboardType: keyboardType,
-            onChanged: onChanged,
+            controller: widget.controller,
+            obscureText: widget.isPassword ? _obscureText : false,
+            keyboardType: widget.keyboardType,
+            onChanged: widget.onChanged,
             textAlignVertical: TextAlignVertical.center,
             cursorColor: theme.colorScheme.primary,
             style: TextStyle(
@@ -64,7 +71,7 @@ class AuthTextField extends StatelessWidget {
               color: theme.colorScheme.onSurface,
             ),
             decoration: InputDecoration(
-              hintText: hintText,
+              hintText: widget.hintText,
               hintStyle: TextStyle(
                 fontSize: AppTypography.bodyMedium,
                 color: isDark ? Colors.white38 : Colors.grey.shade400,
@@ -75,13 +82,29 @@ class AuthTextField extends StatelessWidget {
                 horizontal: 16.w,
                 vertical: 12.h,
               ),
-              suffixIcon: showValidationIcon && controller.text.isNotEmpty
-                  ? Icon(
-                      isValid ? Icons.check : null,
-                      color: isDark ? Colors.white38 : Colors.grey.shade400,
-                      size: 20.sp.clamp(20, 24),
+              suffixIcon: widget.isPassword
+                  ? IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                      icon: Icon(
+                        _obscureText
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: isDark ? Colors.white38 : Colors.grey.shade500,
+                        size: 20.sp.clamp(20, 24),
+                      ),
+                      splashRadius: 20,
                     )
-                  : null,
+                  : (widget.showValidationIcon && widget.controller.text.isNotEmpty
+                      ? Icon(
+                          widget.isValid ? Icons.check : null,
+                          color: isDark ? Colors.white38 : Colors.grey.shade400,
+                          size: 20.sp.clamp(20, 24),
+                        )
+                      : null),
             ),
           ),
         ),

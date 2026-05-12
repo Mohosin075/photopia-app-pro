@@ -863,26 +863,36 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           SizedBox(height: 25.h),
           if (_hasDeposit) ...[
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: EdgeInsets.all(14.w),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12).r,
-                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                color: Colors.amber.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(14).r,
+                border: Border.all(color: Colors.amber.withOpacity(0.35)),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline, color: Colors.orange, size: 18.sp),
-                  SizedBox(width: 10.w),
-                  Expanded(
-                    child: Text(
-                      'Payment Notice: You will only be charged ${(_depositPercentage * 100).toInt()}% of the total price today to confirm your booking.',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: isDark
-                            ? Colors.orange[200]
-                            : Colors.orange.shade900,
-                        fontWeight: FontWeight.w600,
+                  Row(
+                    children: [
+                      Icon(Icons.lock_clock_outlined, color: Colors.amber.shade700, size: 18.sp),
+                      SizedBox(width: 8.w),
+                      Text(
+                        'Deposit Required to Confirm',
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.amber[200] : Colors.amber.shade900,
+                        ),
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'This provider requires a ${(_depositPercentage * 100).toInt()}% upfront deposit to secure your booking. Pay $currencySymbol${_depositAmount.toStringAsFixed(2)} now — the remaining $currencySymbol${_balanceAmount.toStringAsFixed(2)} is settled after the session.',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: isDark ? Colors.amber[100] : Colors.amber.shade900,
+                      height: 1.5,
                     ),
                   ),
                 ],
@@ -945,13 +955,13 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 ),
                 if (_hasDeposit) ...[
                   _buildReviewItem(
-                    'Payable Now (Deposit)',
+                    'Pay Now (${(_depositPercentage * 100).toInt()}% Deposit)',
                     '$currencySymbol${_depositAmount.toStringAsFixed(2)}',
                     color: Colors.green,
                     isBold: true,
                   ),
                   _buildReviewItem(
-                    'Remaining Balance',
+                    'Due After Session (Balance)',
                     '$currencySymbol${_balanceAmount.toStringAsFixed(2)}',
                     color: Colors.orange,
                   ),
@@ -960,27 +970,26 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             ),
           ),
           if (_hasDeposit) ...[
-            SizedBox(height: 20.h),
+            SizedBox(height: 12.h),
             Container(
-              padding: EdgeInsets.all(15.w),
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12).r,
-                border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                color: Colors.green.withOpacity(0.07),
+                borderRadius: BorderRadius.circular(10).r,
+                border: Border.all(color: Colors.green.withOpacity(0.2)),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: Colors.orange, size: 20.sp),
-                  SizedBox(width: 12.w),
+                  Icon(Icons.check_circle_outline, color: Colors.green, size: 18.sp),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: Text(
-                      'Note: You only need to pay the deposit (50%) now to confirm. The rest is due later.',
+                      'Only $currencySymbol${_depositAmount.toStringAsFixed(2)} is charged today. Balance of $currencySymbol${_balanceAmount.toStringAsFixed(2)} is due after your session.',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: isDark
-                            ? Colors.orange[200]
-                            : Colors.orange.shade900,
+                        color: isDark ? Colors.green[200] : Colors.green.shade800,
                         fontWeight: FontWeight.w500,
+                        height: 1.4,
                       ),
                     ),
                   ),
@@ -1035,7 +1044,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     return double.tryParse(priceStr) ?? 0;
   }
 
-  bool get _hasDeposit => _depositPercentage < 1.0;
+  bool get _hasDeposit => false; // Deposit disabled
 
   double get _depositPercentage {
     // Default to 50% as requested for automatic deposit
@@ -1095,27 +1104,49 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
 
           if (_hasDeposit) ...[
             Container(
-              padding: EdgeInsets.all(15.w),
+              padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12).r,
-                border: Border.all(color: Colors.blue.withOpacity(0.3)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.blue, size: 20.sp),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Text(
-                      'Automatic Deposit: You only need to pay ${(_depositPercentage * 100).toInt()}% of the total amount now. The remaining balance will be shown in your order history and can be settled later.',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: isDark ? Colors.blue[200] : Colors.blue.shade900,
-                        fontWeight: FontWeight.w600,
-                        height: 1.4,
-                      ),
-                    ),
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(14).r,
+                border: Border.all(color: Colors.blue.withOpacity(0.25)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(isDark ? 0.08 : 0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(6.w),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.payment_outlined, color: Colors.blue, size: 16.sp),
+                      ),
+                      SizedBox(width: 10.w),
+                      Text(
+                        'How Deposit Billing Works',
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12.h),
+                  _buildDepositStep('1', 'Pay $currencySymbol${_depositAmount.toStringAsFixed(2)} now (${(_depositPercentage * 100).toInt()}% deposit) to confirm.', Colors.blue),
+                  SizedBox(height: 6.h),
+                  _buildDepositStep('2', 'Your session is locked in. Provider is notified immediately.', Colors.green),
+                  SizedBox(height: 6.h),
+                  _buildDepositStep('3', 'Pay remaining $currencySymbol${_balanceAmount.toStringAsFixed(2)} after your session is complete.', Colors.orange),
                 ],
               ),
             ),
@@ -1144,17 +1175,17 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 ),
                 if (_hasDeposit) ...[
                   _buildPriceRow(
-                    'Deposit Percentage',
-                    '${(_depositPercentage * 100).toInt()}%',
+                    'Deposit Rate',
+                    '${(_depositPercentage * 100).toInt()}% of total',
                   ),
                   Divider(color: theme.dividerColor.withOpacity(0.1)),
                   _buildPriceRow(
-                    'Payable Now (Deposit)',
+                    'Charge Today',
                     '$currencySymbol${_depositAmount.toStringAsFixed(2)}',
                     isBold: true,
                   ),
                   _buildPriceRow(
-                    'Remaining Balance',
+                    'Due After Session',
                     '$currencySymbol${_balanceAmount.toStringAsFixed(2)}',
                   ),
                 ] else ...[
@@ -1431,7 +1462,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 Navigator.of(context).popUntil((route) => route.isFirst),
             child: Container(
               width: double.infinity,
-              height: 55.h,
+              height: 46.h,
               decoration: BoxDecoration(
                 color: const Color(0xFF1F1F1F),
                 borderRadius: BorderRadius.circular(12).r,
@@ -1785,7 +1816,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           },
           child: Container(
             width: double.infinity,
-            height: 55.h,
+            height: 46.h,
             decoration: BoxDecoration(
               color: const Color(0xFF1F1F1F),
               borderRadius: BorderRadius.circular(12).r,
@@ -1796,7 +1827,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   : Text(
                       _pageIndex == 3
                           ? (_hasDeposit
-                                ? 'Pay 50% Deposit Now'
+                                ? 'Pay ${_getCurrencySymbol(widget.package?['currency'] ?? widget.service?['currency'])}${_depositAmount.toStringAsFixed(2)} Deposit & Confirm'
                                 : 'Pay & Confirm')
                           : 'Continue',
                       style: TextStyle(
@@ -1922,6 +1953,39 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDepositStep(String step, String text, Color color) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 20.w,
+          height: 20.w,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          alignment: Alignment.center,
+          child: Text(
+            step,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SizedBox(width: 10.w),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

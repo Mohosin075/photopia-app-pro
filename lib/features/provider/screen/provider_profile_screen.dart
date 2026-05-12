@@ -21,7 +21,7 @@ import 'package:photopia/features/client/search_screen.dart';
 import 'package:photopia/core/widgets/app_refresher.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
-  final bool showSpecializations;
+  final bool showSpecializations; 
   const ProviderProfileScreen({super.key, this.showSpecializations = true});
 
   @override
