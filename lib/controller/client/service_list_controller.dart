@@ -41,8 +41,10 @@ class ServiceListController extends ChangeNotifier {
         filters.forEach((key, value) {
           if (value != null && value.toString().isNotEmpty) {
             if (value is List) {
-              for (var item in value) {
-                queryParams.add('$key=$item');
+              if (value.isNotEmpty) {
+                // Join lists with commas instead of multiple keys
+                // This is more standard for single keys that expect multiple values
+                queryParams.add('$key=${value.join(',')}');
               }
             } else {
               queryParams.add('$key=$value');

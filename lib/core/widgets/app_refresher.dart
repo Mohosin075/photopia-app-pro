@@ -31,27 +31,40 @@ class _AppRefresherState extends State<AppRefresher> with SingleTickerProviderSt
     if (_isRefreshing) return;
 
     if (notification is ScrollUpdateNotification) {
-      // Over-scroll detection
-      if (notification.metrics.pixels < 0) {
+      final double pixels = notification.metrics.pixels;
+      
+      // On iOS/Bouncing physics, pixels will go negative
+      if (pixels < 0) {
         setState(() {
-          _dragOffset = -notification.metrics.pixels;
+          _dragOffset = -pixels;
         });
-        
-        if (_dragOffset >= _triggerOffset && !_canTrigger) {
-          _canTrigger = true;
-          HapticFeedback.mediumImpact();
-        } else if (_dragOffset < _triggerOffset && _canTrigger) {
+      } 
+      // Reset if we've scrolled past the top
+      else if (pixels > 0 && _dragOffset > 0) {
+        setState(() {
+          _dragOffset = 0;
           _canTrigger = false;
-        }
-      } else {
-        if (_dragOffset != 0) {
-          setState(() {
-            _dragOffset = 0;
-            _canTrigger = false;
-          });
-        }
+        });
       }
-    } else if (notification is ScrollEndNotification) {
+    } 
+    else if (notification is OverscrollNotification) {
+      // Specifically for Android/Clamping physics
+      if (notification.overscroll < 0) {
+        setState(() {
+          _dragOffset -= notification.overscroll;
+        });
+      }
+    }
+
+    // Check if we can trigger based on the current drag offset
+    if (_dragOffset >= _triggerOffset && !_canTrigger) {
+      _canTrigger = true;
+      HapticFeedback.mediumImpact();
+    } else if (_dragOffset < _triggerOffset && _canTrigger) {
+      _canTrigger = false;
+    }
+
+    if (notification is ScrollEndNotification) {
       if (_canTrigger && !_isRefreshing) {
         _startRefresh();
       } else {

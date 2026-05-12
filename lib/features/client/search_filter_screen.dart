@@ -18,19 +18,17 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
   RangeValues _budgetRange = const RangeValues(0, 5000);
   bool _showFavoritesOnly = false;
 
-  final List<String> _serviceTypes = [
-    'Photography',
-    'Videography',
-    'Wedding',
-    'Corporate',
-    'Portrait',
-    'Product',
-    'Fashion',
-    'Real Estate',
-    'Event',
-    'Aerial/Drone',
+  final List<Map<String, String>> _serviceTypes = [
+    {'label': 'Photography', 'value': 'photography'},
+    {'label': 'Videography', 'value': 'videography'},
+    {'label': 'Video Editing', 'value': 'video_editing'},
+    {'label': 'Photo Editing', 'value': 'photo_editing'},
+    {'label': 'Graphic Design', 'value': 'graphic_design'},
+    {'label': 'Drone Photography', 'value': 'drone_photography'},
+    {'label': 'Event Coverage', 'value': 'event_coverage'},
+    {'label': 'Studio Rental', 'value': 'studio_rental'},
   ];
-  final Set<String> _selectedServices = {'Photography'};
+  String _selectedService = 'photography';
 
   final List<String> _equipments = [
     'DSLR',
@@ -143,16 +141,14 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
               children: _serviceTypes
                   .map(
                     (service) => _buildFilterChip(
-                      label: service,
-                      isSelected: _selectedServices.contains(service),
+                      label: service['label']!,
+                      isSelected: _selectedService == service['value'],
                       onSelected: (selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedServices.add(service);
-                          } else {
-                            _selectedServices.remove(service);
-                          }
-                        });
+                        if (selected) {
+                          setState(() {
+                            _selectedService = service['value']!;
+                          });
+                        }
                       },
                     ),
                   )
@@ -191,7 +187,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                   child: OutlinedButton(
                     onPressed: () {
                       setState(() {
-                        _selectedServices.clear();
+                        _selectedService = 'photography';
                         _selectedEquipments.clear();
                         _radius = 200;
                         _showFavoritesOnly = false;
@@ -230,9 +226,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                         'radius': _radius,
                         'minPrice': _budgetRange.start.round(),
                         'maxPrice': _budgetRange.end.round(),
-                        'serviceType': _selectedServices
-                            .map((s) => s.toLowerCase())
-                            .toList(),
+                        'serviceType': _selectedService,
                         'equipments': _selectedEquipments.toList(),
                         'favoritesOnly': _showFavoritesOnly,
                       });

@@ -33,16 +33,31 @@ class TranslatedText extends StatelessWidget {
   final String text;
   final TextStyle? style;
   final TextAlign? textAlign;
+  final int? maxLines;
+  final TextOverflow? overflow;
 
-  const TranslatedText(this.text, {super.key, this.style, this.textAlign});
+  const TranslatedText(
+    this.text, {
+    super.key,
+    this.style,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
+  });
 
   @override
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context);
-    
+
     // If English, just return normal Text
     if (locale.languageCode == 'en') {
-      return Text(text, style: style, textAlign: textAlign);
+      return Text(
+        text,
+        style: style,
+        textAlign: textAlign,
+        maxLines: maxLines,
+        overflow: overflow,
+      );
     }
 
     return FutureBuilder<String>(
@@ -53,6 +68,8 @@ class TranslatedText extends StatelessWidget {
           snapshot.data ?? text,
           style: style,
           textAlign: textAlign,
+          maxLines: maxLines,
+          overflow: overflow,
         );
       },
     );

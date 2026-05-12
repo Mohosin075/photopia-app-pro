@@ -233,64 +233,44 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         );
       },
       child: Container(
-        margin: EdgeInsets.only(bottom: 20.h),
-        padding: EdgeInsets.all(15.w),
+        margin: EdgeInsets.only(bottom: 16.h),
+        padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.05),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(
-                Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.03,
+                Theme.of(context).brightness == Brightness.dark ? 0.2 : 0.04,
               ),
               blurRadius: 10,
-              offset: const Offset(0, 5),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(15.r),
+                  borderRadius: BorderRadius.circular(12.r),
                   child: coverUrl.isNotEmpty
                       ? Image.network(
                           coverUrl,
-                          width: 80.w,
-                          height: 80.w,
+                          width: 70.w,
+                          height: 70.w,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                width: 80.w,
-                                height: 80.w,
-                                color: Theme.of(
-                                  context,
-                                ).dividerColor.withOpacity(0.05),
-                                child: Icon(
-                                  Icons.image,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface.withOpacity(0.2),
-                                ),
-                              ),
+                              _buildImagePlaceholder(context),
                         )
-                      : Container(
-                          width: 80.w,
-                          height: 80.w,
-                          color: Theme.of(
-                            context,
-                          ).dividerColor.withOpacity(0.05),
-                          child: Icon(
-                            Icons.image,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withOpacity(0.2),
-                          ),
-                        ),
+                      : _buildImagePlaceholder(context),
                 ),
-                SizedBox(width: 15.w),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,27 +283,29 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                               booking.serviceId?.title ??
                                   context.l10n.serviceTitleDefault,
                               style: TextStyle(
-                                fontSize: 16.sp,
+                                fontSize: 15.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           _buildStatusBadge(booking.status ?? 'PENDING'),
                         ],
                       ),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 2.h),
                       TranslatedText(
                         booking.package?.name ??
                             context.l10n.standardPackageDefault,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 12.sp,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
-                      SizedBox(height: 8.h),
+                      SizedBox(height: 6.h),
                       Row(
                         children: [
                           Builder(
@@ -349,22 +331,18 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                     : '/$path';
                                 profileUrl = '$base$finalPath';
                               }
-                              debugPrint(
-                                "👤 Provider Name: ${booking.providerId?.name}",
-                              );
-                              debugPrint("👤 Final Profile URL: $profileUrl");
                               return AuthProfileImage(
                                 imageUrl: profileUrl,
-                                size: 24.w,
+                                size: 18.w,
                               );
                             },
                           ),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 6.w),
                           Text(
                             booking.providerId?.name ??
                                 context.l10n.providerNameDefault,
                             style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
@@ -376,81 +354,27 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 15.h),
-            const Divider(),
-            SizedBox(height: 10.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      size: 14.sp,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.3),
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      formattedDate,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    SizedBox(width: 15.w),
-                    Icon(
-                      Icons.access_time,
-                      size: 14.sp,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.3),
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      booking.startTime ?? '00:00',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+            SizedBox(height: 12.h),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: Theme.of(context).dividerColor.withOpacity(0.05),
             ),
             SizedBox(height: 12.h),
-            Builder(
-              builder: (context) {
-                String price = '0';
-                final pricing = booking.pricingDetails;
-
-                if (pricing != null &&
-                    pricing.clientTotal != null &&
-                    pricing.clientTotal != 0) {
-                  price = pricing.clientTotal!.toStringAsFixed(0);
-                } else {
-                  price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
-                }
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}$price',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                  ],
-                );
-              },
+            Row(
+              children: [
+                _buildInfoChip(
+                  context,
+                  Icons.calendar_today_outlined,
+                  formattedDate,
+                ),
+                SizedBox(width: 12.w),
+                _buildInfoChip(
+                  context,
+                  Icons.access_time,
+                  booking.startTime ?? '00:00',
+                ),
+              ],
             ),
             SizedBox(height: 8.h),
             Row(
@@ -458,9 +382,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 Icon(
                   Icons.location_on_outlined,
                   size: 14.sp,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                 ),
                 SizedBox(width: 6.w),
                 Expanded(
@@ -479,6 +401,50 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 ),
               ],
             ),
+            SizedBox(height: 16.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Builder(
+                  builder: (context) {
+                    String price = '0';
+                    final pricing = booking.pricingDetails;
+
+                    if (pricing != null &&
+                        pricing.clientTotal != null &&
+                        pricing.clientTotal != 0) {
+                      price = pricing.clientTotal!.toStringAsFixed(0);
+                    } else {
+                      price = booking.totalPrice?.toStringAsFixed(0) ?? '0';
+                    }
+
+                    return Text(
+                      '${(booking.currency == 'EUR') ? '€' : (booking.currency ?? '€')}$price',
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                  },
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(
+                    context.l10n.viewDetails,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             if (booking.customOptions != null &&
                 booking.customOptions!.isNotEmpty &&
                 (booking.paymentStatus?.toLowerCase() == 'paid' ||
@@ -486,7 +452,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               SizedBox(height: 12.h),
               SizedBox(
                 width: double.infinity,
-                height: 32.h,
+                height: 36.h,
                 child: ElevatedButton(
                   onPressed: () async {
                     final bookingController = Provider.of<BookingController>(
@@ -532,35 +498,70 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
+  Widget _buildImagePlaceholder(BuildContext context) {
+    return Container(
+      width: 70.w,
+      height: 70.w,
+      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      child: Icon(
+        Icons.image_outlined,
+        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.3),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(BuildContext context, IconData icon, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 14.sp,
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+        ),
+        SizedBox(width: 6.w),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildStatusBadge(String status) {
     Color color;
     switch (status.toLowerCase()) {
       case 'completed':
-        color = Colors.green;
+        color = const Color(0xFF4CAF50);
         break;
       case 'upcoming':
       case 'pending':
-        color = Colors.blue;
+        color = const Color(0xFF2196F3);
         break;
       case 'cancelled':
-        color = Colors.red;
+        color = const Color(0xFFF44336);
         break;
       default:
         color = Colors.grey;
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(10.r),
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(6.r),
       ),
       child: Text(
         status.toUpperCase(),
         style: TextStyle(
           color: color,
-          fontSize: 10.sp,
-          fontWeight: FontWeight.bold,
+          fontSize: 9.sp,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.5,
         ),
       ),
     );

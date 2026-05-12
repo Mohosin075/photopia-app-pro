@@ -19,6 +19,15 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
   static const int _totalPages = 5;
 
   @override
+  void initState() {
+    super.initState();
+    // Reset controller state when screen starts to ensure a clean state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProviderOnboardingController>().reset();
+    });
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
@@ -28,6 +37,10 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
     final ctrl = context.read<ProviderOnboardingController>();
     if (_currentPage == 0 && !ctrl.isStep1Valid) {
       CustomSnackBar.show(context: context, message: 'Please fill in your date of birth and select at least one domain.', isError: true);
+      return;
+    }
+    if (_currentPage == 3 && !ctrl.isStep4Valid) {
+      CustomSnackBar.show(context: context, message: 'Profile picture is required to continue.', isError: true);
       return;
     }
     if (_currentPage == _totalPages - 1) {
@@ -463,6 +476,44 @@ class _Step4BioPorfolio extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _SectionLabel('Profile Picture', isRequired: true),
+              SizedBox(height: 12.h),
+              Center(
+                child: GestureDetector(
+                  onTap: ctrl.pickProfileImage,
+                  child: Container(
+                    width: 100.w,
+                    height: 100.w,
+                    decoration: BoxDecoration(
+                      color: cs.surface,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: cs.onSurface.withOpacity(0.1)),
+                      image: ctrl.profileImage != null
+                          ? DecorationImage(image: FileImage(ctrl.profileImage!), fit: BoxFit.cover)
+                          : null,
+                    ),
+                    child: ctrl.profileImage == null
+                        ? Icon(Icons.add_a_photo_outlined, size: 32.sp, color: cs.onSurface.withOpacity(0.4))
+                        : Stack(
+                            children: [
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: GestureDetector(
+                                  onTap: ctrl.removeProfileImage,
+                                  child: Container(
+                                    padding: EdgeInsets.all(4.w),
+                                    decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                    child: Icon(Icons.close, size: 14.sp, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
               _SectionLabel('Mini Bio', isOptional: true),
               SizedBox(height: 4.h),
               Text('Max 500 characters', style: TextStyle(fontSize: 11.sp, color: cs.onSurface.withOpacity(0.4))),

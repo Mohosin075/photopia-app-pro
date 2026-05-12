@@ -498,6 +498,298 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildTrendingSubcategories(List<TrendingSubcategory>? items) {
+    if (items == null || items.isEmpty) return const SizedBox.shrink();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'Trending Right Now', onSeeAllTap: () {}),
+        SizedBox(
+          height: 100.h,
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return Container(
+                width: 160.w,
+                margin: EdgeInsets.only(right: 12.w, bottom: 8.h),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(
+                    color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16.r),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        right: -10.w,
+                        top: -10.h,
+                        child: Icon(
+                          Icons.trending_up_rounded,
+                          size: 60.sp,
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(12.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (item.trendingBadge != null)
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                                child: Text(
+                                  item.trendingBadge!,
+                                  style: TextStyle(
+                                    color: Colors.red.shade700,
+                                    fontSize: 8.sp,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              item.name ?? '',
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (item.parent?['name'] != null)
+                              Text(
+                                item.parent!['name'],
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAvailableNow(List<ServiceItem>? items) {
+    if (items == null || items.isEmpty) return const SizedBox.shrink();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          title: context.l10n.availableRightNow,
+          onSeeAllTap: () {
+            Navigator.push(
+              context,
+              AppTransitions.createPremiumRoute(
+                HomeSeeAllScreen(
+                  title: context.l10n.availableRightNow,
+                  services: items,
+                ),
+              ),
+            );
+          },
+        ),
+        SizedBox(
+          height: 180.h,
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              final provider = item.providerId;
+              final isOnline = provider?.isOnline ?? false;
+
+              return GestureDetector(
+                onTap: () => _navigateToServiceDetails(context, item),
+                child: Container(
+                  width: 260.w,
+                  margin: EdgeInsets.only(right: 16.w),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(
+                      color: isOnline 
+                          ? Colors.green.withOpacity(0.3) 
+                          : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isOnline 
+                            ? Colors.green.withOpacity(0.05) 
+                            : Colors.black.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(12.w),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: Stack(
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: item.coverMedia ?? '',
+                                width: 80.w,
+                                height: 80.w,
+                                fit: BoxFit.cover,
+                                errorWidget: (context, url, error) => Container(
+                                  color: Colors.grey.shade100,
+                                  child: Icon(Icons.image, color: Colors.grey.shade400),
+                                ),
+                              ),
+                              if (isOnline)
+                                Positioned(
+                                  top: 4.h,
+                                  left: 4.w,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      borderRadius: BorderRadius.circular(4.r),
+                                    ),
+                                    child: Text(
+                                      'LIVE',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                item.title ?? '',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 4.h),
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 8.r,
+                                    backgroundImage: provider?.profile != null
+                                        ? CachedNetworkImageProvider(provider!.profile!)
+                                        : null,
+                                    child: provider?.profile == null
+                                        ? Icon(Icons.person, size: 8.sp)
+                                        : null,
+                                  ),
+                                  SizedBox(width: 6.w),
+                                  Expanded(
+                                    child: Text(
+                                      provider?.name ?? '',
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8.h),
+                              Row(
+                                children: [
+                                  Text(
+                                    '${item.currency ?? '€'}${item.price?.toStringAsFixed(0) ?? '0'}',
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w900,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  if (isOnline)
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 6.w,
+                                          height: 6.w,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.green,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        Text(
+                                          'Online',
+                                          style: TextStyle(
+                                            fontSize: 10.sp,
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -618,6 +910,39 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           SizedBox(height: 10.h),
 
+                          // Original Projects (Category 1)
+                          if (data.originalProjects != null && data.originalProjects!.isNotEmpty)
+                            Column(
+                              children: [
+                                _buildHorizontalServiceSection(
+                                  title: context.l10n.originalProjects,
+                                  items: data.originalProjects!,
+                                  onSeeAll: () {
+                                    Navigator.push(
+                                      context,
+                                      AppTransitions.createPremiumRoute(
+                                        HomeSeeAllScreen(
+                                          title: context.l10n.originalProjects,
+                                          services: data.originalProjects!,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 10.h),
+                              ],
+                            ),
+
+                          // Recently Viewed (Category 2)
+                          if (data.recentlyViewed != null &&
+                              data.recentlyViewed!.isNotEmpty)
+                            Column(
+                              children: [
+                                _buildRecentlyViewed(data.recentlyViewed),
+                                SizedBox(height: 10.h),
+                              ],
+                            ),
+
                           // Inspirations
                           if (data.inspirations != null &&
                               data.inspirations!.isNotEmpty)
@@ -628,56 +953,24 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                          // Original Projects
-                          if (data.originalProjects != null)
-                            _buildHorizontalServiceSection(
-                              title: context.l10n.originalProjects,
-                              items: data.originalProjects!,
-                              onSeeAll: () {
-                                Navigator.push(
-                                  context,
-                                  AppTransitions.createPremiumRoute(
-                                    HomeSeeAllScreen(
-                                      title: context.l10n.originalProjects,
-                                      services: data.originalProjects!,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-
-                          SizedBox(height: 10.h),
-
-                          // Recently Viewed
-                          if (data.recentlyViewed != null &&
-                              data.recentlyViewed!.isNotEmpty)
+                          // Trending Subcategories (New Design)
+                          if (data.trendingSubcategories != null &&
+                              data.trendingSubcategories!.isNotEmpty)
                             Column(
                               children: [
-                                _buildRecentlyViewed(data.recentlyViewed),
-                                SizedBox(height: 10.h),
+                                _buildTrendingSubcategories(data.trendingSubcategories),
+                                SizedBox(height: 20.h),
                               ],
                             ),
 
-                          // Available Right Now
-                          if (data.availableNow != null)
-                            _buildHorizontalServiceSection(
-                              title: context.l10n.availableRightNow,
-                              items: data.availableNow!,
-                              showAvailability: true,
-                              onSeeAll: () {
-                                Navigator.push(
-                                  context,
-                                  AppTransitions.createPremiumRoute(
-                                    HomeSeeAllScreen(
-                                      title: context.l10n.availableRightNow,
-                                      services: data.availableNow!,
-                                    ),
-                                  ),
-                                );
-                              },
+                          // Available Right Now (New Design)
+                          if (data.availableNow != null && data.availableNow!.isNotEmpty)
+                            Column(
+                              children: [
+                                _buildAvailableNow(data.availableNow),
+                                SizedBox(height: 20.h),
+                              ],
                             ),
-
-                          SizedBox(height: 10.h),
 
                           // Super Pros
                           if (data.superPros != null &&

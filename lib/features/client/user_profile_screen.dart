@@ -120,13 +120,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (AuthController.isLoggedIn) {
-        context.read<UserProfileController>().getUserProfile();
-        context.read<BookingController>().getMyBookings();
-        context.read<NotificationController>().fetchNotificationStats();
-      }
-    });
+    _refreshData();
+  }
+
+  Future<void> _refreshData() async {
+    if (AuthController.isLoggedIn) {
+      await Future.wait([
+        context.read<UserProfileController>().getUserProfile(),
+        context.read<BookingController>().getMyBookings(),
+        context.read<NotificationController>().fetchNotificationStats(),
+      ]);
+    }
   }
 
   @override
@@ -147,11 +151,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: const [],
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                AppTransitions.createPremiumRoute(const EditProfileScreen()),
+              );
+              if (result == true) {
+                _refreshData();
+              }
+            },
+            icon: Icon(
+              Icons.edit_outlined,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
       ),
       body: Consumer<UserProfileController>(
         builder: (context, controller, child) {
-          if (controller.inProgress) {
+          if (controller.inProgress && controller.userProfile == null) {
             return const Center(child: CircularProgressIndicator());
           }
 

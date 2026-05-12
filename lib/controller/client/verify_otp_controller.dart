@@ -22,11 +22,12 @@ class VerifyOtpController extends ChangeNotifier {
     NetworkResponse response = await NetworkCaller.postRequest(
       url: Urls.verifyOtp,
       body: requestBody,
+      requireAuth: false,
     );
 
     _inProgress = false;
     if (response.isSuccess) {
-      _resetToken = response.body?['data']?['token'];
+      _resetToken = response.body?['data']?['token'] ?? response.body?['data']?['accessToken'];
       isSuccess = true;
     } else {
       _errorMessage = response.errorMessage;

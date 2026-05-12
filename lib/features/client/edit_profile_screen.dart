@@ -111,7 +111,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           message: 'Profile updated successfully!',
           isError: false,
         );
-        Navigator.pop(context);
+        Navigator.pop(context, true); // Return true to indicate success
       } else {
         CustomSnackBar.show(
           context: context,

@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:photopia/core/network/Api_service/network_caller.dart';
 import 'package:photopia/core/network/urls.dart';
+import 'package:photopia/core/utils/image_utils.dart';
 
 class ProviderOnboardingController extends ChangeNotifier {
   static const String _onboardingKey = 'provider_onboarding_completed';
@@ -29,9 +32,10 @@ class ProviderOnboardingController extends ChangeNotifier {
   String radius = '50km';
   bool availableForTravel = false;
 
-  // ── Step 4: Bio & Portfolio ──────────────────────────────────────────────
+  // ── Step 4: Bio & Portfolio & Profile Pic ───────────────────────────────
   String miniBio = '';
   String externalPortfolioLink = '';
+  File? profileImage;
 
   // ── Step 5: Preferences & Legal ─────────────────────────────────────────
   bool emailNewRequests = true;
@@ -42,6 +46,58 @@ class ProviderOnboardingController extends ChangeNotifier {
   bool acceptedTerms = false;
   bool privacyPolicy = false;
   bool gdprAuthorization = false;
+
+  // ── Image Picking ────────────────────────────────────────────────────────
+  Future<void> pickProfileImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    if (pickedFile != null) {
+      File file = File(pickedFile.path);
+      // Optional: process orientation
+      profileImage = await ImageUtils.fixImageOrientation(file);
+      notifyListeners();
+    }
+  }
+
+  void removeProfileImage() {
+    profileImage = null;
+    notifyListeners();
+  }
+
+  // ── State Management ─────────────────────────────────────────────────────
+  void reset() {
+    dateOfBirth = null;
+    primaryDomain = [];
+    specialties = [];
+    selectedCategoryIds = [];
+    yearsOfExperience = null;
+    projectsCompleted = null;
+    education = null;
+    mainCity = '';
+    department = '';
+    radius = '50km';
+    availableForTravel = false;
+    miniBio = '';
+    externalPortfolioLink = '';
+    profileImage = null;
+    emailNewRequests = true;
+    smsUrgentRequests = true;
+    newsletterPros = false;
+    customerReviewReminder = true;
+    acceptedTerms = false;
+    privacyPolicy = false;
+    gdprAuthorization = false;
+    _errorMessage = null;
+    _inProgress = false;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    // Note: Controllers provided by ChangeNotifierProvider usually don't need manual reset in dispose
+    // unless they are reused. But we provide a reset() method for manual cleanup.
+    super.dispose();
+  }
 
   // ── Onboarding Status ────────────────────────────────────────────────────
   static bool isOnboardingCompleted() {
@@ -77,6 +133,7 @@ class ProviderOnboardingController extends ChangeNotifier {
 
   // ── Validation ───────────────────────────────────────────────────────────
   bool get isStep1Valid => dateOfBirth != null && primaryDomain.isNotEmpty;
+  bool get isStep4Valid => profileImage != null; // Profile picture is required
   bool get isStep5Valid => acceptedTerms && privacyPolicy && gdprAuthorization;
 
   // ── API Submission ───────────────────────────────────────────────────────
@@ -135,17 +192,44 @@ class ProviderOnboardingController extends ChangeNotifier {
 
       debugPrint('📋 Submitting Professional Onboarding: $body');
 
-      final response = await NetworkCaller.patchRequest(
-        url: Urls.professionalProfile,
-        body: body,
-      );
+      // 1. Try to fetch existing profile first to check if it exists
+      final checkResponse = await NetworkCaller.getRequest(url: Urls.professionalProfile);
+      
+      NetworkResponse response;
+      if (checkResponse.statusCode == 404 || checkResponse.body?['data'] == null) {
+        // If profile doesn't exist (404), use POST to create it
+        debugPrint('📋 Profile not found, creating new profile with POST');
+        response = await NetworkCaller.postRequest(
+          url: Urls.professionalProfile,
+          body: body,
+        );
+      } else {
+        // If profile exists, use PATCH to update it
+        debugPrint('📋 Profile exists, updating with PATCH');
+        response = await NetworkCaller.patchRequest(
+          url: Urls.professionalProfile,
+          body: body,
+        );
+      }
 
       debugPrint('📋 Onboarding Response: ${response.statusCode} - ${response.body}');
 
       if (response.isSuccess) {
+        // 2. If profile image selected, upload it separately to User Profile API
+        if (profileImage != null) {
+          debugPrint('📸 Uploading profile image as part of onboarding...');
+          await NetworkCaller.multipartRequest(
+            url: Urls.updateUserProfile,
+            method: 'PATCH',
+            fileKey: 'images',
+            filePath: profileImage!.path,
+            requireAuth: true,
+          );
+        }
+
         await markOnboardingCompleted();
         _inProgress = false;
-        notifyListeners();
+        reset(); // Clear state after successful submission as requested
         return true;
       } else {
         _errorMessage = response.errorMessage ?? 'Failed to save profile. Please try again.';
