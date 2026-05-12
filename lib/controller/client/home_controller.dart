@@ -32,6 +32,22 @@ class HomeController extends ChangeNotifier {
       if (response.isSuccess && response.body != null) {
         final model = HomeDataModel.fromJson(response.body!);
         _homeData = model.data;
+
+        // Print counts for each category to the terminal
+        if (_homeData != null) {
+          debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          debugPrint('🏠 [HOME DATA SUMMARY]');
+          debugPrint('✨ Original Projects: ${_homeData?.originalProjects?.length ?? 0}');
+          debugPrint('👁️ Recently Viewed: ${_homeData?.recentlyViewed?.length ?? 0}');
+          debugPrint('🔥 Trending Subcategories: ${_homeData?.trendingSubcategories?.length ?? 0}');
+          debugPrint('⚡ Available Now: ${_homeData?.availableNow?.length ?? 0}');
+          debugPrint('🏆 Super Pros: ${_homeData?.superPros?.length ?? 0}');
+          debugPrint('🎨 Styles: ${_homeData?.styles?.length ?? 0}');
+          debugPrint('📍 Popular Locations: ${_homeData?.popularLocations?.length ?? 0}');
+          debugPrint('💡 Inspirations: ${_homeData?.inspirations?.length ?? 0}');
+          debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        }
+
         notifyListeners();
         return true;
       } else {

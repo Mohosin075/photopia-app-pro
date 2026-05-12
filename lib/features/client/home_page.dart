@@ -4,6 +4,7 @@ import 'package:photopia/controller/client/service_list_controller.dart';
 import 'package:photopia/controller/client/notification_controller.dart';
 import 'package:photopia/controller/location_controller.dart';
 import 'package:photopia/controller/client/home_controller.dart';
+import 'package:photopia/data/models/category_model.dart';
 import 'package:photopia/data/models/service_list_model.dart';
 import 'package:photopia/data/models/home_data_model.dart';
 import 'package:photopia/features/client/widgets/home_header.dart';
@@ -174,9 +175,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: context.l10n.getInspired, onSeeAllTap: () {}),
+        SectionHeader(title: 'Ideas', onSeeAllTap: () {}),
         SizedBox(
-          height: 120.h,
+          height: 150.h, // Increased height to prevent overflow
           child: ListView.builder(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             scrollDirection: Axis.horizontal,
@@ -186,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
               final item = items[index];
               return Container(
                 width: 200.w,
-                margin: EdgeInsets.only(right: 12.w),
+                margin: EdgeInsets.only(right: 12.w, bottom: 10.h),
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -218,15 +219,21 @@ class _MyHomePageState extends State<MyHomePage> {
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4.h),
-                      TranslatedText(
-                      item.description ?? '',
-                      style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7) 
-                            : Colors.white70, 
-                        fontSize: 12.sp
+                    Expanded( // Added expanded to prevent overflow
+                      child: TranslatedText(
+                        item.description ?? '',
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark 
+                              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7) 
+                              : Colors.white70, 
+                          fontSize: 12.sp
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -365,7 +372,7 @@ class _MyHomePageState extends State<MyHomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Explore Styles',
+            'Creative Styles',
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
@@ -421,7 +428,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: 'Top Cities', onSeeAllTap: () {}),
+        SectionHeader(title: 'Near You', onSeeAllTap: () {}),
         SizedBox(
           height: 140.h,
           child: ListView.builder(
@@ -505,7 +512,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: 'Trending Right Now', onSeeAllTap: () {}),
+        SectionHeader(title: 'Trending This Week', onSeeAllTap: () {}),
         SizedBox(
           height: 100.h,
           child: ListView.builder(
@@ -790,6 +797,84 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildMainCategories(List<CategoryModel>? items) {
+    if (items == null || items.isEmpty) return const SizedBox.shrink();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'Main Categories', onSeeAllTap: () {}),
+        SizedBox(
+          height: 120.h,
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return GestureDetector(
+                onTap: () {
+                  context.read<CategoryController>().selectCategory(item.id);
+                  context.read<ServiceListController>().getAllServices(
+                    filters: {'category': item.id},
+                  );
+                },
+                child: Container(
+                  width: 100.w,
+                  margin: EdgeInsets.only(right: 12.w, bottom: 8.h),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          item.icon ?? '📸',
+                          style: TextStyle(fontSize: 24.sp),
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.w),
+                        child: Text(
+                          item.name ?? '',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -910,7 +995,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           SizedBox(height: 10.h),
 
-                          // Original Projects (Category 1)
+                          // 1. Original Projects (Moved to Top)
                           if (data.originalProjects != null && data.originalProjects!.isNotEmpty)
                             Column(
                               children: [
@@ -933,9 +1018,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                          // Recently Viewed (Category 2)
-                          if (data.recentlyViewed != null &&
-                              data.recentlyViewed!.isNotEmpty)
+                          // 2. Recently Viewed
+                          if (data.recentlyViewed != null && data.recentlyViewed!.isNotEmpty)
                             Column(
                               children: [
                                 _buildRecentlyViewed(data.recentlyViewed),
@@ -943,38 +1027,35 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                          // Inspirations
-                          if (data.inspirations != null &&
-                              data.inspirations!.isNotEmpty)
+                          // 3. Main Categories (Added)
+                          if (data.popularCategories != null && data.popularCategories!.isNotEmpty)
                             Column(
                               children: [
-                                _buildInspirations(data.inspirations),
-                                SizedBox(height: 20.h),
+                                _buildMainCategories(data.popularCategories),
+                                SizedBox(height: 10.h),
                               ],
                             ),
 
-                          // Trending Subcategories (New Design)
-                          if (data.trendingSubcategories != null &&
-                              data.trendingSubcategories!.isNotEmpty)
+                          // 4. Trending This Week
+                          if (data.trendingSubcategories != null && data.trendingSubcategories!.isNotEmpty)
                             Column(
                               children: [
                                 _buildTrendingSubcategories(data.trendingSubcategories),
-                                SizedBox(height: 20.h),
+                                SizedBox(height: 10.h),
                               ],
                             ),
 
-                          // Available Right Now (New Design)
+                          // 4. Available Now
                           if (data.availableNow != null && data.availableNow!.isNotEmpty)
                             Column(
                               children: [
                                 _buildAvailableNow(data.availableNow),
-                                SizedBox(height: 20.h),
+                                SizedBox(height: 10.h),
                               ],
                             ),
 
-                          // Super Pros
-                          if (data.superPros != null &&
-                              data.superPros!.isNotEmpty)
+                          // 5. Super Pros
+                          if (data.superPros != null && data.superPros!.isNotEmpty)
                             Column(
                               children: [
                                 _buildSuperPros(data.superPros),
@@ -982,7 +1063,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                          // Explore Styles
+                          // 6. Creative Styles
                           if (data.styles != null && data.styles!.isNotEmpty)
                             Column(
                               children: [
@@ -991,9 +1072,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                          // Popular Locations
-                          if (data.popularLocations != null &&
-                              data.popularLocations!.isNotEmpty)
+                          // 7. Near You
+                          if (data.popularLocations != null && data.popularLocations!.isNotEmpty)
                             Column(
                               children: [
                                 _buildPopularLocations(context, data.popularLocations),
@@ -1001,9 +1081,16 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                          SizedBox(
-                            height: 100.h,
-                          ), // Bottom padding for navigation bar
+                          // 8. Ideas
+                          if (data.inspirations != null && data.inspirations!.isNotEmpty)
+                            Column(
+                              children: [
+                                _buildInspirations(data.inspirations),
+                                SizedBox(height: 20.h),
+                              ],
+                            ),
+
+                          SizedBox(height: 100.h),
                         ],
                       ),
                     ),

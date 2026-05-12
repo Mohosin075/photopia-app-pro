@@ -21,14 +21,14 @@ class CategoryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoryController = context.watch<CategoryController>();
-    final categories = categoryController.rootCategories;
+    final themes = ['ALL', ...categoryController.themes];
 
     return SizedBox(
       height: 34.h.clamp(32, 38),
       child: ListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         scrollDirection: Axis.horizontal,
-        itemCount: isLoading || categoryController.isLoading ? 5 : categories.length + 1,
+        itemCount: isLoading || categoryController.isLoading ? 5 : themes.length,
         itemBuilder: (context, index) {
           if (isLoading || categoryController.isLoading) {
             return Padding(
@@ -37,18 +37,17 @@ class CategoryBar extends StatelessWidget {
             );
           }
 
-          // Index 0 is "All"
-          final bool isAll = index == 0;
-          final CategoryModel? category = isAll ? null : categories[index - 1];
-          final String label = isAll ? 'All' : category!.name;
-          final bool isSelected = isAll 
-              ? selectedCategoryId == null 
-              : selectedCategoryId == category!.id;
+          final String theme = themes[index];
+          final bool isAll = theme == 'ALL';
+          final String label = isAll ? 'All' : theme;
+          final bool isSelected = categoryController.selectedTheme == theme || 
+                                 (isAll && (categoryController.selectedTheme == null || categoryController.selectedTheme == 'ALL'));
 
           return GestureDetector(
             onTap: () {
+              categoryController.loadCategories(theme: isAll ? 'ALL' : theme);
               if (onCategorySelected != null) {
-                onCategorySelected!(isAll ? null : category!.id);
+                onCategorySelected!(null); // Reset category selection when theme changes
               }
             },
             child: Container(
@@ -65,22 +64,12 @@ class CategoryBar extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  if (!isAll && category?.icon != null) ...[
-                     // Handle icon if needed, for now use default if no icon
-                     Icon(
-                        Icons.category_outlined,
-                        size: 18.sp.clamp(18, 20),
-                        color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
-                      ),
-                      SizedBox(width: 8.w),
-                  ] else if (isAll) ...[
-                      Icon(
-                        Icons.grid_view_outlined,
-                        size: 18.sp.clamp(18, 20),
-                        color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
-                      ),
-                      SizedBox(width: 8.w),
-                  ],
+                  Icon(
+                    isAll ? Icons.grid_view_outlined : Icons.palette_outlined,
+                    size: 18.sp.clamp(18, 20),
+                    color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
+                  ),
+                  SizedBox(width: 8.w),
                   Text(
                     label,
                     style: TextStyle(

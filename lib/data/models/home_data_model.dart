@@ -48,13 +48,13 @@ class HomeData {
               .map((v) => RecentlyViewedItem.fromJson(v))
               .toList()
           : null,
-      popularCategories: json['popularCategories'] != null
-          ? (json['popularCategories'] as List)
+      popularCategories: (json['popularCategories'] ?? json['mainCategories']) != null
+          ? ((json['popularCategories'] ?? json['mainCategories']) as List)
               .map((v) => CategoryModel.fromJson(v))
               .toList()
           : null,
-      trendingSubcategories: json['trendingSubcategories'] != null
-          ? (json['trendingSubcategories'] as List)
+      trendingSubcategories: (json['trendingSubcategories'] ?? json['trendingThisWeek']) != null
+          ? ((json['trendingSubcategories'] ?? json['trendingThisWeek']) as List)
               .map((v) => TrendingSubcategory.fromJson(v))
               .toList()
           : null,
@@ -68,11 +68,21 @@ class HomeData {
               .map((v) => SuperPro.fromJson(v))
               .toList()
           : null,
-      styles: json['styles'] != null
-          ? List<String>.from(json['styles'])
-          : null,
-      popularLocations: json['popularLocations'] != null
-          ? (json['popularLocations'] as List)
+      styles: json['styles'] is List
+          ? (json['styles'] as List)
+              .map((v) => v is Map ? (v['name']?.toString() ?? '') : v.toString())
+              .where((s) => s.isNotEmpty)
+              .cast<String>()
+              .toList()
+          : json['creativeStyles'] is List
+              ? (json['creativeStyles'] as List)
+                  .map((v) => v is Map ? (v['name']?.toString() ?? '') : v.toString())
+                  .where((s) => s.isNotEmpty)
+                  .cast<String>()
+                  .toList()
+              : null,
+      popularLocations: (json['popularLocations'] ?? json['nearYou']) != null
+          ? ((json['popularLocations'] ?? json['nearYou']) as List)
               .map((v) => PopularLocation.fromJson(v))
               .toList()
           : null,
@@ -81,8 +91,8 @@ class HomeData {
               .map((v) => ServiceItem.fromJson(v))
               .toList()
           : null,
-      inspirations: json['inspirations'] != null
-          ? (json['inspirations'] as List)
+      inspirations: (json['inspirations'] ?? json['ideas']) != null
+          ? ((json['inspirations'] ?? json['ideas']) as List)
               .map((v) => Inspiration.fromJson(v))
               .toList()
           : null,

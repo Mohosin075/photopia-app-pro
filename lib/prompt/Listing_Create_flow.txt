@@ -66,7 +66,7 @@ Theme, Category এবং Sub-category অনুযায়ী ডেটা ফে
 const List<String> appThemes = [
   'PHOTOGRAPHY',
   'VIDEOGRAPHY',
-  'EDITING & POST-PRODUCTION'
+  'EDITING AND POST-PRODUCTION'
 ];
 ```
  
@@ -223,7 +223,7 @@ import 'package:flutter/material.dart';
 class CategoryProvider with ChangeNotifier {
   final CategoryService _service = CategoryService();
  
-  List<String> _themes = ['PHOTOGRAPHY', 'VIDEOGRAPHY', 'EDITING & POST-PRODUCTION'];
+  List<String> _themes = ['PHOTOGRAPHY', 'VIDEOGRAPHY', 'EDITING AND POST-PRODUCTION'];
   List<CategoryModel> _categories = [];
   List<CategoryModel> _subCategories = [];
   List<ServiceModel> _services = [];

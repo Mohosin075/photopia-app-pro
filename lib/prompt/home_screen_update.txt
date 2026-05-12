@@ -1,0 +1,715 @@
+{
+    "statusCode": 200,
+    "success": true,
+    "message": "Home data retrieved successfully",
+    "data": {
+        "originalProjects": [
+            {
+                "_id": "69e14df4139d03b898796347",
+                "providerId": {
+                    "_id": "69a874fb3dddb8394cbc4293",
+                    "name": "Nazmul islam Rimon",
+                    "profile": "/images/1775861732777-bwq25b.jpg",
+                    "isOnline": false
+                },
+                "title": "Professional VideoEditor",
+                "description": "This is importent",
+                "category": null,
+                "serviceType": "photo_editing",
+                "subCategory": "69e14859139d03b898795ea8",
+                "tags": [
+                    "photo_editing",
+                    "video_editing"
+                ],
+                "equipment": [
+                    "Canon",
+                    "Soiny"
+                ],
+                "price": 5,
+                "currency": "EUR",
+                "pricingType": "HOURLY",
+                "pricingModel": {
+                    "type": "HOURLY",
+                    "weekdayHourlyRate": 5,
+                    "weekendHourlyRate": 6,
+                    "dailyRate": 1,
+                    "dailyHours": 8,
+                    "_id": "69e14df4139d03b898796348",
+                    "packages": []
+                },
+                "travelFeePerKm": null,
+                "allowOutsideRadius": null,
+                "maxTravelFee": null,
+                "depositPercentage": null,
+                "cancellationPolicy": {
+                    "freeCancellationHours": 24,
+                    "partialRefundHours": 12,
+                    "noRefundHours": 2
+                },
+                "duration": "2",
+                "location": {
+                    "type": "ONSITE",
+                    "country": "Bangladesh",
+                    "city": "Dhaka",
+                    "address": "Mohakhali,TbGate,Gulshan",
+                    "serviceRadiusKm": 25,
+                    "_id": null
+                },
+                "gallery": [
+                    "/images/1776373234183-x6jrya.jpg",
+                    "/images/1776373235411-b1e98a.jpg",
+                    "/images/1776373236110-e4fk8h.jpg"
+                ],
+                "status": "ACTIVE",
+                "isVerified": false,
+                "isActive": true,
+                "pricingRules": [],
+                "createdAt": "2026-04-16T21:00:36.933Z",
+                "updatedAt": "2026-05-12T20:19:48.183Z",
+                "__v": 0,
+                "totalView": 218,
+                "totalBooking": 17
+            },
+            {
+                "_id": "69e15579139d03b89879650f",
+                "providerId": {
+                    "_id": "69a874fb3dddb8394cbc4293",
+                    "name": "Nazmul islam Rimon",
+                    "profile": "/images/1775861732777-bwq25b.jpg",
+                    "isOnline": false
+                },
+                "title": "Photography Package Service",
+                "description": "Flexible photography packages for personal and corporate events with professional editing.",
+                "category": null,
+                "serviceType": "photography",
+                "subCategory": "69e1591b002497d4d3bd26e5",
+                "tags": [
+                    "photo",
+                    "studio"
+                ],
+                "equipment": [
+                    "Nikon Z6",
+                    "Softbox"
+                ],
+                "price": 120,
+                "currency": "EUR",
+                "pricingType": "PACKAGE",
+                "pricingModel": {
+                    "type": "PACKAGE",
+                    "dailyHours": 8,
+                    "packages": [
+                        {
+                            "name": "Basic",
+                            "price": 120,
+                            "duration": 2,
+                            "description": "2 hour session",
+                            "includes": [
+                                "50 edited photos"
+                            ],
+                            "_id": "69e17380d5683edf64786ae9"
+                        },
+                        {
+                            "name": "Premium",
+                            "price": 300,
+                            "duration": 5,
+                            "description": "5 hour session",
+                            "includes": [
+                                "150 edited photos",
+                                "online gallery"
+                            ],
+                            "_id": "69e17380d5683edf64786aea"
+                        }
+                    ],
+                    "_id": "69e17380d5683edf64786ae8"
+                },
+                "travelFeePerKm": 0,
+                "allowOutsideRadius": false,
+                "maxTravelFee": 100,
+                "depositPercentage": 0.5,
+                "cancellationPolicy": {
+                    "freeCancellationHours": 24,
+                    "partialRefundHours": 12,
+                    "noRefundHours": 2
+                },
+                "duration": "1",
+                "location": {
+                    "type": "ONSITE",
+                    "country": "USA",
+                    "city": "Chicago",
+                    "address": "201 E Randolph St",
+                    "serviceRadiusKm": 20,
+                    "_id": "69e17380d5683edf64786aeb"
+                },
+                "gallery": [
+                    "https://images.unsplash.com/photo-1516035069371-29a1b244cc32",
+                    "/images/1776382845488-h9g6d9.jpg",
+                    "/images/1776382846409-myymem.jpg",
+                    "/images/1776382847317-s9pftn.jpg"
+                ],
+                "status": "ACTIVE",
+                "isVerified": false,
+                "isActive": true,
+                "pricingRules": [],
+                "createdAt": "2026-04-16T21:32:41.326Z",
+                "updatedAt": "2026-05-12T20:14:00.359Z",
+                "__v": 0,
+                "coverMedia": "/images/1776382844781-sd9czg.jpg",
+                "totalView": 180,
+                "totalBooking": 17
+            },
+            {
+                "_id": "69fcedf7c0c20bb995b7cffe",
+                "providerId": {
+                    "_id": "69a874fb3dddb8394cbc4293",
+                    "name": "Nazmul islam Rimon",
+                    "profile": "/images/1775861732777-bwq25b.jpg",
+                    "isOnline": false
+                },
+                "title": "Editing and videography",
+                "description": "I am very professional Videographer and editor",
+                "category": {
+                    "_id": "69f681ac0f2f322ec6edf6f6",
+                    "name": "Emerging Formats",
+                    "theme": "EDITING AND POST-PRODUCTION"
+                },
+                "serviceType": "video_editing",
+                "subCategory": "69f681bf0f2f322ec6edf70d",
+                "tags": [
+                    "video_editing",
+                    "videography"
+                ],
+                "equipment": [],
+                "price": 20,
+                "currency": "EUR",
+                "pricingType": "HOURLY",
+                "pricingModel": {
+                    "type": "HOURLY",
+                    "weekdayHourlyRate": 20,
+                    "weekendHourlyRate": 50,
+                    "dailyRate": 1,
+                    "dailyHours": 8,
+                    "_id": "69fcedf7c0c20bb995b7cfff",
+                    "packages": []
+                },
+                "travelFeePerKm": 0,
+                "allowOutsideRadius": true,
+                "maxTravelFee": 100,
+                "depositPercentage": 0.5,
+                "cancellationPolicy": {
+                    "freeCancellationHours": 24,
+                    "partialRefundHours": 12,
+                    "noRefundHours": 2
+                },
+                "duration": "2",
+                "location": {
+                    "type": "ONSITE",
+                    "country": "Bangladesh",
+                    "city": "Chittagong",
+                    "address": "Feni,Sadar",
+                    "serviceRadiusKm": 20,
+                    "_id": "69fcedf7c0c20bb995b7d000"
+                },
+                "coverMedia": "/images/1778183671135-gxqopy.jpg",
+                "gallery": [
+                    "/images/1778183671135-gxqopy.jpg",
+                    "/images/1778183671168-w9mdw6.jpg"
+                ],
+                "status": "ACTIVE",
+                "isVerified": false,
+                "isActive": true,
+                "isOriginal": false,
+                "pricingRules": [],
+                "createdAt": "2026-05-07T19:54:31.977Z",
+                "updatedAt": "2026-05-12T20:17:50.592Z",
+                "__v": 0,
+                "totalView": 130,
+                "totalBooking": 1
+            }
+        ],
+        "recentlyViewed": [
+            {
+                "_id": "69e15e8f4d344db4bbc71202",
+                "serviceId": {
+                    "cancellationPolicy": {
+                        "freeCancellationHours": 24,
+                        "partialRefundHours": 12,
+                        "noRefundHours": 2
+                    },
+                    "isOriginal": false,
+                    "_id": "69e15579139d03b89879650f",
+                    "providerId": {
+                        "_id": "69a874fb3dddb8394cbc4293",
+                        "name": "Nazmul islam Rimon",
+                        "profile": "/images/1775861732777-bwq25b.jpg",
+                        "isOnline": false,
+                        "id": "69a874fb3dddb8394cbc4293"
+                    },
+                    "title": "Photography Package Service",
+                    "description": "Flexible photography packages for personal and corporate events with professional editing.",
+                    "category": null,
+                    "serviceType": "photography",
+                    "subCategory": "69e1591b002497d4d3bd26e5",
+                    "tags": [
+                        "photo",
+                        "studio"
+                    ],
+                    "equipment": [
+                        "Nikon Z6",
+                        "Softbox"
+                    ],
+                    "price": 120,
+                    "currency": "EUR",
+                    "pricingType": "PACKAGE",
+                    "pricingModel": {
+                        "type": "PACKAGE",
+                        "dailyHours": 8,
+                        "packages": [
+                            {
+                                "name": "Basic",
+                                "price": 120,
+                                "duration": 2,
+                                "description": "2 hour session",
+                                "includes": [
+                                    "50 edited photos"
+                                ],
+                                "_id": "69e17380d5683edf64786ae9",
+                                "id": "69e17380d5683edf64786ae9"
+                            },
+                            {
+                                "name": "Premium",
+                                "price": 300,
+                                "duration": 5,
+                                "description": "5 hour session",
+                                "includes": [
+                                    "150 edited photos",
+                                    "online gallery"
+                                ],
+                                "_id": "69e17380d5683edf64786aea",
+                                "id": "69e17380d5683edf64786aea"
+                            }
+                        ],
+                        "_id": "69e17380d5683edf64786ae8"
+                    },
+                    "travelFeePerKm": 0,
+                    "allowOutsideRadius": false,
+                    "maxTravelFee": 100,
+                    "depositPercentage": 0.5,
+                    "duration": "1",
+                    "location": {
+                        "type": "ONSITE",
+                        "country": "USA",
+                        "city": "Chicago",
+                        "address": "201 E Randolph St",
+                        "serviceRadiusKm": 20,
+                        "_id": "69e17380d5683edf64786aeb"
+                    },
+                    "gallery": [
+                        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32",
+                        "/images/1776382845488-h9g6d9.jpg",
+                        "/images/1776382846409-myymem.jpg",
+                        "/images/1776382847317-s9pftn.jpg"
+                    ],
+                    "status": "ACTIVE",
+                    "isVerified": false,
+                    "isActive": true,
+                    "pricingRules": [],
+                    "createdAt": "2026-04-16T21:32:41.326Z",
+                    "updatedAt": "2026-05-12T20:14:00.359Z",
+                    "__v": 0,
+                    "coverMedia": "/images/1776382844781-sd9czg.jpg",
+                    "totalView": 180,
+                    "totalBooking": 17,
+                    "id": "69e15579139d03b89879650f"
+                },
+                "userId": "69a874fb3dddb8394cbc4293",
+                "__v": 0,
+                "createdAt": "2026-04-16T22:11:23.069Z",
+                "updatedAt": "2026-04-16T22:11:23.069Z",
+                "viewedAt": "2026-04-16T22:11:23.067Z",
+                "id": "69e15e8f4d344db4bbc71202"
+            }
+        ],
+        "mainCategories": [
+            {
+                "_id": "69f660160f2f322ec6eddf96",
+                "name": "Portrait & People",
+                "theme": "PHOTOGRAPHY",
+                "type": "category",
+                "isPopular": false,
+                "isTrending": false,
+                "isActive": true,
+                "createdAt": "2026-05-02T20:35:34.750Z",
+                "updatedAt": "2026-05-02T20:35:34.750Z",
+                "__v": 0,
+                "id": "69f660160f2f322ec6eddf96"
+            },
+            {
+                "_id": "69f660ac0f2f322ec6eddff3",
+                "name": "Events",
+                "theme": "PHOTOGRAPHY",
+                "type": "category",
+                "isPopular": false,
+                "isTrending": false,
+                "isActive": true,
+                "createdAt": "2026-05-02T20:38:04.297Z",
+                "updatedAt": "2026-05-02T20:38:04.297Z",
+                "__v": 0,
+                "id": "69f660ac0f2f322ec6eddff3"
+            },
+            {
+                "_id": "69f662750f2f322ec6ede14a",
+                "name": "Fashion & Beauty",
+                "theme": "PHOTOGRAPHY",
+                "type": "category",
+                "isPopular": false,
+                "isTrending": false,
+                "isActive": true,
+                "createdAt": "2026-05-02T20:45:41.104Z",
+                "updatedAt": "2026-05-02T20:45:41.104Z",
+                "__v": 0,
+                "id": "69f662750f2f322ec6ede14a"
+            }
+        ],
+        "trendingThisWeek": [
+            {
+                "_id": "69f660240f2f322ec6eddfa3",
+                "name": "Studio portrait",
+                "theme": "PHOTOGRAPHY",
+                "parent": "69f660160f2f322ec6eddf96",
+                "type": "subcategory",
+                "isPopular": false,
+                "isTrending": false,
+                "isActive": true,
+                "createdAt": "2026-05-02T20:35:48.600Z",
+                "updatedAt": "2026-05-02T20:35:48.600Z",
+                "__v": 0,
+                "id": "69f660240f2f322ec6eddfa3"
+            },
+            {
+                "_id": "69f6603c0f2f322ec6eddfad",
+                "name": "Lifestyle / natural portrait",
+                "theme": "PHOTOGRAPHY",
+                "parent": "69f660160f2f322ec6eddf96",
+                "type": "subcategory",
+                "isPopular": false,
+                "isTrending": false,
+                "isActive": true,
+                "createdAt": "2026-05-02T20:36:12.409Z",
+                "updatedAt": "2026-05-02T20:36:12.409Z",
+                "__v": 0,
+                "id": "69f6603c0f2f322ec6eddfad"
+            },
+            {
+                "_id": "69f6605b0f2f322ec6eddfb7",
+                "name": "Portrait corporate / business",
+                "theme": "PHOTOGRAPHY",
+                "parent": "69f660160f2f322ec6eddf96",
+                "type": "subcategory",
+                "isPopular": false,
+                "isTrending": false,
+                "isActive": true,
+                "createdAt": "2026-05-02T20:36:43.997Z",
+                "updatedAt": "2026-05-02T20:36:43.997Z",
+                "__v": 0,
+                "id": "69f6605b0f2f322ec6eddfb7"
+            }
+        ],
+        "availableNow": [
+            {
+                "_id": "6a037c70c8f89255be43a8f9",
+                "user": {
+                    "_id": "69a5d78b3dddb8394cbc405f",
+                    "name": "Rimon FLT",
+                    "profile": "/images/1778613361281-k81ecr.jpg"
+                },
+                "dateOfBirth": "1995-01-12T00:00:00.000Z",
+                "primaryDomain": [
+                    "Videography"
+                ],
+                "categories": [],
+                "areaOfIntervention": {
+                    "mainCity": "Dhaka City",
+                    "department": "CSE",
+                    "radius": "50km",
+                    "availableForTravel": true
+                },
+                "experienceDetails": {
+                    "yearsOfExperience": "1-3 years",
+                    "projectsCompleted": "10-50",
+                    "education": "Self-taught"
+                },
+                "notificationPreferences": {
+                    "emailNewRequests": true,
+                    "smsUrgentRequests": true,
+                    "newsletterPros": true,
+                    "customerReviewReminder": true
+                },
+                "legalNotice": {
+                    "acceptedTerms": true,
+                    "privacyPolicy": true,
+                    "gdprAuthorization": true
+                },
+                "miniBio": "I am professional Designer,Video Grapher and photographer",
+                "specialties": [
+                    "Wedding",
+                    "Portrait",
+                    "Real Estate",
+                    "Fashion"
+                ],
+                "portfolio": [],
+                "documents": [],
+                "language": [],
+                "isVerified": false,
+                "rating": 0,
+                "reviewCount": 0,
+                "profileViews": 0,
+                "projects": 0,
+                "responseRate": 95,
+                "responseTime": 60,
+                "deliveryRate": 100,
+                "satisfactionRate": 100,
+                "isSuperPro": false,
+                "stripeAccountId": null,
+                "stripeOnboardingComplete": false,
+                "createdAt": "2026-05-12T19:16:00.807Z",
+                "updatedAt": "2026-05-12T19:58:05.123Z",
+                "__v": 0,
+                "coverPhoto": "/coverPhoto/1778615884579-vh7819.jpg"
+            },
+            {
+                "_id": "69e2685982e2020818f78fda",
+                "user": {
+                    "_id": "69e2620b82e2020818f78b6c",
+                    "name": "Photopia",
+                    "profile": "/images/1767048629458-l94gk7.jpg",
+                    "isOnline": false,
+                    "lastActive": "2026-04-17T17:18:04.262Z"
+                },
+                "specialties": [
+                    "photographer",
+                    "videographer"
+                ],
+                "portfolio": [],
+                "documents": [],
+                "language": [],
+                "isVerified": false,
+                "rating": 0,
+                "reviewCount": 0,
+                "profileViews": 0,
+                "projects": 0,
+                "responseRate": 95,
+                "responseTime": 60,
+                "deliveryRate": 100,
+                "satisfactionRate": 100,
+                "isSuperPro": false,
+                "stripeAccountId": "acct_1TNFtL2d9bayyzxS",
+                "stripeOnboardingComplete": false,
+                "createdAt": "2026-04-17T17:05:29.874Z",
+                "updatedAt": "2026-04-17T17:09:19.329Z",
+                "__v": 0
+            },
+            {
+                "_id": "69e77769ed987a201aece0b6",
+                "user": {
+                    "_id": "69e776cbed987a201aece05d",
+                    "name": "test3",
+                    "profile": "/images/1767048629458-l94gk7.jpg",
+                    "isOnline": false,
+                    "lastActive": "2026-04-28T07:56:00.788Z"
+                },
+                "specialties": [
+                    "photographer",
+                    "videographer",
+                    "editor"
+                ],
+                "portfolio": [],
+                "documents": [],
+                "language": [],
+                "isVerified": false,
+                "rating": 0,
+                "reviewCount": 0,
+                "profileViews": 0,
+                "projects": 0,
+                "responseRate": 95,
+                "responseTime": 60,
+                "deliveryRate": 100,
+                "satisfactionRate": 100,
+                "isSuperPro": false,
+                "stripeAccountId": null,
+                "stripeOnboardingComplete": false,
+                "createdAt": "2026-04-21T13:11:05.762Z",
+                "updatedAt": "2026-04-21T13:11:06.505Z",
+                "__v": 0
+            }
+        ],
+        "availableNowCounts": {
+            "online": 0,
+            "quickResponse": 3,
+            "expressDelivery": 3,
+            "thisWeekend": 6,
+            "lastMinute": 0
+        },
+        "superPros": [
+            {
+                "primaryDomain": [],
+                "isSuperPro": false,
+                "_id": "69d42315c484df5db9ce1054",
+                "user": {
+                    "isOnline": false,
+                    "_id": "69d420e5c484df5db9ce0e94",
+                    "name": "Mijanog",
+                    "profile": "/images/1775515956434-zy5rk7.jpg",
+                    "id": "69d420e5c484df5db9ce0e94"
+                },
+                "specialties": [],
+                "isVerified": false,
+                "rating": 0,
+                "reviewCount": 0,
+                "projects": 0,
+                "id": "69d42315c484df5db9ce1054"
+            },
+            {
+                "primaryDomain": [],
+                "isSuperPro": false,
+                "_id": "69cfbbea59fef20979b4f4b7",
+                "user": {
+                    "_id": "69cfb81d59fef20979b4e86d",
+                    "name": "test1",
+                    "profile": "/images/1775221401723-pdjfh0.jpg",
+                    "isOnline": false,
+                    "id": "69cfb81d59fef20979b4e86d"
+                },
+                "specialties": [
+                    "testeur"
+                ],
+                "isVerified": false,
+                "rating": 0,
+                "reviewCount": 0,
+                "projects": 0,
+                "id": "69cfbbea59fef20979b4f4b7"
+            },
+            {
+                "isSuperPro": false,
+                "_id": "69a894c43dddb8394cbc42d2",
+                "user": {
+                    "_id": "69a874fb3dddb8394cbc4293",
+                    "name": "Nazmul islam Rimon",
+                    "profile": "/images/1775861732777-bwq25b.jpg",
+                    "isOnline": false,
+                    "id": "69a874fb3dddb8394cbc4293"
+                },
+                "specialties": [
+                    "Wedding",
+                    "Event",
+                    "Portrait",
+                    "Real Estate",
+                    "Travel",
+                    "Fashion",
+                    "Corporate",
+                    "Product",
+                    "Street",
+                    "Documentary"
+                ],
+                "isVerified": false,
+                "rating": 0,
+                "reviewCount": 0,
+                "projects": 0,
+                "primaryDomain": [
+                    "Photography",
+                    "Videography",
+                    "Editing"
+                ],
+                "id": "69a894c43dddb8394cbc42d2"
+            }
+        ],
+        "creativeStyles": [
+            {
+                "_id": "69f674650f2f322ec6edf08c",
+                "name": "Standard Video Editing",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f674720f2f322ec6edf09f",
+                "name": "Event planning",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f6747b0f2f322ec6edf0a9",
+                "name": "Corporate Set-up",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f674850f2f322ec6edf0b3",
+                "name": "Advertising editing",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f6748e0f2f322ec6edf0bd",
+                "name": "Social media editing",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f674950f2f322ec6edf0c7",
+                "name": "YouTube Editing",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f6749e0f2f322ec6edf0d1",
+                "name": "Interview editing",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f674aa0f2f322ec6edf0db",
+                "name": "Vlog editing",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f674b40f2f322ec6edf0e5",
+                "name": "Testimonial editing",
+                "theme": "EDITING AND POST-PRODUCTION"
+            },
+            {
+                "_id": "69f674c00f2f322ec6edf0ef",
+                "name": "Film Editing",
+                "theme": "EDITING AND POST-PRODUCTION"
+            }
+        ],
+        "nearYou": [
+            {
+                "town": "Paris",
+                "count": 1247,
+                "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34"
+            },
+            {
+                "town": "Lyon",
+                "count": 423,
+                "image": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad"
+            },
+            {
+                "town": "Nice",
+                "count": 187,
+                "image": "https://images.unsplash.com/photo-1560969184-10fe8719e047"
+            }
+        ],
+        "ideas": [
+            {
+                "title": "Professional VideoEditor",
+                "description": "This is importent",
+                "link": "/services/69e14df4139d03b898796347",
+                "icon": "💡"
+            },
+            {
+                "title": "Photography Package Service",
+                "description": "Flexible photography packages for personal and corporate events with professional editing.",
+                "link": "/services/69e15579139d03b89879650f",
+                "icon": "💡"
+            },
+            {
+                "title": "Editing and videography",
+                "description": "I am very professional Videographer and editor",
+                "link": "/services/69fcedf7c0c20bb995b7cffe",
+                "icon": "💡"
+            }
+        ]
+    }
+}
