@@ -152,7 +152,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
                     child: SafeArea(
                       top: false,
                       child: Container(
-                        height: 70.h,
+                        height: 60.h,
                         padding: EdgeInsets.symmetric(horizontal: 8.w),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -185,7 +185,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
                     ),
                   ),
                   Positioned(
-                    bottom: 30.h,
+                    bottom: ScreenUtil().bottomBarHeight + 35.h,
                     child: _buildSearchButton(),
                   ),
                 ],

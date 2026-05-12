@@ -61,14 +61,10 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return PopScope(
-      canPop: false,
+      canPop: _currentPage == 0,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.provider_bottom_navigation,
-            (route) => false,
-          );
+        if (!didPop && _currentPage > 0) {
+          _goBack();
         }
       },
       child: Scaffold(
@@ -114,10 +110,18 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              if (_currentPage == 0)
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 12.w),
+                    child: Icon(Icons.arrow_back, size: 24.sp, color: cs.onSurface),
+                  ),
+                ),
               Text('Step ${_currentPage + 1} of $_totalPages',
                   style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
+              const Spacer(),
               if (_currentPage > 0 && _currentPage < _totalPages - 1)
                 GestureDetector(
                   onTap: () {
