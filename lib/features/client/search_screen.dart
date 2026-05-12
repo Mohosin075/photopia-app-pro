@@ -43,9 +43,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _onSearch(Map<String, dynamic> filters) {
-    final searchTerm = filters['searchTerm']?.toString() ?? '';
-
-    if (searchTerm.isEmpty && filters.length == 1) {
+    // If only searchTerm is present and it's empty, clear search
+    if (filters.length == 1 && filters.containsKey('searchTerm') && (filters['searchTerm']?.toString().isEmpty ?? true)) {
       _clearSearch();
       return;
     }
@@ -140,10 +139,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildBody() {
-    if (_isFieldFocused) {
-      return _buildSuggestionsView();
-    }
-    if (_isSearching) {
+    if (_isSearching || _currentFilters.isNotEmpty) {
       return _buildSearchResults();
     }
     return _buildBrowseView();
@@ -191,7 +187,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ],
             
             Text(
-              context.l10n.trendingCategories,
+              context.l10n.browseCategories,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,

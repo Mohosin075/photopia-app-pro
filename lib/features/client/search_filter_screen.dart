@@ -51,14 +51,18 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 20.sp,
+          ),
         ),
         title: Text(
-          context.l10n.navSearch,
+          context.l10n.search,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
-            fontSize: 18.sp.clamp(18, 20),
+            fontSize: 20.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -133,6 +137,8 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
             ),
             SizedBox(height: 25.h),
 
+            // Remove "Type of Service" section as requested
+            /*
             _buildSectionTitle(context.l10n.typeOfService),
             SizedBox(height: 10.h),
             Wrap(
@@ -155,6 +161,7 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                   .toList(),
             ),
             SizedBox(height: 25.h),
+            */
 
             _buildSectionTitle(context.l10n.equipmentUsed),
             SizedBox(height: 10.h),
