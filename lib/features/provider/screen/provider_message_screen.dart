@@ -58,10 +58,10 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
                   }
 
                   return RefreshIndicator(
-                    onRefresh: () async => await chatController.getChats(),
+                    onRefresh: () async => await controller.getChats(),
                     color: Theme.of(context).colorScheme.primary,
                     backgroundColor: Theme.of(context).colorScheme.surface,
-                    child: _buildConversationList(chatController.chats),
+                    child: _buildConversationList(controller),
                   );
                 },
               ),

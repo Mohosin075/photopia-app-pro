@@ -618,7 +618,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(context.l10n.closeBtn ?? "Close"),
+            child: Text("Close"),
           ),
         ],
       ),
@@ -739,10 +739,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       conversation: Conversation(
                         id: "", // Empty ID for new/admin chat
                         receiverId: "admin", // Standard admin ID
-                        receiverName: "Photopia Support",
-                        receiverProfile: "",
+                        name: "Photopia Support",
+                        avatarUrl: "",
                         lastMessage: "",
-                        lastMessageTime: DateTime.now().toString(),
+                        lastMessageTime: DateTime.now(),
                         unreadCount: 0,
                       ),
                     ),
