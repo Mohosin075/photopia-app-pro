@@ -52,7 +52,7 @@ class HomeSeeAllProsScreen extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16.w,
                 mainAxisSpacing: 16.h,
-                childAspectRatio: 0.8,
+                childAspectRatio: 0.75,
               ),
               itemCount: pros.length,
               itemBuilder: (context, index) {
@@ -68,73 +68,124 @@ class HomeSeeAllProsScreen extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                           color: isDark 
-                              ? Colors.black.withOpacity(0.2) 
-                              : Colors.black.withOpacity(0.04),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+                              ? Colors.black.withOpacity(0.3) 
+                              : Colors.black.withOpacity(0.06),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    padding: EdgeInsets.all(12.w),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            CircleAvatar(
-                              radius: 40.r,
-                              backgroundColor: Theme.of(context).dividerColor.withOpacity(0.05),
-                              backgroundImage: pro.user?.profile != null
-                                  ? CachedNetworkImageProvider(pro.user!.profile!)
-                                  : null,
-                              child: pro.user?.profile == null
-                                  ? Icon(Icons.person, size: 40.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3))
-                                  : null,
-                            ),
-                            if (pro.isSuperPro == true)
-                              Container(
-                                padding: EdgeInsets.all(4.w),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
-                                ),
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.white,
-                                  size: 12.sp,
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+                                child: CachedNetworkImage(
+                                  imageUrl: pro.user?.profile ?? '',
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(
+                                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100,
+                                  ),
+                                  errorWidget: (context, url, error) => Container(
+                                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100,
+                                    child: Icon(Icons.person, color: Colors.grey.shade400, size: 40.sp),
+                                  ),
                                 ),
                               ),
-                          ],
-                        ),
-                        SizedBox(height: 12.h),
-                        TranslatedText(
-                          pro.user?.name ?? 'Pro',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
+                              if (pro.isSuperPro == true)
+                                Positioned(
+                                  left: 10.w,
+                                  bottom: 10.h,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.shade400,
+                                      borderRadius: BorderRadius.circular(6.r),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.verified, color: Colors.white, size: 10.sp),
+                                        SizedBox(width: 4.w),
+                                        Text(
+                                          'SUPER PRO',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8.sp,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                        SizedBox(height: 6.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.star_rounded,
-                              color: Colors.orange,
-                              size: 16.sp,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              pro.rating?.toStringAsFixed(1) ?? '5.0',
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        Padding(
+                          padding: EdgeInsets.all(12.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                pro.user?.name ?? 'Professional',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w800,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 2.h),
+                              Text(
+                                'Corporate Videographer',
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 8.h),
+                              Row(
+                                children: [
+                                  Icon(Icons.star_rounded, color: Colors.orange.shade400, size: 14.sp),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    pro.rating?.toStringAsFixed(1) ?? '0.0',
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.orange.shade700,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    '(124)',
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

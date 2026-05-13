@@ -120,7 +120,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
 
           final listings = _getFilteredListings(controller.listings);
 
-          return AppRefresher(
+          return RefreshIndicator(
             onRefresh: () async {
               HapticFeedback.lightImpact();
               await controller.getMyListings();

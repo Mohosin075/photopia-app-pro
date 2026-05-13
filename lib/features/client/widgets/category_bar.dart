@@ -43,6 +43,20 @@ class CategoryBar extends StatelessWidget {
           final bool isSelected = categoryController.selectedTheme == theme || 
                                  (isAll && (categoryController.selectedTheme == null || categoryController.selectedTheme == 'ALL'));
 
+          IconData getThemeIcon(String theme) {
+            switch (theme) {
+              case 'PHOTOGRAPHY':
+                return Icons.camera_alt_outlined;
+              case 'VIDEOGRAPHY':
+                return Icons.videocam_outlined;
+              case 'EDITING AND POST-PRODUCTION':
+                return Icons.video_settings_outlined;
+              case 'ALL':
+              default:
+                return Icons.grid_view_outlined;
+            }
+          }
+
           return GestureDetector(
             onTap: () {
               categoryController.loadCategories(theme: isAll ? 'ALL' : theme);
@@ -65,7 +79,7 @@ class CategoryBar extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    isAll ? Icons.grid_view_outlined : Icons.palette_outlined,
+                    getThemeIcon(theme),
                     size: 18.sp.clamp(18, 20),
                     color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
                   ),

@@ -84,8 +84,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 );
 
                 if (filteredBookings.isEmpty) {
-                  return AppRefresher(
-                    onRefresh: () => controller.getMyBookings(),
+                  return RefreshIndicator(
+                    onRefresh: () async => await controller.getMyBookings(),
                     color: Theme.of(context).colorScheme.primary,
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -119,8 +119,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   );
                 }
 
-                return AppRefresher(
-                  onRefresh: () => controller.getMyBookings(),
+                return RefreshIndicator(
+                  onRefresh: () async => await controller.getMyBookings(),
                   color: Theme.of(context).colorScheme.primary,
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),

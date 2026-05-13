@@ -341,7 +341,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                 ),
             ],
           ),
-          body: AppRefresher(
+          body: RefreshIndicator(
             onRefresh: () async => _loadProfileData(),
             color: Theme.of(context).colorScheme.primary,
             backgroundColor: Theme.of(context).colorScheme.surface,

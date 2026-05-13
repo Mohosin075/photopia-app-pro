@@ -46,8 +46,8 @@ class _ProviderWalletScreenState extends State<ProviderWalletScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: AppRefresher(
-        onRefresh: () async => context.read<WalletController>().getMyWallet(),
+      body: RefreshIndicator(
+        onRefresh: () async => await context.read<WalletController>().getMyWallet(),
         color: Theme.of(context).colorScheme.onSurface,
         backgroundColor: Theme.of(context).colorScheme.surface,
         child: SingleChildScrollView(

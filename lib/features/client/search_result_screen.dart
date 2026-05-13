@@ -8,7 +8,8 @@ import 'package:provider/provider.dart';
 
 class SearchResultScreen extends StatefulWidget {
   final Map<String, dynamic> filters;
-  const SearchResultScreen({super.key, required this.filters});
+  final String? title;
+  const SearchResultScreen({super.key, required this.filters, this.title});
 
   @override
   State<SearchResultScreen> createState() => _SearchResultScreenState();
@@ -19,26 +20,47 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      debugPrint("🔍 [SEARCH_RESULT] Filters: ${widget.filters}");
       context.read<ServiceListController>().getAllServices(filters: widget.filters);
     });
   }
 
+  String _getDynamicTitle() {
+    if (widget.title != null) return widget.title!;
+    
+    if (widget.filters.containsKey('searchTerm') && widget.filters['searchTerm'].toString().isNotEmpty) {
+      return widget.filters['searchTerm'];
+    }
+    if (widget.filters.containsKey('theme')) {
+      return widget.filters['theme'];
+    }
+    if (widget.filters.containsKey('city')) {
+      return widget.filters['city'];
+    }
+    if (widget.filters.containsKey('categoryName')) {
+      return widget.filters['categoryName'];
+    }
+    
+    return 'Search Results';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Search Results',
+          _getDynamicTitle(),
           style: TextStyle(
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),

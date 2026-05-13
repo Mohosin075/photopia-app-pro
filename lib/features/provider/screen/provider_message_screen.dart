@@ -57,11 +57,11 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
                     return _buildEmptyState();
                   }
 
-                  return AppRefresher(
-                    onRefresh: () async => controller.getChats(),
+                  return RefreshIndicator(
+                    onRefresh: () async => await chatController.getChats(),
                     color: Theme.of(context).colorScheme.primary,
                     backgroundColor: Theme.of(context).colorScheme.surface,
-                    child: _buildConversationList(controller),
+                    child: _buildConversationList(chatController.chats),
                   );
                 },
               ),

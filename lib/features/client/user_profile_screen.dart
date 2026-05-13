@@ -177,7 +177,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
           final user = controller.userProfile;
 
-          return AppRefresher(
+          return RefreshIndicator(
             onRefresh: () async {
               await controller.getUserProfile();
               if (mounted) {

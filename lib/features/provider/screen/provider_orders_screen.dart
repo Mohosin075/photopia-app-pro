@@ -209,10 +209,10 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
   Widget _buildTodayTab(ProviderOrdersController controller) {
     final todayOrders = controller.todayOrders;
     
-    return AppRefresher(
+    return RefreshIndicator(
       color: Theme.of(context).colorScheme.primary,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      onRefresh: () async => controller.getMyOrders(filterType: 'today'),
+      onRefresh: () async => await controller.getMyOrders(filterType: 'today'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       itemCount: todayOrders.isEmpty ? 1 : todayOrders.length + 1,
@@ -306,10 +306,10 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
   Widget _buildUpcomingTab(ProviderOrdersController controller) {
     final upcomingOrders = controller.upcomingOrders;
     
-    return AppRefresher(
+    return RefreshIndicator(
       color: Theme.of(context).colorScheme.primary,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      onRefresh: () async => controller.getMyOrders(filterType: 'upcoming'),
+      onRefresh: () async => await controller.getMyOrders(filterType: 'upcoming'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       itemCount: upcomingOrders.isEmpty ? 1 : upcomingOrders.length + 1,
@@ -400,10 +400,10 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
   Widget _buildPendingTab(ProviderOrdersController controller) {
     final pendingOrders = controller.pendingOrders;
     
-    return AppRefresher(
+    return RefreshIndicator(
       color: Theme.of(context).colorScheme.primary,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      onRefresh: () async => controller.getMyOrders(status: 'pending'),
+      onRefresh: () async => await controller.getMyOrders(status: 'pending'),
       child: ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       itemCount: pendingOrders.isEmpty ? 1 : pendingOrders.length + 1,

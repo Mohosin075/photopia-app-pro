@@ -209,15 +209,26 @@ class Inspiration {
   String? description;
   String? link;
   String? icon;
+  String? image;
 
-  Inspiration({this.title, this.description, this.link, this.icon});
+  Inspiration({this.title, this.description, this.link, this.icon, this.image});
 
   factory Inspiration.fromJson(Map<String, dynamic> json) {
+    String? imageUrl = json['image']?.toString();
+    if (imageUrl != null && !imageUrl.startsWith('http')) {
+      final String base = Urls.baseUrl.endsWith('/')
+          ? Urls.baseUrl.substring(0, Urls.baseUrl.length - 1)
+          : Urls.baseUrl;
+      final String path = imageUrl.startsWith('/') ? imageUrl : '/$imageUrl';
+      imageUrl = "$base$path";
+    }
+
     return Inspiration(
       title: json['title'],
       description: json['description'],
       link: json['link'],
       icon: json['icon'],
+      image: imageUrl,
     );
   }
 }

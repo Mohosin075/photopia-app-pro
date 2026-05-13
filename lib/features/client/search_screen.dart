@@ -515,9 +515,9 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
              Expanded(
-              child: AppRefresher(
+              child: RefreshIndicator(
                 onRefresh: () async {
-                  context.read<ServiceListController>().getAllServices(filters: _currentFilters);
+                  await context.read<ServiceListController>().getAllServices(filters: _currentFilters);
                 },
                 child: GridView.builder(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),

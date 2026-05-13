@@ -10,6 +10,8 @@ import 'package:photopia/controller/auth_controller.dart';
 import 'package:photopia/controller/client/change_password_controller.dart';
 import 'package:photopia/controller/language_controller.dart';
 import 'package:photopia/controller/language_controller.dart';
+import 'package:photopia/features/client/chat_screen.dart';
+import 'package:photopia/data/models/conversation_model.dart';
 import 'package:photopia/core/widgets/custom_snacbar.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -481,7 +483,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _tile(
               icon: Icons.description_outlined,
               title: l.settingsTermsOfService,
-              onTap: () => _showComingSoon(l.settingsTermsOfService),
+              onTap: () {
+                // Future API placeholder:
+                // await controller.getTermsOfService();
+                _showTermsDialog();
+              },
             ),
             _divider(),
             _tile(
@@ -556,6 +562,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ]),
 
           SizedBox(height: 32.h),
+        ],
+      ),
+    );
+  }
+
+  // ── Terms & Conditions ──────────────────────────────────────────────────
+
+  void _showTermsDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text(
+          context.l10n.settingsTermsOfService,
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Terms of Service",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                ),
+                SizedBox(height: 10.h),
+                Text(
+                  "By using Photopia, you agree to our terms. This platform connects professional photographers and videographers with clients.",
+                  style: TextStyle(fontSize: 13.sp),
+                ),
+                SizedBox(height: 15.h),
+                Text(
+                  "1. User Responsibilities",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Users must provide accurate information and respect other members of the community.",
+                ),
+                SizedBox(height: 10.h),
+                Text(
+                  "2. Payments",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Payments are processed securely through our verified payment partners.",
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(context.l10n.closeBtn ?? "Close"),
+          ),
         ],
       ),
     );
@@ -667,7 +731,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle: l.settingsContactSubtitle,
               onTap: () {
                 Navigator.pop(ctx);
-                _showComingSoon(l.settingsContact);
+                // Contact Admin functionality
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      conversation: Conversation(
+                        id: "", // Empty ID for new/admin chat
+                        receiverId: "admin", // Standard admin ID
+                        receiverName: "Photopia Support",
+                        receiverProfile: "",
+                        lastMessage: "",
+                        lastMessageTime: DateTime.now().toString(),
+                        unreadCount: 0,
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
             SizedBox(height: 12.h),

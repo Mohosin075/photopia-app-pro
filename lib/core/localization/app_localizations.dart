@@ -139,9 +139,16 @@ class AppLocalizations {
   // ── Home Page ─────────────────────────────────────────────────────────────
   String get originalProjects => _isFr ? 'Projets originaux' : 'Original Projects';
   String get recentlyViewed => _isFr ? 'Récemment consultés' : 'Recently Viewed';
+  String get ideasForProject => _isFr ? 'Idées pour votre projet' : 'Ideas for your project';
   String get getInspired => _isFr ? 'Laissez-vous inspirer' : 'Get Inspired';
   String get superPros => _isFr ? 'Super Pros' : 'Super Pros';
   String get availableRightNow => _isFr ? 'Disponible en ce moment' : 'Available Right Now';
+  String get nearYou => _isFr ? 'Près de chez vous' : 'Near You';
+  String get popularCategories => _isFr ? 'Catégories populaires' : 'Popular Categories';
+  String get mainCategories => _isFr ? 'Catégories principales' : 'Main Categories';
+  String get findYourStyle => _isFr ? 'Trouvez votre style' : 'Find Your Style';
+  String get trendingProjects => _isFr ? 'Projets tendances' : 'Trending Projects';
+  String get trendingThisWeek => _isFr ? 'Tendances de la semaine' : 'Trending This Week';
   String get unableToLoadHome => _isFr ? 'Impossible de charger l\'accueil' : 'Unable to load home';
   String get tryAgain => _isFr ? 'Réessayer' : 'Try Again';
   String get noData => _isFr ? 'Aucune donnée' : 'No Data';

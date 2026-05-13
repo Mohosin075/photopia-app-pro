@@ -74,7 +74,7 @@ class _ProviderStatisticsScreenState extends State<ProviderStatisticsScreen> {
           ],
         ),
       ),
-      body: AppRefresher(
+      body: RefreshIndicator(
         onRefresh: _handleRefresh,
         color: Theme.of(context).colorScheme.onSurface,
         backgroundColor: Theme.of(context).colorScheme.surface,

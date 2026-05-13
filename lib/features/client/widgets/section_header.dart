@@ -4,8 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class SectionHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onSeeAllTap;
+  final Widget? titleIcon;
 
-  const SectionHeader({super.key, required this.title, this.onSeeAllTap});
+  const SectionHeader({
+    super.key, 
+    required this.title, 
+    this.onSeeAllTap,
+    this.titleIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +20,21 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+          Row(
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              if (titleIcon != null) ...[
+                SizedBox(width: 8.w),
+                titleIcon!,
+              ],
+            ],
           ),
           if (onSeeAllTap != null)
             GestureDetector(
