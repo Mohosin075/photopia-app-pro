@@ -15,6 +15,10 @@ class CategoryController extends ChangeNotifier {
   List<CategoryModel> _categories = [];
   List<CategoryModel> get categories => _categories;
 
+  // Holds ALL categories (no theme filter) specifically for Create Listing
+  List<CategoryModel> _allCategories = [];
+  List<CategoryModel> get allCategories => _allCategories;
+
   List<CategoryModel> _subCategories = [];
   List<CategoryModel> get subCategories => _subCategories;
 
@@ -37,15 +41,16 @@ class CategoryController extends ChangeNotifier {
   String? _selectedSubCategoryId;
   String? get selectedSubCategoryId => _selectedSubCategoryId;
 
-  // Root categories (type == 'category') filtered by theme if selected
   List<CategoryModel> get rootCategories {
     var list = _categories.where((c) => c.type == 'category').toList();
     
     if (_selectedTheme != null && _selectedTheme != 'ALL') {
-      var filteredList = list.where((c) => c.theme == _selectedTheme).toList();
-      if (filteredList.isNotEmpty) {
-        list = filteredList;
-      }
+      list = list.where((c) {
+        // Handle case-insensitive comparison and null safety
+        final String categoryTheme = (c.theme ?? '').trim().toUpperCase();
+        final String selected = _selectedTheme!.trim().toUpperCase();
+        return categoryTheme == selected;
+      }).toList();
     }
     
     // Sort alphabetically by name
@@ -75,6 +80,51 @@ class CategoryController extends ChangeNotifier {
   }
 
   // --- New Methods according to update_category_Api.txt ---
+
+  // Fetches ALL categories (all themes) for use in the Create Listing screen
+  Future<void> fetchAllCategoriesForListing() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Fetch all root categories with a high limit to ensure we get all themes
+      final response = await NetworkCaller.getRequest(
+        url: '${Urls.categories}?type=category&limit=200',
+        requireAuth: false,
+      );
+
+      if (response.isSuccess && response.body != null) {
+        final dynamic rawData = response.body?['data'];
+        List<dynamic> listData = [];
+
+        if (rawData is Map && rawData.containsKey('data')) {
+          listData = rawData['data'] as List<dynamic>;
+        } else if (rawData is List) {
+          listData = rawData;
+        }
+
+        _allCategories = listData
+            .map((json) => CategoryModel.fromJson(json))
+            .toList();
+
+        // Also update _categories so rootCategories getter works for filtering
+        _categories = _allCategories;
+
+        final themes = _allCategories.map((c) => '${c.name}(${c.theme})').toList();
+        debugPrint('✅ [CategoryController] fetchAllCategoriesForListing: ${_allCategories.length} categories');
+        debugPrint('   Themes present: $themes');
+      } else {
+        _errorMessage = response.body?['message'] ?? 'Failed to fetch categories';
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      debugPrint('❌ Error in fetchAllCategoriesForListing: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   // ক্যাটাগরি লোড করা (থিম অনুযায়ী)
   Future<void> loadCategories({String? theme}) async {

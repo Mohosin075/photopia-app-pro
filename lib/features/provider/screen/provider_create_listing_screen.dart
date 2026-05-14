@@ -166,52 +166,58 @@ class _ProviderCreateListingScreenState
         context,
         listen: false,
       );
-      await categoryController.getAllCategories();
-      final rootCategories = categoryController.rootCategories;
+      // Fetch ALL categories (no theme filter) so all themes have their categories
+      await categoryController.fetchAllCategoriesForListing();
+
+      // Debug: print what themes and categories are available
+      final allCats = categoryController.allCategories;
+      debugPrint('🗂 [CreateListing] Total categories fetched: ${allCats.length}');
+      for (var c in allCats) {
+        debugPrint('  📁 Category: ${c.name} | theme: ${c.theme} | type: ${c.type}');
+      }
 
       if (mounted) {
         setState(() {
           _isLoadingCategories = false;
-          if (rootCategories.isNotEmpty) {
-            if (widget.existingListing != null &&
-                widget.existingListing!.category != null) {
-              // Extract the ID safely
-              final String? categoryId = widget.existingListing!.category!.id;
+          if (widget.existingListing != null &&
+              widget.existingListing!.category != null) {
+            // Extract the ID safely
+            final String? categoryId = widget.existingListing!.category!.id;
 
-              _selectedCategory = rootCategories.firstWhere(
+            final allRoots = allCats.where((c) => c.type == 'category').toList();
+            try {
+              _selectedCategory = allRoots.firstWhere(
                 (c) => c.id == categoryId,
-                orElse: () => rootCategories.first,
               );
+            } catch (_) {
+              _selectedCategory = null;
+            }
 
-              // Set the theme in controller if available from the selected category
-              if (_selectedCategory?.theme != null) {
-                categoryController.selectTheme(_selectedCategory!.theme);
-              }
+            // Set the theme in controller if available from the selected category
+            if (_selectedCategory?.theme != null) {
+              categoryController.selectTheme(_selectedCategory!.theme);
+            }
 
-              // Use the new selectCategory logic to fetch subcategories
-              categoryController.selectCategory(_selectedCategory?.id).then((
-                _,
-              ) {
-                if (mounted && widget.existingListing!.subCategory != null) {
-                  final subId = widget.existingListing!.subCategory!;
-                  final subcategories = categoryController.subCategories;
-                  if (subcategories.isNotEmpty) {
-                    try {
-                      setState(() {
-                        _selectedSubCategory = subcategories.firstWhere(
-                          (s) => s.id == subId,
-                        );
-                      });
-                    } catch (_) {
-                      _selectedSubCategory = null;
-                    }
+            // Use the new selectCategory logic to fetch subcategories
+            categoryController.selectCategory(_selectedCategory?.id).then((
+              _,
+            ) {
+              if (mounted && widget.existingListing!.subCategory != null) {
+                final subId = widget.existingListing!.subCategory!;
+                final subcategories = categoryController.subCategories;
+                if (subcategories.isNotEmpty) {
+                  try {
+                    setState(() {
+                      _selectedSubCategory = subcategories.firstWhere(
+                        (s) => s.id == subId,
+                      );
+                    });
+                  } catch (_) {
+                    _selectedSubCategory = null;
                   }
                 }
-              });
-            } else if (_selectedCategory == null) {
-              _selectedCategory = rootCategories.first;
-              categoryController.selectCategory(_selectedCategory?.id);
-            }
+              }
+            });
           }
         });
       }
@@ -293,7 +299,8 @@ class _ProviderCreateListingScreenState
       errors['category'] = "Category is required";
       isValid = false;
     }
-    if (_selectedSubCategory == null) {
+    final subCategories = context.read<CategoryController>().subCategories;
+    if (_selectedSubCategory == null && subCategories.isNotEmpty) {
       errors['subCategory'] = "Sub-Category is required";
       isValid = false;
     }
@@ -874,7 +881,9 @@ class _ProviderCreateListingScreenState
               dropdownColor: Theme.of(context).colorScheme.surface,
               isExpanded: true,
               disabledHint: Text(
-                'Select a theme first',
+                selectedTheme == null
+                    ? 'Select a theme first'
+                    : 'No category available for this theme',
                 style: TextStyle(
                   color: Theme.of(
                     context,
@@ -895,7 +904,7 @@ class _ProviderCreateListingScreenState
                 Icons.keyboard_arrow_down,
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               ),
-              onChanged: selectedTheme == null
+              onChanged: (selectedTheme == null || rootCategories.isEmpty)
                   ? null
                   : (CategoryModel? newValue) {
                       setState(() {
@@ -964,7 +973,9 @@ class _ProviderCreateListingScreenState
               dropdownColor: Theme.of(context).colorScheme.surface,
               isExpanded: true,
               disabledHint: Text(
-                'Select a category first',
+                _selectedCategory == null
+                    ? 'Select a category first'
+                    : 'No sub-category available',
                 style: TextStyle(
                   color: Theme.of(
                     context,
@@ -985,7 +996,7 @@ class _ProviderCreateListingScreenState
                 Icons.keyboard_arrow_down,
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               ),
-              onChanged: _selectedCategory == null
+              onChanged: (_selectedCategory == null || subcategories.isEmpty)
                   ? null
                   : (CategoryModel? newValue) {
                       setState(() {
