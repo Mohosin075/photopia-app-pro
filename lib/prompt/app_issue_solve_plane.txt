@@ -9,6 +9,8 @@ Client side → page history থাকতে হবে
 Professional side → separate page history থাকতে হবে
 Back চাপলে app exit না হয়ে previous page এ যাবে
 📱 UI Fixes
+Missing Profile Pictures: Added default human icon placeholder in messages/chats for missing/invalid profile pictures [COMPLETE]
+   👉 Check: Open Messages list or Chat screen. Users without an avatar will now show a smooth default human icon instead of a broken image or empty space.
 Search logo alignment ঠিক করতে হবে (same height) [COMPLETE]
 Titles: [COMPLETE]
 ALL CAPS ❌
@@ -27,7 +29,8 @@ Home page section redesign করতে হবে (new version) [COMPLETE]
 📸 Content rules
 Creators বাধ্যতামূলকভাবে profile photo দিতে পারবে [COMPLETE]
 🖼️ UI interactions
-Banner / profile picture zoom করা যাবে না → এটা enable করতে হবে বা fix করতে হবে [COMPLETE]
+Banner / profile picture zoom করা যাবে না → এটা enable করতে হবে বা fix করতে হবে [COMPLETE] - Hero animation glitch fixed.
+   👉 Check: Tap any provider profile picture or banner (even default cover); it will open full-screen smoothly without jumping.
 🔍 Hashtags
 Hashtag click করলে search result page এ যাবে [COMPLETE]
 সেখানে:
@@ -104,7 +107,8 @@ Only first name show হবে [INCOMPLETE]
 Reviews → one line fix [INCOMPLETE]
 Email/phone hide করতে হবে (security) [INCOMPLETE]
 Share button add করতে হবে [INCOMPLETE]
-“View profile” & “Message” button remove (duplicate) [INCOMPLETE]
+“View profile” & “Message” button remove (duplicate) [COMPLETE] - Removed from Service Details screen.
+   👉 Check: Go to any Service Details page, the duplicate middle "Message" and "View Profile" buttons are no longer there (only Bottom bar buttons remain).
 “Free” label remove everywhere [INCOMPLETE]
 Only Premium users will show “Premium” badge [INCOMPLETE]
 

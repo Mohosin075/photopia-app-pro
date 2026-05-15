@@ -133,51 +133,62 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
         ),
         bottomNavigationBar: isKeyboardVisible
             ? const SizedBox.shrink()
-            : Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.06),
-                      blurRadius: 20,
-                      spreadRadius: 0,
-                      offset: const Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: SafeArea(
-                  top: false,
-                  child: Container(
-                    height: 60.h,
-                    padding: EdgeInsets.symmetric(horizontal: 8.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildNavItem(
-                          index: 0,
-                          iconAsset: 'assets/images/client_home_icon.png',
-                          label: context.l10n.navHome,
-                        ),
-                        _buildNavItem(
-                          index: 1,
-                          iconAsset: 'assets/images/message_icon.png',
-                          label: context.l10n.navMessages,
-                        ),
-                        Expanded(child: Center(child: _buildSearchButton())),
-                        _buildNavItem(
-                          index: 3,
-                          iconAsset: 'assets/images/client_favorite_icon.png',
-                          label: context.l10n.navFavorites,
-                        ),
-                        _buildNavItem(
-                          index: 4,
-                          iconAsset: 'assets/images/client_profile_icon.png',
-                          label: context.l10n.navProfile,
+            : Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.06),
+                          blurRadius: 20,
+                          spreadRadius: 0,
+                          offset: const Offset(0, -5),
                         ),
                       ],
                     ),
+                    child: SafeArea(
+                      top: false,
+                      child: Container(
+                        height: 60.h,
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildNavItem(
+                              index: 0,
+                              iconAsset: 'assets/images/client_home_icon.png',
+                              label: context.l10n.navHome,
+                            ),
+                            _buildNavItem(
+                              index: 1,
+                              iconAsset: 'assets/images/message_icon.png',
+                              label: context.l10n.navMessages,
+                            ),
+                            // Empty space for the floating search button
+                            const Expanded(child: SizedBox.shrink()),
+                            _buildNavItem(
+                              index: 3,
+                              iconAsset: 'assets/images/client_favorite_icon.png',
+                              label: context.l10n.navFavorites,
+                            ),
+                            _buildNavItem(
+                              index: 4,
+                              iconAsset: 'assets/images/client_profile_icon.png',
+                              label: context.l10n.navProfile,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                    bottom: ScreenUtil().bottomBarHeight + 30.h,
+                    child: _buildSearchButton(),
+                  ),
+                ],
               ),
       ),
     );

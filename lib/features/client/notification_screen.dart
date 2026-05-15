@@ -38,6 +38,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         surfaceTintColor: Colors.transparent,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
+        centerTitle: false,
         toolbarHeight: 60.h,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
@@ -73,22 +74,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(top: 15.h, right: 8.w),
-            child: TextButton(
-              onPressed: () {
-                context.read<NotificationController>().markAllAsRead();
-              },
-              child: Text(
-                context.l10n.markAllAsRead,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 14.sp.clamp(14, 16),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
           IconButton(
             icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface, size: 20.sp),
             onPressed: () => Navigator.push(
@@ -113,8 +98,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Consumer<NotificationController>(
               builder: (context, controller, child) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     IntrinsicWidth(
                       child: Column(
@@ -138,6 +124,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 6.h),
+                      child: TextButton(
+                        onPressed: () {
+                          context.read<NotificationController>().markAllAsRead();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          context.l10n.markAllAsRead,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 13.sp.clamp(13, 14),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ],
