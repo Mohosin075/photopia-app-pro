@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:ui';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/features/client/widgets/service_card.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/review_controller.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
-import 'package:photopia/controller/client/provider_details_controller.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/utils/guest_dialog_helper.dart';
-import 'package:photopia/controller/client/favorites_controller.dart';
-import 'package:photopia/data/models/service_list_model.dart';
+import 'package:photopya/controller/client/review_controller.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
+import 'package:photopya/controller/client/provider_details_controller.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/utils/guest_dialog_helper.dart';
+import 'package:photopya/controller/client/favorites_controller.dart';
+import 'package:photopya/data/models/service_list_model.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
   final Map<String, dynamic> provider;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 
 class PhotoCard extends StatelessWidget {
   final String title;

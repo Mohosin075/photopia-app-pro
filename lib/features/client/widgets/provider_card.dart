@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/provider_profile_screen.dart';
+import 'package:photopya/features/client/provider_profile_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/favorites_controller.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/utils/guest_dialog_helper.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/features/client/chat_screen.dart';
-import 'package:photopia/data/models/conversation_model.dart';
-import 'package:photopia/data/models/chat_message_model.dart';
-import 'package:photopia/core/widgets/subscription_badge.dart';
+import 'package:photopya/controller/client/favorites_controller.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/utils/guest_dialog_helper.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/features/client/chat_screen.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
+import 'package:photopya/core/widgets/subscription_badge.dart';
 
 class ProviderCard extends StatelessWidget {
   final Map<String, dynamic> provider;

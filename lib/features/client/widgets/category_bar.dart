@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 
-import 'package:photopia/data/models/category_model.dart';
+import 'package:photopya/data/models/category_model.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/category_controller.dart';
+import 'package:photopya/controller/category_controller.dart';
 
 class CategoryBar extends StatelessWidget {
   final bool isLoading;

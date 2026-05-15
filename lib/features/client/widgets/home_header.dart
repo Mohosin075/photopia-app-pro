@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/notification_controller.dart';
-import 'package:photopia/controller/location_controller.dart';
-import 'package:photopia/features/client/notification_screen.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/controller/client/notification_controller.dart';
+import 'package:photopya/controller/location_controller.dart';
+import 'package:photopya/features/client/notification_screen.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 import 'package:provider/provider.dart';
 
 class HomeHeader extends StatelessWidget {

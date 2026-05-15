@@ -1,4 +1,4 @@
-import 'package:photopia/core/network/urls.dart';
+import 'package:photopya/core/network/urls.dart';
 
 class ProfessionalProfileModel {
   final int? profileViews;

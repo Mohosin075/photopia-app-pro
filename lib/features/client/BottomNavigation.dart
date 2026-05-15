@@ -3,18 +3,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/home_page.dart';
-import 'package:photopia/features/client/user_profile_screen.dart';
-import 'package:photopia/features/client/favorites_screen.dart';
-import 'package:photopia/features/client/messages_screen.dart';
-import 'package:photopia/features/client/search_screen.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
-import 'package:photopia/core/utils/guest_dialog_helper.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/features/client/home_page.dart';
+import 'package:photopya/features/client/user_profile_screen.dart';
+import 'package:photopya/features/client/favorites_screen.dart';
+import 'package:photopya/features/client/messages_screen.dart';
+import 'package:photopya/features/client/search_screen.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
+import 'package:photopya/core/utils/guest_dialog_helper.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/booking_controller.dart';
-import 'package:photopia/core/notification/notification_service.dart';
+import 'package:photopya/controller/client/booking_controller.dart';
+import 'package:photopya/core/notification/notification_service.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
   const BottomNavigationScreen({super.key});
@@ -133,62 +133,51 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
         ),
         bottomNavigationBar: isKeyboardVisible
             ? const SizedBox.shrink()
-            : Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.06),
-                          blurRadius: 20,
-                          spreadRadius: 0,
-                          offset: const Offset(0, -5),
+            : Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.06),
+                      blurRadius: 20,
+                      spreadRadius: 0,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  top: false,
+                  child: Container(
+                    height: 60.h,
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildNavItem(
+                          index: 0,
+                          iconAsset: 'assets/images/client_home_icon.png',
+                          label: context.l10n.navHome,
+                        ),
+                        _buildNavItem(
+                          index: 1,
+                          iconAsset: 'assets/images/message_icon.png',
+                          label: context.l10n.navMessages,
+                        ),
+                        Expanded(child: Center(child: _buildSearchButton())),
+                        _buildNavItem(
+                          index: 3,
+                          iconAsset: 'assets/images/client_favorite_icon.png',
+                          label: context.l10n.navFavorites,
+                        ),
+                        _buildNavItem(
+                          index: 4,
+                          iconAsset: 'assets/images/client_profile_icon.png',
+                          label: context.l10n.navProfile,
                         ),
                       ],
                     ),
-                    child: SafeArea(
-                      top: false,
-                      child: Container(
-                        height: 60.h,
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildNavItem(
-                              index: 0,
-                              iconAsset: 'assets/images/client_home_icon.png',
-                              label: context.l10n.navHome,
-                            ),
-                            _buildNavItem(
-                              index: 1,
-                              iconAsset: 'assets/images/message_icon.png',
-                              label: context.l10n.navMessages,
-                            ),
-                            // Empty space for the floating search button
-                            const Expanded(child: SizedBox.shrink()),
-                            _buildNavItem(
-                              index: 3,
-                              iconAsset: 'assets/images/client_favorite_icon.png',
-                              label: context.l10n.navFavorites,
-                            ),
-                            _buildNavItem(
-                              index: 4,
-                              iconAsset: 'assets/images/client_profile_icon.png',
-                              label: context.l10n.navProfile,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
-                  Positioned(
-                    bottom: ScreenUtil().bottomBarHeight + 30.h,
-                    child: _buildSearchButton(),
-                  ),
-                ],
+                ),
               ),
       ),
     );

@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/book_now_SelectPackage_screen.dart';
-import 'package:photopia/features/client/book_now_confirmation_screen.dart';
-import 'package:photopia/features/client/provider_profile_screen.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/utils/guest_dialog_helper.dart';
+import 'package:photopya/features/client/book_now_SelectPackage_screen.dart';
+import 'package:photopya/features/client/book_now_confirmation_screen.dart';
+import 'package:photopya/features/client/provider_profile_screen.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/utils/guest_dialog_helper.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/favorites_controller.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
-import 'package:photopia/core/widgets/video_player_screen.dart';
-import 'package:photopia/data/models/conversation_model.dart';
-import 'package:photopia/data/models/chat_message_model.dart';
-import 'package:photopia/core/widgets/subscription_badge.dart';
-import 'package:photopia/features/client/chat_screen.dart';
-import 'package:photopia/features/client/search_screen.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/core/services/translation_service.dart';
+import 'package:photopya/controller/client/favorites_controller.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
+import 'package:photopya/core/widgets/video_player_screen.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
+import 'package:photopya/core/widgets/subscription_badge.dart';
+import 'package:photopya/features/client/chat_screen.dart';
+import 'package:photopya/features/client/search_screen.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/services/translation_service.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
@@ -83,12 +83,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                               Text(context.l10n.providerLabel, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                               SizedBox(height: 12.h),
                               _buildProviderCard(providerName, providerAvatar, rating, reviews),
-                              SizedBox(height: 18.h),
-                              _buildActionButtons(
-                                providerId: serviceDetail?.providerId?.sId ?? (widget.service['providerId'] is Map ? widget.service['providerId']['_id'] : widget.service['providerId'])?.toString() ?? '',
-                                name: providerName,
-                                profile: providerAvatar,
-                              ),
+
                               SizedBox(height: 20.h),
                               _buildStatsRow(
                                 responseTime: serviceDetail?.responseTime ?? widget.service['responseTime']?.toString(),
@@ -263,49 +258,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     );
   }
 
-  Widget _buildActionButtons({required String providerId, required String name, required String profile}) {
-    return Row(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              if (!AuthController.isLoggedIn) {
-                GuestDialogHelper.showGuestDialog(context);
-                return;
-              }
-              final conversation = Conversation(
-                id: '',
-                name: name,
-                lastMessage: '',
-                avatarUrl: profile,
-                lastMessageTime: DateTime.now(),
-                unreadCount: 0,
-                isOnline: false,
-                status: MessageStatus.read,
-                isTemporary: true,
-                receiverId: providerId,
-              );
-              Navigator.of(context, rootNavigator: true).push(
-                MaterialPageRoute(
-                  builder: (context) => ChatScreen(conversation: conversation),
-                ),
-              );
-            },
-            child: Container(height: 48.h, decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(12).r), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.message_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 18.sp), SizedBox(width: 8.w), Text(context.l10n.messageBtn, style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 14.sp, fontWeight: FontWeight.bold))])),
-          ),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ProviderProfileScreen(provider: {'name': name, 'avatar': profile, 'id': providerId, '_id': providerId})));
-            },
-            child: Container(height: 48.h, decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12).r, border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))), child: Center(child: Text(context.l10n.viewProfileBtn, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14.sp, fontWeight: FontWeight.bold)))),
-          ),
-        ),
-      ],
-    );
-  }
+
 
   Widget _buildStatsRow({String? responseTime, dynamic completedProjects}) {
     return Row(

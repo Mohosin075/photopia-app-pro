@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
 
 class LogOutController extends ChangeNotifier {
   bool _inProgress = false;

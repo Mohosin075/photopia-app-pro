@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
 
 class PrivacyPolicyScreen extends StatefulWidget {
   static const String name = '/privacy_policy';

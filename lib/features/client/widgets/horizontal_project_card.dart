@@ -1,16 +1,16 @@
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/favorites_controller.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/utils/guest_dialog_helper.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
+import 'package:photopya/controller/client/favorites_controller.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/utils/guest_dialog_helper.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:photopia/features/client/widgets/service_card.dart';
-import 'package:photopia/features/client/search_screen.dart';
-import 'package:photopia/core/services/translation_service.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
+import 'package:photopya/features/client/search_screen.dart';
+import 'package:photopya/core/services/translation_service.dart';
 import 'dart:ui';
 
 class HorizontalProjectCard extends StatefulWidget {

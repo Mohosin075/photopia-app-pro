@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:async';
-import 'package:photopia/controller/client/role_switch_controller.dart';
-import 'package:photopia/controller/provider/provider_onboarding_controller.dart';
+import 'package:photopya/controller/client/role_switch_controller.dart';
+import 'package:photopya/controller/provider/provider_onboarding_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/core/routes/app_routes.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/routes/app_routes.dart';
 
 class ModeTransitionScreen extends StatefulWidget {
   final String targetRole; // 'client' or 'professional'

@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/data/models/professional_profile_model.dart';
+import 'package:photopya/data/models/professional_profile_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/provider/provider_profile_controller.dart';
-import 'package:photopia/core/widgets/subscription_badge.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/features/client/widgets/auth_profile_image.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
+import 'package:photopya/controller/provider/provider_profile_controller.dart';
+import 'package:photopya/core/widgets/subscription_badge.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/features/client/widgets/auth_profile_image.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:photopia/core/utils/image_utils.dart';
-import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
-import 'package:photopia/core/widgets/document_viewer_screen.dart';
+import 'package:photopya/core/utils/image_utils.dart';
+import 'package:photopya/core/widgets/full_screen_image_viewer.dart';
+import 'package:photopya/core/widgets/document_viewer_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/features/client/search_screen.dart';
-import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/features/client/search_screen.dart';
+import 'package:photopya/features/client/search_result_screen.dart';
+import 'package:photopya/core/widgets/app_refresher.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
   final bool showSpecializations; 
@@ -95,11 +96,12 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   void _onHashtagTap(String hashtag) {
     if (_isEditing) return;
 
-    // Navigate to Search Screen with initial query
-    // We assume SearchScreen is the main search page in the client flow
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SearchScreen(initialSearchTerm: '#$hashtag'),
+        builder: (context) => SearchResultScreen(
+          filters: {'searchTerm': '#$hashtag'},
+          title: '#$hashtag',
+        ),
       ),
     );
   }

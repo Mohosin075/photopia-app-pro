@@ -5,13 +5,13 @@ import 'package:get_storage/get_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/controller/client/user_profile_controller.dart';
-import 'package:photopia/controller/client/notification_controller.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/chat_message_model.dart';
-import 'package:photopia/data/models/chat_response_model.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/controller/client/user_profile_controller.dart';
+import 'package:photopya/controller/client/notification_controller.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
+import 'package:photopya/data/models/chat_response_model.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatController extends ChangeNotifier {
@@ -594,6 +594,43 @@ class ChatController extends ChangeNotifier {
           await sendMessage(newChatId, text, receiverId: otherUserId);
           await getChats();
           return newChatId;
+        }
+      }
+      _errorMessage = response.errorMessage ?? 'Failed to initiate chat';
+    } catch (e) {
+      _errorMessage = 'An error occurred: $e';
+    } finally {
+      if (_isLoading) {
+        _isLoading = false;
+        notifyListeners();
+      }
+    }
+    return null;
+  }
+
+  Future<String?> createChatAndSendMediaMessage(
+    String otherUserId,
+    String filePath, {
+    String? text,
+  }) async {
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final response = await NetworkCaller.postRequest(
+        url: Urls.createChat(otherUserId),
+        body: {},
+      );
+
+      if (response.isSuccess) {
+        final Map<String, dynamic> data = response.body?['data'] ?? {};
+        final String newChatId = (data['_id'] ?? data['id'] ?? '').toString();
+
+        if (newChatId.isNotEmpty) {
+           await sendMediaMessage(newChatId, filePath, receiverId: otherUserId, text: text);
+           await getChats();
+           return newChatId;
         }
       }
       _errorMessage = response.errorMessage ?? 'Failed to initiate chat';

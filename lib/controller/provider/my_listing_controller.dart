@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/my_listing_model.dart';
-import 'package:photopia/data/models/provider_service_model.dart'
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/my_listing_model.dart';
+import 'package:photopya/data/models/provider_service_model.dart'
     as service_model;
 
 class MyListingController extends ChangeNotifier {

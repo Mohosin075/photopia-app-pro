@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/BottomNavigation.dart';
+import 'package:photopya/features/client/BottomNavigation.dart';
 import 'package:get_storage/get_storage.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -46,7 +46,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       'title': 'Premium Quality, Trusted Results',
       'description':
-          'Read reviews, check ratings, and hire verified professionals with confidence',
+          'Read reviews, check ratings, and book verified professionals’ services with confidence',
       'image': 'assets/images/onboard_container4.png',
     },
   ];

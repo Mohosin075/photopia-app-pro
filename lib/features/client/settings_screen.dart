@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/features/client/payment_methods_screen.dart';
-import 'package:photopia/features/client/privacy_policy_screen.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/features/client/payment_methods_screen.dart';
+import 'package:photopya/features/client/privacy_policy_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/theme_controller.dart';
-import 'package:photopia/controller/client/delete_account_controller.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/controller/client/change_password_controller.dart';
-import 'package:photopia/controller/language_controller.dart';
-import 'package:photopia/controller/language_controller.dart';
-import 'package:photopia/features/client/chat_screen.dart';
-import 'package:photopia/data/models/conversation_model.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/controller/client/chat_controller.dart';
-import 'package:photopia/features/client/terms_of_service_screen.dart';
+import 'package:photopya/controller/theme_controller.dart';
+import 'package:photopya/controller/client/delete_account_controller.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/controller/client/change_password_controller.dart';
+import 'package:photopya/controller/language_controller.dart';
+import 'package:photopya/controller/language_controller.dart';
+import 'package:photopya/features/client/chat_screen.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/controller/client/chat_controller.dart';
+import 'package:photopya/features/client/terms_of_service_screen.dart';
+import 'package:photopya/features/common/screens/notification_settings_screen.dart';
 class SettingsScreen extends StatefulWidget {
   static const String name = '/settings';
   const SettingsScreen({super.key});
@@ -454,6 +455,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           SizedBox(height: 16.h),
 
+          // ── Notifications Section ─────────────────────────────────────────
+          _sectionLabel(context.l10n.notifications),
+          _card([
+            _tile(
+              icon: Icons.notifications_none_outlined,
+              title: 'Notification Settings',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
+              ),
+            ),
+          ]),
+
+          SizedBox(height: 16.h),
+
           // ── Language Section ──────────────────────────────────────────────
           _sectionLabel(l.language),
           _card([
@@ -792,7 +808,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _sectionLabel(String label) => Padding(
     padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
     child: Text(
-      label.toUpperCase(),
+      label,
       style: TextStyle(
         fontSize: 11.sp,
         fontWeight: FontWeight.w600,

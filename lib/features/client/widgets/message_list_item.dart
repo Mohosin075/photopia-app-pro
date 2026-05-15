@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/data/models/chat_message_model.dart';
-import 'package:photopia/data/models/conversation_model.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
+import 'package:photopya/data/models/conversation_model.dart';
 import 'package:intl/intl.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
 
 class MessageListItem extends StatelessWidget {
   final Conversation conversation;
@@ -29,23 +30,19 @@ class MessageListItem extends StatelessWidget {
           children: [
             Stack(
               children: [
-                CircleAvatar(
-                  radius: 22.r.clamp(20, 26),
+                CustomNetworkImage(
+                  imageUrl: conversation.avatarUrl,
+                  width: 44.r.clamp(40, 52),
+                  height: 44.r.clamp(40, 52),
+                  shape: BoxShape.circle,
                   backgroundColor: Theme.of(context).brightness == Brightness.dark 
                       ? Colors.grey[800] 
                       : Colors.grey[200],
-                  backgroundImage: conversation.avatarUrl.isNotEmpty
-                      ? (conversation.avatarUrl.startsWith('assets/')
-                          ? AssetImage(conversation.avatarUrl) as ImageProvider
-                          : NetworkImage(conversation.avatarUrl))
-                      : null,
-                  child: conversation.avatarUrl.isEmpty
-                      ? Icon(
-                          Icons.person,
-                          size: 24.sp,
-                          color: Colors.grey[400],
-                        )
-                      : null,
+                  placeholder: Icon(
+                    Icons.person,
+                    size: 24.sp,
+                    color: Colors.grey[400],
+                  ),
                 ),
                 if (conversation.isOnline)
                   Positioned(

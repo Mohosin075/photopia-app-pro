@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/user_profile_controller.dart';
-import 'package:photopia/controller/provider/provider_profile_controller.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/subscription_plan_model.dart';
+import 'package:photopya/controller/client/user_profile_controller.dart';
+import 'package:photopya/controller/provider/provider_profile_controller.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/subscription_plan_model.dart';
 
 class SubscriptionController extends ChangeNotifier {
   bool _isLoading = false;

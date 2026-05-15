@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/constants/app_sizes.dart';
+import 'package:photopya/core/constants/app_sizes.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:photopia/features/client/BottomNavigation.dart';
-import 'package:photopia/features/onboarding/onboarding_screen.dart';
+import 'package:photopya/features/client/BottomNavigation.dart';
+import 'package:photopya/features/onboarding/onboarding_screen.dart';
 
 class GetStartedScreen extends StatelessWidget {
   static const String name = '/get_started';

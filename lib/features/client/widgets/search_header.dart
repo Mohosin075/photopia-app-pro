@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/search_filter_screen.dart';
+import 'package:photopya/features/client/search_filter_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/search_history_controller.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/controller/client/search_history_controller.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class SearchHeader extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;

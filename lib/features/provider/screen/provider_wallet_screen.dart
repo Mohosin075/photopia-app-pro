@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/core/constants/app_sizes.dart';
-import 'package:photopia/features/provider/screen/provider_transaction_details_screen.dart';
-import 'package:photopia/features/provider/screen/provider_request_payout_screen.dart';
-import 'package:photopia/controller/provider/wallet_controller.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/core/constants/app_sizes.dart';
+import 'package:photopya/features/provider/screen/provider_transaction_details_screen.dart';
+import 'package:photopya/features/provider/screen/provider_request_payout_screen.dart';
+import 'package:photopya/controller/provider/wallet_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/widgets/app_refresher.dart';
 
 class ProviderWalletScreen extends StatefulWidget {
   const ProviderWalletScreen({super.key});

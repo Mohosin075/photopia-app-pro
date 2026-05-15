@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/chat_controller.dart';
-import 'package:photopia/data/models/chat_response_model.dart';
-import 'package:photopia/features/client/widgets/message_list_item.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
-import 'package:photopia/features/client/chat_screen.dart';
-import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopya/controller/client/chat_controller.dart';
+import 'package:photopya/data/models/chat_response_model.dart';
+import 'package:photopya/features/client/widgets/message_list_item.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/features/client/chat_screen.dart';
+import 'package:photopya/controller/auth_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/core/widgets/app_refresher.dart';
-import 'package:photopia/core/utils/app_transitions.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/widgets/app_refresher.dart';
+import 'package:photopya/core/utils/app_transitions.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});

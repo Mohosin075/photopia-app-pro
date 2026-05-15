@@ -1,5 +1,5 @@
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/category_model.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/category_model.dart';
 
 class ServiceListModel {
   int? statusCode;

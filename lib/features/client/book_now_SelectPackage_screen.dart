@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/provider/calender_availibility_controller.dart';
-import 'package:photopia/features/client/book_now_confirmation_screen.dart';
+import 'package:photopya/controller/provider/calender_availibility_controller.dart';
+import 'package:photopya/features/client/book_now_confirmation_screen.dart';
 import 'package:provider/provider.dart';
 
 class SelectPackageScreen extends StatefulWidget {

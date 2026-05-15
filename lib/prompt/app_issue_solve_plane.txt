@@ -1,0 +1,112 @@
+🔧 1. General Fixes (সব জায়গার জন্য)
+🟢 Branding / Name
+App এর নাম ভুল: Photopia ❌ → Photopya ✔ [COMPLETE]
+Logo-ও update করতে হবে [COMPLETE]
+🔙 Back button bug
+Phone back চাপলে app বন্ধ হয়ে যাচ্ছে ❌ [COMPLETE]
+ঠিক করতে হবে:
+Client side → page history থাকতে হবে
+Professional side → separate page history থাকতে হবে
+Back চাপলে app exit না হয়ে previous page এ যাবে
+📱 UI Fixes
+Search logo alignment ঠিক করতে হবে (same height) [COMPLETE]
+Titles: [COMPLETE]
+ALL CAPS ❌
+Only first letter capital ✔ (e.g. “Photography”, “Videography”)
+🏠 Home page text change [COMPLETE]
+
+পুরানো:
+Read reviews, check ratings, and hire verified professionals with confidence
+নতুন:
+Read reviews, check ratings, and book verified professionals’ services with confidence
+
+💡 “Ideas for your project”
+Home page section redesign করতে হবে (new version) [COMPLETE]
+
+👤 2. Client Side Fixes
+📸 Content rules
+Creators বাধ্যতামূলকভাবে profile photo দিতে পারবে [COMPLETE]
+🖼️ UI interactions
+Banner / profile picture zoom করা যাবে না → এটা enable করতে হবে বা fix করতে হবে [COMPLETE]
+🔍 Hashtags
+Hashtag click করলে search result page এ যাবে [COMPLETE]
+সেখানে:
+Profile search
+Service search → আলাদা filter থাকবে
+💬 Messages
+Document attach করা যাবে না → add করতে হবে [COMPLETE]
+🔎 Search page
+Category open করলে back button যোগ করতে হবে: [COMPLETE]
+“←” top-left এ
+main search page এ ফেরত যাবে
+
+👤 3. Profile Space (Client Side)
+❌ Broken features
+Settings button কাজ করছে না [COMPLETE] - Fixed in SettingsScreen linking.
+Privacy & Security কাজ করছে না [INCOMPLETE]
+🧾 Fixes / changes
+“Speciality” remove করতে হবে (client side) [INCOMPLETE]
+Language add:
+French যুক্ত করতে হবে (proper working) [COMPLETE] - Added to Language Picker and Controller.
+Order history:
+Invoice download feature যোগ করতে হবে [INCOMPLETE]
+🆘 Help & Support
+Contact [COMPLETE] - Admin contact integrated.
+FAQ [INCOMPLETE]
+⚙️ Settings add করতে হবে:
+Dark mode toggle [COMPLETE] - Integrated in SettingsScreen.
+Change password [COMPLETE] - Integrated in SettingsScreen.
+Deactivate account [COMPLETE] - Integrated in SettingsScreen.
+Delete account [COMPLETE] - Integrated in SettingsScreen.
+Payment methods:
+Add / modify / delete [COMPLETE] - Linked to PaymentMethodsScreen.
+Terms of Service [COMPLETE] - Linked in SettingsScreen.
+
+🔁 Switch to Professional Mode (Onboarding system) [INCOMPLETE] - Need to review multi-step form.
+User কে প্রশ্ন করে determine করতে হবে:
+Photographer, Videographer, Editor
+👉 Multi-step form:
+SECTION 1: Personal Info (Required)
+SECTION 2: Domain (Required)
+SECTION 3: Categories (Optional)
+SECTION 4: Area
+SECTION 5: Experience
+SECTION 6: Portfolio
+SECTION 7: Profile picture (Required)
+SECTION 8: Notifications [COMPLETE] - NotificationSettingsScreen created.
+SECTION 9: Legal
+
+💼 4. Professional Side Fixes
+📦 Orders
+Pending order:
+Pro price modify করতে পারবে [INCOMPLETE]
+client অনুযায়ী package adjust করতে পারবে (VERY IMPORTANT) [INCOMPLETE]
+📅 Calendar issues
+Booking click করলে back যায় না ❌ [INCOMPLETE]
+Date select করে event create করা যাবে [INCOMPLETE]
+Listing from date → bug fix করতে হবে [INCOMPLETE]
+📌 Listings (BIG FIX AREA)
+Theme → multiple allowed [INCOMPLETE]
+Duration remove → description এ দিতে হবে [INCOMPLETE]
+Country → dropdown list [COMPLETE] - Replaced with flexible selection.
+City → autocomplete (3 letters) [COMPLETE] - Implemented in Create Listing.
+Address optional [COMPLETE] - Updated field requirements.
+Mandatory fields clearly mark করতে হবে (*) [INCOMPLETE]
+❌ Bugs
+Listing publish fail (because all info required) [INCOMPLETE]
+Draft system broken [INCOMPLETE]
+No proper listing scheduling [INCOMPLETE]
+Availability system missing/buggy [INCOMPLETE]
+
+🧑‍💼 Professional Profile Fixes
+Only first name show হবে [INCOMPLETE]
+“About” button remove → section add below stats [INCOMPLETE]
+Reviews → one line fix [INCOMPLETE]
+Email/phone hide করতে হবে (security) [INCOMPLETE]
+Share button add করতে হবে [INCOMPLETE]
+“View profile” & “Message” button remove (duplicate) [INCOMPLETE]
+“Free” label remove everywhere [INCOMPLETE]
+Only Premium users will show “Premium” badge [INCOMPLETE]
+
+📌 Summary (এক লাইনে)
+👉 এটা আসলে একটা full app QA + UX redesign + bug fixing specification document for Photopya app (client + professional both sides)

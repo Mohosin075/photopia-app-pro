@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:photopia/controller/provider/wallet_controller.dart';
-import 'package:photopia/controller/provider/provider_profile_controller.dart';
-import 'package:photopia/controller/provider/statistics_controller.dart';
-import 'package:photopia/core/widgets/subscription_badge.dart';
-import 'package:photopia/data/models/statistics_model.dart';
-import 'package:photopia/features/provider/screen/provider_subscription_screen.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
+import 'package:photopya/controller/provider/wallet_controller.dart';
+import 'package:photopya/controller/provider/provider_profile_controller.dart';
+import 'package:photopya/controller/provider/statistics_controller.dart';
+import 'package:photopya/core/widgets/subscription_badge.dart';
+import 'package:photopya/data/models/statistics_model.dart';
+import 'package:photopya/features/provider/screen/provider_subscription_screen.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/widgets/app_refresher.dart';
 
 class ProviderStatisticsScreen extends StatefulWidget {
   const ProviderStatisticsScreen({super.key});

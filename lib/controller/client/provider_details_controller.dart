@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/professional_profile_model.dart';
-import 'package:photopia/data/models/user_profile_model.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/professional_profile_model.dart';
+import 'package:photopya/data/models/user_profile_model.dart';
 
 class ProviderDetailsController extends ChangeNotifier {
   bool _isLoading = false;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:photopia/core/network/urls.dart';
+import 'package:photopya/core/network/urls.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/widgets/exif_aware_network_image.dart';
+import 'package:photopya/core/widgets/exif_aware_network_image.dart';
 
 class CustomNetworkImage extends StatelessWidget {
   final dynamic imageUrl;
@@ -74,6 +74,7 @@ class CustomNetworkImage extends StatelessWidget {
               width: width ?? double.infinity,
               height: height ?? double.infinity,
               fit: fit,
+              errorPlaceholder: _buildErrorPlaceholder(width, height),
             ),
     );
   }

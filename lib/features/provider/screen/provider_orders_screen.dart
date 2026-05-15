@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/features/provider/screen/provider_notification_screen.dart';
-import 'package:photopia/features/provider/screen/booking_details_screen.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/features/provider/screen/provider_notification_screen.dart';
+import 'package:photopya/features/provider/screen/booking_details_screen.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/provider/provider_orders_controller.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/data/models/conversation_model.dart';
-import 'package:photopia/data/models/chat_message_model.dart';
-import 'package:photopia/features/client/chat_screen.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopya/controller/provider/provider_orders_controller.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
+import 'package:photopya/features/client/chat_screen.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/widgets/app_refresher.dart';
 
 class ProviderOrdersScreen extends StatefulWidget {
   const ProviderOrdersScreen({super.key});

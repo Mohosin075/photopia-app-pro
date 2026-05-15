@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:photopia/features/provider/screen/provider_orders_screen.dart';
-import 'package:photopia/features/provider/screen/provider_calendar_screen.dart';
-import 'package:photopia/features/provider/screen/provider_overview_screen.dart';
-import 'package:photopia/features/provider/screen/provider_message_screen.dart';
-import 'package:photopia/features/provider/screen/provider_menu_screen.dart';
-import 'package:photopia/features/provider/widgets/provider_custom_bottom_nav_bar.dart';
+import 'package:flutter/services.dart';
+import 'package:photopya/features/provider/screen/provider_orders_screen.dart';
+import 'package:photopya/features/provider/screen/provider_calendar_screen.dart';
+import 'package:photopya/features/provider/screen/provider_overview_screen.dart';
+import 'package:photopya/features/provider/screen/provider_message_screen.dart';
+import 'package:photopya/features/provider/screen/provider_menu_screen.dart';
+import 'package:photopya/features/provider/widgets/provider_custom_bottom_nav_bar.dart';
 
-import 'package:photopia/controller/common/bottom_nav_controller.dart';
+import 'package:photopya/controller/common/bottom_nav_controller.dart';
 import 'package:provider/provider.dart';
 
-import 'package:photopia/core/notification/notification_service.dart';
+import 'package:photopya/core/notification/notification_service.dart';
 
 class ProviderBottomNavigationScreen extends StatefulWidget {
   final int initialIndex;
@@ -23,6 +24,7 @@ class ProviderBottomNavigationScreen extends StatefulWidget {
 
 class _ProviderBottomNavigationScreenState
     extends State<ProviderBottomNavigationScreen> {
+  DateTime? _lastBackPressTime;
   // Navigation keys for each tab
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
@@ -70,8 +72,32 @@ class _ProviderBottomNavigationScreenState
           if (selectedIndex != 0) {
             context.read<BottomNavController>().setIndex(0);
           } else {
-            // Re-invoke pop if we're on the very first screen of the first tab
-            Navigator.of(context).pop();
+            final now = DateTime.now();
+            final isDoubleBack = _lastBackPressTime != null &&
+                now.difference(_lastBackPressTime!) <
+                    const Duration(seconds: 2);
+
+            if (isDoubleBack) {
+              SystemNavigator.pop();
+            } else {
+              _lastBackPressTime = now;
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text(
+                    'Press back again to exit',
+                    textAlign: TextAlign.center,
+                  ),
+                  duration: const Duration(seconds: 2),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                  backgroundColor: const Color(0xFF1A1A1A),
+                ),
+              );
+            }
           }
         }
       },

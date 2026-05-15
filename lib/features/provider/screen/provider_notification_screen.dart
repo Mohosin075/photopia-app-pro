@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/notification_controller.dart';
-import 'package:photopia/data/models/notification_model.dart';
+import 'package:photopya/controller/client/notification_controller.dart';
+import 'package:photopya/data/models/notification_model.dart';
+import 'package:photopya/features/common/screens/notification_settings_screen.dart';
 
 class ProviderNotificationScreen extends StatefulWidget {
   const ProviderNotificationScreen({super.key});
@@ -82,6 +83,13 @@ class _ProviderNotificationScreenState extends State<ProviderNotificationScreen>
                   fontWeight: FontWeight.w500,
                 ),
               ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface, size: 20.sp),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
             ),
           ),
           SizedBox(width: 5.w),

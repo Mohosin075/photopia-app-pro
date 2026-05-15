@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/provider/calender_availibility_controller.dart';
-import 'package:photopia/controller/client/user_profile_controller.dart';
-import 'package:photopia/data/models/calender_availibility_model.dart';
-import 'package:photopia/controller/provider/service_controller.dart';
-import 'package:photopia/controller/provider/provider_profile_controller.dart';
-import 'package:photopia/core/constants/app_sizes.dart';
+import 'package:photopya/controller/provider/calender_availibility_controller.dart';
+import 'package:photopya/controller/client/user_profile_controller.dart';
+import 'package:photopya/data/models/calender_availibility_model.dart';
+import 'package:photopya/controller/provider/service_controller.dart';
+import 'package:photopya/controller/provider/provider_profile_controller.dart';
+import 'package:photopya/core/constants/app_sizes.dart';
 
 class ProviderAvailabilitySettingsScreen extends StatefulWidget {
   const ProviderAvailabilitySettingsScreen({super.key});

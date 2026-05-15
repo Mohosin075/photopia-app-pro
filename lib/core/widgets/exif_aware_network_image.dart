@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopya/controller/auth_controller.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -12,6 +12,7 @@ class ExifAwareNetworkImage extends StatefulWidget {
   final double width;
   final BoxFit fit;
   final Map<String, String>? headers;
+  final Widget? errorPlaceholder;
 
   const ExifAwareNetworkImage({
     super.key,
@@ -20,6 +21,7 @@ class ExifAwareNetworkImage extends StatefulWidget {
     required this.width,
     this.fit = BoxFit.cover,
     this.headers,
+    this.errorPlaceholder,
   });
 
   @override
@@ -124,6 +126,7 @@ class _ExifAwareNetworkImageState extends State<ExifAwareNetworkImage> with Auto
     }
 
     if (_error || _imageBytes == null) {
+      if (widget.errorPlaceholder != null) return widget.errorPlaceholder!;
       return SizedBox(
         height: widget.height,
         width: widget.width,

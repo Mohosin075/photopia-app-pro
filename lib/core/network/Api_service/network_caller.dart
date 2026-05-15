@@ -4,8 +4,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/network/urls.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/network/urls.dart';
 
 class NetworkResponse {
   final bool isSuccess;

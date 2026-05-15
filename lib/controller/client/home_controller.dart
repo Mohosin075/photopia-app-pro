@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/home_data_model.dart';
-import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/home_data_model.dart';
+import 'package:photopya/controller/auth_controller.dart';
 
 class HomeController extends ChangeNotifier {
   bool _isLoading = false;

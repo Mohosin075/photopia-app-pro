@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/data/models/home_data_model.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/data/models/home_data_model.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:photopia/core/services/translation_service.dart';
-import 'package:photopia/features/provider/screen/provider_profile_screen.dart'; // Add navigation if possible later
+import 'package:photopya/core/services/translation_service.dart';
+import 'package:photopya/features/provider/screen/provider_profile_screen.dart'; // Add navigation if possible later
 
 class HomeSeeAllProsScreen extends StatelessWidget {
   final String title;

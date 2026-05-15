@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/payment_controller.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/data/models/payment_method_model.dart';
+import 'package:photopya/controller/client/payment_controller.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/data/models/payment_method_model.dart';
 import 'package:provider/provider.dart';
 
 class PaymentMethodsScreen extends StatefulWidget {

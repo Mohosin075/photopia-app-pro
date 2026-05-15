@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/booking_controller.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/data/models/booking_model.dart' hide Provider;
+import 'package:photopya/controller/client/booking_controller.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/data/models/booking_model.dart' hide Provider;
 import 'package:provider/provider.dart';
-import 'package:photopia/features/client/widgets/auth_profile_image.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/features/client/client_booking_details_screen.dart';
-import 'package:photopia/core/services/translation_service.dart';
-import 'package:photopia/core/widgets/app_refresher.dart';
-import 'package:photopia/core/utils/app_transitions.dart';
+import 'package:photopya/features/client/widgets/auth_profile_image.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/features/client/client_booking_details_screen.dart';
+import 'package:photopya/core/services/translation_service.dart';
+import 'package:photopya/core/widgets/app_refresher.dart';
+import 'package:photopya/core/utils/app_transitions.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   static const String name = '/order_history';

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/constants/app_typography.dart';
+import 'package:photopya/core/constants/app_typography.dart';
 import 'dart:ui';
 import 'dart:io';
-import 'package:photopia/core/utils/image_utils.dart';
+import 'package:photopya/core/utils/image_utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/provider/provider_profile_controller.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/core/widgets/subscription_badge.dart';
-import 'package:photopia/features/client/widgets/auth_profile_image.dart';
-import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
+import 'package:photopya/controller/provider/provider_profile_controller.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/core/widgets/subscription_badge.dart';
+import 'package:photopya/features/client/widgets/auth_profile_image.dart';
+import 'package:photopya/core/widgets/full_screen_image_viewer.dart';
 
 class ProviderEditProfileScreen extends StatefulWidget {
   const ProviderEditProfileScreen({super.key});

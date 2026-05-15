@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/category_details_screen.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/features/client/widgets/category_bar.dart';
-import 'package:photopia/features/client/widgets/search_header.dart';
-import 'package:photopia/features/client/search_result_screen.dart';
-import 'package:photopia/features/client/widgets/service_card.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/features/client/category_details_screen.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/features/client/widgets/category_bar.dart';
+import 'package:photopya/features/client/widgets/search_header.dart';
+import 'package:photopya/features/client/search_result_screen.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
-import 'package:photopia/controller/category_controller.dart';
-import 'package:photopia/controller/client/search_history_controller.dart';
-import 'package:photopia/data/models/category_model.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
+import 'package:photopya/controller/category_controller.dart';
+import 'package:photopya/controller/client/search_history_controller.dart';
+import 'package:photopya/data/models/category_model.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/widgets/app_refresher.dart';
 
 class SearchScreen extends StatefulWidget {
   static const String name = '/search';
@@ -262,34 +262,15 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   if (inSubcategory) ...[
-                    GestureDetector(
-                      onTap: () => controller.selectCategory(null),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.arrow_back,
-                              size: 16.sp,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              context.l10n.back,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        size: 24.sp,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
+                      onPressed: () => controller.selectCategory(null),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                     SizedBox(width: 12.w),
                   ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/notification_model.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/notification_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationController extends ChangeNotifier {

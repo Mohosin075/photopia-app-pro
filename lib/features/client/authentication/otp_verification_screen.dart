@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/features/client/authentication/widgets/auth_widgets.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/features/client/authentication/widgets/auth_widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/verify_otp_controller.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/controller/client/verify_otp_controller.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   static const String name = '/otp_verification';

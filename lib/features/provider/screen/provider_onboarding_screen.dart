@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/provider/provider_onboarding_controller.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/core/routes/app_routes.dart';
+import 'package:photopya/controller/provider/provider_onboarding_controller.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/core/routes/app_routes.dart';
 
 class ProviderOnboardingScreen extends StatefulWidget {
   const ProviderOnboardingScreen({super.key});

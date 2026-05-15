@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/features/client/widgets/service_card.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/review_controller.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
-import 'package:photopia/controller/client/provider_details_controller.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/utils/guest_dialog_helper.dart';
-import 'package:photopia/controller/client/favorites_controller.dart';
-import 'package:photopia/core/widgets/subscription_badge.dart';
-import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
-import 'package:photopia/features/client/widgets/auth_profile_image.dart';
-import 'package:photopia/features/client/search_screen.dart';
+import 'package:photopya/controller/client/review_controller.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
+import 'package:photopya/controller/client/provider_details_controller.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/utils/guest_dialog_helper.dart';
+import 'package:photopya/controller/client/favorites_controller.dart';
+import 'package:photopya/core/widgets/subscription_badge.dart';
+import 'package:photopya/core/widgets/full_screen_image_viewer.dart';
+import 'package:photopya/features/client/widgets/auth_profile_image.dart';
+import 'package:photopya/features/client/search_screen.dart';
+import 'package:photopya/features/client/search_result_screen.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
   final Map<String, dynamic> provider;
@@ -83,10 +84,12 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
   }
 
   void _onHashtagTap(String hashtag) {
-    // Navigate to Search Screen with initial query
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SearchScreen(initialSearchTerm: '#$hashtag'),
+        builder: (context) => SearchResultScreen(
+          filters: {'searchTerm': '#$hashtag'},
+          title: '#$hashtag',
+        ),
       ),
     );
   }
@@ -153,22 +156,19 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                             builder: (context) => FullScreenImageViewer(
                               imageUrl: (cover != null && cover.isNotEmpty)
                                   ? cover
-                                  : null,
-                              tag: 'banner_hero',
+                                  : 'assets/images/img5.png',
+                              tag: 'banner_hero_dest',
                             ),
                           ),
                         );
                       },
-                      child: Hero(
-                        tag: 'banner_hero',
-                        child: CustomNetworkImage(
-                          imageUrl: (cover != null && cover.isNotEmpty)
-                              ? cover
-                              : 'assets/images/img5.png',
-                          height: 220.h,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
+                      child: CustomNetworkImage(
+                        imageUrl: (cover != null && cover.isNotEmpty)
+                            ? cover
+                            : 'assets/images/img5.png',
+                        height: 220.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
                       ),
                     );
                   },
@@ -293,10 +293,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                         ),
                       );
                     },
-                    child: Hero(
-                      tag: 'header_avatar',
-                      child: AuthProfileImage(imageUrl: avatar, size: 75.r),
-                    ),
+                    child: AuthProfileImage(imageUrl: avatar, size: 75.r),
                   ),
                   SizedBox(width: 18.w),
                   Expanded(
@@ -558,14 +555,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                       ),
                     ),
                   ),
-                  child: Hero(
-                    tag: 'portfolio_$index',
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
-                      child: CustomNetworkImage(
-                        imageUrl: portfolioImages[index],
-                        fit: BoxFit.cover,
-                      ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: CustomNetworkImage(
+                      imageUrl: portfolioImages[index],
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
-import 'package:photopia/features/client/widgets/service_card.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
-import 'package:photopia/features/client/service_details_screen.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/features/client/service_details_screen.dart';
 import 'package:provider/provider.dart';
 
 class SearchResultScreen extends StatefulWidget {

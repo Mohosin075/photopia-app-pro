@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/provider_service_model.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/provider_service_model.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
 
-import 'package:photopia/data/models/category_model.dart';
+import 'package:photopya/data/models/category_model.dart';
 import 'package:mime/mime.dart';
 
 class ServiceController extends ChangeNotifier {

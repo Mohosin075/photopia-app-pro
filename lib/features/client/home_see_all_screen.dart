@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/data/models/service_list_model.dart';
-import 'package:photopia/features/client/widgets/service_card.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/data/models/service_list_model.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class HomeSeeAllScreen extends StatelessWidget {
   final String title;

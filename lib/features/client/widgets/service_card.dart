@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:photopia/core/services/translation_service.dart';
+import 'package:photopya/core/services/translation_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
-import 'package:photopia/features/client/service_details_screen.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/features/client/service_details_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/favorites_controller.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/utils/guest_dialog_helper.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/core/widgets/subscription_badge.dart';
+import 'package:photopya/controller/client/favorites_controller.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/utils/guest_dialog_helper.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/core/widgets/subscription_badge.dart';
 
 class ServiceCard extends StatelessWidget {
   final String title;

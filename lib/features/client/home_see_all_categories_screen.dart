@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/data/models/category_model.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/data/models/category_model.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:photopia/controller/category_controller.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
+import 'package:photopya/controller/category_controller.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
 import 'package:provider/provider.dart';
 
-import 'package:photopia/core/utils/category_icon_helper.dart';
-import 'package:photopia/core/utils/app_transitions.dart';
-import 'package:photopia/features/client/search_result_screen.dart';
+import 'package:photopya/core/utils/category_icon_helper.dart';
+import 'package:photopya/core/utils/app_transitions.dart';
+import 'package:photopya/features/client/search_result_screen.dart';
 
 class HomeSeeAllCategoriesScreen extends StatelessWidget {
   final String title;

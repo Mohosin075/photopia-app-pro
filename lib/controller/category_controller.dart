@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/category_model.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/category_model.dart';
 import 'package:provider/provider.dart';
 
 class CategoryController extends ChangeNotifier {

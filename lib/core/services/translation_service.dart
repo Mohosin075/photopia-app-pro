@@ -1,6 +1,6 @@
 import 'package:translator/translator.dart';
 import 'package:flutter/material.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class TranslationService {
   static final GoogleTranslator _translator = GoogleTranslator();

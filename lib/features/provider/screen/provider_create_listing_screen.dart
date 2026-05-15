@@ -2,18 +2,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photopia/core/utils/image_utils.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/core/constants/location_data.dart';
+import 'package:photopya/core/utils/image_utils.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/core/constants/location_data.dart';
 import 'package:country_picker/country_picker.dart';
-import 'package:photopia/controller/category_controller.dart';
-import 'package:photopia/controller/provider/service_controller.dart';
-import 'package:photopia/data/models/category_model.dart';
-import 'package:photopia/data/models/provider_service_model.dart';
+import 'package:photopya/controller/category_controller.dart';
+import 'package:photopya/controller/provider/service_controller.dart';
+import 'package:photopya/data/models/category_model.dart';
+import 'package:photopya/data/models/provider_service_model.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/core/widgets/app_refresher.dart';
+import 'package:photopya/core/widgets/app_refresher.dart';
 
 class ProviderCreateListingScreen extends StatefulWidget {
   final Data? existingListing;
@@ -618,13 +618,12 @@ class _ProviderCreateListingScreenState
                 });
               },
               children: [
-                _buildStep1Service(),
-                _buildStep2Details(),
-                _buildStep3PricingAvailability(),
-                _buildStep4Review(),
+                _buildStep1Service(inProgress),
+                _buildStep2Details(inProgress),
+                _buildStep3PricingAvailability(inProgress),
+                _buildStep4Review(inProgress),
               ],
             ),
-      bottomNavigationBar: _buildBottomNavigation(inProgress),
     );
   }
 
@@ -667,70 +666,58 @@ class _ProviderCreateListingScreenState
     );
   }
 
-  Widget _buildBottomNavigation(bool inProgress) {
-    return SafeArea(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            if (_currentStep > 0)
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: inProgress ? null : _previousStep,
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: Size(0, 42.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                  ),
-                  child: const Text('Back'),
-                ),
-              ),
-            if (_currentStep > 0) SizedBox(width: 12.w),
+  Widget _buildNavigationButtons(bool inProgress) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 20.h),
+      child: Row(
+        children: [
+          if (_currentStep > 0)
             Expanded(
-              child: ElevatedButton(
-                onPressed: inProgress
-                    ? null
-                    : (_currentStep == 3 ? _publishListing : _nextStep),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
+              child: OutlinedButton(
+                onPressed: inProgress ? null : _previousStep,
+                style: OutlinedButton.styleFrom(
                   minimumSize: Size(0, 42.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
-                  elevation: 0,
                 ),
-                child: inProgress
-                    ? SizedBox(
-                        height: 20.h,
-                        width: 20.h,
-                        child: const CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : Text(_currentStep == 3 ? 'Publish' : 'Continue'),
+                child: const Text('Back'),
               ),
             ),
-          ],
-        ),
+          if (_currentStep > 0) SizedBox(width: 12.w),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: inProgress
+                  ? null
+                  : (_currentStep == 3 ? _publishListing : _nextStep),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                minimumSize: Size(0, 42.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                elevation: 0,
+              ),
+              child: inProgress
+                  ? SizedBox(
+                      height: 20.h,
+                      width: 20.h,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(_currentStep == 3 ? 'Publish' : 'Continue'),
+            ),
+          ),
+        ],
       ),
     );
   }
 
 
-  Widget _buildStep1Service() {
+  Widget _buildStep1Service(bool inProgress) {
     return ListView(
       padding: EdgeInsets.all(20.w),
       children: [
@@ -788,11 +775,14 @@ class _ProviderCreateListingScreenState
         SizedBox(height: 20.h),
         _buildLabel('Coverage Radius'),
         _buildRadiusSelector(),
+        
+        SizedBox(height: 40.h),
+        _buildNavigationButtons(inProgress),
       ],
     );
   }
 
-  Widget _buildStep3PricingAvailability() {
+  Widget _buildStep3PricingAvailability(bool inProgress) {
     return ListView(
       padding: EdgeInsets.all(20.w),
       children: [
@@ -849,11 +839,13 @@ class _ProviderCreateListingScreenState
             fontStyle: FontStyle.italic,
           ),
         ),
+        SizedBox(height: 40.h),
+        _buildNavigationButtons(inProgress),
       ],
     );
   }
 
-  Widget _buildStep4Review() {
+  Widget _buildStep4Review(bool inProgress) {
     return ListView(
       padding: EdgeInsets.all(20.w),
       children: [
@@ -899,6 +891,7 @@ class _ProviderCreateListingScreenState
         _buildSelectedImagesGrid(),
         
         SizedBox(height: 50.h),
+        _buildNavigationButtons(inProgress),
       ],
     );
   }
@@ -1265,7 +1258,7 @@ class _ProviderCreateListingScreenState
     );
   }
 
-  Widget _buildStep2Details() {
+  Widget _buildStep2Details(bool inProgress) {
     return ListView(
       padding: EdgeInsets.all(20.w),
       children: [
@@ -1335,6 +1328,9 @@ class _ProviderCreateListingScreenState
         
         SizedBox(height: 30.h),
         _buildAutoAcceptSection(),
+        
+        SizedBox(height: 40.h),
+        _buildNavigationButtons(inProgress),
       ],
     );
   }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/provider/provider_orders_controller.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/data/models/conversation_model.dart';
-import 'package:photopia/data/models/chat_message_model.dart';
-import 'package:photopia/features/client/chat_screen.dart';
+import 'package:photopya/controller/provider/provider_orders_controller.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
+import 'package:photopya/features/client/chat_screen.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
   static const String name = "/booking-details";

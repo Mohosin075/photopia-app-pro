@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/onboarding/onboarding_screen.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/features/onboarding/onboarding_screen.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   static const String name = '/role_selection';

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/user_profile_controller.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/core/routes/app_routes.dart';
-import 'package:photopia/features/client/widgets/auth_profile_image.dart';
+import 'package:photopya/controller/client/user_profile_controller.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/core/routes/app_routes.dart';
+import 'package:photopya/features/client/widgets/auth_profile_image.dart';
+import 'package:photopya/core/widgets/full_screen_image_viewer.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/user_profile_model.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/user_profile_model.dart';
 
 class ViewProfileScreen extends StatefulWidget {
   static const String name = '/view_profile';
@@ -111,7 +112,22 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 20.h),
-                AuthProfileImage(imageUrl: imageUrl, size: 120.w),
+                GestureDetector(
+                  onTap: () {
+                    if (imageUrl != null && imageUrl.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FullScreenImageViewer(
+                            imageUrl: imageUrl,
+                            tag: 'view_profile_photo',
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: AuthProfileImage(imageUrl: imageUrl, size: 120.w),
+                ),
                 SizedBox(height: 30.h),
                 _buildInfoTile(
                   Icons.person_outline,

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/data/models/service_list_model.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/data/models/service_list_model.dart';
 
 class ServiceListController extends ChangeNotifier {
   bool _isLoading = false;

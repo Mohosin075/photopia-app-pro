@@ -2,17 +2,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:photopia/app.dart';
-import 'package:photopia/features/client/home_page.dart';
+import 'package:photopya/app.dart';
+import 'package:photopya/features/client/home_page.dart';
 
 import 'package:get_storage/get_storage.dart';
 
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopya/controller/auth_controller.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:photopia/core/notification/notification_service.dart';
+import 'package:photopya/core/notification/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

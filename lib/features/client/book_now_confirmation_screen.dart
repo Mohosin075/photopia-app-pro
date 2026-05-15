@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:photopia/controller/provider/calender_availibility_controller.dart';
-import 'package:photopia/controller/location_controller.dart';
-import 'package:photopia/controller/client/booking_controller.dart';
-import 'package:photopia/controller/client/user_profile_controller.dart';
-import 'package:photopia/controller/client/payment_controller.dart';
-import 'package:photopia/data/models/calender_availibility_model.dart';
+import 'package:photopya/controller/provider/calender_availibility_controller.dart';
+import 'package:photopya/controller/location_controller.dart';
+import 'package:photopya/controller/client/booking_controller.dart';
+import 'package:photopya/controller/client/user_profile_controller.dart';
+import 'package:photopya/controller/client/payment_controller.dart';
+import 'package:photopya/data/models/calender_availibility_model.dart';
 import 'package:provider/provider.dart';
 
-import 'package:photopia/data/models/payment_method_model.dart';
+import 'package:photopya/data/models/payment_method_model.dart';
 
 class BookingConfirmationScreen extends StatefulWidget {
   final Map<String, dynamic>? service;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/provider/subscription_controller.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/data/models/subscription_plan_model.dart';
-import 'package:photopia/features/provider/widgets/provider_custom_bottom_nav_bar.dart';
-import 'package:photopia/features/provider/screen/BottomNavigationBar/bottom_navigation_screen.dart';
+import 'package:photopya/controller/provider/subscription_controller.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/data/models/subscription_plan_model.dart';
+import 'package:photopya/features/provider/widgets/provider_custom_bottom_nav_bar.dart';
+import 'package:photopya/features/provider/screen/BottomNavigationBar/bottom_navigation_screen.dart';
 
 class ProviderSubscriptionScreen extends StatefulWidget {
   const ProviderSubscriptionScreen({super.key});

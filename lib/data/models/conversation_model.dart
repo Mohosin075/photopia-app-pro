@@ -1,4 +1,4 @@
-import 'package:photopia/data/models/chat_message_model.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
 
 class Conversation {
   final String id;

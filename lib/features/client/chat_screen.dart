@@ -1,23 +1,23 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/chat_controller.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/core/widgets/full_screen_image_viewer.dart';
-import 'package:photopia/data/models/conversation_model.dart';
-import 'package:photopia/data/models/chat_message_model.dart';
+import 'package:photopya/controller/client/chat_controller.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/core/widgets/full_screen_image_viewer.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:photopia/features/client/media_preview_screen.dart';
+import 'package:photopya/features/client/media_preview_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:photopia/core/widgets/document_viewer_screen.dart';
-import 'package:photopia/features/client/provider_profile_screen.dart';
-import 'package:photopia/features/client/view_profile_screen.dart';
-import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopya/core/widgets/document_viewer_screen.dart';
+import 'package:photopya/features/client/provider_profile_screen.dart';
+import 'package:photopya/features/client/view_profile_screen.dart';
+import 'package:photopya/controller/auth_controller.dart';
 
 class ChatScreen extends StatefulWidget {
   final Conversation conversation;
@@ -87,14 +87,23 @@ class _ChatScreenState extends State<ChatScreen> {
     if (result != null && result.files.single.path != null) {
       final String path = result.files.single.path!;
       
-      // Directly send document or show preview? 
-      // For now, let's just send it via the controller's media method
       if (mounted) {
-        context.read<ChatController>().sendMediaMessage(
-          _currentChatId, 
-          path, 
-          receiverId: widget.conversation.receiverId,
-        );
+        final controller = context.read<ChatController>();
+        if (_currentChatId.isEmpty && widget.conversation.isTemporary) {
+          final newChatId = await controller.createChatAndSendMediaMessage(
+            widget.conversation.receiverId ?? '',
+            path,
+          );
+          if (newChatId != null) {
+            setState(() => _currentChatId = newChatId);
+          }
+        } else {
+          controller.sendMediaMessage(
+            _currentChatId, 
+            path, 
+            receiverId: widget.conversation.receiverId,
+          );
+        }
       }
     }
   }
@@ -324,17 +333,13 @@ class _ChatScreenState extends State<ChatScreen> {
           padding: EdgeInsets.symmetric(vertical: 5.h),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 20.r,
+              CustomNetworkImage(
+                imageUrl: widget.conversation.avatarUrl,
+                width: 40.r,
+                height: 40.r,
+                shape: BoxShape.circle,
                 backgroundColor: Theme.of(context).colorScheme.surface,
-                backgroundImage: widget.conversation.avatarUrl.isNotEmpty
-                    ? (widget.conversation.avatarUrl.startsWith('assets/')
-                        ? AssetImage(widget.conversation.avatarUrl) as ImageProvider
-                        : NetworkImage(widget.conversation.avatarUrl))
-                    : null,
-                child: widget.conversation.avatarUrl.isEmpty
-                    ? Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 24.sp)
-                    : null,
+                placeholder: Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), size: 24.sp),
               ),
               SizedBox(width: 12.w),
               Expanded(

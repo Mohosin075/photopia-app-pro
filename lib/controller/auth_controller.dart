@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
-import 'package:photopia/controller/provider/wallet_controller.dart';
-import 'package:photopia/controller/provider/provider_profile_controller.dart';
-import 'package:photopia/controller/client/user_profile_controller.dart';
-import 'package:photopia/controller/provider/statistics_controller.dart';
-import 'package:photopia/controller/provider/service_controller.dart';
-import 'package:photopia/controller/provider/my_listing_controller.dart';
-import 'package:photopia/controller/provider/provider_orders_controller.dart';
-import 'package:photopia/controller/provider/subscription_controller.dart';
-import 'package:photopia/controller/provider/calender_availibility_controller.dart';
-import 'package:photopia/controller/client/chat_controller.dart';
-import 'package:photopia/controller/client/notification_controller.dart';
-import 'package:photopia/core/routes/app_routes.dart';
+import 'package:photopya/controller/provider/wallet_controller.dart';
+import 'package:photopya/controller/provider/provider_profile_controller.dart';
+import 'package:photopya/controller/client/user_profile_controller.dart';
+import 'package:photopya/controller/provider/statistics_controller.dart';
+import 'package:photopya/controller/provider/service_controller.dart';
+import 'package:photopya/controller/provider/my_listing_controller.dart';
+import 'package:photopya/controller/provider/provider_orders_controller.dart';
+import 'package:photopya/controller/provider/subscription_controller.dart';
+import 'package:photopya/controller/provider/calender_availibility_controller.dart';
+import 'package:photopya/controller/client/chat_controller.dart';
+import 'package:photopya/controller/client/notification_controller.dart';
+import 'package:photopya/core/routes/app_routes.dart';
 
 /// A global navigator key used for navigation outside of widget context (e.g., from NetworkCaller)
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

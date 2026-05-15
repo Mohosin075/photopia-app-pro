@@ -1,4 +1,4 @@
-import 'package:photopia/data/models/professional_profile_model.dart';
+import 'package:photopya/data/models/professional_profile_model.dart';
 
 class ReviewResponse {
   int? statusCode;

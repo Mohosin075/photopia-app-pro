@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/favorites_controller.dart';
-import 'package:photopia/features/client/widgets/service_card.dart';
-import 'package:photopia/features/client/widgets/provider_card.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
-import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopya/controller/client/favorites_controller.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
+import 'package:photopya/features/client/widgets/provider_card.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/controller/auth_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class FavoritesScreen extends StatefulWidget {
   static const String name = '/favorites';

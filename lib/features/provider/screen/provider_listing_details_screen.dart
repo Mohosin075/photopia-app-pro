@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/common/bottom_nav_controller.dart';
-import 'package:photopia/controller/provider/my_listing_controller.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/core/widgets/custom_network_image.dart';
-import 'package:photopia/core/widgets/my_loader.dart';
-import 'package:photopia/features/provider/screen/provider_create_listing_screen.dart';
+import 'package:photopya/controller/common/bottom_nav_controller.dart';
+import 'package:photopya/controller/provider/my_listing_controller.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/core/widgets/custom_network_image.dart';
+import 'package:photopya/core/widgets/my_loader.dart';
+import 'package:photopya/features/provider/screen/provider_create_listing_screen.dart';
 import 'package:provider/provider.dart';
 
 class ProviderListingDetailsScreen extends StatefulWidget {

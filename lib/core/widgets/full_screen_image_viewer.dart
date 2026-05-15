@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'dart:io';
-import 'package:photopia/core/widgets/exif_aware_network_image.dart';
-import 'package:photopia/core/network/urls.dart';
+import 'package:photopya/core/widgets/exif_aware_network_image.dart';
+import 'package:photopya/core/network/urls.dart';
 
 class FullScreenImageViewer extends StatelessWidget {
   final String? imageUrl;
@@ -68,7 +68,13 @@ class FullScreenImageViewer extends StatelessWidget {
 
     if (hasImageUrl) {
       if (imageUrl!.startsWith('assets/')) {
-        return _buildEmptyState();
+        return Image.asset(
+          imageUrl!,
+          fit: BoxFit.contain,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) => _buildEmptyState(),
+        );
       }
       final String fullUrl = imageUrl!.startsWith('http') ? imageUrl! : '${Urls.baseUrl}$imageUrl';
       return ExifAwareNetworkImage(
@@ -79,7 +85,13 @@ class FullScreenImageViewer extends StatelessWidget {
       );
     } else if (hasFilePath) {
       if (filePath!.startsWith('assets/')) {
-        return _buildEmptyState();
+        return Image.asset(
+          filePath!,
+          fit: BoxFit.contain,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) => _buildEmptyState(),
+        );
       }
       return Image.file(
         File(filePath!),

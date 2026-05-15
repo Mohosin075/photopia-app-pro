@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/core/constants/app_sizes.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/core/constants/app_sizes.dart';
 
 /// Reusable custom text field for authentication screens
 class AuthTextField extends StatefulWidget {

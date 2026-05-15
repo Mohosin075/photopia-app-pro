@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/chat_controller.dart';
+import 'package:photopya/controller/client/chat_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -52,12 +52,23 @@ class _MediaPreviewScreenState extends State<MediaPreviewScreen> {
     setState(() => _isSending = true);
     
     final controller = context.read<ChatController>();
-    final success = await controller.sendMediaMessage(
-      widget.chatId,
-      widget.filePath,
-      receiverId: widget.receiverId,
-      text: _captionController.text.trim(),
-    );
+    bool success = false;
+
+    if (widget.chatId.isEmpty && widget.receiverId != null) {
+      final newChatId = await controller.createChatAndSendMediaMessage(
+        widget.receiverId!,
+        widget.filePath,
+        text: _captionController.text.trim(),
+      );
+      success = newChatId != null;
+    } else {
+      success = await controller.sendMediaMessage(
+        widget.chatId,
+        widget.filePath,
+        receiverId: widget.receiverId,
+        text: _captionController.text.trim(),
+      );
+    }
 
     if (success && mounted) {
       Navigator.pop(context); // Close preview

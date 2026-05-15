@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/features/provider/screen/provider_availability_settings_screen.dart';
-import 'package:photopia/features/provider/screen/booking_details_screen.dart';
-import 'package:photopia/controller/provider/calender_availibility_controller.dart';
-import 'package:photopia/controller/client/user_profile_controller.dart';
-import 'package:photopia/data/models/calender_availibility_model.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/features/provider/screen/provider_availability_settings_screen.dart';
+import 'package:photopya/features/provider/screen/booking_details_screen.dart';
+import 'package:photopya/controller/provider/calender_availibility_controller.dart';
+import 'package:photopya/controller/client/user_profile_controller.dart';
+import 'package:photopya/data/models/calender_availibility_model.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderCalendarScreen extends StatefulWidget {
   const ProviderCalendarScreen({super.key});

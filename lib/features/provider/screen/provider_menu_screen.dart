@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/features/provider/screen/provider_wallet_screen.dart';
-import 'package:photopia/features/common/mode_transition_screen.dart';
-import 'package:photopia/core/routes/app_routes.dart';
-import 'package:photopia/features/provider/screen/provider_subscription_screen.dart';
-import 'package:photopia/controller/provider/provider_profile_controller.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/controller/client/log_out_controller.dart';
-import 'package:photopia/features/client/widgets/auth_profile_image.dart';
-import 'package:photopia/features/provider/screen/provider_statistics_screen.dart';
-import 'package:photopia/features/provider/screen/provider_notification_screen.dart';
-import 'package:photopia/features/provider/screen/provider_profile_screen.dart';
-import 'package:photopia/core/widgets/subscription_badge.dart';
-import 'package:photopia/controller/client/chat_controller.dart';
-import 'package:photopia/features/client/chat_screen.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/data/models/conversation_model.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/features/provider/screen/provider_wallet_screen.dart';
+import 'package:photopya/features/common/mode_transition_screen.dart';
+import 'package:photopya/core/routes/app_routes.dart';
+import 'package:photopya/features/provider/screen/provider_subscription_screen.dart';
+import 'package:photopya/controller/provider/provider_profile_controller.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/controller/client/log_out_controller.dart';
+import 'package:photopya/features/client/widgets/auth_profile_image.dart';
+import 'package:photopya/features/provider/screen/provider_statistics_screen.dart';
+import 'package:photopya/features/provider/screen/provider_notification_screen.dart';
+import 'package:photopya/features/provider/screen/provider_profile_screen.dart';
+import 'package:photopya/core/widgets/subscription_badge.dart';
+import 'package:photopya/controller/client/chat_controller.dart';
+import 'package:photopya/features/client/chat_screen.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
-import 'package:photopia/features/client/settings_screen.dart';
-import 'package:photopia/features/client/payment_methods_screen.dart';
+import 'package:photopya/features/client/settings_screen.dart';
+import 'package:photopya/features/client/payment_methods_screen.dart';
 
 class ProviderMenuScreen extends StatefulWidget {
   const ProviderMenuScreen({super.key});

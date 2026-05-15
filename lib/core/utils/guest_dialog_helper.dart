@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/features/client/authentication/log_in_screen.dart';
-import 'package:photopia/features/client/authentication/sign_up_screen.dart';
+import 'package:photopya/features/client/authentication/log_in_screen.dart';
+import 'package:photopya/features/client/authentication/sign_up_screen.dart';
 
 class GuestDialogHelper {
   static void showGuestDialog(BuildContext context) {

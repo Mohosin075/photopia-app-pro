@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/controller/auth_controller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/controller/auth_controller.dart';
 
 class LocationController extends ChangeNotifier {
   String _currentAddress = "Detecting location...";

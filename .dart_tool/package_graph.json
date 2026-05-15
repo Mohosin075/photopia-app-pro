@@ -1,10 +1,10 @@
 {
   "roots": [
-    "photopia"
+    "photopya"
   ],
   "packages": [
     {
-      "name": "photopia",
+      "name": "photopya",
       "version": "1.0.0+1",
       "dependencies": [
         "cached_network_image",

@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
-import 'package:photopia/controller/client/notification_controller.dart';
-import 'package:photopia/controller/location_controller.dart';
-import 'package:photopia/controller/client/home_controller.dart';
-import 'package:photopia/data/models/category_model.dart';
-import 'package:photopia/data/models/service_list_model.dart';
-import 'package:photopia/data/models/home_data_model.dart';
-import 'package:photopia/features/client/widgets/home_header.dart';
-import 'package:photopia/features/client/widgets/category_bar.dart';
-import 'package:photopia/features/client/widgets/section_header.dart';
-import 'package:photopia/features/client/widgets/horizontal_project_card.dart';
-import 'package:photopia/features/client/category_details_screen.dart';
-import 'package:photopia/features/client/service_details_screen.dart';
-import 'package:photopia/features/client/search_result_screen.dart';
-import 'package:photopia/features/client/search_screen.dart';
-import 'package:photopia/features/client/home_see_all_locations_screen.dart';
-import 'package:photopia/features/client/home_see_all_inspirations_screen.dart';
-import 'package:photopia/features/client/home_see_all_categories_screen.dart';
-import 'package:photopia/core/utils/category_icon_helper.dart';
-import 'package:photopia/features/client/home_see_all_subcategories_screen.dart';
-import 'package:photopia/features/client/home_see_all_screen.dart';
-import 'package:photopia/features/client/home_see_all_pros_screen.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
+import 'package:photopya/controller/client/notification_controller.dart';
+import 'package:photopya/controller/location_controller.dart';
+import 'package:photopya/controller/client/home_controller.dart';
+import 'package:photopya/data/models/category_model.dart';
+import 'package:photopya/data/models/service_list_model.dart';
+import 'package:photopya/data/models/home_data_model.dart';
+import 'package:photopya/features/client/widgets/home_header.dart';
+import 'package:photopya/features/client/widgets/category_bar.dart';
+import 'package:photopya/features/client/widgets/section_header.dart';
+import 'package:photopya/features/client/widgets/horizontal_project_card.dart';
+import 'package:photopya/features/client/category_details_screen.dart';
+import 'package:photopya/features/client/service_details_screen.dart';
+import 'package:photopya/features/client/search_result_screen.dart';
+import 'package:photopya/features/client/search_screen.dart';
+import 'package:photopya/features/client/home_see_all_locations_screen.dart';
+import 'package:photopya/features/client/home_see_all_inspirations_screen.dart';
+import 'package:photopya/features/client/home_see_all_categories_screen.dart';
+import 'package:photopya/core/utils/category_icon_helper.dart';
+import 'package:photopya/features/client/home_see_all_subcategories_screen.dart';
+import 'package:photopya/features/client/home_see_all_screen.dart';
+import 'package:photopya/features/client/home_see_all_pros_screen.dart';
 import 'package:flutter/services.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import 'package:photopia/controller/category_controller.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
-import 'package:photopia/core/services/translation_service.dart';
-import 'package:photopia/core/utils/app_transitions.dart';
+import 'package:photopya/controller/category_controller.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/services/translation_service.dart';
+import 'package:photopya/core/utils/app_transitions.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -199,142 +199,155 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: GridView.builder(
-            padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
-              childAspectRatio: 0.75,
-            ),
-            itemCount: items.length > 4 ? 4 : items.length,
-            itemBuilder: (context, index) {
-              final item = items[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    AppTransitions.createPremiumRoute(
-                      SearchResultScreen(
-                        filters: {'theme': item.title},
-                        title: item.title,
+          padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 5.h, bottom: 20.h),
+          child: SizedBox(
+            height: 220.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: items.length > 6 ? 6 : items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      AppTransitions.createPremiumRoute(
+                        SearchResultScreen(
+                          filters: {'theme': item.title},
+                          title: item.title,
+                        ),
                       ),
+                    );
+                  },
+                  child: Container(
+                    width: 280.w,
+                    margin: EdgeInsets.only(right: 16.w),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(24.r),
+                      image: item.image != null
+                          ? DecorationImage(
+                              image: CachedNetworkImageProvider(item.image!),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.15),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade900,
-                    borderRadius: BorderRadius.circular(16.r),
-                    image: item.image != null
-                        ? DecorationImage(
-                            image: CachedNetworkImageProvider(item.image!),
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                              Colors.black.withOpacity(0.3),
-                              BlendMode.darken,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(24.r),
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.black.withOpacity(0.1),
+                                    Colors.black.withOpacity(0.4),
+                                    Colors.black.withOpacity(0.9),
+                                  ],
+                                  stops: const [0.0, 0.5, 1.0],
+                                ),
+                              ),
                             ),
-                          )
-                        : null,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16.r),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.black.withOpacity(0.9),
+                          ),
+                          Positioned(
+                            top: 16.h,
+                            right: 16.w,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30.r),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                child: Container(
+                                  padding: EdgeInsets.all(10.w),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.2),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    CategoryIconHelper.getIcon(item.title),
+                                    size: 18.sp,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Padding(
+                              padding: EdgeInsets.all(20.w),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.title ?? '',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22.sp,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.5,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          item.description ?? 'Explore premium packages',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.85),
+                                            fontSize: 13.sp,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10.w),
+                                      Container(
+                                        padding: EdgeInsets.all(6.w),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).colorScheme.primary,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 12.sp,
+                                          color: Theme.of(context).colorScheme.onPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
                           ),
-                        ),
-                        // Corner Icon
-                        Positioned(
-                          top: 10.h,
-                          right: 10.w,
-                          child: Container(
-                            padding: EdgeInsets.all(6.w),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              CategoryIconHelper.getIcon(item.title),
-                              size: 14.sp,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        // Content
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Padding(
-                            padding: EdgeInsets.all(12.w),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.title ?? '',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: 6.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        item.description ?? 'View packages',
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.8),
-                                          fontSize: 10.sp,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    SizedBox(width: 4.w),
-                                    Icon(
-                                      Icons.arrow_forward,
-                                      size: 10.sp,
-                                      color: Colors.white.withOpacity(0.8),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ],

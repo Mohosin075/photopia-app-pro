@@ -5,8 +5,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/network/urls.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/network/urls.dart';
 
 /// A widget that loads a profile image using the Bearer token
 /// so that auth-protected image endpoints can be correctly fetched.

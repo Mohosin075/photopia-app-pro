@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:photopia/core/constants/app_typography.dart';
-import 'package:photopia/core/constants/app_sizes.dart';
-import 'package:photopia/features/client/authentication/widgets/auth_widgets.dart';
+import 'package:photopya/core/constants/app_typography.dart';
+import 'package:photopya/core/constants/app_sizes.dart';
+import 'package:photopya/features/client/authentication/widgets/auth_widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/controller/client/sign_in_controller.dart';
-import 'package:photopia/controller/auth_controller.dart';
-import 'package:photopia/core/widgets/custom_snacbar.dart';
-import 'package:photopia/core/network/Api_service/network_caller.dart';
-import 'package:photopia/core/network/urls.dart';
-import 'package:photopia/core/notification/notification_service.dart';
-import 'package:photopia/core/routes/app_routes.dart';
-import 'package:photopia/core/localization/app_localizations.dart';
+import 'package:photopya/controller/client/sign_in_controller.dart';
+import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
+import 'package:photopya/core/network/Api_service/network_caller.dart';
+import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/core/notification/notification_service.dart';
+import 'package:photopya/core/routes/app_routes.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class LogInScreen extends StatefulWidget {
   static const String name = '/log_in';

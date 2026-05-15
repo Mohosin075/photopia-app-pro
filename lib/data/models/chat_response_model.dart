@@ -1,6 +1,6 @@
-import 'package:photopia/data/models/professional_profile_model.dart';
-import 'package:photopia/data/models/conversation_model.dart';
-import 'package:photopia/data/models/chat_message_model.dart';
+import 'package:photopya/data/models/professional_profile_model.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/data/models/chat_message_model.dart';
 
 class ChatResponse {
   int? statusCode;

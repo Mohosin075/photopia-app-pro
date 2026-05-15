@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:photopia/features/client/widgets/shimmer_skeletons.dart';
-import 'package:photopia/features/client/widgets/category_bar.dart';
-import 'package:photopia/features/client/widgets/search_header.dart';
-import 'package:photopia/features/client/widgets/service_card.dart';
+import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/features/client/widgets/category_bar.dart';
+import 'package:photopya/features/client/widgets/search_header.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/services.dart';
-import 'package:photopia/controller/client/service_list_controller.dart';
+import 'package:photopya/controller/client/service_list_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:photopia/data/models/service_list_model.dart';
-import 'package:photopia/controller/client/favorites_controller.dart';
+import 'package:photopya/data/models/service_list_model.dart';
+import 'package:photopya/controller/client/favorites_controller.dart';
 
 class CategoryDetailsScreen extends StatefulWidget {
   final String categoryName;
