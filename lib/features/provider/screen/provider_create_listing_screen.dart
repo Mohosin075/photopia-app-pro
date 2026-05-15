@@ -42,6 +42,24 @@ class _ProviderCreateListingScreenState
       TextEditingController();
   final TextEditingController _dailyRateController = TextEditingController();
   final TextEditingController _dailyHoursController = TextEditingController();
+  final TextEditingController _minBudgetController = TextEditingController();
+
+  // Multi-step management
+  final PageController _pageController = PageController();
+  int _currentStep = 0;
+
+  // Step 1: Service variables
+  String? _selectedServiceType; // Photography, Videography, Editing, Other
+
+  // Step 2: Details variables
+  final TextEditingController _durationUnitController = TextEditingController(text: 'Hours');
+  final List<AddonControllers> _addonControllers = [];
+  bool _isAutoAcceptEnabled = false;
+  bool _verifiedClientsOnly = false;
+  int _selectedAutoAcceptRadius = 30;
+
+  // Step 3: Availability variables
+  final List<AvailabilitySlotControllers> _availabilityControllers = [];
 
   // Dynamic Package controllers
   final List<PackageControllers> _packageControllers = [];
@@ -63,6 +81,7 @@ class _ProviderCreateListingScreenState
   final Map<String, String> _localFieldErrors = {};
 
   final List<String> _locationTypes = ['On-site', 'Remote', 'Studio'];
+  double? _depositPercentage;
 
   String? _selectedCountry;
   String? _selectedCity;
@@ -244,10 +263,50 @@ class _ProviderCreateListingScreenState
     _weekendHourlyRateController.dispose();
     _dailyRateController.dispose();
     _dailyHoursController.dispose();
+    _minBudgetController.dispose();
+    _pageController.dispose();
+    _durationUnitController.dispose();
+    for (var controller in _addonControllers) {
+      controller.dispose();
+    }
+    for (var controller in _availabilityControllers) {
+      controller.dispose();
+    }
     for (var controller in _packageControllers) {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  void _nextStep() {
+    if (_currentStep < 3) {
+      setState(() {
+        _currentStep++;
+      });
+      _pageController.animateToPage(
+        _currentStep,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _previousStep() {
+    if (_currentStep > 0) {
+      setState(() {
+        _currentStep--;
+      });
+      _pageController.animateToPage(
+        _currentStep,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  Future<void> _saveDraft() async {
+    // Similar to publish but with status 'DRAFT'
+    await _publishListing(isDraft: true);
   }
 
   Future<void> _pickImages() async {
@@ -359,10 +418,6 @@ class _ProviderCreateListingScreenState
     }
 
     // 3. Location Fields
-    if (_countryController.text.trim().isEmpty) {
-      errors['country'] = "Country is required";
-      isValid = false;
-    }
     if (_locationController.text.trim().isEmpty) {
       errors['city'] = "City is required";
       isValid = false;
@@ -390,11 +445,11 @@ class _ProviderCreateListingScreenState
     return isValid;
   }
 
-  Future<void> _publishListing() async {
-    if (!_isFormValid(showErrors: true)) return;
+  Future<void> _publishListing({bool isDraft = false}) async {
+    if (!isDraft && !_isFormValid(showErrors: true)) return;
 
     final controller = Provider.of<ServiceController>(context, listen: false);
-    controller.clearErrors(); // Clear old errors
+    controller.clearErrors();
 
     // Prepare service data
     final serviceData = Data(
@@ -409,50 +464,58 @@ class _ProviderCreateListingScreenState
           : _selectedPricingModel == 'By Day'
           ? "DAILY"
           : "PACKAGE",
-      price:
-          int.tryParse(
+      price: int.tryParse(
             _selectedPricingModel == 'By Hour'
                 ? _weekdayHourlyRateController.text
                 : _selectedPricingModel == 'By Day'
                 ? _dailyRateController.text
                 : (_packageControllers.isNotEmpty
-                      ? (_packageControllers.first.price.text.isEmpty
-                            ? '0'
-                            : _packageControllers.first.price.text)
-                      : '0'),
-          ) ??
-          0,
+                    ? _packageControllers.first.price.text
+                    : '0'),
+          ) ?? 0,
       currency: "EUR",
-      duration: (int.tryParse(_durationController.text) ?? 1).toString(),
-      serviceType: _normalizeServiceType(
-        _selectedServiceTypes.isNotEmpty ? _selectedServiceTypes.first : "",
-      ),
+      duration: "${_durationController.text} ${_durationUnitController.text}",
+      serviceType: _normalizeServiceType(_selectedServiceType ?? "Photography"),
       location: Location(
-        type: _selectedLocationType == 'Remote'
-            ? 'REMOTE'
-            : 'ONSITE', // Strictly map to backend enum
+        type: _selectedLocationType == 'Remote' ? 'REMOTE' : 'ONSITE',
         country: _countryController.text.trim(),
         city: _locationController.text.trim(),
         address: _addressController.text.trim(),
         serviceRadiusKm: _serviceRadius.toInt(),
       ),
       gallery: _existingNetworkImages,
-      coverMedia: _existingNetworkImages.isNotEmpty
-          ? _existingNetworkImages.first
-          : "", // Ensure coverMedia is never null
-      status: (widget.existingListing?.status ?? "ACTIVE")
-          .toUpperCase(), // Strictly map to backend enum
+      coverMedia: _existingNetworkImages.isNotEmpty ? _existingNetworkImages.first : "",
+      status: isDraft ? "DRAFT" : (widget.existingListing?.status ?? "ACTIVE").toUpperCase(),
       isVerified: widget.existingListing?.isVerified ?? false,
+      depositPercentage: _depositPercentage ?? 0,
+      
+      // New fields
+      addons: _addonControllers.map((a) => Addon(
+        name: a.name.text.trim(),
+        price: int.tryParse(a.price.text) ?? 0,
+      )).toList(),
+      
+      autoAccept: AutoAccept(
+        isEnabled: _isAutoAcceptEnabled,
+        minBudget: int.tryParse(_minBudgetController.text) ?? 0,
+        withinRadius: _selectedAutoAcceptRadius,
+        verifiedClientsOnly: _verifiedClientsOnly,
+      ),
+      
+      availabilitySlots: _availabilityControllers.map((s) => AvailabilitySlot(
+        startDate: s.startDate.text,
+        endDate: s.endDate.text,
+        startTime: s.startTime.text,
+        endTime: s.endTime.text,
+      )).toList(),
     );
 
-    // Setup pricing model for HOURLY, DAILY or PACKAGE
+    // Pricing Model
     if (_selectedPricingModel == 'By Hour') {
       serviceData.pricingModel = PricingModel(
         type: "HOURLY",
-        weekdayHourlyRate:
-            double.tryParse(_weekdayHourlyRateController.text) ?? 0,
-        weekendHourlyRate:
-            double.tryParse(_weekendHourlyRateController.text) ?? 0,
+        weekdayHourlyRate: double.tryParse(_weekdayHourlyRateController.text) ?? 0,
+        weekendHourlyRate: double.tryParse(_weekendHourlyRateController.text) ?? 0,
       );
     } else if (_selectedPricingModel == 'By Day') {
       serviceData.pricingModel = PricingModel(
@@ -463,32 +526,19 @@ class _ProviderCreateListingScreenState
     } else if (_selectedPricingModel == 'By Service') {
       serviceData.pricingModel = PricingModel(
         type: "PACKAGE",
-        packages: _packageControllers
-            .where((p) => p.name.text.isNotEmpty)
-            .map(
-              (p) => Packages(
-                name: p.name.text.trim(),
-                price: int.tryParse(p.price.text) ?? 0,
-                duration: int.tryParse(p.duration.text) ?? 1,
-                description: p.description.text.trim(),
-                includes: p.includes.text
-                    .split(',')
-                    .map((e) => e.trim())
-                    .where((e) => e.isNotEmpty)
-                    .toList(),
-              ),
-            )
-            .toList(),
+        packages: _packageControllers.map((p) => Packages(
+          name: p.name.text.trim(),
+          price: int.tryParse(p.price.text) ?? 0,
+          duration: int.tryParse(p.duration.text) ?? 1,
+          description: p.description.text.trim(),
+          includes: p.includes.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+        )).toList(),
       );
     }
 
     bool success;
     if (widget.existingListing != null) {
-      success = await controller.updateService(
-        widget.existingListing!.sId!,
-        serviceData,
-        _selectedImages,
-      );
+      success = await controller.updateService(widget.existingListing!.sId!, serviceData, _selectedImages);
     } else {
       success = await controller.createService(serviceData, _selectedImages);
     }
@@ -496,21 +546,19 @@ class _ProviderCreateListingScreenState
     if (success && mounted) {
       CustomSnackBar.show(
         context: context,
-        message: widget.existingListing != null
-            ? "Service updated successfully"
-            : "Service published successfully",
+        message: isDraft ? "Draft saved" : "Listing published",
         isError: false,
       );
       Navigator.pop(context, true);
     } else if (mounted) {
-      // Display error summary snackbar
       CustomSnackBar.show(
         context: context,
-        message: controller.errorMessage ?? "Failed to publish listing",
+        message: controller.errorMessage ?? "Operation failed",
         isError: true,
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -519,179 +567,965 @@ class _ProviderCreateListingScreenState
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        toolbarHeight: 100.h,
+        automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          widget.existingListing != null ? 'Edit Listing' : 'Create Listing',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontSize: AppTypography.h1,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
+                ),
+                Text(
+                  widget.existingListing != null ? 'Edit Listing' : 'Create Listing',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton(
+                  onPressed: inProgress ? null : _saveDraft,
+                  child: Text(
+                    'Save Draft',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10.h),
+            _buildStepper(),
+          ],
         ),
       ),
       body: _isLoadingCategories
           ? const Center(child: CircularProgressIndicator())
-          : AppRefresher(
-              onRefresh: () async {
-                await _fetchCategories();
+          : PageView(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              onPageChanged: (index) {
+                setState(() {
+                  _currentStep = index;
+                });
               },
-              color: Theme.of(context).colorScheme.primary,
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 20.w,
-                    vertical: 10.h,
+              children: [
+                _buildStep1Service(),
+                _buildStep2Details(),
+                _buildStep3PricingAvailability(),
+                _buildStep4Review(),
+              ],
+            ),
+      bottomNavigationBar: _buildBottomNavigation(inProgress),
+    );
+  }
+
+  Widget _buildStepper() {
+    final steps = ['Service', 'Details', 'Pricing', 'Review'];
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Row(
+        children: List.generate(steps.length, (index) {
+          bool isActive = index <= _currentStep;
+          bool isCurrent = index == _currentStep;
+          return Expanded(
+            child: Column(
+              children: [
+                Container(
+                  height: 3.h,
+                  decoration: BoxDecoration(
+                    color: isActive 
+                        ? Theme.of(context).colorScheme.primary 
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(2.r),
                   ),
-                  children: [
-                    _buildSectionTitle('Basic Information'),
-                    _buildLabel('Listing Title', isRequired: true),
-                    _buildTextField(
-                      _titleController,
-                      'e.g. Professional Portrait Shoot',
-                      errorText:
-                          _localFieldErrors['title'] ??
-                          context
-                              .watch<ServiceController>()
-                              .fieldErrors['title'],
-                    ),
-                    SizedBox(height: 15.h),
-                    _buildLabel('Theme', isRequired: true),
-                    _buildThemeDropdown(errorText: _localFieldErrors['theme']),
-                    SizedBox(height: 15.h),
-                    _buildLabel('Category', isRequired: true),
-                    _buildCategoryDropdown(
-                      errorText:
-                          _localFieldErrors['category'] ??
-                          context
-                              .watch<ServiceController>()
-                              .fieldErrors['category'],
-                    ),
-                    SizedBox(height: 15.h),
-                    _buildLabel('Sub-Category', isRequired: true),
-                    _buildSubCategoryDropdown(
-                      errorText:
-                          _localFieldErrors['subCategory'] ??
-                          context
-                              .watch<ServiceController>()
-                              .fieldErrors['subCategory'],
-                    ),
-                    SizedBox(height: 15.h),
-                    _buildLabel('Service Type', isRequired: true),
-                    _buildServiceTypeDropdown(
-                      errorText:
-                          _localFieldErrors['serviceType'] ??
-                          context
-                              .watch<ServiceController>()
-                              .fieldErrors['serviceType'],
-                    ),
-                    SizedBox(height: 15.h),
-                    _buildLabel('Description', isRequired: true),
-                    _buildTextField(
-                      _descriptionController,
-                      'Tell clients about your service (min 10 characters)...',
-                      maxLines: 4,
-                      errorText:
-                          _localFieldErrors['description'] ??
-                          (_descriptionController.text.isNotEmpty &&
-                                  _descriptionController.text.length < 10
-                              ? 'Description must be at least 10 characters'
-                              : context
-                                    .watch<ServiceController>()
-                                    .fieldErrors['description']),
-                    ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  steps[index],
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                    color: isActive 
+                        ? Theme.of(context).colorScheme.primary 
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
 
-                    SizedBox(height: 30.h),
-                    _buildSectionTitle('Pricing & Duration'),
-                    _buildPricingToggle(),
-                    SizedBox(height: 20.h),
-                    _buildPricingFields(),
-
-                    SizedBox(height: 30.h),
-                    _buildSectionTitle('Location & Radius'),
-                    _buildLabel('Location Type', isRequired: true),
-                    _buildLocationTypeDropdown(),
-                    SizedBox(height: 15.h),
-                    _buildLabel('Country', isRequired: true),
-                    _buildCountryDropdown(
-                      errorText:
-                          _localFieldErrors['country'] ??
-                          context
-                              .watch<ServiceController>()
-                              .fieldErrors['location.country'],
+  Widget _buildBottomNavigation(bool inProgress) {
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            if (_currentStep > 0)
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: inProgress ? null : _previousStep,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: Size(0, 42.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
-                    SizedBox(height: 15.h),
-                    _buildLabel('City', isRequired: true),
-                    _buildCityDropdown(
-                      errorText:
-                          _localFieldErrors['city'] ??
-                          context
-                              .watch<ServiceController>()
-                              .fieldErrors['location.city'],
-                    ),
-                    SizedBox(height: 15.h),
-                    _buildLabel('Address'),
-                    _buildTextField(
-                      _addressController,
-                      'e.g. Street name, Number',
-                      errorText:
-                          _localFieldErrors['address'] ??
-                          context
-                              .watch<ServiceController>()
-                              .fieldErrors['location.address'],
-                    ),
-                    SizedBox(height: 15.h),
-                    _buildLabel('Service Radius: ${_serviceRadius.toInt()} km'),
-                    _buildRadiusSlider(),
-                    _buildAcceptOutsideRadiusToggle(),
+                  ),
+                  child: const Text('Back'),
+                ),
+              ),
+            if (_currentStep > 0) SizedBox(width: 12.w),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: inProgress
+                    ? null
+                    : (_currentStep == 3 ? _publishListing : _nextStep),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  minimumSize: Size(0, 42.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  elevation: 0,
+                ),
+                child: inProgress
+                    ? SizedBox(
+                        height: 20.h,
+                        width: 20.h,
+                        child: const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Text(_currentStep == 3 ? 'Publish' : 'Continue'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                    SizedBox(height: 30.h),
-                    _buildSectionTitle('More Details'),
-                    if (_selectedPricingModel != 'By Service') ...[
-                      _buildLabel('Duration (Hours)', isRequired: true),
-                      _buildDurationDropdown(
-                        _durationController,
-                        hint: 'Select duration',
-                        errorText:
-                            _localFieldErrors['duration'] ??
-                            context
-                                .watch<ServiceController>()
-                                .fieldErrors['duration'],
-                      ),
-                      SizedBox(height: 15.h),
-                    ],
-                    _buildLabel('Equipment (Optional)'),
-                    _buildEquipmentInput(),
-                    _buildEquipmentList(),
 
-                    SizedBox(height: 30.h),
-                    _buildSectionTitle('Portfolio Photos'),
-                    _buildPhotoUploadArea(
-                      errorText:
-                          _localFieldErrors['photos'] ??
-                          context
-                              .watch<ServiceController>()
-                              .fieldErrors['images'],
-                    ),
-                    _buildSelectedImagesGrid(),
+  Widget _buildStep1Service() {
+    return ListView(
+      padding: EdgeInsets.all(20.w),
+      children: [
+        Text(
+          'Service',
+          style: TextStyle(
+            fontSize: 24.sp,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          'Select your domain and category',
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+        SizedBox(height: 30.h),
+        
+        _buildLabel('Service Type'),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 15.w,
+          crossAxisSpacing: 15.w,
+          childAspectRatio: 1.5,
+          children: [
+            _buildServiceTypeCard('Photography', Icons.camera_alt),
+            _buildServiceTypeCard('Videography', Icons.videocam),
+            _buildServiceTypeCard('Editing', Icons.content_cut),
+            _buildServiceTypeCard('Other Service', Icons.add),
+          ],
+        ),
+        
+        if (_selectedServiceType != null) ...[
+          SizedBox(height: 25.h),
+          _buildLabel('Theme', isRequired: true),
+          _buildThemeDropdown(errorText: _localFieldErrors['theme']),
+          SizedBox(height: 15.h),
+          _buildLabel('Category', isRequired: true),
+          _buildCategoryDropdown(errorText: _localFieldErrors['category']),
+          SizedBox(height: 15.h),
+          _buildLabel('Sub-Category', isRequired: true),
+          _buildSubCategoryDropdown(errorText: _localFieldErrors['subCategory']),
+        ],
 
-                    SizedBox(height: 40.h),
-                    _buildFooterButtons(inProgress),
-                    SizedBox(height: 30.h),
-                  ],
+        SizedBox(height: 30.h),
+        _buildSectionTitle('Service Location'),
+        _buildLabel('Enter your city or region'),
+        _buildLocationAutocomplete(errorText: _localFieldErrors['city']),
+        
+        SizedBox(height: 20.h),
+        _buildLabel('Coverage Radius'),
+        _buildRadiusSelector(),
+      ],
+    );
+  }
+
+  Widget _buildStep3PricingAvailability() {
+    return ListView(
+      padding: EdgeInsets.all(20.w),
+      children: [
+        Text(
+          'Pricing & Availability',
+          style: TextStyle(
+            fontSize: 24.sp,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          'Set your rates and available slots',
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+        SizedBox(height: 30.h),
+        
+        _buildPricingToggle(),
+        SizedBox(height: 20.h),
+        _buildPricingFields(),
+        
+        SizedBox(height: 30.h),
+        _buildLabel('Deposit Required'),
+        _buildDepositDropdown(),
+        
+        SizedBox(height: 30.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionTitle('Availability Slots'),
+            TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _availabilityControllers.add(AvailabilitySlotControllers());
+                });
+              },
+              icon: Icon(Icons.add, size: 18.sp),
+              label: Text('Add Slot'),
+            ),
+          ],
+        ),
+        _buildAvailabilitySlotsList(),
+        
+        SizedBox(height: 20.h),
+        Text(
+          '💡 These slots are specific to this listing. You can also manage global availability in Calendar Settings.',
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: Colors.orange[800],
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStep4Review() {
+    return ListView(
+      padding: EdgeInsets.all(20.w),
+      children: [
+        Text(
+          'Review & Publish',
+          style: TextStyle(
+            fontSize: 24.sp,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          'Double check everything before going live',
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+        SizedBox(height: 30.h),
+        
+        // Listing Preview Card
+        _buildListingPreviewCard(),
+        
+        SizedBox(height: 30.h),
+        _buildSummarySection('Service Details', [
+          'Type: $_selectedServiceType',
+          'Theme: ${context.read<CategoryController>().selectedTheme}',
+          'Category: ${_selectedCategory?.name}',
+          'City: ${_locationController.text}',
+        ], onEdit: () => _jumpToStep(0)),
+        
+        SizedBox(height: 20.h),
+        _buildSummarySection('Pricing', [
+          'Model: $_selectedPricingModel',
+          if (_selectedPricingModel == 'By Hour') 'Rate: €${_weekdayHourlyRateController.text}/hr',
+          if (_selectedPricingModel == 'By Day') 'Rate: €${_dailyRateController.text}/day',
+          'Deposit: ${_depositPercentage ?? 0}%',
+        ], onEdit: () => _jumpToStep(2)),
+        
+        SizedBox(height: 30.h),
+        _buildPhotoUploadArea(errorText: _localFieldErrors['photos']),
+        _buildSelectedImagesGrid(),
+        
+        SizedBox(height: 50.h),
+      ],
+    );
+  }
+
+  void _jumpToStep(int step) {
+    setState(() {
+      _currentStep = step;
+    });
+    _pageController.animateToPage(
+      step,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Widget _buildListingPreviewCard() {
+    return Container(
+      padding: EdgeInsets.all(15.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_selectedImages.isNotEmpty || _existingNetworkImages.isNotEmpty)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15.r),
+              child: _selectedImages.isNotEmpty 
+                ? Image.file(_selectedImages.first, height: 180.h, width: double.infinity, fit: BoxFit.cover)
+                : Image.network(_existingNetworkImages.first, height: 180.h, width: double.infinity, fit: BoxFit.cover),
+            )
+          else
+            Container(
+              height: 180.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(15.r),
+              ),
+              child: Icon(Icons.image_outlined, size: 50.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+            ),
+          SizedBox(height: 15.h),
+          Text(
+            _titleController.text.isEmpty ? 'Listing Title' : _titleController.text,
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 5.h),
+          Row(
+            children: [
+              Icon(Icons.location_on_outlined, size: 14.sp, color: Theme.of(context).colorScheme.primary),
+              SizedBox(width: 4.w),
+              Text(
+                _locationController.text.isEmpty ? 'City, Country' : '${_locationController.text}, ${_countryController.text}',
+                style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  _selectedServiceType ?? 'Service',
+                  style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Text(
+                _selectedPricingModel == 'By Service' 
+                  ? 'Packages' 
+                  : '€${_selectedPricingModel == 'By Hour' ? _weekdayHourlyRateController.text : _dailyRateController.text}',
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummarySection(String title, List<String> details, {required VoidCallback onEdit}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+            TextButton(onPressed: onEdit, child: Text('Edit', style: TextStyle(fontSize: 12.sp))),
+          ],
+        ),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(15.w),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: details.map((d) => Padding(
+              padding: EdgeInsets.only(bottom: 4.h),
+              child: Text(d, style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
+            )).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDepositDropdown() {
+    final values = [0, 20, 25, 50];
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<double>(
+          value: _depositPercentage ?? 0,
+          isExpanded: true,
+          items: values.map((int v) {
+            return DropdownMenuItem<double>(
+              value: v.toDouble(),
+              child: Text('$v%'),
+            );
+          }).toList(),
+          onChanged: (double? newValue) {
+            setState(() {
+              _depositPercentage = newValue;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvailabilitySlotsList() {
+    if (_availabilityControllers.isEmpty) {
+      return Text(
+        'No availability slots added yet',
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+        ),
+      );
+    }
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _availabilityControllers.length,
+      separatorBuilder: (_, __) => SizedBox(height: 15.h),
+      itemBuilder: (context, index) {
+        final slot = _availabilityControllers[index];
+        return Container(
+          padding: EdgeInsets.all(15.w),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(15.r),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            ),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDatePickerField(slot.startDate, 'Start Date'),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: _buildDatePickerField(slot.endDate, 'End Date'),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        slot.dispose();
+                        _availabilityControllers.removeAt(index);
+                      });
+                    },
+                    icon: Icon(Icons.delete_outline, color: Colors.red[400]),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTimePickerField(slot.startTime, 'Start Time'),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: _buildTimePickerField(slot.endTime, 'End Time'),
+                  ),
+                  const SizedBox(width: 48), // Match IconButton width for alignment
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDatePickerField(TextEditingController controller, String label) {
+    return GestureDetector(
+      onTap: () async {
+        final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2030),
+        );
+        if (picked != null) {
+          setState(() {
+            controller.text = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+          });
+        }
+      },
+      child: AbsorbPointer(
+        child: _buildTextField(controller, label),
+      ),
+    );
+  }
+
+  Widget _buildTimePickerField(TextEditingController controller, String label) {
+    return GestureDetector(
+      onTap: () async {
+        final TimeOfDay? picked = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        );
+        if (picked != null) {
+          setState(() {
+            controller.text = "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
+          });
+        }
+      },
+      child: AbsorbPointer(
+        child: _buildTextField(controller, label),
+      ),
+    );
+  }
+
+  Widget _buildServiceTypeCard(String title, IconData icon) {
+    bool isSelected = _selectedServiceType == title;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedServiceType = title;
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(15.r),
+          border: Border.all(
+            color: isSelected 
+                ? Theme.of(context).colorScheme.primary 
+                : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ] : null,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 30.sp,
+              color: isSelected 
+                  ? Theme.of(context).colorScheme.primary 
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
+            SizedBox(height: 10.h),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected 
+                    ? Theme.of(context).colorScheme.primary 
+                    : Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRadiusSelector() {
+    final radii = [
+      {'label': '30 km', 'value': 30},
+      {'label': '50 km', 'value': 50},
+      {'label': '100 km', 'value': 100},
+      {'label': 'National', 'value': 500},
+    ];
+    
+    return Row(
+      children: radii.map((r) {
+        bool isSelected = _serviceRadius == (r['value'] as num).toDouble();
+        return Expanded(
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _serviceRadius = (r['value'] as num).toDouble();
+              });
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 4.w),
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              decoration: BoxDecoration(
+                color: isSelected 
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.1) 
+                    : Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(10.r),
+                border: Border.all(
+                  color: isSelected 
+                      ? Theme.of(context).colorScheme.primary 
+                      : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  r['label'] as String,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected 
+                        ? Theme.of(context).colorScheme.primary 
+                        : Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
               ),
             ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildStep2Details() {
+    return ListView(
+      padding: EdgeInsets.all(20.w),
+      children: [
+        Text(
+          'Details',
+          style: TextStyle(
+            fontSize: 24.sp,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          'Add details about your service',
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+        SizedBox(height: 30.h),
+        
+        _buildLabel('Listing Title', isRequired: true),
+        _buildTextField(_titleController, 'e.g. Wedding Photography Premium Package'),
+        
+        SizedBox(height: 20.h),
+        _buildLabel('Description', isRequired: true),
+        _buildTextField(_descriptionController, 'Describe your service in detail...', maxLines: 5),
+        
+        SizedBox(height: 20.h),
+        _buildLabel('Estimated Duration'),
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: _buildTextField(_durationController, 'Value'),
+            ),
+            SizedBox(width: 15.w),
+            Expanded(
+              flex: 3,
+              child: _buildDurationUnitDropdown(),
+            ),
+          ],
+        ),
+        
+        SizedBox(height: 30.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionTitle('Add-ons'),
+            TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _addonControllers.add(AddonControllers());
+                });
+              },
+              icon: Icon(Icons.add, size: 18.sp),
+              label: Text('Add'),
+            ),
+          ],
+        ),
+        _buildAddonList(),
+        
+        SizedBox(height: 30.h),
+        _buildSectionTitle('Equipment'),
+        _buildEquipmentInput(),
+        _buildEquipmentList(),
+        
+        SizedBox(height: 30.h),
+        _buildAutoAcceptSection(),
+      ],
+    );
+  }
+
+  Widget _buildDurationUnitDropdown() {
+    final units = ['Minutes', 'Hours', 'Days', 'Weeks'];
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _durationUnitController.text,
+          isExpanded: true,
+          icon: const Icon(Icons.keyboard_arrow_down),
+          items: units.map((String unit) {
+            return DropdownMenuItem<String>(
+              value: unit,
+              child: Text(unit),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            if (newValue != null) {
+              setState(() {
+                _durationUnitController.text = newValue;
+              });
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddonList() {
+    if (_addonControllers.isEmpty) {
+      return Text(
+        'No add-ons added yet',
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+        ),
+      );
+    }
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _addonControllers.length,
+      separatorBuilder: (_, __) => SizedBox(height: 10.h),
+      itemBuilder: (context, index) {
+        return Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: _buildTextField(_addonControllers[index].name, 'Service name'),
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              flex: 2,
+              child: _buildTextField(_addonControllers[index].price, 'Price (€)'),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _addonControllers[index].dispose();
+                  _addonControllers.removeAt(index);
+                });
+              },
+              icon: Icon(Icons.delete_outline, color: Colors.red[400]),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAutoAcceptSection() {
+    return Container(
+      padding: EdgeInsets.all(15.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(15.r),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Auto-Accept Bookings',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Automatically accept matching requests',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+              Switch(
+                value: _isAutoAcceptEnabled,
+                onChanged: (val) {
+                  setState(() {
+                    _isAutoAcceptEnabled = val;
+                  });
+                },
+                activeColor: Theme.of(context).colorScheme.primary,
+              ),
+            ],
+          ),
+          if (_isAutoAcceptEnabled) ...[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 15.h),
+              child: Divider(color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+            ),
+            _buildLabel('Minimum budget (€)'),
+            _buildTextField(_minBudgetController, 'e.g. 500'),
+            SizedBox(height: 15.h),
+            _buildLabel('Within radius'),
+            _buildAutoAcceptRadiusDropdown(),
+            SizedBox(height: 15.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Verified clients only',
+                  style: TextStyle(fontSize: 14.sp),
+                ),
+                Switch(
+                  value: _verifiedClientsOnly,
+                  onChanged: (val) {
+                    setState(() {
+                      _verifiedClientsOnly = val;
+                    });
+                  },
+                  activeColor: Theme.of(context).colorScheme.primary,
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAutoAcceptRadiusDropdown() {
+    final radii = [30, 50, 100];
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: _selectedAutoAcceptRadius,
+          isExpanded: true,
+          items: radii.map((int r) {
+            return DropdownMenuItem<int>(
+              value: r,
+              child: Text('$r km'),
+            );
+          }).toList(),
+          onChanged: (int? newValue) {
+            if (newValue != null) {
+              setState(() {
+                _selectedAutoAcceptRadius = newValue;
+              });
+            }
+          },
+        ),
+      ),
     );
   }
 
@@ -1035,105 +1869,16 @@ class _ProviderCreateListingScreenState
     );
   }
 
-  Widget _buildCountryDropdown({String? errorText}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () {
-            showCountryPicker(
-              context: context,
-              showPhoneCode: false,
-              onSelect: (Country country) {
-                setState(() {
-                  _selectedCountry = country.name;
-                  _selectedCity = null;
-                  _countryController.text = country.name;
-                  _locationController.text = '';
-                  _localFieldErrors.remove('country');
-                });
-              },
-              countryListTheme: CountryListThemeData(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.r),
-                  topRight: Radius.circular(20.r),
-                ),
-                inputDecoration: InputDecoration(
-                  hintText: 'Search country',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                    borderSide: BorderSide(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.1),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(
-                color: errorText != null
-                    ? Colors.red
-                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _selectedCountry ?? 'Select Country',
-                  style: TextStyle(
-                    color: _selectedCountry == null
-                        ? Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withOpacity(0.4)
-                        : Theme.of(context).colorScheme.onSurface,
-                    fontSize: 13.sp,
-                  ),
-                ),
-                Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.4),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (errorText != null)
-          Padding(
-            padding: EdgeInsets.only(left: 4.w, top: 4.h),
-            child: Text(
-              errorText,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
-            ),
-          ),
-      ],
-    );
-  }
 
-  Widget _buildCityDropdown({String? errorText}) {
-    final cities = _selectedCountry != null
-        ? LocationData.getCities(_selectedCountry!)
-        : <String>[];
-
+  Widget _buildLocationAutocomplete({String? errorText}) {
+    final allCities = LocationData.countriesAndCities.values.expand((cities) => cities).toList();
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
           decoration: BoxDecoration(
-            color: _selectedCountry == null
-                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05)
-                : Theme.of(context).colorScheme.surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
               color: errorText != null
@@ -1141,55 +1886,81 @@ class _ProviderCreateListingScreenState
                   : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             ),
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _selectedCity,
-              dropdownColor: Theme.of(context).colorScheme.surface,
-              isExpanded: true,
-              disabledHint: Text(
-                'Select country first',
-                style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.4),
-                  fontSize: 13.sp,
+          child: Autocomplete<String>(
+            optionsBuilder: (TextEditingValue textEditingValue) {
+              if (textEditingValue.text.isEmpty) {
+                return const Iterable<String>.empty();
+              }
+              return allCities.where((String city) {
+                return city.toLowerCase().contains(textEditingValue.text.toLowerCase());
+              });
+            },
+            onSelected: (String selection) {
+              setState(() {
+                _locationController.text = selection;
+                _selectedCity = selection;
+                
+                // Automatically find the country for this city if possible
+                LocationData.countriesAndCities.forEach((country, cities) {
+                  if (cities.contains(selection)) {
+                    _countryController.text = country;
+                    _selectedCountry = country;
+                  }
+                });
+                
+                _localFieldErrors.remove('city');
+              });
+            },
+            fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+              // Sync our controller with the autocomplete controller
+              if (controller.text != _locationController.text && _locationController.text.isNotEmpty && controller.text.isEmpty) {
+                controller.text = _locationController.text;
+              }
+              
+              return TextField(
+                controller: controller,
+                focusNode: focusNode,
+                onChanged: (value) {
+                  setState(() {
+                    _locationController.text = value;
+                    if (value.isNotEmpty) _localFieldErrors.remove('city');
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'Enter your city or region',
+                  prefixIcon: Icon(Icons.location_on_outlined, size: 20.sp),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 ),
-              ),
-              hint: Text(
-                'Select City',
-                style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.4),
-                  fontSize: 13.sp,
-                ),
-              ),
-              icon: Icon(
-                Icons.keyboard_arrow_down,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-              ),
-              onChanged: _selectedCountry == null
-                  ? null
-                  : (String? newValue) {
-                      setState(() {
-                        _selectedCity = newValue;
-                        _locationController.text = newValue ?? '';
-                        _localFieldErrors.remove('city');
-                      });
-                    },
-              items: cities.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 13.sp,
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              );
+            },
+            optionsViewBuilder: (context, onSelected, options) {
+              return Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  elevation: 4.0,
+                  borderRadius: BorderRadius.circular(10.r),
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Container(
+                    width: 300.w, // Match width or constraint
+                    constraints: BoxConstraints(maxHeight: 200.h),
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: options.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final String option = options.elementAt(index);
+                        return ListTile(
+                          title: Text(option, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          onTap: () => onSelected(option),
+                        );
+                      },
                     ),
                   ),
-                );
-              }).toList(),
-            ),
+                ),
+              );
+            },
           ),
         ),
         if (errorText != null)
@@ -2058,84 +2829,6 @@ class _ProviderCreateListingScreenState
     );
   }
 
-  Widget _buildFooterButtons(bool inProgress) {
-    bool isReady = _isFormValid();
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: inProgress ? null : () => Navigator.pop(context),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: Size(0, 50.h),
-                  side: BorderSide(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.1),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                ),
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: AppTypography.bodyLarge,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: 15.w),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: (isReady && !inProgress) ? _publishListing : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isReady
-                      ? Theme.of(context).colorScheme.onSurface
-                      : Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.2),
-                  disabledBackgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.1),
-                  minimumSize: Size(0, 50.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  elevation: 0,
-                ),
-                child: inProgress
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(
-                        widget.existingListing != null ? 'Update' : 'Publish',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.surface,
-                          fontSize: AppTypography.bodyLarge,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
-        if (!isReady && !inProgress) ...[
-          SizedBox(height: 10.h),
-          Center(
-            child: Text(
-              'Please complete all required fields to publish',
-              style: TextStyle(
-                color: Colors.red[400],
-                fontSize: AppTypography.bodySmall,
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
   String _normalizeServiceType(String type) {
     String normalized = type.toLowerCase().trim();
     if (normalized == 'photo') return 'photography';
@@ -2191,3 +2884,42 @@ class PackageControllers {
     includes.dispose();
   }
 }
+
+class AddonControllers {
+  final TextEditingController name;
+  final TextEditingController price;
+
+  AddonControllers({String name = '', String price = ''})
+    : name = TextEditingController(text: name),
+      price = TextEditingController(text: price);
+
+  void dispose() {
+    name.dispose();
+    price.dispose();
+  }
+}
+
+class AvailabilitySlotControllers {
+  final TextEditingController startDate;
+  final TextEditingController endDate;
+  final TextEditingController startTime;
+  final TextEditingController endTime;
+
+  AvailabilitySlotControllers({
+    String startDate = '',
+    String endDate = '',
+    String startTime = '',
+    String endTime = '',
+  }) : startDate = TextEditingController(text: startDate),
+       endDate = TextEditingController(text: endDate),
+       startTime = TextEditingController(text: startTime),
+       endTime = TextEditingController(text: endTime);
+
+  void dispose() {
+    startDate.dispose();
+    endDate.dispose();
+    startTime.dispose();
+    endTime.dispose();
+  }
+}
+

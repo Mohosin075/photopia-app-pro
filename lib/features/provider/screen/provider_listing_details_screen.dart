@@ -372,8 +372,7 @@ class _ProviderListingDetailsScreenState
                       flex: 4,
                       child: ElevatedButton(
                         onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
+                          final result = await Navigator.of(context, rootNavigator: true).push(
                             MaterialPageRoute(
                               builder: (context) => ProviderCreateListingScreen(
                                 existingListing: listing,

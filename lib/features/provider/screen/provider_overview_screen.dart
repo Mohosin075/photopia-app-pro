@@ -78,8 +78,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                     return;
                   }
 
-                  Navigator.push(
-                    context,
+                  Navigator.of(context, rootNavigator: true).push(
                     AppTransitions.createPremiumRoute(const ProviderCreateListingScreen()),
                   );
                 },
@@ -348,8 +347,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                           .read<MyListingController>()
                           .singleListingData;
 
-                      Navigator.push(
-                        context,
+                      Navigator.of(context, rootNavigator: true).push(
                         AppTransitions.createPremiumRoute(
                           ProviderCreateListingScreen(
                             existingListing: fullListing,

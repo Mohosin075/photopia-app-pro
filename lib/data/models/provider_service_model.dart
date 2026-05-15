@@ -96,6 +96,9 @@ class Data {
   bool? isActive;
   String? sId;
   List<PricingRules>? pricingRules;
+  List<Addon>? addons;
+  AutoAccept? autoAccept;
+  List<AvailabilitySlot>? availabilitySlots;
   String? createdAt;
   String? updatedAt;
   int? iV;
@@ -128,6 +131,9 @@ class Data {
     this.isActive,
     this.sId,
     this.pricingRules,
+    this.addons,
+    this.autoAccept,
+    this.availabilitySlots,
     this.createdAt,
     this.updatedAt,
     this.iV,
@@ -184,6 +190,19 @@ class Data {
         pricingRules!.add(new PricingRules.fromJson(v));
       });
     }
+    if (json['addons'] != null) {
+      addons = <Addon>[];
+      json['addons'].forEach((v) {
+        addons!.add(new Addon.fromJson(v));
+      });
+    }
+    autoAccept = json['autoAccept'] != null ? new AutoAccept.fromJson(json['autoAccept']) : null;
+    if (json['availabilitySlots'] != null) {
+      availabilitySlots = <AvailabilitySlot>[];
+      json['availabilitySlots'].forEach((v) {
+        availabilitySlots!.add(new AvailabilitySlot.fromJson(v));
+      });
+    }
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];
@@ -231,6 +250,15 @@ class Data {
     data['_id'] = this.sId;
     if (this.pricingRules != null) {
       data['pricingRules'] = this.pricingRules!.map((v) => v.toJson()).toList();
+    }
+    if (this.addons != null) {
+      data['addons'] = this.addons!.map((v) => v.toJson()).toList();
+    }
+    if (this.autoAccept != null) {
+      data['autoAccept'] = this.autoAccept!.toJson();
+    }
+    if (this.availabilitySlots != null) {
+      data['availabilitySlots'] = this.availabilitySlots!.map((v) => v.toJson()).toList();
     }
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
@@ -468,6 +496,85 @@ class Coordinates {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['lat'] = this.lat;
     data['lng'] = this.lng;
+    return data;
+  }
+}
+
+class Addon {
+  String? name;
+  int? price;
+
+  Addon({this.name, this.price});
+
+  Addon.fromJson(Map<String, dynamic> json) {
+    name = json['name']?.toString();
+    price = (json['price'] as num?)?.toInt();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['price'] = this.price;
+    return data;
+  }
+}
+
+class AutoAccept {
+  bool? isEnabled;
+  int? minBudget;
+  int? withinRadius;
+  bool? verifiedClientsOnly;
+
+  AutoAccept({
+    this.isEnabled = false,
+    this.minBudget,
+    this.withinRadius,
+    this.verifiedClientsOnly = false,
+  });
+
+  AutoAccept.fromJson(Map<String, dynamic> json) {
+    isEnabled = json['isEnabled'];
+    minBudget = (json['minBudget'] as num?)?.toInt();
+    withinRadius = (json['withinRadius'] as num?)?.toInt();
+    verifiedClientsOnly = json['verifiedClientsOnly'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['isEnabled'] = this.isEnabled;
+    data['minBudget'] = this.minBudget;
+    data['withinRadius'] = this.withinRadius;
+    data['verifiedClientsOnly'] = this.verifiedClientsOnly;
+    return data;
+  }
+}
+
+class AvailabilitySlot {
+  String? startDate;
+  String? endDate;
+  String? startTime;
+  String? endTime;
+
+  AvailabilitySlot({
+    this.startDate,
+    this.endDate,
+    this.startTime,
+    this.endTime,
+  });
+
+  AvailabilitySlot.fromJson(Map<String, dynamic> json) {
+    startDate = json['startDate'];
+    endDate = json['endDate'];
+    startTime = json['startTime'];
+    endTime = json['endTime'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['startDate'] = this.startDate;
+    data['endDate'] = this.endDate;
+    data['startTime'] = this.startTime;
+    data['endTime'] = this.endTime;
     return data;
   }
 }
