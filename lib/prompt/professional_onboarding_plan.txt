@@ -1,0 +1,146 @@
+OVERALL FLOW (UX DESIGN)
+Step 1 → Personal Info
+Step 2 → Domain Selection
+Step 3 → Category Setup
+Step 4 → Area of Work
+Step 5 → Experience
+Step 6 → Portfolio
+Step 7 → Profile Image
+Step 8 → Notifications
+Step 9 → Legal Consent
+Final → Submit Profile
+
+
+SECTION 1: Personal Information (REQUIRED)
+🎯 Purpose:
+
+User identity verification + contact base
+
+📦 Fields:
+👤 Full Name (Required)
+Split: First Name + Last Name
+📧 Email (Required, unique)
+📱 Phone Number (Required)
+Country Code selector (+880 etc.)
+🌍 Country (Required dropdown list)
+🏙 City (Required list or search)
+🏠 Address (Optional text)
+🎂 Date of Birth (Required)
+Rule: Minimum age = 16
+⚙️ Validation Rules:
+Email must be unique
+Age check: today - DOB >= 16
+Phone format validation
+🎯 SECTION 2: Domain Selection (REQUIRED)
+🎯 Purpose:
+
+Define user profession type
+
+📦 Fields:
+Primary Domain (Multi-choice)
+📸 Photography
+🎥 Videography
+🎬 Editing
+⚙️ Rule:
+At least 1 selection required
+This selection controls next step categories
+🗂 SECTION 3: Categories by Domain (DYNAMIC PAGES)
+🎯 Purpose:
+
+Specialization selection
+
+⚙️ Logic:
+
+👉 Based on domain selection, show separate pages:
+
+If Photography:
+Wedding Photography
+Portrait
+Event
+Product
+Fashion
+If Videography:
+Wedding Video
+Cinematic
+Event Coverage
+Commercial
+If Editing:
+Photo Retouching
+Color Grading
+Video Editing
+Motion Graphics
+⚠️ Important Rule:
+Specialization is independent from domain switching
+User can select multiple categories per domain
+📍 SECTION 4: Area of Intervention (OPTIONAL)
+🎯 Purpose:
+
+Define working location scope
+
+📦 Fields:
+Main City (Text)
+Department (Dropdown)
+Radius:
+10 km
+30 km
+50 km
+100 km
+Whole Country
+Available for Travel:
+Yes / No
+⚙️ Logic:
+
+Used for matching clients nearby
+
+🧠 SECTION 5: Experience (OPTIONAL)
+📦 Fields:
+Experience:
+<1 year
+1–3 years
+3–5 years
+5–10 years
+10+ years
+Projects Completed:
+<10
+10–50
+50–100
+100+
+Education:
+Self-taught
+School
+Professional Training
+🎨 SECTION 6: Portfolio & Visibility (OPTIONAL)
+🎯 Purpose:
+
+Showcase skill credibility
+
+📦 Fields:
+Mini Bio (max 500 characters)
+External Portfolio URL (hidden from public UI)
+Upload Portfolio Images:
+Min: 3
+Max: 20
+⚠️ Important Rule:
+External URL stored but NOT displayed publicly
+🖼 SECTION 7: Profile Picture (REQUIRED)
+📦 Fields:
+Profile Image Upload (mandatory)
+JPG / PNG only
+Auto crop to square
+🔔 SECTION 8: Notification Preferences (REQUIRED)
+📦 Fields:
+Email new requests → Yes/No
+SMS urgent requests → Yes/No
+Newsletter → Yes/No
+Review reminders → Yes/No
+⚙️ Default:
+
+All = YES (recommended)
+
+⚖️ SECTION 9: Legal (REQUIRED)
+📦 Fields:
+Accept Terms of Use ☑️
+Accept Privacy Policy ☑️
+GDPR Authorization ☑️
+⚠️ Rule:
+Cannot proceed without all checked

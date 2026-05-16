@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/controller/provider/provider_onboarding_controller.dart';
+import 'package:photopya/controller/client/user_profile_controller.dart';
 import 'package:photopya/core/widgets/custom_snacbar.dart';
 import 'package:photopya/core/routes/app_routes.dart';
 
@@ -16,14 +18,19 @@ class ProviderOnboardingScreen extends StatefulWidget {
 class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  static const int _totalPages = 5;
+  static const int _totalPages = 6;
 
   @override
   void initState() {
     super.initState();
-    // Reset controller state when screen starts to ensure a clean state
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProviderOnboardingController>().reset();
+      final ctrl = context.read<ProviderOnboardingController>();
+      ctrl.reset();
+      // Pre-fill user data
+      final userCtrl = context.read<UserProfileController>();
+      if (userCtrl.userProfile != null) {
+        ctrl.initFromUserProfile(userCtrl.userProfile!);
+      }
     });
   }
 
@@ -36,16 +43,20 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
   void _goNext() {
     final ctrl = context.read<ProviderOnboardingController>();
     if (_currentPage == 0 && !ctrl.isStep1Valid) {
-      CustomSnackBar.show(context: context, message: 'Please fill in your date of birth and select at least one domain.', isError: true);
+      CustomSnackBar.show(context: context, message: 'Please fill in all required personal information fields.', isError: true);
       return;
     }
-    if (_currentPage == 3 && !ctrl.isStep4Valid) {
-      CustomSnackBar.show(context: context, message: 'Profile picture is required to continue.', isError: true);
+    if (_currentPage == 1 && !ctrl.isStep2Valid) {
+      CustomSnackBar.show(context: context, message: 'Please select a domain and at least one category.', isError: true);
+      return;
+    }
+    if (_currentPage == 4 && !ctrl.isStep5Valid) {
+      CustomSnackBar.show(context: context, message: 'Profile picture is required.', isError: true);
       return;
     }
     if (_currentPage == _totalPages - 1) {
-      if (!ctrl.isStep5Valid) {
-        CustomSnackBar.show(context: context, message: 'Please accept all terms to continue.', isError: true);
+      if (!ctrl.isStep6Valid) {
+        CustomSnackBar.show(context: context, message: 'Please accept all legal terms to continue.', isError: true);
         return;
       }
       _submit();
@@ -92,11 +103,12 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   onPageChanged: (i) => setState(() => _currentPage = i),
                   children: const [
-                    _Step1DomainBirthday(),
-                    _Step2Experience(),
+                    _Step1PersonalInfo(),
+                    _Step2Profession(),
                     _Step3Location(),
-                    _Step4BioPorfolio(),
-                    _Step5Legal(),
+                    _Step4Experience(),
+                    _Step5BioPortfolio(),
+                    _Step6Legal(),
                   ],
                 ),
               ),
@@ -109,13 +121,21 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
   }
 
   Widget _buildHeader(ColorScheme cs) {
-    final titles = ['Domain & Info', 'Experience', 'Location', 'Bio & Portfolio', 'Preferences'];
+    final titles = [
+      'Personal Info',
+      'Profession',
+      'Work Area',
+      'Experience',
+      'Portfolio',
+      'Preferences'
+    ];
     final subtitles = [
-      'Tell us about your craft',
-      'Share your background',
+      'Verify your identity',
+      'What do you do?',
       'Where do you work?',
-      'Introduce yourself',
-      'Confirm & finish',
+      'Share your background',
+      'Showcase your work',
+      'Confirm & finish'
     ];
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
@@ -146,7 +166,6 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
             ],
           ),
           SizedBox(height: 12.h),
-          // Progress bar
           ClipRRect(
             borderRadius: BorderRadius.circular(4.r),
             child: LinearProgressIndicator(
@@ -223,10 +242,8 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
 
 // ── Step Widgets ─────────────────────────────────────────────────────────────
 
-class _Step1DomainBirthday extends StatelessWidget {
-  const _Step1DomainBirthday();
-
-  static const _domains = ['Photography', 'Videography', 'Editing'];
+class _Step1PersonalInfo extends StatelessWidget {
+  const _Step1PersonalInfo();
 
   @override
   Widget build(BuildContext context) {
@@ -238,19 +255,80 @@ class _Step1DomainBirthday extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionLabel('First Name', isRequired: true),
+                        SizedBox(height: 8.h),
+                        _TextField(hint: 'John', value: ctrl.firstName, icon: Icons.person_outline, onChanged: (v) => ctrl.firstName = v, cs: cs),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionLabel('Last Name', isRequired: true),
+                        SizedBox(height: 8.h),
+                        _TextField(hint: 'Doe', value: ctrl.lastName, icon: Icons.person_outline, onChanged: (v) => ctrl.lastName = v, cs: cs),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              _SectionLabel('Email Address', isRequired: true),
+              SizedBox(height: 8.h),
+              _TextField(hint: 'Email', value: ctrl.email, icon: Icons.email_outlined, onChanged: (v) => ctrl.email = v, cs: cs, keyboardType: TextInputType.emailAddress),
+              SizedBox(height: 16.h),
+              _SectionLabel('Phone Number', isRequired: true),
+              SizedBox(height: 8.h),
+              _TextField(hint: '+33 6 12 34 56 78', value: ctrl.phone, icon: Icons.phone_outlined, onChanged: (v) => ctrl.phone = v, cs: cs, keyboardType: TextInputType.phone),
+              SizedBox(height: 16.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionLabel('Country', isRequired: true),
+                        SizedBox(height: 8.h),
+                        _DropdownField(hint: 'Select', value: ctrl.country, items: const ['France', 'Belgium', 'Switzerland', 'UK'], onChanged: (v) { ctrl.country = v ?? 'France'; ctrl.notifyListeners(); }, cs: cs),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionLabel('City', isRequired: true),
+                        SizedBox(height: 8.h),
+                        _TextField(hint: 'Paris', value: ctrl.city, icon: Icons.location_city, onChanged: (v) => ctrl.city = v, cs: cs),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              _SectionLabel('Address', isOptional: true),
+              SizedBox(height: 8.h),
+              _TextField(hint: '123 Main St', value: ctrl.address, icon: Icons.home_outlined, onChanged: (v) => ctrl.address = v, cs: cs),
+              SizedBox(height: 16.h),
               _SectionLabel('Date of Birth', isRequired: true),
               SizedBox(height: 8.h),
               GestureDetector(
                 onTap: () async {
                   final picked = await showDatePicker(
                     context: context,
-                    initialDate: ctrl.dateOfBirth ?? DateTime(1995),
+                    initialDate: ctrl.dateOfBirth ?? DateTime(2000),
                     firstDate: DateTime(1940),
-                    lastDate: DateTime.now().subtract(const Duration(days: 365 * 16)),
-                    builder: (context, child) => Theme(
-                      data: Theme.of(context),
-                      child: child!,
-                    ),
+                    lastDate: DateTime.now().subtract(const Duration(days: 365 * 16)), // Minimum 16 years old
+                    builder: (context, child) => Theme(data: Theme.of(context), child: child!),
                   );
                   if (picked != null) {
                     ctrl.dateOfBirth = picked;
@@ -271,7 +349,7 @@ class _Step1DomainBirthday extends StatelessWidget {
                       Text(
                         ctrl.dateOfBirth != null
                             ? '${ctrl.dateOfBirth!.day}/${ctrl.dateOfBirth!.month}/${ctrl.dateOfBirth!.year}'
-                            : 'Select your date of birth',
+                            : 'Select your date of birth (Min 16)',
                         style: TextStyle(
                           fontSize: 14.sp,
                           color: ctrl.dateOfBirth != null ? cs.onSurface : cs.onSurface.withOpacity(0.4),
@@ -281,7 +359,46 @@ class _Step1DomainBirthday extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 20.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _Step2Profession extends StatelessWidget {
+  const _Step2Profession();
+
+  static const _domains = ['Photography', 'Videography', 'Editing'];
+
+  List<String> _getCategoriesForDomains(List<String> domains) {
+    List<String> categories = [];
+    if (domains.contains('Photography')) {
+      categories.addAll(['Wedding Photography', 'Portrait', 'Event', 'Product', 'Fashion']);
+    }
+    if (domains.contains('Videography')) {
+      categories.addAll(['Wedding Video', 'Cinematic', 'Event Coverage', 'Commercial']);
+    }
+    if (domains.contains('Editing')) {
+      categories.addAll(['Photo Retouching', 'Color Grading', 'Video Editing', 'Motion Graphics']);
+    }
+    return categories.toSet().toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Consumer<ProviderOnboardingController>(
+      builder: (context, ctrl, _) {
+        final dynamicCategories = _getCategoriesForDomains(ctrl.primaryDomain);
+        
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               _SectionLabel('Primary Domain', isRequired: true),
               SizedBox(height: 8.h),
               Wrap(
@@ -293,6 +410,8 @@ class _Step1DomainBirthday extends StatelessWidget {
                     onTap: () {
                       if (selected) {
                         ctrl.primaryDomain.remove(domain);
+                        // Clean up categories that belong to the removed domain
+                        ctrl.specialties.removeWhere((s) => !_getCategoriesForDomains(ctrl.primaryDomain).contains(s));
                       } else {
                         ctrl.primaryDomain.add(domain);
                       }
@@ -302,81 +421,30 @@ class _Step1DomainBirthday extends StatelessWidget {
                   );
                 }).toList(),
               ),
-              SizedBox(height: 20.h),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _Step2Experience extends StatelessWidget {
-  const _Step2Experience();
-
-  static const _specialtiesOptions = ['Wedding', 'Portrait', 'Corporate', 'Fashion', 'Real Estate', 'Event', 'Product', 'Travel', 'Street', 'Documentary'];
-  static const _yearsOptions = ['<1 year', '1-3 years', '3-5 years', '5-10 years', '>10 years'];
-  static const _projectsOptions = ['<10', '10-50', '50-100', '>100'];
-  static const _educationOptions = ['Self-taught', 'School', 'Professional training'];
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Consumer<ProviderOnboardingController>(
-      builder: (context, ctrl, _) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SectionLabel('Specialties', isOptional: true),
-              SizedBox(height: 8.h),
-              Wrap(
-                spacing: 10.w,
-                runSpacing: 10.h,
-                children: _specialtiesOptions.map((s) {
-                  final selected = ctrl.specialties.contains(s);
-                  return GestureDetector(
-                    onTap: () {
-                      if (selected) ctrl.specialties.remove(s);
-                      else ctrl.specialties.add(s);
-                      ctrl.notifyListeners();
-                    },
-                    child: _SelectChip(label: s, selected: selected),
-                  );
-                }).toList(),
-              ),
               SizedBox(height: 24.h),
-              _SectionLabel('Years of Experience', isOptional: true),
-              SizedBox(height: 8.h),
-              _DropdownField(
-                hint: 'Select experience',
-                value: ctrl.yearsOfExperience,
-                items: _yearsOptions,
-                onChanged: (v) { ctrl.yearsOfExperience = v; ctrl.notifyListeners(); },
-                cs: cs,
-              ),
-              SizedBox(height: 16.h),
-              _SectionLabel('Projects Completed', isOptional: true),
-              SizedBox(height: 8.h),
-              _DropdownField(
-                hint: 'Select range',
-                value: ctrl.projectsCompleted,
-                items: _projectsOptions,
-                onChanged: (v) { ctrl.projectsCompleted = v; ctrl.notifyListeners(); },
-                cs: cs,
-              ),
-              SizedBox(height: 16.h),
-              _SectionLabel('Education', isOptional: true),
-              SizedBox(height: 8.h),
-              _DropdownField(
-                hint: 'Select education',
-                value: ctrl.education,
-                items: _educationOptions,
-                onChanged: (v) { ctrl.education = v; ctrl.notifyListeners(); },
-                cs: cs,
-              ),
-              SizedBox(height: 20.h),
+              
+              if (ctrl.primaryDomain.isNotEmpty) ...[
+                _SectionLabel('Categories / Specialties', isRequired: true),
+                SizedBox(height: 4.h),
+                Text('Select at least one specialization', style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
+                SizedBox(height: 8.h),
+                Wrap(
+                  spacing: 10.w,
+                  runSpacing: 10.h,
+                  children: dynamicCategories.map((s) {
+                    final selected = ctrl.specialties.contains(s);
+                    return GestureDetector(
+                      onTap: () {
+                        if (selected) ctrl.specialties.remove(s);
+                        else ctrl.specialties.add(s);
+                        ctrl.notifyListeners();
+                      },
+                      child: _SelectChip(label: s, selected: selected),
+                    );
+                  }).toList(),
+                ),
+                SizedBox(height: 20.h),
+              ],
             ],
           ),
         );
@@ -387,7 +455,7 @@ class _Step2Experience extends StatelessWidget {
 
 class _Step3Location extends StatelessWidget {
   const _Step3Location();
-  static const _radiusOptions = ['10km', '30km', '50km', '100km', 'whole France'];
+  static const _radiusOptions = ['10km', '30km', '50km', '100km', 'Whole Country'];
 
   @override
   Widget build(BuildContext context) {
@@ -399,35 +467,17 @@ class _Step3Location extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SectionLabel('Main City', isOptional: true),
+              _SectionLabel('Main City (Area of work)', isOptional: true),
               SizedBox(height: 8.h),
-              _TextField(
-                hint: 'e.g. Paris',
-                value: ctrl.mainCity,
-                icon: Icons.location_city_outlined,
-                onChanged: (v) { ctrl.mainCity = v; },
-                cs: cs,
-              ),
+              _TextField(hint: 'e.g. Paris', value: ctrl.mainCity, icon: Icons.location_city_outlined, onChanged: (v) { ctrl.mainCity = v; }, cs: cs),
               SizedBox(height: 16.h),
               _SectionLabel('Department', isOptional: true),
               SizedBox(height: 8.h),
-              _TextField(
-                hint: 'e.g. 75',
-                value: ctrl.department,
-                icon: Icons.map_outlined,
-                onChanged: (v) { ctrl.department = v; },
-                cs: cs,
-              ),
+              _DropdownField(hint: 'e.g. 75', value: ctrl.department.isEmpty ? null : ctrl.department, items: const ['75', '92', '93', '94'], onChanged: (v) { ctrl.department = v ?? ''; ctrl.notifyListeners(); }, cs: cs),
               SizedBox(height: 16.h),
               _SectionLabel('Intervention Radius', isOptional: true),
               SizedBox(height: 8.h),
-              _DropdownField(
-                hint: 'Select radius',
-                value: ctrl.radius,
-                items: _radiusOptions,
-                onChanged: (v) { if (v != null) { ctrl.radius = v; ctrl.notifyListeners(); } },
-                cs: cs,
-              ),
+              _DropdownField(hint: 'Select radius', value: ctrl.radius, items: _radiusOptions, onChanged: (v) { if (v != null) { ctrl.radius = v; ctrl.notifyListeners(); } }, cs: cs),
               SizedBox(height: 20.h),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
@@ -446,11 +496,7 @@ class _Step3Location extends StatelessWidget {
                         Text('Can travel outside your area', style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
                       ],
                     ),
-                    Switch(
-                      value: ctrl.availableForTravel,
-                      onChanged: (v) { ctrl.availableForTravel = v; ctrl.notifyListeners(); },
-                      activeColor: cs.primary,
-                    ),
+                    Switch(value: ctrl.availableForTravel, onChanged: (v) { ctrl.availableForTravel = v; ctrl.notifyListeners(); }, activeColor: cs.primary),
                   ],
                 ),
               ),
@@ -463,8 +509,45 @@ class _Step3Location extends StatelessWidget {
   }
 }
 
-class _Step4BioPorfolio extends StatelessWidget {
-  const _Step4BioPorfolio();
+class _Step4Experience extends StatelessWidget {
+  const _Step4Experience();
+
+  static const _yearsOptions = ['<1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years'];
+  static const _projectsOptions = ['<10', '10-50', '50-100', '100+'];
+  static const _educationOptions = ['Self-taught', 'School', 'Professional Training'];
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Consumer<ProviderOnboardingController>(
+      builder: (context, ctrl, _) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionLabel('Years of Experience', isOptional: true),
+              SizedBox(height: 8.h),
+              _DropdownField(hint: 'Select experience', value: ctrl.yearsOfExperience, items: _yearsOptions, onChanged: (v) { ctrl.yearsOfExperience = v; ctrl.notifyListeners(); }, cs: cs),
+              SizedBox(height: 16.h),
+              _SectionLabel('Projects Completed', isOptional: true),
+              SizedBox(height: 8.h),
+              _DropdownField(hint: 'Select range', value: ctrl.projectsCompleted, items: _projectsOptions, onChanged: (v) { ctrl.projectsCompleted = v; ctrl.notifyListeners(); }, cs: cs),
+              SizedBox(height: 16.h),
+              _SectionLabel('Education', isOptional: true),
+              SizedBox(height: 8.h),
+              _DropdownField(hint: 'Select education', value: ctrl.education, items: _educationOptions, onChanged: (v) { ctrl.education = v; ctrl.notifyListeners(); }, cs: cs),
+              SizedBox(height: 20.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _Step5BioPortfolio extends StatelessWidget {
+  const _Step5BioPortfolio();
 
   @override
   Widget build(BuildContext context) {
@@ -503,7 +586,7 @@ class _Step4BioPorfolio extends StatelessWidget {
                                   onTap: ctrl.removeProfileImage,
                                   child: Container(
                                     padding: EdgeInsets.all(4.w),
-                                    decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                                     child: Icon(Icons.close, size: 14.sp, color: Colors.white),
                                   ),
                                 ),
@@ -514,6 +597,7 @@ class _Step4BioPorfolio extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 24.h),
+              
               _SectionLabel('Mini Bio', isOptional: true),
               SizedBox(height: 4.h),
               Text('Max 500 characters', style: TextStyle(fontSize: 11.sp, color: cs.onSurface.withOpacity(0.4))),
@@ -539,17 +623,70 @@ class _Step4BioPorfolio extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
+              
               _SectionLabel('External Portfolio Link', isOptional: true),
               SizedBox(height: 8.h),
-              _TextField(
-                hint: 'https://yourportfolio.com',
-                value: ctrl.externalPortfolioLink,
-                icon: Icons.link_outlined,
-                onChanged: (v) { ctrl.externalPortfolioLink = v; },
-                cs: cs,
-                keyboardType: TextInputType.url,
+              _TextField(hint: 'https://yourportfolio.com', value: ctrl.externalPortfolioLink, icon: Icons.link_outlined, onChanged: (v) { ctrl.externalPortfolioLink = v; }, cs: cs, keyboardType: TextInputType.url),
+              SizedBox(height: 24.h),
+              
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _SectionLabel('Portfolio Images', isOptional: true),
+                  Text('${ctrl.portfolioImages.length}/20', style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
+                ],
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 8.h),
+              Text('Upload between 3 to 20 images to showcase your work.', style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
+              SizedBox(height: 12.h),
+              Wrap(
+                spacing: 8.w,
+                runSpacing: 8.h,
+                children: [
+                  ...List.generate(ctrl.portfolioImages.length, (index) {
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: Image.file(
+                            ctrl.portfolioImages[index],
+                            width: 80.w,
+                            height: 80.w,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          right: 4.w,
+                          top: 4.w,
+                          child: GestureDetector(
+                            onTap: () => ctrl.removePortfolioImage(index),
+                            child: Container(
+                              padding: EdgeInsets.all(2.w),
+                              decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                              child: Icon(Icons.close, size: 12.sp, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                  if (ctrl.portfolioImages.length < 20)
+                    GestureDetector(
+                      onTap: ctrl.pickPortfolioImages,
+                      child: Container(
+                        width: 80.w,
+                        height: 80.w,
+                        decoration: BoxDecoration(
+                          color: cs.surface,
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(color: cs.onSurface.withOpacity(0.2), style: BorderStyle.solid),
+                        ),
+                        child: Icon(Icons.add_photo_alternate_outlined, size: 28.sp, color: cs.primary),
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(height: 40.h),
             ],
           ),
         );
@@ -558,8 +695,8 @@ class _Step4BioPorfolio extends StatelessWidget {
   }
 }
 
-class _Step5Legal extends StatelessWidget {
-  const _Step5Legal();
+class _Step6Legal extends StatelessWidget {
+  const _Step6Legal();
 
   @override
   Widget build(BuildContext context) {
@@ -571,49 +708,22 @@ class _Step5Legal extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SectionLabel('Notification Preferences', isOptional: true),
+              _SectionLabel('Notification Preferences', isRequired: true),
               SizedBox(height: 12.h),
-              _SwitchTile(
-                label: 'Email for new requests', icon: Icons.email_outlined,
-                value: ctrl.emailNewRequests,
-                onChanged: (v) { ctrl.emailNewRequests = v; ctrl.notifyListeners(); }, cs: cs,
-              ),
-              _SwitchTile(
-                label: 'SMS for urgent requests', icon: Icons.sms_outlined,
-                value: ctrl.smsUrgentRequests,
-                onChanged: (v) { ctrl.smsUrgentRequests = v; ctrl.notifyListeners(); }, cs: cs,
-              ),
-              _SwitchTile(
-                label: 'Newsletter & Pro tips', icon: Icons.newspaper_outlined,
-                value: ctrl.newsletterPros,
-                onChanged: (v) { ctrl.newsletterPros = v; ctrl.notifyListeners(); }, cs: cs,
-              ),
-              _SwitchTile(
-                label: 'Review reminders', icon: Icons.star_outline,
-                value: ctrl.customerReviewReminder,
-                onChanged: (v) { ctrl.customerReviewReminder = v; ctrl.notifyListeners(); }, cs: cs,
-              ),
+              _SwitchTile(label: 'Email for new requests', icon: Icons.email_outlined, value: ctrl.emailNewRequests, onChanged: (v) { ctrl.emailNewRequests = v; ctrl.notifyListeners(); }, cs: cs),
+              _SwitchTile(label: 'SMS for urgent requests', icon: Icons.sms_outlined, value: ctrl.smsUrgentRequests, onChanged: (v) { ctrl.smsUrgentRequests = v; ctrl.notifyListeners(); }, cs: cs),
+              _SwitchTile(label: 'Newsletter & Pro tips', icon: Icons.newspaper_outlined, value: ctrl.newsletterPros, onChanged: (v) { ctrl.newsletterPros = v; ctrl.notifyListeners(); }, cs: cs),
+              _SwitchTile(label: 'Review reminders', icon: Icons.star_outline, value: ctrl.customerReviewReminder, onChanged: (v) { ctrl.customerReviewReminder = v; ctrl.notifyListeners(); }, cs: cs),
+              
               SizedBox(height: 24.h),
               _SectionLabel('Legal Agreement', isRequired: true),
               SizedBox(height: 4.h),
               Text('All three must be accepted to continue.', style: TextStyle(fontSize: 11.sp, color: cs.onSurface.withOpacity(0.4))),
               SizedBox(height: 12.h),
-              _CheckTile(
-                label: 'I accept the Terms & Conditions',
-                value: ctrl.acceptedTerms,
-                onChanged: (v) { ctrl.acceptedTerms = v!; ctrl.notifyListeners(); }, cs: cs,
-              ),
-              _CheckTile(
-                label: 'I accept the Privacy Policy',
-                value: ctrl.privacyPolicy,
-                onChanged: (v) { ctrl.privacyPolicy = v!; ctrl.notifyListeners(); }, cs: cs,
-              ),
-              _CheckTile(
-                label: 'I authorize GDPR data processing',
-                value: ctrl.gdprAuthorization,
-                onChanged: (v) { ctrl.gdprAuthorization = v!; ctrl.notifyListeners(); }, cs: cs,
-              ),
-              SizedBox(height: 20.h),
+              _CheckTile(label: 'I accept the Terms of Use', value: ctrl.acceptedTerms, onChanged: (v) { ctrl.acceptedTerms = v!; ctrl.notifyListeners(); }, cs: cs),
+              _CheckTile(label: 'I accept the Privacy Policy', value: ctrl.privacyPolicy, onChanged: (v) { ctrl.privacyPolicy = v!; ctrl.notifyListeners(); }, cs: cs),
+              _CheckTile(label: 'I authorize GDPR data processing', value: ctrl.gdprAuthorization, onChanged: (v) { ctrl.gdprAuthorization = v!; ctrl.notifyListeners(); }, cs: cs),
+              SizedBox(height: 40.h),
             ],
           ),
         );
@@ -632,44 +742,36 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        Text(text,
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurface,
-            )),
-        SizedBox(width: 8.w),
-        if (isRequired)
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFF4D4D).withOpacity(0.12),
-              borderRadius: BorderRadius.circular(6.r),
+    return RichText(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w600,
+          color: cs.onSurface,
+          fontFamily: 'HelveticaNeue', // Ensuring consistency
+        ),
+        children: [
+          if (isRequired)
+            TextSpan(
+              text: ' *',
+              style: TextStyle(
+                color: const Color(0xFFFF4D4D),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            child: Text('Required',
-                style: TextStyle(
-                  fontSize: 10.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFFFF4D4D),
-                )),
-          )
-        else if (isOptional)
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
-            decoration: BoxDecoration(
-              color: cs.onSurface.withOpacity(0.07),
-              borderRadius: BorderRadius.circular(6.r),
+          if (isOptional)
+            TextSpan(
+              text: ' (optional)',
+              style: TextStyle(
+                color: cs.onSurface.withOpacity(0.4),
+                fontSize: 10.sp,
+                fontWeight: FontWeight.normal,
+              ),
             ),
-            child: Text('Optional',
-                style: TextStyle(
-                  fontSize: 10.sp,
-                  fontWeight: FontWeight.w500,
-                  color: cs.onSurface.withOpacity(0.45),
-                )),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -689,12 +791,7 @@ class _SelectChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(30.r),
         border: Border.all(color: selected ? cs.primary : cs.onSurface.withOpacity(0.12)),
       ),
-      child: Text(label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-            color: selected ? cs.onPrimary : cs.onSurface,
-          )),
+      child: Text(label, style: TextStyle(fontSize: 13.sp, fontWeight: selected ? FontWeight.w600 : FontWeight.normal, color: selected ? cs.onPrimary : cs.onSurface)),
     );
   }
 }
@@ -805,25 +902,17 @@ class _CheckTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 10.h),
-      child: GestureDetector(
-        onTap: () => onChanged(!value),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            color: value ? cs.primary.withOpacity(0.08) : cs.surface,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: value ? cs.primary.withOpacity(0.4) : cs.onSurface.withOpacity(0.08)),
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: Row(
+        children: [
+          Checkbox(
+            value: value,
+            onChanged: onChanged,
+            activeColor: cs.primary,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
           ),
-          child: Row(
-            children: [
-              Icon(value ? Icons.check_circle : Icons.radio_button_unchecked,
-                  size: 20.sp, color: value ? cs.primary : cs.onSurface.withOpacity(0.4)),
-              SizedBox(width: 12.w),
-              Expanded(child: Text(label, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500, color: cs.onSurface))),
-            ],
-          ),
-        ),
+          Expanded(child: Text(label, style: TextStyle(fontSize: 13.sp, color: cs.onSurface))),
+        ],
       ),
     );
   }

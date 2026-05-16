@@ -1,0 +1,125 @@
+Offline Handling System Design Prompt (Photopia Project)
+
+Prompt:
+
+Design and implement an offline-first architecture for a multi-sided marketplace mobile application (Photographers, Video Editors, Photo Editors, and Clients). The application must work seamlessly in both online and offline conditions.
+
+🌐 1. Core Principle (Must Follow)
+
+The system must follow Offline-First Architecture:
+
+App always reads data from local storage first
+Server is used only for sync and updates
+User experience should never break due to no internet
+📦 2. Data Storage Strategy
+
+Implement a dual-layer data system:
+
+🔹 Local Storage (Primary in offline mode)
+
+Use:
+
+Hive / SQLite (Flutter)
+
+Store:
+
+User profiles (cached)
+Photographer listings
+Services data
+Previous bookings
+Chat history (last synced messages)
+🔹 Remote Server (Source of truth)
+
+Use API backend for:
+
+New bookings
+Payments
+Chat sync
+Profile updates
+Availability status
+🔄 3. Sync Engine (Most Important Part)
+
+Create a background sync system:
+
+When internet is available:
+Sync local changes → server
+Pull latest updates → local DB
+When internet is not available:
+Save all user actions in Pending Queue
+Mark them as:
+pending_create
+pending_update
+pending_delete
+📡 4. Network Detection System
+
+Implement real-time connectivity check:
+
+Detect internet status continuously
+Switch app state:
+Online Mode
+Offline Mode
+
+UI behavior:
+
+Show “You are offline” banner
+Disable live actions (booking, payment)
+Keep browsing available
+⚙️ 5. Request Handling Flow
+
+Every API request must follow this flow:
+
+User Action
+   ↓
+Check Internet
+   ↓
+If ONLINE → Call API → Save response to local DB
+If OFFLINE → Save request to Pending Queue
+📱 6. UI Behavior Rules
+Offline Mode UI:
+Show cached data only
+Grey out unavailable actions
+Show “Sync pending” indicators
+Allow browsing and viewing profiles
+Online Mode UI:
+Fetch fresh data
+Auto sync pending actions
+Update UI in real-time
+🔁 7. Sync Scenarios
+Scenario 1: User creates booking offline
+Save locally
+Add to Pending Queue
+Sync when internet returns
+Scenario 2: Photographer updates profile offline
+Save local change
+Mark as pending update
+Push to server later
+Scenario 3: Internet returns
+Auto sync all pending operations
+Resolve conflicts (server priority or latest timestamp)
+🧠 8. Conflict Resolution Strategy
+
+If data mismatch happens:
+
+Priority rules:
+
+Server data (default authority)
+Latest timestamp wins
+User override only if no conflict risk
+🚀 9. Performance Optimization
+Use pagination for large data
+Cache only recent/important data
+Clear old cache automatically
+Compress sync payloads
+🔐 10. Safety & Data Integrity
+Never lose user offline actions
+Every offline action must be queued
+Retry failed sync automatically
+Show sync status to user
+🏁 Final Goal
+
+The application must behave like a production-level marketplace app (Fiverr/Uber style) where:
+
+User can use app anytime (online/offline)
+No action is lost
+Sync is automatic and invisible
+User experience feels seamless

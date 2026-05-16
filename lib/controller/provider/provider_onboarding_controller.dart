@@ -15,7 +15,14 @@ class ProviderOnboardingController extends ChangeNotifier {
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
 
-  // ── Step 1: Domain & Birthday ────────────────────────────────────────────
+  // ── Step 1: Personal Info & Domain ─────────────────────────────────────────
+  String firstName = '';
+  String lastName = '';
+  String email = '';
+  String phone = '';
+  String country = 'France'; // Default or from user
+  String city = '';
+  String address = '';
   DateTime? dateOfBirth;
   List<String> primaryDomain = []; // Photography, Videography, Editing
 
@@ -36,11 +43,12 @@ class ProviderOnboardingController extends ChangeNotifier {
   String miniBio = '';
   String externalPortfolioLink = '';
   File? profileImage;
+  List<File> portfolioImages = [];
 
   // ── Step 5: Preferences & Legal ─────────────────────────────────────────
   bool emailNewRequests = true;
   bool smsUrgentRequests = true;
-  bool newsletterPros = false;
+  bool newsletterPros = true; // Recommended default Yes
   bool customerReviewReminder = true;
 
   bool acceptedTerms = false;
@@ -53,7 +61,6 @@ class ProviderOnboardingController extends ChangeNotifier {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
     if (pickedFile != null) {
       File file = File(pickedFile.path);
-      // Optional: process orientation
       profileImage = await ImageUtils.fixImageOrientation(file);
       notifyListeners();
     }
@@ -64,8 +71,53 @@ class ProviderOnboardingController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> pickPortfolioImages() async {
+    final picker = ImagePicker();
+    final pickedFiles = await picker.pickMultiImage(imageQuality: 70);
+    if (pickedFiles.isNotEmpty) {
+      for (var pickedFile in pickedFiles) {
+        if (portfolioImages.length >= 20) break; // Max 20
+        File file = File(pickedFile.path);
+        File? fixedFile = await ImageUtils.fixImageOrientation(file);
+        if (fixedFile != null) {
+          portfolioImages.add(fixedFile);
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+  void removePortfolioImage(int index) {
+    if (index >= 0 && index < portfolioImages.length) {
+      portfolioImages.removeAt(index);
+      notifyListeners();
+    }
+  }
+
   // ── State Management ─────────────────────────────────────────────────────
+  
+  void initFromUserProfile(dynamic userProfile) {
+    if (userProfile == null) return;
+    final fullName = userProfile.fullName ?? '';
+    final parts = fullName.split(' ');
+    firstName = parts.isNotEmpty ? parts.first : '';
+    lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+    email = userProfile.email ?? '';
+    phone = userProfile.phone ?? '';
+    if (userProfile.location != null && userProfile.location!.isNotEmpty) {
+      address = userProfile.location!;
+    }
+    // We don't overwrite if they already typed something
+  }
+
   void reset() {
+    firstName = '';
+    lastName = '';
+    email = '';
+    phone = '';
+    country = 'France';
+    city = '';
+    address = '';
     dateOfBirth = null;
     primaryDomain = [];
     specialties = [];
@@ -80,9 +132,10 @@ class ProviderOnboardingController extends ChangeNotifier {
     miniBio = '';
     externalPortfolioLink = '';
     profileImage = null;
+    portfolioImages = [];
     emailNewRequests = true;
     smsUrgentRequests = true;
-    newsletterPros = false;
+    newsletterPros = true;
     customerReviewReminder = true;
     acceptedTerms = false;
     privacyPolicy = false;
@@ -132,9 +185,10 @@ class ProviderOnboardingController extends ChangeNotifier {
   }
 
   // ── Validation ───────────────────────────────────────────────────────────
-  bool get isStep1Valid => dateOfBirth != null && primaryDomain.isNotEmpty;
-  bool get isStep4Valid => profileImage != null; // Profile picture is required
-  bool get isStep5Valid => acceptedTerms && privacyPolicy && gdprAuthorization;
+  bool get isStep1Valid => firstName.trim().isNotEmpty && lastName.trim().isNotEmpty && email.trim().isNotEmpty && phone.trim().isNotEmpty && country.trim().isNotEmpty && city.trim().isNotEmpty && dateOfBirth != null;
+  bool get isStep2Valid => primaryDomain.isNotEmpty && specialties.isNotEmpty;
+  bool get isStep5Valid => profileImage != null; // Profile picture is required
+  bool get isStep6Valid => acceptedTerms && privacyPolicy && gdprAuthorization;
 
   // ── API Submission ───────────────────────────────────────────────────────
   Future<bool> submitOnboarding() async {
