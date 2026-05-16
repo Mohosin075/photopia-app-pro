@@ -70,6 +70,8 @@ dependencies:
   image_cropper: ^12.2.1
   translator: ^1.0.4+1
   country_picker: ^2.0.27
+  flutter_svg: ^2.0.10+1
+  share_plus: ^12.0.2
 
 
 
@@ -131,6 +133,7 @@ flutter:
     - assets/images/edit_icon.png
     - assets/images/edit_done_icon.png
     - assets/images/camera_icon.png
+    - assets/images/photopya.svg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

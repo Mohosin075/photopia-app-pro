@@ -9,6 +9,7 @@ import 'package:photopya/data/models/service_list_model.dart';
 import 'package:photopya/data/models/home_data_model.dart';
 import 'package:photopya/features/client/widgets/home_header.dart';
 import 'package:photopya/features/client/widgets/category_bar.dart';
+import 'package:photopya/features/client/widgets/service_card.dart';
 import 'package:photopya/features/client/widgets/section_header.dart';
 import 'package:photopya/features/client/widgets/horizontal_project_card.dart';
 import 'package:photopya/features/client/category_details_screen.dart';
@@ -1191,11 +1192,21 @@ class _MyHomePageState extends State<MyHomePage> {
                             .watch<CategoryController>()
                             .selectedCategoryId,
                         onCategorySelected: (categoryId) {
-                          context.read<CategoryController>().selectCategory(
+                          final categoryController = context.read<CategoryController>();
+                          categoryController.selectCategory(
                             categoryId,
                           );
+                          
+                          final Map<String, dynamic> filters = {};
+                          if (categoryId != null) {
+                            filters['category'] = categoryId;
+                          } else if (categoryController.selectedTheme != null && 
+                                     categoryController.selectedTheme != 'ALL') {
+                            filters['theme'] = categoryController.selectedTheme;
+                          }
+                          
                           serviceListController.getAllServices(
-                            filters: {'category': categoryId},
+                            filters: filters,
                           );
                         },
                       ),
@@ -1207,8 +1218,16 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             // Scrollable Dynamic Home Content
             Expanded(
-              child: Consumer<HomeController>(
-                builder: (context, homeController, child) {
+              child: Consumer2<HomeController, CategoryController>(
+                builder: (context, homeController, categoryController, child) {
+                  final bool hasActiveFilter = (categoryController.selectedTheme != null && 
+                                             categoryController.selectedTheme != 'ALL') || 
+                                             categoryController.selectedCategoryId != null;
+
+                  if (hasActiveFilter) {
+                    return _buildFilteredResults();
+                  }
+
                   if (homeController.isLoading &&
                       homeController.homeData == null) {
                     return const HomeShimmer();
@@ -1377,6 +1396,109 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFilteredResults() {
+    return Consumer<ServiceListController>(
+      builder: (context, controller, child) {
+        if (controller.isLoading) {
+          return GridView.builder(
+            padding: EdgeInsets.all(16.w),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.w,
+              mainAxisSpacing: 20.h,
+              childAspectRatio: 0.62,
+            ),
+            itemCount: 6,
+            itemBuilder: (context, index) => const ServiceCardSkeleton(),
+          );
+        }
+
+        if (controller.errorMessage != null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 60.sp, color: Colors.red.withOpacity(0.3)),
+                SizedBox(height: 16.h),
+                Text(controller.errorMessage!),
+                SizedBox(height: 16.h),
+                ElevatedButton(
+                  onPressed: () {
+                    final categoryController = context.read<CategoryController>();
+                    final Map<String, dynamic> filters = {};
+                    if (categoryController.selectedCategoryId != null) {
+                      filters['category'] = categoryController.selectedCategoryId;
+                    } else if (categoryController.selectedTheme != null && categoryController.selectedTheme != 'ALL') {
+                      filters['theme'] = categoryController.selectedTheme;
+                    }
+                    controller.getAllServices(filters: filters);
+                  },
+                  child: Text(context.l10n.tryAgain),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final services = controller.services;
+
+        if (services.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.search_off, size: 80.sp, color: Colors.grey[300]),
+                SizedBox(height: 16.h),
+                Text(
+                  context.l10n.noData,
+                  style: TextStyle(fontSize: 16.sp, color: Colors.grey),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          color: Theme.of(context).colorScheme.primary,
+          onRefresh: () async {
+            final categoryController = context.read<CategoryController>();
+            final Map<String, dynamic> filters = {};
+            if (categoryController.selectedCategoryId != null) {
+              filters['category'] = categoryController.selectedCategoryId;
+            } else if (categoryController.selectedTheme != null && categoryController.selectedTheme != 'ALL') {
+              filters['theme'] = categoryController.selectedTheme;
+            }
+            await controller.getAllServices(filters: filters);
+          },
+          child: GridView.builder(
+            padding: EdgeInsets.all(16.w),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.w,
+              mainAxisSpacing: 20.h,
+              childAspectRatio: 0.62,
+            ),
+            itemCount: services.length,
+            itemBuilder: (context, index) {
+              final service = services[index];
+              return ServiceCard(
+                id: service.sId ?? '',
+                title: service.title ?? '',
+                subtitle: service.providerId?.name ?? 'Professional',
+                imageUrl: service.coverMedia ?? '',
+                rating: service.rating ?? 0.0,
+                reviews: service.reviews ?? 0,
+                price: service.price,
+                currency: service.currency,
+                providerId: service.providerId?.sId,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

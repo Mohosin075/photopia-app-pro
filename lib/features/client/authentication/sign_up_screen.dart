@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photopya/core/constants/app_typography.dart';
 import 'package:photopya/core/constants/app_sizes.dart';
 import 'package:photopya/features/client/authentication/widgets/auth_widgets.dart';
@@ -72,20 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 32.h.clamp(32, 40)),
-                // Logo
-                Center(
-                  child: Image.asset(
-                    Theme.of(context).brightness == Brightness.dark
-                        ? 'assets/images/app_name_dark.png'
-                        : 'assets/images/app_name_light.png',
-                    height: 40.h,
-                    fit: BoxFit.contain,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
-                  ),
-                ),
-                SizedBox(height: 40.h),
+
                 // Title
                 Text(
                   context.l10n.createAccount,

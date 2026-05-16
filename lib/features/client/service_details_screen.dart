@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:photopya/features/client/book_now_SelectPackage_screen.dart';
 import 'package:photopya/features/client/book_now_confirmation_screen.dart';
 import 'package:photopya/features/client/provider_profile_screen.dart';
@@ -186,25 +187,42 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 onTap: () => Navigator.pop(context),
                 child: Container(padding: EdgeInsets.all(8.w), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, shape: BoxShape.circle), child: Icon(Icons.arrow_back, size: 20.sp, color: Theme.of(context).colorScheme.onSurface)),
               ),
-              Row(
-                children: [
-                  Consumer<FavoritesController>(
-                    builder: (context, controller, child) {
-                      bool isFavorite = controller.isPostFavorite(widget.service['_id'] ?? widget.service['id']);
-                      return GestureDetector(
+                  Row(
+                    children: [
+                      GestureDetector(
                         onTap: () {
-                          if (!AuthController.isLoggedIn) {
-                            GuestDialogHelper.showGuestDialog(context);
-                            return;
-                          }
-                          controller.toggleFavorite(serviceId: widget.service['_id'] ?? widget.service['id'], optimisticData: widget.service);
+                          final String title = widget.service['title'] ?? 'Service';
+                          final String provider = widget.service['subtitle'] ?? 'Professional';
+                          Share.share('Check out this service: $title by $provider on Photopya!');
                         },
-                        child: Container(padding: EdgeInsets.all(8.w), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, shape: BoxShape.circle), child: Icon(isFavorite ? Icons.bookmark : Icons.bookmark_border, size: 20.sp, color: Theme.of(context).colorScheme.onSurface)),
-                      );
-                    },
+                        child: Container(
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, shape: BoxShape.circle),
+                          child: Icon(Icons.share_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface),
+                        ),
+                      ),
+                      SizedBox(width: 10.w),
+                      Consumer<FavoritesController>(
+                        builder: (context, controller, child) {
+                          bool isFavorite = controller.isPostFavorite(widget.service['_id'] ?? widget.service['id']);
+                          return GestureDetector(
+                            onTap: () {
+                              if (!AuthController.isLoggedIn) {
+                                GuestDialogHelper.showGuestDialog(context);
+                                return;
+                              }
+                              controller.toggleFavorite(serviceId: widget.service['_id'] ?? widget.service['id'], optimisticData: widget.service);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(8.w),
+                              decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, shape: BoxShape.circle),
+                              child: Icon(isFavorite ? Icons.bookmark : Icons.bookmark_border, size: 20.sp, color: Theme.of(context).colorScheme.onSurface),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
             ],
           ),
         ),

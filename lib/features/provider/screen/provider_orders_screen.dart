@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photopya/core/constants/app_typography.dart';
 import 'package:photopya/features/provider/screen/provider_notification_screen.dart';
 import 'package:photopya/features/provider/screen/booking_details_screen.dart';
@@ -76,16 +77,7 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Image.asset(
-                        Theme.of(context).brightness == Brightness.dark
-                            ? 'assets/images/app_name_dark.png'
-                            : 'assets/images/app_name_light.png',
-                        height: 24.h,
-                        fit: BoxFit.contain,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
-                      ),
+                      child: const SizedBox.shrink(),
                     ),
                   ),
                   SizedBox(width: 10.w),

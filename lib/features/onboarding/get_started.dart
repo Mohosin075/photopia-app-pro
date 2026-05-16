@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photopya/core/constants/app_sizes.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:photopya/features/client/BottomNavigation.dart';
@@ -24,18 +25,7 @@ class GetStartedScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo
-                Image.asset(
-                  Theme.of(context).brightness == Brightness.dark
-                      ? 'assets/images/app_name_dark.png'
-                      : 'assets/images/app_name_light.png',
-                  height: 50.h,
-                  fit: BoxFit.contain,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                ),
-                SizedBox(height: 50.h), // Button
+
                 // Subtitle
                 Text(
                   'Connect with the world\'s best\nphotography & video professionals',

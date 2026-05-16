@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photopya/controller/client/notification_controller.dart';
 import 'package:photopya/controller/location_controller.dart';
 import 'package:photopya/features/client/notification_screen.dart';
@@ -19,16 +20,6 @@ class HomeHeader extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                Theme.of(context).brightness == Brightness.dark
-                    ? 'assets/images/app_name_dark.png'
-                    : 'assets/images/app_name_light.png',
-                height: 24.h,
-                fit: BoxFit.contain,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
-              ),
               Consumer<LocationController>(
                 builder: (context, controller, _) {
                   final String location = controller.currentAddress;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dart:ui';
 import 'package:photopya/core/constants/app_typography.dart';
 import 'package:photopya/features/client/widgets/service_card.dart';
@@ -111,6 +112,17 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.share_outlined,
+              color: Theme.of(context).colorScheme.onSurface,
+              size: 24.sp,
+            ),
+            onPressed: () {
+              final String name = widget.provider['name']?.toString() ?? 'Professional';
+              Share.share('Check out $name\'s profile on Photopya!');
+            },
+          ),
           Consumer<FavoritesController>(
             builder: (context, controller, child) {
               bool isFavorite = controller.isProviderFavorite(

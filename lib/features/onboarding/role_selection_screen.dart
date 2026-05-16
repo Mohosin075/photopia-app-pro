@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photopya/features/onboarding/onboarding_screen.dart';
 import 'package:photopya/core/localization/app_localizations.dart';
 
@@ -33,18 +34,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo
-              Image.asset(
-                Theme.of(context).brightness == Brightness.dark
-                    ? 'assets/images/app_name_dark.png'
-                    : 'assets/images/app_name_light.png',
-                height: 35.h,
-                fit: BoxFit.contain,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
-              ),
-              SizedBox(height: 40.h),
+
               Text(
                 context.l10n.howToUsePhotopia,
                 textAlign: TextAlign.center,
