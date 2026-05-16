@@ -119,7 +119,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
               size: 24.sp,
             ),
             onPressed: () {
-              final String name = widget.provider['name']?.toString() ?? 'Professional';
+              final String _rawName = widget.provider['name']?.toString() ?? 'Professional';
+              final String name = _rawName.trim().split(' ').first;
               Share.share('Check out $name\'s profile on Photopya!');
             },
           ),
@@ -150,38 +151,63 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
           SizedBox(width: 10.w),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await context.read<ProviderDetailsController>().getProviderDetails(
+            widget.provider['_id'] ?? widget.provider['id'] ?? '',
+          );
+        },
+        child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          child: Column(
           children: [
             Stack(
               clipBehavior: Clip.none,
               children: [
                 Consumer<ProviderDetailsController>(
                   builder: (context, controller, child) {
+                    if (controller.isLoading) {
+                      return ShimmerSkeleton(
+                        height: 220.h,
+                        width: double.infinity,
+                      );
+                    }
+                    
                     final String? cover =
                         controller.profProfileDetails?.coverPhoto;
+                        
                     return GestureDetector(
                       onTap: () {
+                        if (cover == null || cover.isEmpty) return;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => FullScreenImageViewer(
-                              imageUrl: (cover != null && cover.isNotEmpty)
-                                  ? cover
-                                  : 'assets/images/img5.png',
+                              imageUrl: cover,
                               tag: 'banner_hero_dest',
                             ),
                           ),
                         );
                       },
-                      child: CustomNetworkImage(
-                        imageUrl: (cover != null && cover.isNotEmpty)
-                            ? cover
-                            : 'assets/images/img5.png',
-                        height: 220.h,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+                      child: cover != null && cover.isNotEmpty
+                          ? CustomNetworkImage(
+                              imageUrl: cover,
+                              height: 220.h,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(
+                              height: 220.h,
+                              width: double.infinity,
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                              child: Center(
+                                child: Icon(
+                                  Icons.image_outlined,
+                                  size: 40.sp,
+                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                ),
+                              ),
+                            ),
                     );
                   },
                 ),
@@ -222,6 +248,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
               ],
             ),
             SizedBox(height: 100.h),
+            // ── Portfolio & Reviews Tabs ──
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Column(
@@ -236,6 +263,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -485,10 +513,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
         final services = serviceController.services;
         final prof = detailsController.profProfileDetails;
         final providerDetails = detailsController.providerDetails;
-        final name =
+        final _rawPortfolioName =
             providerDetails?.fullName ??
             widget.provider['name']?.toString() ??
             'Provider Name';
+        final name = _rawPortfolioName.trim().split(' ').first;
 
         final portfolioImages =
             prof?.portfolio
@@ -654,62 +683,68 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
       builder: (context, controller, child) {
         if (controller.isLoading) return const ReviewListSkeleton();
         if (controller.reviews.isEmpty)
-          return const Center(child: Text('No reviews yet'));
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 30),
+              child: Text('No reviews yet'),
+            ),
+          );
         return Column(
-          children: controller.reviews
-              .map(
-                (r) => Padding(
-                  padding: EdgeInsets.only(bottom: 20.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20.r,
-                            backgroundImage: r.user?.profile != null
-                                ? NetworkImage(r.user!.profile!)
-                                : const AssetImage('assets/images/img7.jpg'),
-                          ),
-                          SizedBox(width: 12.w),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                r.user?.name ?? 'User',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Row(
-                                children: List.generate(
-                                  5,
-                                  (i) => Icon(
-                                    Icons.star,
-                                    color: i < (r.rating ?? 0)
-                                        ? Colors.orange
-                                        : Colors.grey[300],
-                                    size: 14.sp,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        r.comment ?? '',
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
+          children: controller.reviews.map((r) {
+            final stars = r.rating?.toInt() ?? 0;
+            return Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 18.r,
+                    backgroundImage: r.user?.profile != null
+                        ? NetworkImage(r.user!.profile!) as ImageProvider
+                        : const AssetImage('assets/images/img7.jpg'),
                   ),
-                ),
-              )
-              .toList(),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              r.user?.name?.split(' ').first ?? 'User',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.sp,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Row(
+                              children: List.generate(5, (i) => Icon(
+                                Icons.star,
+                                color: i < stars ? Colors.orange : Colors.grey[300],
+                                size: 11.sp,
+                              )),
+                            ),
+                          ],
+                        ),
+                        if (r.comment != null && r.comment!.isNotEmpty)
+                          Text(
+                            r.comment!,
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         );
       },
     );

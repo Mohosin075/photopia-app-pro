@@ -1494,6 +1494,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 price: service.price,
                 currency: service.currency,
                 providerId: service.providerId?.sId,
+                isPremium: service.providerId?.isSubscribed ?? false,
               );
             },
           ),

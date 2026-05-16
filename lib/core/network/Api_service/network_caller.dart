@@ -6,6 +6,9 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:photopya/controller/auth_controller.dart';
 import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/core/services/local_storage_service.dart';
+import 'package:photopya/core/services/connectivity_service.dart';
+import 'package:photopya/core/services/offline_sync_service.dart';
 
 class NetworkResponse {
   final bool isSuccess;
@@ -13,6 +16,7 @@ class NetworkResponse {
   final int statusCode;
   final Map<String, dynamic>? body;
   final List<int>? bodyBytes;
+  final bool isOffline;
 
   NetworkResponse({
     required this.isSuccess,
@@ -20,6 +24,7 @@ class NetworkResponse {
     this.body,
     this.bodyBytes,
     this.errorMessage,
+    this.isOffline = false,
   });
 }
 
@@ -209,6 +214,32 @@ class NetworkCaller {
         addBearer: addBearer,
       );
 
+      // --- OFFLINE CHECK ---
+      if (!ConnectivityService().isOnline) {
+        debugPrint('📡 OFFLINE: Fetching from cache for $url');
+        final cachedData = LocalStorageService.getCache(url);
+        if (cachedData != null) {
+          final decodedData = jsonDecode(cachedData);
+          Map<String, dynamic>? finalBody;
+          if (decodedData is Map) {
+            finalBody = decodedData.map((key, value) => MapEntry(key.toString(), value));
+          }
+          return NetworkResponse(
+            isSuccess: true,
+            statusCode: 200,
+            body: finalBody,
+            isOffline: true,
+          );
+        } else {
+          return NetworkResponse(
+            isSuccess: false,
+            statusCode: 503,
+            errorMessage: "No internet connection and no cached data available.",
+            isOffline: true,
+          );
+        }
+      }
+
       _logRequest('GET', url, {}, headers);
 
       final Response response = await _client
@@ -223,7 +254,11 @@ class NetworkCaller {
           final retryResponse = await _client
               .get(uri, headers: retryHeaders)
               .timeout(const Duration(seconds: 60));
-          return _handleResponse(retryResponse, url, 'GET');
+          final retryNetworkResponse = _handleResponse(retryResponse, url, 'GET');
+          if (retryNetworkResponse.isSuccess && retryNetworkResponse.body != null) {
+            await LocalStorageService.saveCache(url, retryResponse.body);
+          }
+          return retryNetworkResponse;
         } else {
           await AuthController.forceLogout();
           return NetworkResponse(
@@ -239,10 +274,19 @@ class NetworkCaller {
           final retryResponse = await _client
               .get(uri, headers: retryHeaders)
               .timeout(const Duration(seconds: 60));
-          return _handleResponse(retryResponse, url, 'GET');
+          final retryNetworkResponse = _handleResponse(retryResponse, url, 'GET');
+          if (retryNetworkResponse.isSuccess && retryNetworkResponse.body != null) {
+            await LocalStorageService.saveCache(url, retryResponse.body);
+          }
+          return retryNetworkResponse;
         }
       }
-      return _handleResponse(response, url, 'GET');
+      
+      final networkResponse = _handleResponse(response, url, 'GET');
+      if (networkResponse.isSuccess && networkResponse.body != null) {
+        await LocalStorageService.saveCache(url, response.body);
+      }
+      return networkResponse;
     } catch (e) {
       debugPrint('GET request error: $e');
       return NetworkResponse(

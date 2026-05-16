@@ -103,8 +103,8 @@ Availability system missing/buggy [INCOMPLETE]
 
 🧑‍💼 Professional Profile Fixes
 Only first name show হবে [COMPLETE] - First name extracted via .split(' ').first in ProviderProfileScreen.
-“About” button remove → section add below stats [INCOMPLETE]
-Reviews → one line fix [INCOMPLETE]
+“About” tab remove → User wants to keep the 3 tabs (Portfolio, Reviews, About) [COMPLETE]
+Reviews → one line fix [COMPLETE] - Reviews compacted into a single-line layout.
 Email/phone hide করতে হবে (security) [COMPLETE] - Removed email and phone from the About section in ProviderProfileScreen.
 Share button add করতে হবে [COMPLETE] - Share button added next to bookmark icon on ServiceDetailsScreen and ProviderProfileScreen.
 “View profile” & “Message” button remove (duplicate) [COMPLETE] - Removed from Service Details screen.

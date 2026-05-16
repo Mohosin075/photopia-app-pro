@@ -10,6 +10,7 @@ import 'package:photopya/features/client/chat_screen.dart';
 import 'package:photopya/data/models/conversation_model.dart';
 import 'package:photopya/data/models/chat_message_model.dart';
 import 'package:photopya/core/widgets/subscription_badge.dart';
+import 'package:photopya/features/client/widgets/auth_profile_image.dart';
 
 class ProviderCard extends StatelessWidget {
   final Map<String, dynamic> provider;
@@ -37,19 +38,10 @@ class ProviderCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              provider['profile'] != null || provider['avatar'] != null
-                  ? CustomNetworkImage(
-                      imageUrl: provider['profile'] ?? provider['avatar'] ?? '',
-                      width: 60.r,
-                      height: 60.r,
-                      borderRadius: BorderRadius.circular(30).r,
-                    )
-                  : CircleAvatar(
-                      radius: 30.r,
-                      backgroundImage: const AssetImage(
-                        'assets/images/img6.png',
-                      ),
-                    ),
+              AuthProfileImage(
+                imageUrl: provider['profile'] ?? provider['avatar'] ?? '',
+                size: 60.r,
+              ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Column(

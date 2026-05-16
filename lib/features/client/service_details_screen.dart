@@ -18,6 +18,7 @@ import 'package:photopya/features/client/chat_screen.dart';
 import 'package:photopya/features/client/search_screen.dart';
 import 'package:photopya/core/localization/app_localizations.dart';
 import 'package:photopya/core/services/translation_service.dart';
+import 'package:photopya/features/client/widgets/auth_profile_image.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
@@ -60,59 +61,70 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               final List<String> equipment = serviceDetail?.equipment ?? [];
               final List<dynamic> gallery = serviceDetail?.gallery ?? [];
               final String coverMedia = serviceDetail?.coverMedia ?? widget.service['coverMedia'] ?? widget.service['imageUrl'] ?? '';
-              final String providerName = serviceDetail?.providerId?.name ?? widget.service['subtitle'] ?? context.l10n.professional;
-              final String providerAvatar = serviceDetail?.providerId?.profile ?? 'assets/images/img6.png';
+              final String _rawProviderName = serviceDetail?.providerId?.name ?? widget.service['subtitle'] ?? context.l10n.professional;
+              final String providerName = _rawProviderName.trim().split(' ').first;
+              final String providerAvatar = serviceDetail?.providerId?.profile ?? '';
               final double rating = serviceDetail?.rating ?? (widget.service['rating'] ?? 0.0).toDouble();
               final int reviews = serviceDetail?.reviews ?? widget.service['reviews'] ?? 0;
               final List<String> tags = serviceDetail?.category != null ? [serviceDetail!.category!.name!] : (widget.service['tags'] as List<String>? ?? []);
+              final bool isPremiumProvider = serviceDetail?.providerId?.isSubscribed ?? widget.service['isPremium'] == true;
 
               return Stack(
                 children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildTopMedia(coverMedia, gallery, isLoading),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 20.h),
-                              TranslatedText(title, style: TextStyle(fontSize: 20.sp.clamp(20, 22), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
-                              SizedBox(height: 20.h),
-                              Text(context.l10n.providerLabel, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
-                              SizedBox(height: 12.h),
-                              _buildProviderCard(providerName, providerAvatar, rating, reviews),
+                  RefreshIndicator(
+                    onRefresh: () async {
+                      final id = widget.service['id'] ?? widget.service['_id'];
+                      if (id != null) {
+                        await controller.getServiceById(id.toString());
+                      }
+                    },
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildTopMedia(coverMedia, gallery, isLoading),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 20.h),
+                                TranslatedText(title, style: TextStyle(fontSize: 20.sp.clamp(20, 22), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                                SizedBox(height: 20.h),
+                                Text(context.l10n.providerLabel, style: TextStyle(fontSize: 14.sp.clamp(14, 16), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                                SizedBox(height: 12.h),
+                               _buildProviderCard(providerName, providerAvatar, rating, reviews, isPremiumProvider),
 
-                              SizedBox(height: 20.h),
-                              _buildStatsRow(
-                                responseTime: serviceDetail?.responseTime ?? widget.service['responseTime']?.toString(),
-                                completedProjects: serviceDetail?.completedProjects ?? widget.service['completedProjects'],
-                              ),
-                              SizedBox(height: 25.h),
-                              _buildSectionTitle(context.l10n.aboutLabel),
-                              SizedBox(height: 8.h),
-                              TranslatedText(description, style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8), height: 1.5)),
-                              if (equipment.isNotEmpty) ...[
+                                SizedBox(height: 20.h),
+                                _buildStatsRow(
+                                  responseTime: serviceDetail?.responseTime ?? widget.service['responseTime']?.toString(),
+                                  completedProjects: serviceDetail?.completedProjects ?? widget.service['completedProjects'],
+                                ),
                                 SizedBox(height: 25.h),
-                                Row(children: [Icon(Icons.camera_alt_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface), SizedBox(width: 8.w), _buildSectionTitle(context.l10n.equipmentLabel)]),
-                                SizedBox(height: 12.h),
-                                _buildEquipmentTags(equipment),
-                              ],
-                              if (gallery.isNotEmpty) ...[
+                                _buildSectionTitle(context.l10n.aboutLabel),
+                                SizedBox(height: 8.h),
+                                TranslatedText(description, style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8), height: 1.5)),
+                                if (equipment.isNotEmpty) ...[
+                                  SizedBox(height: 25.h),
+                                  Row(children: [Icon(Icons.camera_alt_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface), SizedBox(width: 8.w), _buildSectionTitle(context.l10n.equipmentLabel)]),
+                                  SizedBox(height: 12.h),
+                                  _buildEquipmentTags(equipment),
+                                ],
+                                if (gallery.isNotEmpty) ...[
+                                  SizedBox(height: 25.h),
+                                  _buildSectionTitle(context.l10n.portfolioTitle),
+                                  SizedBox(height: 12.h),
+                                  _buildPortfolioGrid(gallery),
+                                ],
                                 SizedBox(height: 25.h),
-                                _buildSectionTitle(context.l10n.portfolioTitle),
-                                SizedBox(height: 12.h),
-                                _buildPortfolioGrid(gallery),
+                                _buildBottomTags(tags),
+                                SizedBox(height: 120.h),
                               ],
-                              SizedBox(height: 25.h),
-                              _buildBottomTags(tags),
-                              SizedBox(height: 120.h),
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   Positioned(
@@ -230,7 +242,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     );
   }
 
-  Widget _buildProviderCard(String name, String avatar, double rating, int reviews) {
+  Widget _buildProviderCard(String name, String avatar, double rating, int reviews, bool isPremium) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -249,7 +261,10 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       },
       child: Row(
         children: [
-          CircleAvatar(radius: 25.r, backgroundImage: avatar.startsWith('http') ? NetworkImage(avatar) as ImageProvider<Object> : AssetImage(avatar)),
+          AuthProfileImage(
+            imageUrl: avatar,
+            size: 50.r,
+          ),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
@@ -260,7 +275,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     Text(name, style: TextStyle(fontSize: 15.sp.clamp(15, 16), fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                     SizedBox(width: 8.w),
                     SubscriptionBadge(
-                      isSubscribed: widget.service['isPremium'] == true,
+                      isSubscribed: isPremium,
                       iconSize: 10.sp,
                       fontSize: 10.sp.clamp(10, 11),
                       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),

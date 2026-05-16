@@ -13,6 +13,9 @@ import 'package:photopya/controller/auth_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:photopya/core/notification/notification_service.dart';
+import 'package:photopya/core/services/local_storage_service.dart';
+import 'package:photopya/core/services/connectivity_service.dart';
+import 'package:photopya/core/services/offline_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +31,11 @@ void main() async {
   Stripe.publishableKey = "pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa";
   
   await GetStorage.init();
+  
+  // Initialize Offline and Network Services
+  await LocalStorageService.init();
+  ConnectivityService().init();
+  OfflineSyncService().init();
 
   await AuthController.initialize();
   runApp(DevicePreview(enabled: false, builder: (context) => const Photopia()));

@@ -467,8 +467,9 @@ class ProviderInfo {
   String? profile;
   bool? isOnline;
   String? lastActive;
+  bool isSubscribed;
 
-  ProviderInfo({this.sId, this.name, this.email, this.profile, this.isOnline, this.lastActive});
+  ProviderInfo({this.sId, this.name, this.email, this.profile, this.isOnline, this.lastActive, this.isSubscribed = false});
 
   static String? _formatUrl(dynamic url) {
     if (url == null) return null;
@@ -501,6 +502,10 @@ class ProviderInfo {
       profile: _formatUrl(json['profile']),
       isOnline: json['isOnline'],
       lastActive: json['lastActive'],
+      isSubscribed:
+          json['isSubscribed'] == true ||
+          json['isPremium'] == true ||
+          json['subscription'] != null,
     );
   }
 
@@ -512,6 +517,7 @@ class ProviderInfo {
     data['profile'] = profile;
     data['isOnline'] = isOnline;
     data['lastActive'] = lastActive;
+    data['isSubscribed'] = isSubscribed;
     return data;
   }
 }
