@@ -247,10 +247,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
         widget.provider['avatar'] ??
         widget.provider['profile'] ??
         '';
-    final name =
+    final _rawName =
         providerDetails?.fullName ??
         widget.provider['name']?.toString() ??
         'Provider Name';
+    final name = _rawName.trim().split(' ').first;
 
     final prof = controller.profProfileDetails;
     // For the tagline under the name, prefer Bio (short)
@@ -749,10 +750,6 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
 
         final location =
             user?.location ?? widget.provider['location']?.toString() ?? 'N/A';
-        final email =
-            user?.email ?? widget.provider['email']?.toString() ?? 'N/A';
-        final phone =
-            user?.phone ?? widget.provider['phone']?.toString() ?? 'N/A';
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -777,8 +774,6 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
               'Location',
               location,
             ),
-            _buildAboutDetailItem(Icons.email_outlined, 'Email', email),
-            _buildAboutDetailItem(Icons.phone_outlined, 'Phone', phone),
 
             // Professional Details Section
             if (prof?.experienceDetails != null ||
