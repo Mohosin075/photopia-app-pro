@@ -68,19 +68,18 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: const SizedBox.shrink(),
-                    ),
+                  Image.asset(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? 'assets/images/photopya_dark.png'
+                        : 'assets/images/photopya_light.png',
+                    height: 26.h,
+                    fit: BoxFit.contain,
                   ),
-                  SizedBox(width: 10.w),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
