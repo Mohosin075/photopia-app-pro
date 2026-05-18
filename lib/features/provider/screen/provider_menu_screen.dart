@@ -189,7 +189,7 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
 
                     // App Version
                     Text(
-                      'Photopia Pro v1.0.4',
+                      'Photopya Pro v1.0.4',
                       style: TextStyle(
                         fontSize: 12.sp.clamp(11, 13),
                         color: Theme.of(

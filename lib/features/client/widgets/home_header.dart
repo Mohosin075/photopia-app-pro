@@ -12,13 +12,22 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Logo
+          Image.asset(
+            isDark ? 'assets/images/photopya_dark.png' : 'assets/images/photopya_light.png',
+            height: 28.h,
+            fit: BoxFit.contain,
+          ),
+          SizedBox(height: 10.h),
+          // Location + Notification row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Consumer<LocationController>(
                 builder: (context, controller, _) {
@@ -62,40 +71,40 @@ class HomeHeader extends StatelessWidget {
                   );
                 },
               ),
-            ],
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationScreen(),
-                ),
-              );
-            },
-            child: Consumer<NotificationController>(
-              builder: (context, controller, child) {
-                final bool hasUnread = controller.unreadCount > 0;
-                return Stack(
-                  children: [
-                    Icon(Icons.notifications_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface),
-                    if (hasUnread)
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          width: 8.w,
-                          height: 8.w,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationScreen(),
+                    ),
+                  );
+                },
+                child: Consumer<NotificationController>(
+                  builder: (context, controller, child) {
+                    final bool hasUnread = controller.unreadCount > 0;
+                    return Stack(
+                      children: [
+                        Icon(Icons.notifications_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface),
+                        if (hasUnread)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              width: 8.w,
+                              height: 8.w,
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),

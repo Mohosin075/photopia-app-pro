@@ -77,6 +77,14 @@ class _LogInScreenState extends State<LogInScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 24.h.clamp(24, 30)),
+                Center(
+                  child: Image.asset(
+                    isDark ? 'assets/images/photopya_dark.png' : 'assets/images/photopya_light.png',
+                    height: 40.h,
+                    fit: BoxFit.contain,
+                  ),
+                ),
                 SizedBox(height: 32.h.clamp(32, 40)),
 
                 // Title

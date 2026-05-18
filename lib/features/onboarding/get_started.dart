@@ -25,6 +25,12 @@ class GetStartedScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Image.asset(
+                  'assets/images/photopya_light.png',
+                  height: 48.h,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 32.h),
 
                 // Subtitle
                 Text(
