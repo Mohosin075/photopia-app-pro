@@ -81,11 +81,28 @@ class _SelectPackageScreenState extends State<SelectPackageScreen> {
           'name': 'Standard Package',
           'price': widget.service?['price']?.toString() ?? '0',
           'currency': serviceCurrency,
-          'duration': widget.service?['duration'] ?? 'Flexible',
+          'duration': _formatDuration(widget.service?['duration']),
           'features': ['Standard Service'],
         },
       ];
     }
+  }
+
+  String _formatDuration(dynamic duration) {
+    if (duration == null) return 'Flexible';
+    if (duration is String) return duration;
+    if (duration is Map) {
+      final value = duration['value'];
+      final unit = duration['unit']?.toString() ?? 'hour';
+      if (value != null) {
+        if (unit == 'minute' || unit == 'minutes') {
+          return '$value min${value > 1 ? 's' : ''}';
+        } else {
+          return '$value hr${value > 1 ? 's' : ''}';
+        }
+      }
+    }
+    return duration.toString();
   }
 
   // Helper to get currency symbol for UI

@@ -1,5 +1,6 @@
 import 'package:photopya/core/network/urls.dart';
 import 'package:photopya/data/models/category_model.dart';
+import 'package:photopya/data/models/service_duration.dart';
 
 class ServiceListModel {
   int? statusCode;
@@ -98,7 +99,7 @@ class ServiceItem {
   String? subCategory;
   int? price;
   String? currency;
-  String? duration;
+  ServiceDuration? duration;
   LocationInfo? location;
   String? coverMedia;
   String? status;
@@ -225,7 +226,7 @@ class ServiceItem {
       subCategory: json['subCategory']?.toString(),
       price: (json['price'] as num?)?.toInt() ?? 0,
       currency: currencyValue ?? 'EUR',
-      duration: json['duration']?.toString() ?? 'Flexible',
+      duration: json['duration'] != null ? ServiceDuration.fromJson(json['duration']) : null,
       location: json['location'] is Map
           ? LocationInfo.fromJson(json['location'])
           : null,
@@ -290,7 +291,9 @@ class ServiceItem {
     data['subCategory'] = subCategory;
     data['price'] = price;
     data['currency'] = currency;
-    data['duration'] = duration;
+    if (duration != null) {
+      data['duration'] = duration!.toJson();
+    }
     if (location != null) {
       data['location'] = location!.toJson();
     }

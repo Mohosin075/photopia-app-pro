@@ -1,3 +1,5 @@
+import 'package:photopya/data/models/service_duration.dart';
+
 class MyListingModel {
   int? statusCode;
   bool? success;
@@ -87,7 +89,7 @@ class Listing {
   Category? category;
   int? price;
   String? currency;
-  String? duration;
+  ServiceDuration? duration;
   Location? location;
   String? coverMedia;
   String? status;
@@ -126,7 +128,7 @@ class Listing {
         : null;
     price = json['price'];
     currency = json['currency'];
-    duration = json['duration'];
+    duration = json['duration'] != null ? ServiceDuration.fromJson(json['duration']) : null;
     location = json['location'] != null
         ? new Location.fromJson(json['location'])
         : null;
@@ -160,7 +162,9 @@ class Listing {
     }
     data['price'] = this.price;
     data['currency'] = this.currency;
-    data['duration'] = this.duration;
+    if (this.duration != null) {
+      data['duration'] = this.duration!.toJson();
+    }
     if (this.location != null) {
       data['location'] = this.location!.toJson();
     }

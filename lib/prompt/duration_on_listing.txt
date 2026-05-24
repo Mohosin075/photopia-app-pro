@@ -1,0 +1,43 @@
+Flutter Integration Guide - Customizable Service Duration (Hours/Minutes)
+This document provides the Flutter Development Team with detailed instructions, Dart model updates, API payload examples, and integration steps to support the new customizable service duration feature.
+1. What Changed in the Backend?
+Previously, duration was a plain string (e.g., "2" or "2 hours"). It is now strictly a structured object containing a numeric value and a unit (either 'minute' or 'hour').
+New Service Duration Schema (JSON Representation)
+json{  "duration": {    "value": 45,    "unit": "minute"  }}
+2. Updating Dart Models in Flutter
+Update your Service Dart model to parse the new nested duration object.
+Updated Dart Model Code
+dartclass ServiceDuration {  final int value;  final String unit; // 'minute' or 'hour'  ServiceDuration({    required this.value,    required this.unit,  });  factory ServiceDuration.fromJson(Map<String, dynamic> json) {    return ServiceDuration(      value: json['value'] as int? ?? 1,      unit: json['unit'] as String? ?? 'hour',    );  }  Map<String, dynamic> toJson() {    return {      'value': value,      'unit': unit,    };  }  // Helper getter to resolve duration to total minutes (very useful for availability slots)  int get totalMinutes {    if (unit == 'minute') {      return value;    } else {      return value * 60;    }  }  // Helper getter to format the duration nicely in the UI  String get formattedDisplay {    if (unit == 'minute') {      return '$value min${value > 1 ? 's' : ''}';    } else {      return '$value hr${value > 1 ? 's' : ''}';    }  }}// In your main Service Model:class ServiceModel {  final String id;  final String title;  final ServiceDuration duration; // Updated field  final double price;  // ... other fields  ServiceModel({    required this.id,    required this.title,    required this.duration,    required this.price,  });  factory ServiceModel.fromJson(Map<String, dynamic> json) {    return ServiceModel(      id: json['_id'] as String,      title: json['title'] as String,      duration: ServiceDuration.fromJson(json['duration'] as Map<String, dynamic>),      price: (json['price'] as num).toDouble(),    );  }}
+3. API Integrations
+A. Creating & Updating a Service
+When the user submits the form to create or update a service, the request payload must contain the structured duration object.
+API Endpoint: POST /api/v1/services or PATCH /api/v1/services/:id
+json{  "title": "Professional Portrait Session",  "price": 120,  "duration": {    "value": 45,    "unit": "minute"  },  "category": "65b...",  "location": {    "type": "provider_studio",    "country": "Germany",    "city": "Berlin"  }}
+Zod Auto-Transforms (Backward Compatibility)
+To prevent network or input errors, the backend validation uses smart transformations. The API also accepts raw numbers or strings and converts them automatically:
+Input 2 $\rightarrow$ automatically converted to {"value": 2, "unit": "hour"}
+Input "30 min" $\rightarrow$ automatically converted to {"value": 30, "unit": "minute"}
+Best Practice: Always send the clean { value, unit } object for new builds.
+B. Fetching Available Time Slots
+The slots endpoint /api/v1/availability/slots/:providerId expects the duration query parameter in minutes (e.g. duration=45 or duration=120).
+Use the totalMinutes helper method from your ServiceDuration model to make this call clean:
+dartfinal int durationInMinutes = service.duration.totalMinutes;// API Request URL:// GET /api/v1/availability/slots/65b... ?date=2026-05-24&duration=45final response = await http.get(  Uri.parse('/api/v1/availability/slots/$providerId?date=$selectedDate&duration=$durationInMinutes'),);
+C. Booking Details (Displaying Booking Duration)
+In the booking model, the backend stores durationHours as a double (e.g. 0.75 for 45 minutes, 2.0 for 2 hours) to keep pricing logic simple and consistent.
+Displaying Booking Duration in UI
+To render this in a human-readable format on the bookings page, use this simple Dart utility:
+dartString formatBookingDuration(double durationHours) {  if (durationHours < 1.0) {    final int minutes = (durationHours * 60).round();    return '$minutes mins';  } else {    // If it has a fractional part (e.g. 1.5 hours)    if (durationHours % 1 != 0) {      final int hours = durationHours.floor();      final int minutes = ((durationHours - hours) * 60).round();      return '$hours hr${hours > 1 ? 's' : ''} $minutes mins';    }    final int hours = durationHours.round();    return '$hours hr${hours > 1 ? 's' : ''}';  }}// Example outputs:// formatBookingDuration(0.75) -> "45 mins"// formatBookingDuration(2.0)  -> "2 hrs"// formatBookingDuration(1.5)  -> "1 hr 30 mins"
+4. UI/UX Form Guidelines for Flutter Team
+When building or updating the Create/Edit Service Form in Flutter:
+Input Fields:
+Use a TextField with keyboardType: TextInputType.number to capture the duration value.
+Use a DropdownButton<String> containing 'minute' and 'hour' to select the duration unit.
+Form State Management:
+Form Submission Code:
+UI Localization / User-Friendly Labels:
+In the dropdown, show:
+'minute' $\rightarrow$ "Minutes"
+'hour' $\rightarrow$ "Hours"
+This integration ensures a seamless and stable user experience across the app! If you have any questions, feel free to reach out to the backend team.
+dartfinal Map<String, dynamic> requestPayload = {  "title": titleController.text,  "price": double.parse(priceController.text),  "duration": {    "value": selectedValue,    "unit": selectedUnit,  },  // ... other fields};
+dartint selectedValue = 45;String selectedUnit = 'minute'; // default

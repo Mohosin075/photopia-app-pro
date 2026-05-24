@@ -208,20 +208,38 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     }
   }
 
-  int get _packageDurationInMinutes {
-    final durationStr =
-        (widget.package?['duration'] ?? widget.service?['duration'] ?? '')
-            .toString()
-            .toLowerCase();
+  int _parseDurationToMinutes(dynamic duration) {
+    if (duration == null) return 60;
+    if (duration is Map) {
+      final value = (duration['value'] as num?)?.toInt() ?? 1;
+      final unit = duration['unit']?.toString().toLowerCase() ?? 'hour';
+      if (unit == 'minute' || unit == 'minutes') {
+        return value;
+      } else {
+        return value * 60;
+      }
+    }
+    final durationStr = duration.toString().toLowerCase();
     if (durationStr.contains('4 hour')) return 240;
     if (durationStr.contains('8 hour')) return 480;
     if (durationStr.contains('full day')) return 600;
+
+    // Check for min
+    if (durationStr.contains('min')) {
+      final int? minutes = int.tryParse(durationStr.split(' ')[0]);
+      if (minutes != null) return minutes;
+    }
 
     // Check if it's just a number of hours
     final int? hours = int.tryParse(durationStr.split(' ')[0]);
     if (hours != null) return hours * 60;
 
     return 60; // Default to 1 hour
+  }
+
+  int get _packageDurationInMinutes {
+    final dynamic dur = widget.package?['duration'] ?? widget.service?['duration'];
+    return _parseDurationToMinutes(dur);
   }
 
   void _buildTimeSlotsForDate(DateTime date) {
@@ -1008,16 +1026,13 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   String _calculateEndTime() {
     if (_selectedTime.isEmpty) return "";
     try {
-      int durationHours = 1;
+      int durationMinutes = 60;
       if (widget.service?['pricingType'] == 'DAILY' ||
           widget.service?['pricingModel']?['type'] == 'DAILY') {
-        durationHours = widget.service?['pricingModel']?['dailyHours'] ?? 8;
+        durationMinutes = (widget.service?['pricingModel']?['dailyHours'] ?? 8) * 60;
       } else {
-        final durationStr =
-            (widget.package?['duration'] ?? widget.service?['duration'] ?? "1")
-                .toString()
-                .toLowerCase();
-        durationHours = int.tryParse(durationStr.split(' ')[0]) ?? 1;
+        final dynamic dur = widget.package?['duration'] ?? widget.service?['duration'];
+        durationMinutes = _parseDurationToMinutes(dur);
       }
 
       final parts = _selectedTime.split(':');
@@ -1026,10 +1041,13 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
       final int startHour = int.tryParse(parts[0]) ?? 9;
       final int startMinute = int.tryParse(parts[1]) ?? 0;
 
-      int endHour = startHour + durationHours;
-      if (endHour >= 24) endHour = endHour % 24;
+      final totalStartMinutes = startHour * 60 + startMinute;
+      final totalEndMinutes = totalStartMinutes + durationMinutes;
 
-      return "${endHour.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}";
+      int endHour = (totalEndMinutes ~/ 60) % 24;
+      int endMinute = totalEndMinutes % 60;
+
+      return "${endHour.toString().padLeft(2, '0')}:${endMinute.toString().padLeft(2, '0')}";
     } catch (e) {
       debugPrint("Error calculating end time: $e");
       return "";

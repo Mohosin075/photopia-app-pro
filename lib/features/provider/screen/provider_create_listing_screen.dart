@@ -12,6 +12,7 @@ import 'package:photopya/controller/category_controller.dart';
 import 'package:photopya/controller/provider/service_controller.dart';
 import 'package:photopya/data/models/category_model.dart';
 import 'package:photopya/data/models/provider_service_model.dart';
+import 'package:photopya/data/models/service_duration.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/core/widgets/app_refresher.dart';
 
@@ -103,7 +104,17 @@ class _ProviderCreateListingScreenState
       _countryController.text = listing.location?.country ?? '';
       _selectedCountry = listing.location?.country;
       _selectedCity = listing.location?.city;
-      _durationController.text = listing.duration ?? '';
+      if (listing.duration != null) {
+        _durationController.text = listing.duration!.value?.toString() ?? '';
+        final rawUnit = listing.duration!.unit?.toLowerCase() ?? 'hour';
+        if (rawUnit == 'minute' || rawUnit == 'minutes') {
+          _durationUnitController.text = 'Minutes';
+        } else {
+          _durationUnitController.text = 'Hours';
+        }
+      } else {
+        _durationController.text = '';
+      }
 
       if (listing.tags != null && listing.tags!.isNotEmpty) {
         _selectedServiceTypes.addAll(listing.tags!);
@@ -474,7 +485,10 @@ class _ProviderCreateListingScreenState
                     : '0'),
           ) ?? 0,
       currency: "EUR",
-      duration: "${_durationController.text} ${_durationUnitController.text}",
+      duration: ServiceDuration(
+        value: int.tryParse(_durationController.text.trim()) ?? 1,
+        unit: _durationUnitController.text.trim().toLowerCase().startsWith('minute') ? 'minute' : 'hour',
+      ),
       serviceType: _normalizeServiceType(_selectedServiceType ?? "Photography"),
       location: Location(
         type: _selectedLocationType == 'Remote' ? 'REMOTE' : 'ONSITE',
@@ -1293,7 +1307,7 @@ class _ProviderCreateListingScreenState
           children: [
             Expanded(
               flex: 2,
-              child: _buildTextField(_durationController, 'Value'),
+              child: _buildTextField(_durationController, 'Value', keyboardType: TextInputType.number),
             ),
             SizedBox(width: 15.w),
             Expanded(
@@ -1336,7 +1350,7 @@ class _ProviderCreateListingScreenState
   }
 
   Widget _buildDurationUnitDropdown() {
-    final units = ['Minutes', 'Hours', 'Days', 'Weeks'];
+    final units = ['Minutes', 'Hours'];
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
@@ -1567,6 +1581,7 @@ class _ProviderCreateListingScreenState
     String hint, {
     int maxLines = 1,
     String? errorText,
+    TextInputType? keyboardType,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -1584,6 +1599,7 @@ class _ProviderCreateListingScreenState
           TextField(
             controller: controller,
             maxLines: maxLines,
+            keyboardType: keyboardType,
             onChanged: (value) =>
                 setState(() {}), // Trigger rebuild for button validation
             decoration: InputDecoration(

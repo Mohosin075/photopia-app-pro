@@ -7,6 +7,7 @@ import 'package:photopya/core/network/urls.dart';
 import 'package:photopya/core/widgets/custom_network_image.dart';
 import 'package:photopya/core/widgets/my_loader.dart';
 import 'package:photopya/features/provider/screen/provider_create_listing_screen.dart';
+import 'package:photopya/data/models/service_duration.dart';
 import 'package:provider/provider.dart';
 
 class ProviderListingDetailsScreen extends StatefulWidget {
@@ -225,7 +226,7 @@ class _ProviderListingDetailsScreenState
                     Icon(Icons.circle, size: 4.sp, color: Colors.grey[400]),
                     SizedBox(width: 8.w),
                     Text(
-                      listing.duration ?? 'per session',
+                      listing.duration?.formattedDisplay ?? 'per session',
                       style: TextStyle(
                         fontSize: AppTypography.bodyLarge,
                         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),

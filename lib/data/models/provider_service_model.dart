@@ -1,4 +1,5 @@
 import 'package:photopya/data/models/category_model.dart';
+import 'package:photopya/data/models/service_duration.dart';
 
 class ProviderServiceListModel {
   int? statusCode;
@@ -24,6 +25,14 @@ class ProviderServiceListModel {
       });
     }
   }
+
+  
+  Map <String,String> name ={
+    'en' : 'english',
+    'bn' : 'bangla',
+  };
+
+
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -87,7 +96,7 @@ class Data {
   double? depositPercentage;
   CancellationPolicy? cancellationPolicy;
   PricingModel? pricingModel;
-  String? duration;
+  ServiceDuration? duration;
   Location? location;
   List<dynamic>? gallery;
   String? coverMedia;
@@ -172,7 +181,7 @@ class Data {
     pricingModel = json['pricingModel'] != null && json['pricingModel'] is Map
         ? new PricingModel.fromJson(json['pricingModel'])
         : null;
-    duration = json['duration']?.toString();
+    duration = json['duration'] != null ? ServiceDuration.fromJson(json['duration']) : null;
     location = json['location'] != null && json['location'] is Map
         ? new Location.fromJson(json['location'])
         : null;
@@ -236,7 +245,9 @@ class Data {
     if (this.pricingModel != null) {
       data['pricingModel'] = this.pricingModel!.toJson();
     }
-    data['duration'] = this.duration;
+    if (this.duration != null) {
+      data['duration'] = this.duration!.toJson();
+    }
     if (this.location != null) {
       data['location'] = this.location!.toJson();
     }

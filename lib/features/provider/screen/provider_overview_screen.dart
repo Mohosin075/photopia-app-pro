@@ -267,7 +267,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 child: Icon(Icons.circle, size: 4.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
               ),
               Text(
-                '${listing.currency ?? '\$'} ${listing.price ?? 0} / ${((listing.duration != null && num.tryParse(listing.duration!) != null) ? '${listing.duration} hrs' : (listing.duration ?? 'hr'))}',
+                '${listing.currency ?? '\$'} ${listing.price ?? 0} / ${listing.duration?.formattedDisplay ?? 'session'}',
                 style: TextStyle(
                   fontSize: AppTypography.bodyMedium,
                   fontWeight: FontWeight.w600,
