@@ -1220,9 +1220,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: Consumer2<HomeController, CategoryController>(
                 builder: (context, homeController, categoryController, child) {
-                  final bool hasActiveFilter = (categoryController.selectedTheme != null && 
-                                             categoryController.selectedTheme != 'ALL') || 
-                                             categoryController.selectedCategoryId != null;
+                  final bool hasActiveFilter = true;
 
                   if (hasActiveFilter) {
                     return _buildFilteredResults();
