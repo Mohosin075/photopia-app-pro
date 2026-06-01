@@ -1220,7 +1220,9 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: Consumer2<HomeController, CategoryController>(
                 builder: (context, homeController, categoryController, child) {
-                  final bool hasActiveFilter = true;
+                  final bool hasActiveFilter = (categoryController.selectedTheme != null && 
+                                             categoryController.selectedTheme != 'ALL') || 
+                                             categoryController.selectedCategoryId != null;
 
                   if (hasActiveFilter) {
                     return _buildFilteredResults();
@@ -1289,27 +1291,33 @@ class _MyHomePageState extends State<MyHomePage> {
                           SizedBox(height: 10.h),
 
                           // 1. Original Projects (Moved to Top)
-                          if (data.originalProjects != null && data.originalProjects!.isNotEmpty)
-                            Column(
-                              children: [
-                                _buildHorizontalServiceSection(
-                                  title: context.l10n.originalProjects,
-                                  items: data.originalProjects!,
-                                  onSeeAll: () {
-                                    Navigator.push(
-                                      context,
-                                      AppTransitions.createPremiumRoute(
-                                        HomeSeeAllScreen(
-                                          title: context.l10n.originalProjects,
-                                          services: data.originalProjects!,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                SizedBox(height: 10.h),
-                              ],
-                            ),
+                          Consumer<ServiceListController>(
+                             builder: (context, serviceListController, child) {
+                               final services = serviceListController.services;
+                               final displayItems = services.isNotEmpty ? services : (data.originalProjects ?? []);
+                               if (displayItems.isEmpty) return const SizedBox.shrink();
+                               return Column(
+                                 children: [
+                                   _buildHorizontalServiceSection(
+                                     title: context.l10n.originalProjects,
+                                     items: displayItems,
+                                     onSeeAll: () {
+                                       Navigator.push(
+                                         context,
+                                         AppTransitions.createPremiumRoute(
+                                           HomeSeeAllScreen(
+                                             title: context.l10n.originalProjects,
+                                             services: displayItems,
+                                           ),
+                                         ),
+                                       );
+                                     },
+                                   ),
+                                   SizedBox(height: 10.h),
+                                 ],
+                               );
+                             },
+                           ),
 
                           // 2. Recently Viewed
                           if (data.recentlyViewed != null && data.recentlyViewed!.isNotEmpty)
@@ -1383,84 +1391,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                          // 9. All Services
-                          const Divider(color: Color(0xFFF0F0F0)),
-                          SizedBox(height: 20.h),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Text(
-                              'All Services',
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 15.h),
-                          Consumer<ServiceListController>(
-                            builder: (context, serviceListController, child) {
-                              if (serviceListController.isLoading) {
-                                return GridView.builder(
-                                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 16.w,
-                                    mainAxisSpacing: 20.h,
-                                    childAspectRatio: 0.62,
-                                  ),
-                                  itemCount: 4,
-                                  itemBuilder: (context, index) => const ServiceCardSkeleton(),
-                                );
-                              }
-
-                              final services = serviceListController.services;
-                              if (services.isEmpty) {
-                                return Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 30.h),
-                                    child: Text(
-                                      context.l10n.noData,
-                                      style: TextStyle(fontSize: 14.sp, color: Colors.grey),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              return GridView.builder(
-                                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 16.w,
-                                  mainAxisSpacing: 20.h,
-                                  childAspectRatio: 0.62,
-                                ),
-                                itemCount: services.length,
-                                itemBuilder: (context, index) {
-                                  final item = services[index];
-                                  return ServiceCard(
-                                    id: item.sId ?? '',
-                                    title: item.title ?? '',
-                                    subtitle: item.providerId?.name ?? 'Professional',
-                                    imageUrl: item.coverMedia ?? '',
-                                    rating: item.rating ?? 0.0,
-                                    reviews: item.reviews ?? 0,
-                                    price: item.price,
-                                    currency: item.currency,
-                                    providerId: item.providerId?.sId,
-                                    isPremium: item.providerId?.isSubscribed ?? false,
-                                    tags: item.tags ?? [],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-
-                          SizedBox(height: 100.h),
+                           SizedBox(height: 100.h),
                         ],
                       ),
                     ),
