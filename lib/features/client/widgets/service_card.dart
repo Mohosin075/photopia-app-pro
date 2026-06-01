@@ -215,32 +215,6 @@ class ServiceCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (tags.isNotEmpty) ...[
-                      SizedBox(height: 6.h),
-                      Wrap(
-                        spacing: 6.w,
-                        runSpacing: 4.h,
-                        children: tags.take(3).map((tag) => Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.06),
-                            borderRadius: BorderRadius.circular(6.r),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
-                            ),
-                          ),
-                          child: Text(
-                            '#$tag',
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                        )).toList(),
-                      ),
-                    ],
-                    SizedBox(height: 8.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

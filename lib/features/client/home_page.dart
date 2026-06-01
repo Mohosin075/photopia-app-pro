@@ -1291,33 +1291,27 @@ class _MyHomePageState extends State<MyHomePage> {
                           SizedBox(height: 10.h),
 
                           // 1. Original Projects (Moved to Top)
-                          Consumer<ServiceListController>(
-                             builder: (context, serviceListController, child) {
-                               final services = serviceListController.services;
-                               final displayItems = services.isNotEmpty ? services : (data.originalProjects ?? []);
-                               if (displayItems.isEmpty) return const SizedBox.shrink();
-                               return Column(
-                                 children: [
-                                   _buildHorizontalServiceSection(
-                                     title: context.l10n.originalProjects,
-                                     items: displayItems,
-                                     onSeeAll: () {
-                                       Navigator.push(
-                                         context,
-                                         AppTransitions.createPremiumRoute(
-                                           HomeSeeAllScreen(
-                                             title: context.l10n.originalProjects,
-                                             services: displayItems,
-                                           ),
-                                         ),
-                                       );
-                                     },
-                                   ),
-                                   SizedBox(height: 10.h),
-                                 ],
-                               );
-                             },
-                           ),
+                          if (data.originalProjects != null && data.originalProjects!.isNotEmpty)
+                            Column(
+                              children: [
+                                _buildHorizontalServiceSection(
+                                  title: context.l10n.originalProjects,
+                                  items: data.originalProjects!,
+                                  onSeeAll: () {
+                                    Navigator.push(
+                                      context,
+                                      AppTransitions.createPremiumRoute(
+                                        HomeSeeAllScreen(
+                                          title: context.l10n.originalProjects,
+                                          services: data.originalProjects!,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 10.h),
+                              ],
+                            ),
 
                           // 2. Recently Viewed
                           if (data.recentlyViewed != null && data.recentlyViewed!.isNotEmpty)
@@ -1391,7 +1385,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
 
-                           SizedBox(height: 100.h),
+                          SizedBox(height: 100.h),
                         ],
                       ),
                     ),
@@ -1501,7 +1495,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 currency: service.currency,
                 providerId: service.providerId?.sId,
                 isPremium: service.providerId?.isSubscribed ?? false,
-                tags: service.tags ?? [],
               );
             },
           ),
