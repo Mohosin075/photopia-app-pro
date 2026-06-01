@@ -40,6 +40,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   String? _city;
   String? _country;
   String _specialRequests = '';
+  List<Map<String, dynamic>> _selectedAddons = [];
   double _distanceFromProvider = 0.0;
   String _paymentMethod = 'Credit/Debit Card';
   String? _createdBookingId; // Track if booking was already created
@@ -816,11 +817,174 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             maxLines: 5,
             onChanged: (val) => setState(() => _specialRequests = val),
           ),
+          _buildAddonsSection(),
           SizedBox(height: 40.h),
           _buildBottomButton(),
           SizedBox(height: 20.h),
         ],
       ),
+    );
+  }
+
+  Widget _buildAddonsSection() {
+    final List<dynamic>? addons = widget.service?['addons'] ?? widget.service?['addOns'];
+    if (addons == null || addons.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 30.h),
+        Text(
+          'Select Add-ons',
+          style: TextStyle(
+            fontSize: 16.sp.clamp(16, 18),
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          'Customize your booking with extra services',
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: theme.colorScheme.onSurface.withOpacity(0.5),
+          ),
+        ),
+        SizedBox(height: 16.h),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: addons.length,
+          separatorBuilder: (context, index) => SizedBox(height: 12.h),
+          itemBuilder: (context, index) {
+            final addon = addons[index];
+            final String name = addon['name']?.toString() ?? 'Extra service';
+            final double price = double.tryParse(addon['price']?.toString() ?? '0') ?? 0.0;
+            final String description = addon['description']?.toString() ?? '';
+            final currencySymbol = _getCurrencySymbol(
+              widget.package?['currency'] ?? widget.service?['currency'],
+            );
+
+            final isSelected = _selectedAddons.any((item) => item['name'] == name);
+
+            return InkWell(
+              onTap: () {
+                setState(() {
+                  if (isSelected) {
+                    _selectedAddons.removeWhere((item) => item['name'] == name);
+                  } else {
+                    _selectedAddons.add({'name': name, 'price': price});
+                  }
+                });
+              },
+              borderRadius: BorderRadius.circular(16).r,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? theme.colorScheme.primary.withOpacity(isDark ? 0.15 : 0.06)
+                      : theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16).r,
+                  border: Border.all(
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.dividerColor.withOpacity(0.12),
+                    width: isSelected ? 1.8.w : 1.w,
+                  ),
+                  boxShadow: [
+                    if (isSelected)
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withOpacity(0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 14.sp.clamp(14, 15),
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          if (description.isNotEmpty) ...[
+                            SizedBox(height: 4.h),
+                            Text(
+                              description,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: theme.colorScheme.onSurface.withOpacity(0.55),
+                                height: 1.3,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 15.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$currencySymbol${price.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 14.sp.clamp(14, 15),
+                            fontWeight: FontWeight.bold,
+                            color: isSelected
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 22.w,
+                          height: 22.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isSelected
+                                ? theme.colorScheme.primary
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.onSurface.withOpacity(0.3),
+                              width: 1.5.w,
+                            ),
+                          ),
+                          child: isSelected
+                              ? Icon(
+                                  Icons.check,
+                                  color: theme.colorScheme.onPrimary,
+                                  size: 14.sp,
+                                )
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -951,6 +1115,30 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                       widget.service?['subtitle'] ??
                       'Professional',
                 ),
+                if (_specialRequests.isNotEmpty) ...[
+                  Divider(color: theme.dividerColor.withOpacity(0.1)),
+                  _buildReviewItem('Special Requests', _specialRequests),
+                ],
+                if (_selectedAddons.isNotEmpty) ...[
+                  Divider(color: theme.dividerColor.withOpacity(0.1)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4.h),
+                    child: Text(
+                      'Selected Add-ons',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                  ),
+                  ..._selectedAddons.map((addon) => _buildReviewItem(
+                        addon['name']?.toString() ?? '',
+                        '+ $currencySymbol${(double.tryParse(addon['price']?.toString() ?? '0') ?? 0.0).toStringAsFixed(2)}',
+                        isBold: false,
+                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                      )),
+                ],
                 Divider(color: theme.dividerColor.withOpacity(0.1)),
                 _buildReviewIconItem(Icons.calendar_today_outlined, dateStr),
                 if (_selectedTime.isNotEmpty)
@@ -962,10 +1150,6 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   Icons.location_on_outlined,
                   _location.isEmpty ? 'Not specified' : _location,
                 ),
-                if (_specialRequests.isNotEmpty) ...[
-                  Divider(color: theme.dividerColor.withOpacity(0.1)),
-                  _buildReviewItem('Special Requests', _specialRequests),
-                ],
                 Divider(color: theme.dividerColor.withOpacity(0.1)),
                 _buildReviewItem(
                   'Final Service Total',
@@ -1062,6 +1246,17 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     return double.tryParse(priceStr) ?? 0;
   }
 
+  double get _addonsTotalPrice {
+    return _selectedAddons.fold(0.0, (sum, addon) {
+      final price = double.tryParse(addon['price']?.toString() ?? '0') ?? 0.0;
+      return sum + price;
+    });
+  }
+
+  double get _finalTotalPrice {
+    return _packagePrice + _addonsTotalPrice;
+  }
+
   bool get _hasDeposit => false; // Deposit disabled
 
   double get _depositPercentage {
@@ -1075,15 +1270,15 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   }
 
   double get _depositAmount {
-    return _packagePrice * _depositPercentage;
+    return _finalTotalPrice * _depositPercentage;
   }
 
   double get _balanceAmount {
-    return _packagePrice - _depositAmount;
+    return _finalTotalPrice - _depositAmount;
   }
 
   double get _totalBookingAmount {
-    // Only charge the deposit amount at the time of booking
+    if (!_hasDeposit) return _finalTotalPrice;
     return _depositAmount;
   }
 
@@ -1189,7 +1384,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
               children: [
                 _buildPriceRow(
                   'Service Total',
-                  '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
+                  '$currencySymbol${_finalTotalPrice.toStringAsFixed(2)}',
                 ),
                 if (_hasDeposit) ...[
                   _buildPriceRow(
@@ -1649,7 +1844,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
 
     // Generate a key to check if booking details changed
     final String currentBookingKey =
-        "$serviceId-$formattedDate-$bookingStartTime-$_location";
+        "$serviceId-$formattedDate-$bookingStartTime-$_location-${_selectedAddons.map((e) => e['name']).join(',')}";
     if (_lastBookingKey != currentBookingKey) {
       _createdBookingId = null; // Data changed
       _lastBookingKey = currentBookingKey;
@@ -1685,6 +1880,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         distanceFromProviderKm: _distanceFromProvider,
         paymentMethodId: _selectedPaymentMethod?.id, 
         paymentIntentId: "pending_mobile_flow", 
+        customOptions: _selectedAddons,
       );
       
       if (bookingData != null) {

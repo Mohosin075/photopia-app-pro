@@ -78,6 +78,7 @@ class _ProviderCreateListingScreenState
   final List<File> _selectedImages = [];
   final List<String> _existingNetworkImages = []; // Track original images URL
   final ImagePicker _picker = ImagePicker();
+  int _previewImageIndex = 0;
 
   final Map<String, String> _localFieldErrors = {};
 
@@ -187,6 +188,20 @@ class _ProviderCreateListingScreenState
         }
       }
       _serviceRadius = listing.location?.serviceRadiusKm?.toDouble() ?? 25.0;
+
+      if (listing.autoAcceptBookings != null) {
+        _isAutoAcceptEnabled = listing.autoAcceptBookings!.enabled;
+        _minBudgetController.text = listing.autoAcceptBookings!.minimumBudget != null
+            ? listing.autoAcceptBookings!.minimumBudget!.toInt().toString()
+            : '';
+        _selectedAutoAcceptRadius = listing.autoAcceptBookings!.withinRadiusKm?.toInt() ?? 30;
+        _verifiedClientsOnly = listing.autoAcceptBookings!.verifiedClientsOnly ?? false;
+      } else if (listing.autoAccept != null) {
+        _isAutoAcceptEnabled = listing.autoAccept!.isEnabled ?? false;
+        _minBudgetController.text = listing.autoAccept!.minBudget?.toString() ?? '';
+        _selectedAutoAcceptRadius = listing.autoAccept!.withinRadius ?? 30;
+        _verifiedClientsOnly = listing.autoAccept!.verifiedClientsOnly ?? false;
+      }
     }
   }
 
@@ -338,6 +353,7 @@ class _ProviderCreateListingScreenState
       _localFieldErrors.remove('title');
       _localFieldErrors.remove('description');
       _localFieldErrors.remove('duration');
+      _localFieldErrors.remove('photos');
     });
 
     bool isValid = true;
@@ -357,6 +373,11 @@ class _ProviderCreateListingScreenState
         errors['duration'] = "Duration is required";
         isValid = false;
       }
+    }
+
+    if (_selectedImages.isEmpty && _existingNetworkImages.isEmpty) {
+      errors['photos'] = "At least one portfolio photo is required";
+      isValid = false;
     }
 
     setState(() {
@@ -664,6 +685,12 @@ class _ProviderCreateListingScreenState
         price: int.tryParse(a.price.text) ?? 0,
       )).toList(),
       
+      autoAcceptBookings: AutoAcceptBookings(
+        enabled: _isAutoAcceptEnabled,
+        minimumBudget: double.tryParse(_minBudgetController.text),
+        withinRadiusKm: _selectedAutoAcceptRadius.toDouble(),
+        verifiedClientsOnly: _verifiedClientsOnly,
+      ),
       autoAccept: AutoAccept(
         isEnabled: _isAutoAcceptEnabled,
         minBudget: int.tryParse(_minBudgetController.text) ?? 0,
@@ -1043,24 +1070,50 @@ class _ProviderCreateListingScreenState
         _buildListingPreviewCard(),
         
         SizedBox(height: 30.h),
-        _buildSummarySection('Service Details', [
-          'Type: $_selectedServiceType',
-          'Theme: ${context.read<CategoryController>().selectedTheme}',
-          'Category: ${_selectedCategory?.name}',
-          'City: ${_locationController.text}',
+        _buildSummarySection('About Service & Details', [
+          'Description: ${_descriptionController.text.isEmpty ? "No description provided" : _descriptionController.text}',
+          'Primary Service Type: $_selectedServiceType',
+          'Theme: ${context.read<CategoryController>().selectedTheme ?? "N/A"}',
+          'Category: ${_selectedCategory?.name ?? "N/A"}',
+          'Sub-Category: ${_selectedSubCategory?.name ?? "N/A"}',
+          if (_selectedServiceTypes.isNotEmpty) 'Service Tags: ${_selectedServiceTypes.join(", ")}',
+          'Estimated Duration: ${_durationController.text.trim()} ${_durationUnitController.text}',
+        ], onEdit: () => _jumpToStep(1)),
+        
+        SizedBox(height: 20.h),
+        _buildSummarySection('Location & Range', [
+          'Location Type: $_selectedLocationType',
+          'City/Country: ${_locationController.text}, ${_countryController.text}',
+          'Service Radius: ${_serviceRadius.toInt()} km',
+          'Outside Range Booking: ${_acceptOutsideRadius ? "Accepted" : "Not Accepted"}',
         ], onEdit: () => _jumpToStep(0)),
         
         SizedBox(height: 20.h),
-        _buildSummarySection('Pricing', [
-          'Model: $_selectedPricingModel',
-          if (_selectedPricingModel == 'By Hour') 'Rate: €${_weekdayHourlyRateController.text}/hr',
-          if (_selectedPricingModel == 'By Day') 'Rate: €${_dailyRateController.text}/day',
-          'Deposit: ${_depositPercentage ?? 0}%',
+        _buildSummarySection('Pricing & Packages', [
+          'Pricing Model: $_selectedPricingModel',
+          if (_selectedPricingModel == 'By Hour') 'Weekday Hourly Rate: €${_weekdayHourlyRateController.text}/hr',
+          if (_selectedPricingModel == 'By Hour') 'Weekend Hourly Rate: €${_weekendHourlyRateController.text}/hr',
+          if (_selectedPricingModel == 'By Day') 'Daily Rate: €${_dailyRateController.text}/day (${_dailyHoursController.text} hours included)',
+          if (_selectedPricingModel == 'By Service') 'Packages Added: ${_packageControllers.length}',
+          if (_selectedPricingModel == 'By Service') ..._packageControllers.map((p) => '- ${p.name.text}: €${p.price.text} (${p.duration.text})'),
+          'Required Booking Deposit: ${_depositPercentage ?? 0}%',
+          'Auto Accept Bookings: ${_isAutoAcceptEnabled ? "Enabled (within $_selectedAutoAcceptRadius km)" : "Disabled"}',
         ], onEdit: () => _jumpToStep(2)),
-        
-        SizedBox(height: 30.h),
-        _buildPhotoUploadArea(errorText: _localFieldErrors['photos']),
-        _buildSelectedImagesGrid(),
+
+        if (_addonControllers.isNotEmpty) ...[
+          SizedBox(height: 20.h),
+          _buildSummarySection('Add-ons Available', _addonControllers.map((a) => '${a.name.text}: €${a.price.text}').toList(), onEdit: () => _jumpToStep(1)),
+        ],
+
+        if (_equipment.isNotEmpty) ...[
+          SizedBox(height: 20.h),
+          _buildSummarySection('Equipment Utilized', _equipment, onEdit: () => _jumpToStep(1)),
+        ],
+
+        if (_availabilityControllers.isNotEmpty) ...[
+          SizedBox(height: 20.h),
+          _buildSummarySection('Availability Slots', _availabilityControllers.map((slot) => '${slot.startDate.text} to ${slot.endDate.text} (${slot.startTime.text} - ${slot.endTime.text})').toList(), onEdit: () => _jumpToStep(2)),
+        ],
         
         SizedBox(height: 50.h),
         _buildNavigationButtons(inProgress),
@@ -1080,8 +1133,8 @@ class _ProviderCreateListingScreenState
   }
 
   Widget _buildListingPreviewCard() {
+    final allImages = [..._existingNetworkImages, ..._selectedImages];
     return Container(
-      padding: EdgeInsets.all(15.w),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20.r),
@@ -1096,12 +1149,55 @@ class _ProviderCreateListingScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (_selectedImages.isNotEmpty || _existingNetworkImages.isNotEmpty)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15.r),
-              child: _selectedImages.isNotEmpty 
-                ? Image.file(_selectedImages.first, height: 180.h, width: double.infinity, fit: BoxFit.cover)
-                : Image.network(_existingNetworkImages.first, height: 180.h, width: double.infinity, fit: BoxFit.cover),
+          if (allImages.isNotEmpty)
+            SizedBox(
+              height: 200.h,
+              child: StatefulBuilder(
+                builder: (context, setCardState) {
+                  return Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+                        child: PageView.builder(
+                          itemCount: allImages.length,
+                          onPageChanged: (idx) {
+                            setCardState(() {
+                              _previewImageIndex = idx;
+                            });
+                          },
+                          itemBuilder: (context, idx) {
+                            final img = allImages[idx];
+                            return img is File
+                                ? Image.file(img, width: double.infinity, fit: BoxFit.cover)
+                                : Image.network(
+                                    img.toString().startsWith('http')
+                                        ? img.toString()
+                                        : "${Urls.baseUrl}$img",
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  );
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10.h,
+                        right: 15.w,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Text(
+                            '${_previewImageIndex + 1}/${allImages.length}',
+                            style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              ),
             )
           else
             Container(
@@ -1109,48 +1205,114 @@ class _ProviderCreateListingScreenState
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(15.r),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
               ),
               child: Icon(Icons.image_outlined, size: 50.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
             ),
-          SizedBox(height: 15.h),
-          Text(
-            _titleController.text.isEmpty ? 'Listing Title' : _titleController.text,
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 5.h),
-          Row(
-            children: [
-              Icon(Icons.location_on_outlined, size: 14.sp, color: Theme.of(context).colorScheme.primary),
-              SizedBox(width: 4.w),
-              Text(
-                _locationController.text.isEmpty ? 'City, Country' : '${_locationController.text}, ${_countryController.text}',
-                style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-              ),
-            ],
-          ),
-          SizedBox(height: 10.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20.r),
+          Padding(
+            padding: EdgeInsets.all(15.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Text(
+                        _selectedServiceType ?? 'Service Type',
+                        style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    if (_selectedCategory != null) ...[
+                      SizedBox(width: 6.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                        child: Text(
+                          _selectedCategory!.name,
+                          style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                child: Text(
-                  _selectedServiceType ?? 'Service',
-                  style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+                SizedBox(height: 10.h),
+                Text(
+                  _titleController.text.isEmpty ? 'Listing Title' : _titleController.text,
+                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                 ),
-              ),
-              Text(
-                _selectedPricingModel == 'By Service' 
-                  ? 'Packages' 
-                  : '€${_selectedPricingModel == 'By Hour' ? _weekdayHourlyRateController.text : _dailyRateController.text}',
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
-              ),
-            ],
+                if (_selectedServiceTypes.isNotEmpty) ...[
+                  SizedBox(height: 8.h),
+                  Wrap(
+                    spacing: 6.w,
+                    runSpacing: 6.h,
+                    children: _selectedServiceTypes.map((tag) {
+                      final formattedTag = tag.startsWith('#') ? tag : '#$tag';
+                      return Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Text(
+                          formattedTag,
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+                SizedBox(height: 8.h),
+                Row(
+                  children: [
+                    Icon(Icons.location_on_outlined, size: 14.sp, color: Theme.of(context).colorScheme.primary),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Text(
+                        _locationController.text.isEmpty ? 'City, Country' : '${_locationController.text}, ${_countryController.text} (${_selectedLocationType})',
+                        style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.star, color: Colors.amber, size: 16.sp),
+                        SizedBox(width: 4.w),
+                        Text('0.0 (0)', style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Text(
+                      _selectedPricingModel == 'By Hour'
+                          ? '€${_weekdayHourlyRateController.text}/hr'
+                          : _selectedPricingModel == 'By Day'
+                          ? '€${_dailyRateController.text}/day'
+                          : (_packageControllers.isNotEmpty ? 'From €${_packageControllers.first.price.text}' : 'Free'),
+                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -1168,21 +1330,45 @@ class _ProviderCreateListingScreenState
             TextButton(onPressed: onEdit, child: Text('Edit', style: TextStyle(fontSize: 12.sp))),
           ],
         ),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(15.w),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: details.map((d) => Padding(
-              padding: EdgeInsets.only(bottom: 4.h),
-              child: Text(d, style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
+        if (title == 'Equipment Utilized')
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 8.h,
+            children: details.map((d) => Container(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
+                borderRadius: BorderRadius.circular(10.r),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
+                ),
+              ),
+              child: Text(
+                d,
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             )).toList(),
+          )
+        else
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(15.w),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: details.map((d) => Padding(
+                padding: EdgeInsets.only(bottom: 4.h),
+                child: Text(d, style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
+              )).toList(),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -1521,6 +1707,10 @@ class _ProviderCreateListingScreenState
         SizedBox(height: 30.h),
         _buildAutoAcceptSection(),
         
+        SizedBox(height: 30.h),
+        _buildPhotoUploadArea(errorText: _localFieldErrors['photos']),
+        _buildSelectedImagesGrid(),
+        
         SizedBox(height: 40.h),
         _buildNavigationButtons(inProgress),
       ],
@@ -1686,6 +1876,10 @@ class _ProviderCreateListingScreenState
 
   Widget _buildAutoAcceptRadiusDropdown() {
     final radii = [30, 50, 100];
+    if (!radii.contains(_selectedAutoAcceptRadius)) {
+      radii.add(_selectedAutoAcceptRadius);
+      radii.sort();
+    }
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(

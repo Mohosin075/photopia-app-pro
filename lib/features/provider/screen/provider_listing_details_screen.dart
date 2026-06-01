@@ -294,17 +294,270 @@ class _ProviderListingDetailsScreenState
                 ),
                 SizedBox(height: 10.h),
                 Text(
-                  listing.location?.address ??
-                      '${listing.location?.city ?? ''}, ${listing.location?.country ?? ''}',
+                  (listing.location?.address != null && listing.location!.address!.isNotEmpty)
+                      ? '${listing.location!.address!}\n${listing.location?.city ?? ''}, ${listing.location?.country ?? ''}'
+                      : (listing.location?.city != null || listing.location?.country != null)
+                          ? '${listing.location?.city ?? ''}, ${listing.location?.country ?? ''}'
+                          : 'No location address provided.',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    height: 1.4,
                   ),
                 ),
+                if (listing.location?.type != null) ...[
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Type: ${listing.location!.type == 'REMOTE' ? 'Remote' : 'On-site'}',
+                    style: TextStyle(
+                      fontSize: AppTypography.bodyMedium,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+                if (listing.location?.serviceRadiusKm != null && listing.location!.serviceRadiusKm! > 0) ...[
+                  SizedBox(height: 4.h),
+                  Text(
+                    'Service Radius: ${listing.location!.serviceRadiusKm} km',
+                    style: TextStyle(
+                      fontSize: AppTypography.bodyMedium,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ],
                 SizedBox(height: 20.h),
 
                 const Divider(color: Color(0xFFF0F0F0)),
                 SizedBox(height: 20.h),
+
+                // Equipment Utilized
+                if (listing.equipment != null && listing.equipment!.isNotEmpty) ...[
+                  Text(
+                    'Equipment Utilized',
+                    style: TextStyle(
+                      fontSize: AppTypography.h2,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Wrap(
+                    spacing: 8.w,
+                    runSpacing: 8.h,
+                    children: listing.equipment!.map((d) => Container(
+                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
+                        ),
+                      ),
+                      child: Text(
+                        d.toString(),
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )).toList(),
+                  ),
+                  SizedBox(height: 20.h),
+                  const Divider(color: Color(0xFFF0F0F0)),
+                  SizedBox(height: 20.h),
+                ],
+
+                // Add-ons
+                if (listing.addons != null && listing.addons!.isNotEmpty) ...[
+                  Text(
+                    'Add-ons Available',
+                    style: TextStyle(
+                      fontSize: AppTypography.h2,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Column(
+                    children: listing.addons!.map((addon) => Container(
+                      margin: EdgeInsets.only(bottom: 8.h),
+                      padding: EdgeInsets.all(12.w),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            addon.name ?? '',
+                            style: TextStyle(
+                              fontSize: AppTypography.bodyLarge,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          Text(
+                            '€${addon.price ?? 0}',
+                            style: TextStyle(
+                              fontSize: AppTypography.bodyLarge,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )).toList(),
+                  ),
+                  SizedBox(height: 20.h),
+                  const Divider(color: Color(0xFFF0F0F0)),
+                  SizedBox(height: 20.h),
+                ],
+
+                // Auto-Accept & Booking Rules
+                if (listing.autoAcceptBookings != null || listing.autoAccept != null) ...[
+                  Text(
+                    'Auto-Accept & Booking Rules',
+                    style: TextStyle(
+                      fontSize: AppTypography.h2,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              (listing.autoAcceptBookings?.enabled == true || listing.autoAccept?.isEnabled == true)
+                                  ? Icons.check_circle
+                                  : Icons.cancel,
+                              color: (listing.autoAcceptBookings?.enabled == true || listing.autoAccept?.isEnabled == true)
+                                  ? Colors.green
+                                  : Colors.grey,
+                              size: 20.sp,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              (listing.autoAcceptBookings?.enabled == true || listing.autoAccept?.isEnabled == true)
+                                  ? 'Auto-Accept Bookings: Enabled'
+                                  : 'Auto-Accept Bookings: Disabled',
+                              style: TextStyle(
+                                fontSize: AppTypography.bodyLarge,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (listing.autoAcceptBookings?.enabled == true || listing.autoAccept?.isEnabled == true) ...[
+                          SizedBox(height: 12.h),
+                          Text(
+                            '• Minimum Budget: €${listing.autoAcceptBookings?.minimumBudget?.toInt() ?? listing.autoAccept?.minBudget ?? 0}',
+                            style: TextStyle(
+                              fontSize: AppTypography.bodyMedium,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(height: 6.h),
+                          Text(
+                            '• Within Radius: ${listing.autoAcceptBookings?.withinRadiusKm?.toInt() ?? listing.autoAccept?.withinRadius ?? 30} km',
+                            style: TextStyle(
+                              fontSize: AppTypography.bodyMedium,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(height: 6.h),
+                          Text(
+                            '• Verified Clients Only: ${((listing.autoAcceptBookings?.verifiedClientsOnly ?? listing.autoAccept?.verifiedClientsOnly) == true) ? "Yes" : "No"}',
+                            style: TextStyle(
+                              fontSize: AppTypography.bodyMedium,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  const Divider(color: Color(0xFFF0F0F0)),
+                  SizedBox(height: 20.h),
+                ],
+
+                // Availability Slots
+                if (listing.availabilitySlots != null && listing.availabilitySlots!.isNotEmpty) ...[
+                  Text(
+                    'Availability Slots',
+                    style: TextStyle(
+                      fontSize: AppTypography.h2,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Column(
+                    children: listing.availabilitySlots!.map((slot) => Container(
+                      margin: EdgeInsets.only(bottom: 8.h),
+                      padding: EdgeInsets.all(12.w),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_month_outlined, size: 18.sp, color: Theme.of(context).colorScheme.primary),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${slot.startDate ?? ''} - ${slot.endDate ?? ''}',
+                                  style: TextStyle(
+                                    fontSize: AppTypography.bodyMedium,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                                SizedBox(height: 2.h),
+                                Text(
+                                  '${slot.startTime ?? ''} to ${slot.endTime ?? ''}',
+                                  style: TextStyle(
+                                    fontSize: AppTypography.bodySmall,
+                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )).toList(),
+                  ),
+                  SizedBox(height: 20.h),
+                  const Divider(color: Color(0xFFF0F0F0)),
+                  SizedBox(height: 20.h),
+                ],
 
                 // Stats (Placeholders for now, as they are not in ProviderServiceModel)
                 Row(

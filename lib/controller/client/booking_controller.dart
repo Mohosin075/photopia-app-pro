@@ -69,6 +69,7 @@ class BookingController extends ChangeNotifier {
     String? notes,
     String? paymentMethodId,
     String? paymentIntentId, // Added this
+    List<Map<String, dynamic>>? customOptions,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -121,6 +122,7 @@ class BookingController extends ChangeNotifier {
         "eventType": eventType ?? "Photography Session",
         "specialRequests": specialRequests ?? "",
         "distanceFromProviderKm": distanceFromProviderKm,
+        if (customOptions != null) "customOptions": customOptions,
       };
 
       debugPrint('📦 [BookingController] Request Body: $body');
@@ -220,6 +222,7 @@ class BookingController extends ChangeNotifier {
     String? endTime,
     String? packageName,
     double distanceFromProviderKm = 0.0,
+    List<Map<String, dynamic>>? customOptions,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -238,6 +241,10 @@ class BookingController extends ChangeNotifier {
 
     if (packageName != null && packageName.isNotEmpty) {
       body["packageName"] = packageName;
+    }
+
+    if (customOptions != null) {
+      body["customOptions"] = customOptions;
     }
 
     try {

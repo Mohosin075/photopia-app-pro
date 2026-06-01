@@ -1,6 +1,7 @@
 import 'package:photopya/core/network/urls.dart';
 import 'package:photopya/data/models/category_model.dart';
 import 'package:photopya/data/models/service_duration.dart';
+import 'package:photopya/data/models/provider_service_model.dart';
 
 class ServiceListModel {
   int? statusCode;
@@ -121,6 +122,9 @@ class ServiceItem {
   List<PricingRule>? pricingRules;
   CancellationPolicy? cancellationPolicy;
 
+  List<Addon>? addons;
+  AutoAcceptBookings? autoAcceptBookings;
+
   // Travel & Fees
   double? travelFeePerKm;
   bool? allowOutsideRadius;
@@ -159,6 +163,8 @@ class ServiceItem {
     this.allowOutsideRadius,
     this.maxTravelFee,
     this.depositPercentage,
+    this.addons,
+    this.autoAcceptBookings,
   });
 
   /// Returns true if this service has at least one package defined
@@ -275,6 +281,16 @@ class ServiceItem {
       allowOutsideRadius: json['allowOutsideRadius'] ?? false,
       maxTravelFee: (json['maxTravelFee'] as num?)?.toDouble() ?? 0.0,
       depositPercentage: (json['depositPercentage'] as num?)?.toInt() ?? 50,
+      addons: json['addons'] != null
+          ? (json['addons'] as List).map((v) => Addon.fromJson(v)).toList()
+          : (json['addOns'] != null
+              ? (json['addOns'] as List).map((v) => Addon.fromJson(v)).toList()
+              : []),
+      autoAcceptBookings: json['autoAcceptBookings'] != null
+          ? AutoAcceptBookings.fromJson(json['autoAcceptBookings'])
+          : (json['autoAccept'] != null
+              ? AutoAcceptBookings.fromJson(json['autoAccept'])
+              : null),
     );
   }
 
@@ -325,6 +341,12 @@ class ServiceItem {
     data['allowOutsideRadius'] = allowOutsideRadius;
     data['maxTravelFee'] = maxTravelFee;
     data['depositPercentage'] = depositPercentage;
+    if (this.addons != null) {
+      data['addons'] = this.addons!.map((v) => v.toJson()).toList();
+    }
+    if (this.autoAcceptBookings != null) {
+      data['autoAcceptBookings'] = this.autoAcceptBookings!.toJson();
+    }
     return data;
   }
 }
@@ -558,5 +580,37 @@ class LocationInfo {
     data['address'] = address;
     data['serviceRadiusKm'] = serviceRadiusKm;
     return data;
+  }
+}
+
+class AutoAcceptBookings {
+  final bool enabled;
+  final double? minimumBudget;
+  final double? withinRadiusKm;
+  final bool? verifiedClientsOnly;
+
+  AutoAcceptBookings({
+    required this.enabled,
+    this.minimumBudget,
+    this.withinRadiusKm,
+    this.verifiedClientsOnly,
+  });
+
+  factory AutoAcceptBookings.fromJson(Map<String, dynamic> json) {
+    return AutoAcceptBookings(
+      enabled: json['enabled'] ?? json['isEnabled'] ?? false,
+      minimumBudget: (json['minimumBudget'] ?? json['minBudget'] as num?)?.toDouble(),
+      withinRadiusKm: (json['withinRadiusKm'] ?? json['withinRadius'] as num?)?.toDouble(),
+      verifiedClientsOnly: json['verifiedClientsOnly'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'enabled': enabled,
+      'minimumBudget': minimumBudget,
+      'withinRadiusKm': withinRadiusKm,
+      'verifiedClientsOnly': verifiedClientsOnly,
+    };
   }
 }

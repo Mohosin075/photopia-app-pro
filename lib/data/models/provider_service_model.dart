@@ -107,6 +107,7 @@ class Data {
   List<PricingRules>? pricingRules;
   List<Addon>? addons;
   AutoAccept? autoAccept;
+  AutoAcceptBookings? autoAcceptBookings;
   List<AvailabilitySlot>? availabilitySlots;
   String? createdAt;
   String? updatedAt;
@@ -142,6 +143,7 @@ class Data {
     this.pricingRules,
     this.addons,
     this.autoAccept,
+    this.autoAcceptBookings,
     this.availabilitySlots,
     this.createdAt,
     this.updatedAt,
@@ -206,6 +208,9 @@ class Data {
       });
     }
     autoAccept = json['autoAccept'] != null ? new AutoAccept.fromJson(json['autoAccept']) : null;
+    autoAcceptBookings = json['autoAcceptBookings'] != null
+        ? AutoAcceptBookings.fromJson(json['autoAcceptBookings'])
+        : (json['autoAccept'] != null ? AutoAcceptBookings.fromAutoAccept(AutoAccept.fromJson(json['autoAccept'])) : null);
     if (json['availabilitySlots'] != null) {
       availabilitySlots = <AvailabilitySlot>[];
       json['availabilitySlots'].forEach((v) {
@@ -267,6 +272,9 @@ class Data {
     }
     if (this.autoAccept != null) {
       data['autoAccept'] = this.autoAccept!.toJson();
+    }
+    if (this.autoAcceptBookings != null) {
+      data['autoAcceptBookings'] = this.autoAcceptBookings!.toJson();
     }
     if (this.availabilitySlots != null) {
       data['availabilitySlots'] = this.availabilitySlots!.map((v) => v.toJson()).toList();
@@ -587,5 +595,46 @@ class AvailabilitySlot {
     data['startTime'] = this.startTime;
     data['endTime'] = this.endTime;
     return data;
+  }
+}
+
+class AutoAcceptBookings {
+  final bool enabled;
+  final double? minimumBudget;
+  final double? withinRadiusKm;
+  final bool? verifiedClientsOnly;
+
+  AutoAcceptBookings({
+    required this.enabled,
+    this.minimumBudget,
+    this.withinRadiusKm,
+    this.verifiedClientsOnly,
+  });
+
+  factory AutoAcceptBookings.fromJson(Map<String, dynamic> json) {
+    return AutoAcceptBookings(
+      enabled: json['enabled'] ?? json['isEnabled'] ?? false,
+      minimumBudget: (json['minimumBudget'] ?? json['minBudget'] as num?)?.toDouble(),
+      withinRadiusKm: (json['withinRadiusKm'] ?? json['withinRadius'] as num?)?.toDouble(),
+      verifiedClientsOnly: json['verifiedClientsOnly'] ?? false,
+    );
+  }
+
+  factory AutoAcceptBookings.fromAutoAccept(AutoAccept old) {
+    return AutoAcceptBookings(
+      enabled: old.isEnabled ?? false,
+      minimumBudget: old.minBudget?.toDouble(),
+      withinRadiusKm: old.withinRadius?.toDouble(),
+      verifiedClientsOnly: old.verifiedClientsOnly ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'enabled': enabled,
+      'minimumBudget': minimumBudget,
+      'withinRadiusKm': withinRadiusKm,
+      'verifiedClientsOnly': verifiedClientsOnly,
+    };
   }
 }
