@@ -461,15 +461,20 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    _currentFilters['searchTerm'] != null && _currentFilters['searchTerm'].toString().startsWith('#') 
-                    ? '${context.l10n.searchResultsFor} ${_currentFilters['searchTerm']}' 
-                    : context.l10n.searchResults,
-                    style: TextStyle(
-                      fontSize: AppTypography.h2,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      _currentFilters['searchTerm'] != null && _currentFilters['searchTerm'].toString().startsWith('#') 
+                      ? '${context.l10n.searchResultsFor} ${_currentFilters['searchTerm']}' 
+                      : context.l10n.searchResults,
+                      style: TextStyle(
+                        fontSize: AppTypography.h2,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  SizedBox(width: 12.w),
                   GestureDetector(
                     onTap: _clearSearch,
                     child: Row(

@@ -82,7 +82,7 @@ class _ProviderCreateListingScreenState
   final Map<String, String> _localFieldErrors = {};
 
   final List<String> _locationTypes = ['On-site', 'Remote', 'Studio'];
-  double? _depositPercentage;
+  double? _depositPercentage = 0.0;
 
   String? _selectedCountry;
   String? _selectedCity;
@@ -289,7 +289,162 @@ class _ProviderCreateListingScreenState
     super.dispose();
   }
 
+  bool _validateStep0() {
+    setState(() {
+      _localFieldErrors.clear();
+    });
+
+    bool isValid = true;
+    final Map<String, String> errors = {};
+
+    if (context.read<CategoryController>().selectedTheme == null) {
+      errors['theme'] = "Theme is required";
+      isValid = false;
+    }
+    if (_selectedCategory == null) {
+      errors['category'] = "Category is required";
+      isValid = false;
+    }
+    final subCategories = context.read<CategoryController>().subCategories;
+    if (_selectedSubCategory == null && subCategories.isNotEmpty) {
+      errors['subCategory'] = "Sub-Category is required";
+      isValid = false;
+    }
+    if (_selectedServiceTypes.isEmpty) {
+      errors['serviceType'] = "At least one Service Type is required";
+      isValid = false;
+    }
+    if (_locationController.text.trim().isEmpty) {
+      errors['city'] = "City is required";
+      isValid = false;
+    }
+
+    setState(() {
+      _localFieldErrors.addAll(errors);
+    });
+
+    if (!isValid) {
+      CustomSnackBar.show(
+        context: context,
+        message: errors.values.first,
+        isError: true,
+      );
+    }
+    return isValid;
+  }
+
+  bool _validateStep1() {
+    setState(() {
+      _localFieldErrors.remove('title');
+      _localFieldErrors.remove('description');
+      _localFieldErrors.remove('duration');
+    });
+
+    bool isValid = true;
+    final Map<String, String> errors = {};
+
+    if (_titleController.text.trim().isEmpty) {
+      errors['title'] = "Title is required";
+      isValid = false;
+    }
+    if (_descriptionController.text.trim().length < 10) {
+      errors['description'] = "Description must be at least 10 characters";
+      isValid = false;
+    }
+
+    if (_selectedPricingModel == 'By Hour' || _selectedPricingModel == 'By Day') {
+      if (_durationController.text.trim().isEmpty) {
+        errors['duration'] = "Duration is required";
+        isValid = false;
+      }
+    }
+
+    setState(() {
+      _localFieldErrors.addAll(errors);
+    });
+
+    if (!isValid) {
+      CustomSnackBar.show(
+        context: context,
+        message: errors.values.first,
+        isError: true,
+      );
+    }
+    return isValid;
+  }
+
+  bool _validateStep2() {
+    setState(() {
+      _localFieldErrors.remove('weekdayHourlyRate');
+      _localFieldErrors.remove('weekendHourlyRate');
+      _localFieldErrors.remove('dailyRate');
+      _localFieldErrors.remove('dailyHours');
+      _localFieldErrors.remove('pricing');
+      _localFieldErrors.removeWhere((key, value) => key.startsWith('package_'));
+    });
+
+    bool isValid = true;
+    final Map<String, String> errors = {};
+
+    if (_selectedPricingModel == 'By Hour') {
+      if (_weekdayHourlyRateController.text.trim().isEmpty) {
+        errors['weekdayHourlyRate'] = "Weekday hourly rate is required";
+        isValid = false;
+      }
+      if (_weekendHourlyRateController.text.trim().isEmpty) {
+        errors['weekendHourlyRate'] = "Weekend hourly rate is required";
+        isValid = false;
+      }
+    } else if (_selectedPricingModel == 'By Day') {
+      if (_dailyRateController.text.trim().isEmpty) {
+        errors['dailyRate'] = "Daily rate is required";
+        isValid = false;
+      }
+      if (_dailyHoursController.text.trim().isEmpty) {
+        errors['dailyHours'] = "Daily hours is required";
+        isValid = false;
+      }
+    } else if (_selectedPricingModel == 'By Service') {
+      if (_packageControllers.isEmpty) {
+        errors['pricing'] = "At least one package is required";
+        isValid = false;
+      }
+      for (int i = 0; i < _packageControllers.length; i++) {
+        final pkg = _packageControllers[i];
+        if (pkg.name.text.trim().isEmpty ||
+            pkg.price.text.trim().isEmpty ||
+            pkg.duration.text.trim().isEmpty ||
+            pkg.description.text.trim().isEmpty) {
+          errors['package_$i'] =
+              "Package ${i + 1} requires name, price, duration, and description";
+          isValid = false;
+        }
+      }
+    }
+
+    setState(() {
+      _localFieldErrors.addAll(errors);
+    });
+
+    if (!isValid) {
+      CustomSnackBar.show(
+        context: context,
+        message: errors.values.first,
+        isError: true,
+      );
+    }
+    return isValid;
+  }
+
   void _nextStep() {
+    if (_currentStep == 0) {
+      if (!_validateStep0()) return;
+    } else if (_currentStep == 1) {
+      if (!_validateStep1()) return;
+    } else if (_currentStep == 2) {
+      if (!_validateStep2()) return;
+    }
+
     if (_currentStep < 3) {
       setState(() {
         _currentStep++;
@@ -779,6 +934,9 @@ class _ProviderCreateListingScreenState
           SizedBox(height: 15.h),
           _buildLabel('Sub-Category', isRequired: true),
           _buildSubCategoryDropdown(errorText: _localFieldErrors['subCategory']),
+          SizedBox(height: 15.h),
+          _buildLabel('Service Types (Select multiple)', isRequired: true),
+          _buildServiceTypeDropdown(errorText: _localFieldErrors['serviceType']),
         ],
 
         SizedBox(height: 30.h),
@@ -1172,9 +1330,15 @@ class _ProviderCreateListingScreenState
     bool isSelected = _selectedServiceType == title;
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedServiceType = title;
-        });
+        if (_selectedServiceType != title) {
+          setState(() {
+            _selectedServiceType = title;
+            _selectedCategory = null;
+            _selectedSubCategory = null;
+            _selectedServiceTypes.clear();
+          });
+          context.read<CategoryController>().selectTheme(null);
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -1295,11 +1459,20 @@ class _ProviderCreateListingScreenState
         SizedBox(height: 30.h),
         
         _buildLabel('Listing Title', isRequired: true),
-        _buildTextField(_titleController, 'e.g. Wedding Photography Premium Package'),
+        _buildTextField(
+          _titleController,
+          'e.g. Wedding Photography Premium Package',
+          errorText: _localFieldErrors['title'],
+        ),
         
         SizedBox(height: 20.h),
         _buildLabel('Description', isRequired: true),
-        _buildTextField(_descriptionController, 'Describe your service in detail...', maxLines: 5),
+        _buildTextField(
+          _descriptionController,
+          'Describe your service in detail...',
+          maxLines: 5,
+          errorText: _localFieldErrors['description'],
+        ),
         
         SizedBox(height: 20.h),
         _buildLabel('Estimated Duration'),
@@ -1307,7 +1480,12 @@ class _ProviderCreateListingScreenState
           children: [
             Expanded(
               flex: 2,
-              child: _buildTextField(_durationController, 'Value', keyboardType: TextInputType.number),
+              child: _buildTextField(
+                _durationController,
+                'Value',
+                keyboardType: TextInputType.number,
+                errorText: _localFieldErrors['duration'],
+              ),
             ),
             SizedBox(width: 15.w),
             Expanded(
