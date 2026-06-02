@@ -114,6 +114,31 @@ class UserProfileController extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateNotificationSettings(Map<String, dynamic> settingsPayload) async {
+    _isUpdateInProgress = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    final response = await NetworkCaller.patchRequest(
+      url: Urls.updateUserProfile,
+      body: {
+        'settings': settingsPayload,
+      },
+      requireAuth: true,
+    );
+
+    _isUpdateInProgress = false;
+
+    if (response.isSuccess) {
+      await getUserProfile();
+      return true;
+    } else {
+      _errorMessage = response.errorMessage;
+      notifyListeners();
+      return false;
+    }
+  }
+
   void reset() {
     _inProgress = false;
     _errorMessage = null;
