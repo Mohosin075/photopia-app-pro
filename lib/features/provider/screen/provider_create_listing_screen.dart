@@ -70,6 +70,8 @@ class _ProviderCreateListingScreenState
   bool _isLoadingCategories = true;
 
   final List<String> _selectedServiceTypes = [];
+  final List<String> _customTags = [];
+  final TextEditingController _tagInputController = TextEditingController();
   String _selectedPricingModel = 'By Hour';
   String _selectedLocationType = 'On-site'; // Mandatory location type
   double _serviceRadius = 25.0;
@@ -118,7 +120,7 @@ class _ProviderCreateListingScreenState
       }
 
       if (listing.tags != null && listing.tags!.isNotEmpty) {
-        _selectedServiceTypes.addAll(listing.tags!);
+        _customTags.addAll(listing.tags!);
       }
 
       if (listing.equipment != null) {
@@ -644,7 +646,7 @@ class _ProviderCreateListingScreenState
       description: _descriptionController.text.trim(),
       category: _selectedCategory,
       subCategory: _selectedSubCategory?.id,
-      tags: _selectedServiceTypes,
+      tags: [..._selectedServiceTypes, ..._customTags],
       equipment: _equipment,
       pricingType: _selectedPricingModel == 'By Hour'
           ? "HOURLY"
@@ -1076,7 +1078,7 @@ class _ProviderCreateListingScreenState
           'Theme: ${context.read<CategoryController>().selectedTheme ?? "N/A"}',
           'Category: ${_selectedCategory?.name ?? "N/A"}',
           'Sub-Category: ${_selectedSubCategory?.name ?? "N/A"}',
-          if (_selectedServiceTypes.isNotEmpty) 'Service Tags: ${_selectedServiceTypes.join(", ")}',
+          if ([..._selectedServiceTypes, ..._customTags].isNotEmpty) 'Tags: ${[..._selectedServiceTypes, ..._customTags].join(", ")}',
           'Estimated Duration: ${_durationController.text.trim()} ${_durationUnitController.text}',
         ], onEdit: () => _jumpToStep(1)),
         
@@ -1248,12 +1250,12 @@ class _ProviderCreateListingScreenState
                   _titleController.text.isEmpty ? 'Listing Title' : _titleController.text,
                   style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                 ),
-                if (_selectedServiceTypes.isNotEmpty) ...[
+                if ([..._selectedServiceTypes, ..._customTags].isNotEmpty) ...[
                   SizedBox(height: 8.h),
                   Wrap(
                     spacing: 6.w,
                     runSpacing: 6.h,
-                    children: _selectedServiceTypes.map((tag) {
+                    children: [..._selectedServiceTypes, ..._customTags].map((tag) {
                       final formattedTag = tag.startsWith('#') ? tag : '#$tag';
                       return Container(
                         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
@@ -1687,11 +1689,7 @@ class _ProviderCreateListingScreenState
           children: [
             _buildSectionTitle('Add-ons'),
             TextButton.icon(
-              onPressed: () {
-                setState(() {
-                  _addonControllers.add(AddonControllers());
-                });
-              },
+              onPressed: _showAddAddonSheet,
               icon: Icon(Icons.add, size: 18.sp),
               label: Text('Add'),
             ),
@@ -1703,6 +1701,20 @@ class _ProviderCreateListingScreenState
         _buildSectionTitle('Equipment'),
         _buildEquipmentInput(),
         _buildEquipmentList(),
+
+        SizedBox(height: 30.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionTitle('Tags'),
+            TextButton.icon(
+              onPressed: _showAddTagSheet,
+              icon: Icon(Icons.add, size: 18.sp),
+              label: const Text('Add'),
+            ),
+          ],
+        ),
+        _buildTagsList(),
         
         SizedBox(height: 30.h),
         _buildAutoAcceptSection(),
@@ -1751,6 +1763,322 @@ class _ProviderCreateListingScreenState
     );
   }
 
+  void _showAddTagSheet() {
+    _tagInputController.clear();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            left: 20.w,
+            right: 20.w,
+            top: 24.h,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40.w,
+                  height: 4.h,
+                  margin: EdgeInsets.only(bottom: 20.h),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+              ),
+              Text(
+                'Add Tag',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              SizedBox(height: 6.h),
+              Text(
+                'Add searchable tags for your service (e.g. drone_photography, wedding)',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(10.r),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                  ),
+                ),
+                child: TextField(
+                  controller: _tagInputController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. drone_photography',
+                    prefixText: '# ',
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                      fontSize: 13.sp,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                  onSubmitted: (val) {
+                    final tag = val.trim().replaceAll(' ', '_').toLowerCase();
+                    if (tag.isNotEmpty && !_customTags.contains(tag)) {
+                      setState(() => _customTags.add(tag));
+                      Navigator.pop(ctx);
+                    }
+                  },
+                ),
+              ),
+              SizedBox(height: 24.h),
+              SizedBox(
+                width: double.infinity,
+                height: 50.h,
+                child: ElevatedButton(
+                  onPressed: () {
+                    final tag = _tagInputController.text.trim().replaceAll(' ', '_').toLowerCase();
+                    if (tag.isNotEmpty && !_customTags.contains(tag)) {
+                      setState(() => _customTags.add(tag));
+                      Navigator.pop(ctx);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    'Add Tag',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTagsList() {
+    if (_customTags.isEmpty) {
+      return Text(
+        'No tags added yet',
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+        ),
+      );
+    }
+    return Wrap(
+      spacing: 8.w,
+      runSpacing: 8.h,
+      children: _customTags.asMap().entries.map((entry) {
+        final tag = entry.value;
+        final label = tag.startsWith('#') ? tag : '#$tag';
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(width: 6.w),
+              GestureDetector(
+                onTap: () => setState(() => _customTags.removeAt(entry.key)),
+                child: Icon(
+                  Icons.close,
+                  size: 14.sp,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  void _showAddAddonSheet() {
+
+    final nameController = TextEditingController();
+    final priceController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            left: 20.w,
+            right: 20.w,
+            top: 24.h,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40.w,
+                  height: 4.h,
+                  margin: EdgeInsets.only(bottom: 20.h),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+              ),
+              Text(
+                'Add Add-on',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              Text(
+                'Name',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(10.r),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                  ),
+                ),
+                child: TextField(
+                  controller: nameController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. Extra hour of coverage',
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                      fontSize: 13.sp,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'Price (€)',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(10.r),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                  ),
+                ),
+                child: TextField(
+                  controller: priceController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: '0',
+                    prefixText: '€ ',
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                      fontSize: 13.sp,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                ),
+              ),
+              SizedBox(height: 24.h),
+              SizedBox(
+                width: double.infinity,
+                height: 50.h,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (nameController.text.trim().isNotEmpty &&
+                        priceController.text.trim().isNotEmpty) {
+                      final addon = AddonControllers();
+                      addon.name.text = nameController.text.trim();
+                      addon.price.text = priceController.text.trim();
+                      setState(() => _addonControllers.add(addon));
+                      Navigator.pop(ctx);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    'Add',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildAddonList() {
     if (_addonControllers.isEmpty) {
       return Text(
@@ -1765,29 +2093,53 @@ class _ProviderCreateListingScreenState
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: _addonControllers.length,
-      separatorBuilder: (_, __) => SizedBox(height: 10.h),
+      separatorBuilder: (_, __) => SizedBox(height: 8.h),
       itemBuilder: (context, index) {
-        return Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: _buildTextField(_addonControllers[index].name, 'Service name'),
+        final addon = _addonControllers[index];
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             ),
-            SizedBox(width: 10.w),
-            Expanded(
-              flex: 2,
-              child: _buildTextField(_addonControllers[index].price, 'Price (€)'),
-            ),
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  _addonControllers[index].dispose();
-                  _addonControllers.removeAt(index);
-                });
-              },
-              icon: Icon(Icons.delete_outline, color: Colors.red[400]),
-            ),
-          ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  addon.name.text,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              Text(
+                '€${addon.price.text}',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    addon.dispose();
+                    _addonControllers.removeAt(index);
+                  });
+                },
+                child: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red[400],
+                  size: 20.sp,
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -2202,7 +2554,7 @@ class _ProviderCreateListingScreenState
                 ),
               ),
               hint: Text(
-                'Select Sub-Category (Optional)',
+                'Select Sub-Category',
                 style: TextStyle(
                   color: Theme.of(
                     context,
@@ -2799,10 +3151,25 @@ class _ProviderCreateListingScreenState
     String? errorText,
     bool isRequired = false,
   }) {
-    final options = ['1', '2', '3', '4'];
+    final durationOptions = [
+      {'value': '30min', 'label': '30 Minutes'},
+      {'value': '45min', 'label': '45 Minutes'},
+      {'value': '1',    'label': '1 Hour'},
+      {'value': '1.5',  'label': '1.5 Hours'},
+      {'value': '2',    'label': '2 Hours'},
+      {'value': '2.5',  'label': '2.5 Hours'},
+      {'value': '3',    'label': '3 Hours'},
+      {'value': '4',    'label': '4 Hours'},
+      {'value': '5',    'label': '5 Hours'},
+      {'value': '6',    'label': '6 Hours'},
+      {'value': '8',    'label': '8 Hours'},
+      {'value': '10',   'label': '10 Hours'},
+      {'value': '12',   'label': '12 Hours'},
+    ];
+    final optionValues = durationOptions.map((e) => e['value']!).toList();
 
     // Safety check: ensure selected value is in options or handles null
-    String? effectiveValue = options.contains(controller.text)
+    String? effectiveValue = optionValues.contains(controller.text)
         ? controller.text
         : null;
 
@@ -2839,11 +3206,11 @@ class _ProviderCreateListingScreenState
               }
             });
           },
-          items: options.map<DropdownMenuItem<String>>((String value) {
+          items: durationOptions.map<DropdownMenuItem<String>>((opt) {
             return DropdownMenuItem<String>(
-              value: value,
+              value: opt['value'],
               child: Text(
-                '$value Hour${value == '1' ? '' : 's'}',
+                opt['label']!,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),

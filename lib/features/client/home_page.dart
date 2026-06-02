@@ -1409,7 +1409,7 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisCount: 2,
               crossAxisSpacing: 16.w,
               mainAxisSpacing: 20.h,
-              childAspectRatio: 0.62,
+              childAspectRatio: 0.46,
             ),
             itemCount: 6,
             itemBuilder: (context, index) => const ServiceCardSkeleton(),
@@ -1479,7 +1479,7 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisCount: 2,
               crossAxisSpacing: 16.w,
               mainAxisSpacing: 20.h,
-              childAspectRatio: 0.62,
+              childAspectRatio: 0.46,
             ),
             itemCount: services.length,
             itemBuilder: (context, index) {
@@ -1495,6 +1495,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 currency: service.currency,
                 providerId: service.providerId?.sId,
                 isPremium: service.providerId?.isSubscribed ?? false,
+                tags: service.tags ?? [],
               );
             },
           ),

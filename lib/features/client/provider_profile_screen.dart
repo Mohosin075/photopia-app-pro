@@ -548,7 +548,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                   crossAxisCount: 2,
                   mainAxisSpacing: 15,
                   crossAxisSpacing: 15,
-                  childAspectRatio: 0.55,
+                  childAspectRatio: 0.46,
                 ),
                 itemCount: services.length,
                 itemBuilder: (context, index) {
@@ -563,7 +563,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                     reviews: s.reviews ?? 0,
                     price: s.price,
                     currency: s.currency,
-                    tags: const [],
+                    tags: s.tags ?? [],
                     isPremium: prof?.isSubscribed ?? false,
                     providerId: _providerId,
                   );

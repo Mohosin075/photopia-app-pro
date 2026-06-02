@@ -55,7 +55,7 @@ class HomeSeeAllScreen extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16.w,
                 mainAxisSpacing: 20.h,
-                childAspectRatio: 0.6,
+                childAspectRatio: 0.46,
               ),
               itemCount: services.length,
               itemBuilder: (context, index) {
@@ -70,6 +70,8 @@ class HomeSeeAllScreen extends StatelessWidget {
                   price: service.price,
                   currency: service.currency,
                   providerId: service.providerId?.sId,
+                  tags: service.tags ?? [],
+                  isPremium: service.providerId?.isSubscribed ?? false,
                 );
               },
             ),

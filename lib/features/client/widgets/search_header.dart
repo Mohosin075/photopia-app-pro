@@ -9,7 +9,13 @@ import 'package:photopya/core/localization/app_localizations.dart';
 class SearchHeader extends StatefulWidget {
   final Function(Map<String, dynamic>)? onFilterApplied;
   final VoidCallback? onFocus;
-  const SearchHeader({super.key, this.onFilterApplied, this.onFocus});
+  final bool showTitleHeader;
+  const SearchHeader({
+    super.key,
+    this.onFilterApplied,
+    this.onFocus,
+    this.showTitleHeader = true,
+  });
 
   @override
   State<SearchHeader> createState() => _SearchHeaderState();
@@ -79,36 +85,38 @@ class _SearchHeaderState extends State<SearchHeader> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Row(
-            children: [
-              if (Navigator.canPop(context)) ...[
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 18.sp,
-                    color: Theme.of(context).colorScheme.onSurface,
+        if (widget.showTitleHeader) ...[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Row(
+              children: [
+                if (Navigator.canPop(context)) ...[
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new,
+                      size: 18.sp,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                  SizedBox(width: 12.w),
+                ],
+                Text(
+                  context.l10n.search,
+                  style: TextStyle(
+                    fontSize: 20.sp.clamp(20, 22),
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    letterSpacing: -0.5,
+                  ),
                 ),
-                SizedBox(width: 12.w),
               ],
-              Text(
-                context.l10n.search,
-                style: TextStyle(
-                  fontSize: 20.sp.clamp(20, 22),
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-        SizedBox(height: 15.h),
+          SizedBox(height: 15.h),
+        ],
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Row(

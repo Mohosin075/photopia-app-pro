@@ -75,7 +75,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16.w,
                 mainAxisSpacing: 20.h,
-                childAspectRatio: 0.6,
+                childAspectRatio: 0.46,
               ),
               itemCount: 6,
               itemBuilder: (context, index) => const ServiceCardSkeleton(),
@@ -110,7 +110,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 16.w,
               mainAxisSpacing: 20.h,
-              childAspectRatio: 0.6,
+              childAspectRatio: 0.46,
             ),
             itemCount: services.length,
             itemBuilder: (context, index) {
@@ -124,6 +124,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                 reviews: service.reviews ?? 0,
                 price: service.price,
                 currency: service.currency,
+                tags: service.tags ?? [],
                 providerId: service.providerId?.sId,
               );
             },

@@ -92,6 +92,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                     ),
                   ),
                   SearchHeader(
+                    showTitleHeader: false,
                     onFilterApplied: (filters) {
                       final serviceCtrl = context.read<ServiceListController>();
                       final favCtrl = context.read<FavoritesController>();

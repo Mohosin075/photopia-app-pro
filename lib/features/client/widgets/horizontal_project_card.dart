@@ -9,7 +9,7 @@ import 'package:photopya/core/utils/guest_dialog_helper.dart';
 import 'package:photopya/core/widgets/custom_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:photopya/features/client/widgets/service_card.dart';
-import 'package:photopya/features/client/search_screen.dart';
+import 'package:photopya/features/client/search_result_screen.dart';
 import 'package:photopya/core/services/translation_service.dart';
 import 'dart:ui';
 
@@ -61,7 +61,7 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
       onTap: widget.onTap,
       child: Container(
         width: 140.w,
-        margin: EdgeInsets.only(right: 15.w, bottom: 2.h),
+        margin: EdgeInsets.only(right: 8.w, bottom: 2.h),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
@@ -276,8 +276,9 @@ class _HorizontalProjectCardState extends State<HorizontalProjectCard> {
                               final formattedTag = tag.startsWith('#') ? tag : '#$tag';
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => SearchScreen(
-                                    initialSearchTerm: formattedTag,
+                                  builder: (_) => SearchResultScreen(
+                                    filters: {'searchTerm': formattedTag},
+                                    title: formattedTag,
                                   ),
                                 ),
                               );

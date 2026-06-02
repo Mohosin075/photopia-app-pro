@@ -4,6 +4,7 @@ import 'package:photopya/core/services/translation_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 import 'package:photopya/features/client/service_details_screen.dart';
+import 'package:photopya/features/client/search_result_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/controller/client/favorites_controller.dart';
 import 'package:photopya/core/widgets/custom_network_image.dart';
@@ -13,7 +14,7 @@ import 'package:photopya/core/network/Api_service/network_caller.dart';
 import 'package:photopya/core/network/urls.dart';
 import 'package:photopya/core/widgets/subscription_badge.dart';
 
-class ServiceCard extends StatelessWidget {
+class ServiceCard extends StatefulWidget {
   final String title;
   final String subtitle;
   final String imageUrl;
@@ -46,8 +47,55 @@ class ServiceCard extends StatelessWidget {
   });
 
   @override
+  State<ServiceCard> createState() => _ServiceCardState();
+}
+
+class _ServiceCardState extends State<ServiceCard> {
+  List<String> _resolvedTags = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _resolvedTags = widget.tags;
+    // If no tags from list API, lazy-fetch from detail API
+    if (_resolvedTags.isEmpty && widget.id != null) {
+      _fetchTagsFromDetail();
+    }
+  }
+
+  Future<void> _fetchTagsFromDetail() async {
+    try {
+      final response = await NetworkCaller.getRequest(
+        url: Urls.getSingleList(widget.id),
+        requireAuth: false,
+      );
+      if (response.isSuccess && response.body != null) {
+        final data = response.body!['data'];
+        if (data != null && data['tags'] is List) {
+          final fetched = List<String>.from(data['tags']);
+          if (mounted && fetched.isNotEmpty) {
+            setState(() => _resolvedTags = fetched);
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    final String title = widget.title;
+    final String subtitle = widget.subtitle;
+    final String imageUrl = widget.imageUrl;
+    final double rating = widget.rating;
+    final int reviews = widget.reviews;
+    final String priceRange = widget.priceRange;
+    final num? price = widget.price;
+    final String? currency = widget.currency;
+    final bool isPremium = widget.isPremium;
+    final dynamic id = widget.id;
+    final dynamic providerId = widget.providerId;
+
+    if (widget.isLoading) {
       return const ServiceCardSkeleton();
     }
     return GestureDetector(
@@ -64,7 +112,7 @@ class ServiceCard extends StatelessWidget {
                 'priceRange': priceRange,
                 'price': price,
                 'currency': currency,
-                'tags': tags,
+                'tags': _resolvedTags,
                 'isPremium': isPremium,
                 'id': id,
                 '_id': id,
@@ -89,7 +137,6 @@ class ServiceCard extends StatelessWidget {
           ],
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Take minimum space needed
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Section
@@ -145,7 +192,7 @@ class ServiceCard extends StatelessWidget {
                               'rating': rating,
                               'reviews': reviews,
                               'priceRange': priceRange,
-                              'tags': tags,
+                              'tags': _resolvedTags,
                               'isPremium': isPremium,
                               'providerId': providerId,
                             },
@@ -190,13 +237,14 @@ class ServiceCard extends StatelessWidget {
             // Info Section
             Expanded(
               child: Padding(
-                padding: EdgeInsets.all(8.w),
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         TranslatedText(
                           title,
@@ -205,14 +253,57 @@ class ServiceCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        SizedBox(height: 2.h),
                         TranslatedText(
                           subtitle,
                           style: TextStyle(
                             fontSize: 11.sp.clamp(11, 12),
                             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        if (_resolvedTags.isNotEmpty) ...[
+                          SizedBox(height: 6.h),
+                          Wrap(
+                            spacing: 4.w,
+                            runSpacing: 4.h,
+                            children: _resolvedTags.take(3).map((tag) {
+                              final label = tag.startsWith('#') ? tag : '#$tag';
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => SearchResultScreen(
+                                        filters: {'searchTerm': label},
+                                        title: label,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? Colors.grey.shade800
+                                        : Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(6.r),
+                                  ),
+                                  child: Text(
+                                    label,
+                                    style: TextStyle(
+                                      fontSize: 9.sp,
+                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.65),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ],
                     ),
                     Row(
@@ -237,6 +328,7 @@ class ServiceCard extends StatelessWidget {
                 ),
               ),
             ),
+
           ],
         ),
       ),

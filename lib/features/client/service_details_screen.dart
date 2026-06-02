@@ -15,7 +15,7 @@ import 'package:photopya/data/models/conversation_model.dart';
 import 'package:photopya/data/models/chat_message_model.dart';
 import 'package:photopya/core/widgets/subscription_badge.dart';
 import 'package:photopya/features/client/chat_screen.dart';
-import 'package:photopya/features/client/search_screen.dart';
+import 'package:photopya/features/client/search_result_screen.dart';
 import 'package:photopya/core/localization/app_localizations.dart';
 import 'package:photopya/core/services/translation_service.dart';
 import 'package:photopya/features/client/widgets/auth_profile_image.dart';
@@ -66,7 +66,9 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               final String providerAvatar = serviceDetail?.providerId?.profile ?? '';
               final double rating = serviceDetail?.rating ?? (widget.service['rating'] ?? 0.0).toDouble();
               final int reviews = serviceDetail?.reviews ?? widget.service['reviews'] ?? 0;
-              final List<String> tags = serviceDetail?.category != null ? [serviceDetail!.category!.name!] : (widget.service['tags'] as List<String>? ?? []);
+              final List<String> customTags = (serviceDetail?.tags != null && serviceDetail!.tags!.isNotEmpty)
+                  ? serviceDetail.tags!
+                  : (widget.service['tags'] is List ? List<String>.from(widget.service['tags']) : []);
               final bool isPremiumProvider = serviceDetail?.providerId?.isSubscribed ?? widget.service['isPremium'] == true;
 
               return Stack(
@@ -117,8 +119,12 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                   SizedBox(height: 12.h),
                                   _buildPortfolioGrid(gallery),
                                 ],
-                                SizedBox(height: 25.h),
-                                _buildBottomTags(tags),
+                                if (customTags.isNotEmpty) ...[
+                                  SizedBox(height: 25.h),
+                                  _buildSectionTitle('Tags'),
+                                  SizedBox(height: 12.h),
+                                  _buildBottomTags(customTags),
+                                ],
                                 SizedBox(height: 120.h),
                               ],
                             ),
@@ -326,13 +332,16 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       children: tags.map((tag) {
         final formattedTag = tag.startsWith('#') ? tag : '#$tag';
         return GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => SearchScreen(initialSearchTerm: formattedTag),
-              ),
-            );
-          },
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => SearchResultScreen(
+                                        filters: {'searchTerm': formattedTag},
+                                        title: formattedTag,
+                                      ),
+                                    ),
+                                  );
+                                },
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             decoration: BoxDecoration(
