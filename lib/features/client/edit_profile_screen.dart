@@ -26,7 +26,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _locationController;
   late TextEditingController _emailController;
   late TextEditingController _descriptionController;
-  late TextEditingController _specialtyController;
 
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
@@ -42,9 +41,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _descriptionController = TextEditingController(
       text: profile?.description ?? '',
     );
-    _specialtyController = TextEditingController(
-      text: profile?.specialty ?? '',
-    );
   }
 
   @override
@@ -54,7 +50,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _locationController.dispose();
     _emailController.dispose();
     _descriptionController.dispose();
-    _specialtyController.dispose();
     super.dispose();
   }
 

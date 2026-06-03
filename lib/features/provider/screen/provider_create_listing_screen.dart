@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photopya/core/utils/image_utils.dart';
+import 'package:photopya/core/utils/theme_formatter.dart';
 import 'package:photopya/core/constants/app_typography.dart';
 import 'package:photopya/core/widgets/custom_snacbar.dart';
 import 'package:photopya/core/network/urls.dart';
@@ -15,6 +16,7 @@ import 'package:photopya/data/models/provider_service_model.dart';
 import 'package:photopya/data/models/service_duration.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/core/widgets/app_refresher.dart';
+import 'package:photopya/core/widgets/video_player_screen.dart';
 
 class ProviderCreateListingScreen extends StatefulWidget {
   final Data? existingListing;
@@ -378,8 +380,15 @@ class _ProviderCreateListingScreenState
     }
 
     if (_selectedImages.isEmpty && _existingNetworkImages.isEmpty) {
-      errors['photos'] = "At least one portfolio photo is required";
+      errors['photos'] = "At least one portfolio photo or video is required";
       isValid = false;
+    } else {
+      final bool hasImage = _selectedImages.any((f) => !_isVideo(f.path)) ||
+                            _existingNetworkImages.any((url) => !_isVideo(url));
+      if (!hasImage) {
+        errors['photos'] = "At least one image is required to act as the cover photo";
+        isValid = false;
+      }
     }
 
     setState(() {
@@ -512,6 +521,61 @@ class _ProviderCreateListingScreenState
     }
   }
 
+  Future<void> _pickVideo() async {
+    final XFile? video = await _picker.pickVideo(
+      source: ImageSource.gallery,
+      maxDuration: const Duration(minutes: 5),
+    );
+    if (video != null) {
+      setState(() {
+        _selectedImages.add(File(video.path));
+      });
+    }
+  }
+
+  void _showMediaPickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library, color: Theme.of(context).colorScheme.primary),
+                title: const Text('Upload Photos'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImages();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.video_library, color: Theme.of(context).colorScheme.primary),
+                title: const Text('Upload Video'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickVideo();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  bool _isVideo(String path) {
+    final String lower = path.toLowerCase();
+    return lower.endsWith('.mp4') ||
+        lower.endsWith('.mov') ||
+        lower.endsWith('.avi') ||
+        lower.endsWith('.mkv') ||
+        lower.endsWith('.webm');
+  }
+
   void _removeImage(int index) {
     setState(() {
       _selectedImages.removeAt(index);
@@ -614,8 +678,15 @@ class _ProviderCreateListingScreenState
 
     // Photos (mandatory)
     if (_selectedImages.isEmpty && _existingNetworkImages.isEmpty) {
-      errors['photos'] = "At least one portfolio photo is required";
+      errors['photos'] = "At least one portfolio photo or video is required";
       isValid = false;
+    } else {
+      final bool hasImage = _selectedImages.any((f) => !_isVideo(f.path)) ||
+                            _existingNetworkImages.any((url) => !_isVideo(url));
+      if (!hasImage) {
+        errors['photos'] = "At least one image is required to act as the cover photo";
+        isValid = false;
+      }
     }
 
     if (showErrors) {
@@ -2400,7 +2471,7 @@ class _ProviderCreateListingScreenState
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(
-                        value,
+                        ThemeFormatter.format(value),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 13.sp,
@@ -3432,9 +3503,9 @@ class _ProviderCreateListingScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel('Upload Photos', isRequired: true),
+        _buildLabel('Upload Photos & Videos', isRequired: true),
         GestureDetector(
-          onTap: _pickImages,
+          onTap: _showMediaPickerOptions,
           child: Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 40.h),
@@ -3461,7 +3532,7 @@ class _ProviderCreateListingScreenState
                 ),
                 SizedBox(height: 12.h),
                 Text(
-                  'Click to upload photos',
+                  'Click to upload photos or videos',
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
                     color: errorText != null
@@ -3474,7 +3545,7 @@ class _ProviderCreateListingScreenState
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'Select up to 5 high-quality images',
+                  'Select up to 5 high-quality files',
                   style: TextStyle(
                     fontSize: AppTypography.bodySmall,
                     color: errorText != null
@@ -3526,27 +3597,68 @@ class _ProviderCreateListingScreenState
               ? _selectedImages[index - _existingNetworkImages.length]
               : null;
 
+          final bool isVideoFile = isExisting
+              ? (existingUrl != null && _isVideo(existingUrl))
+              : (newFile != null && _isVideo(newFile.path));
+
           return Stack(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10.r),
-                child: isExisting
-                    ? Image.network(
-                        existingUrl!,
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.error),
-                        ),
-                      )
-                    : Image.file(
-                        newFile!,
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+              GestureDetector(
+                onTap: isVideoFile
+                    ? () {
+                        final String path = isExisting ? existingUrl! : newFile!.path;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoPlayerScreen(videoUrl: path),
+                          ),
+                        );
+                      }
+                    : null,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10.r),
+                  child: isVideoFile
+                      ? Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: Colors.black87,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.play_circle_fill,
+                                color: Colors.white,
+                                size: 40.sp,
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                isExisting ? 'Network Video' : 'Local Video',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 10.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : (isExisting
+                          ? Image.network(
+                              existingUrl!,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                color: Colors.grey[200],
+                                child: const Icon(Icons.error),
+                              ),
+                            )
+                          : Image.file(
+                              newFile!,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                            )),
+                ),
               ),
               Positioned(
                 top: 5,

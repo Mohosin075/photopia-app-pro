@@ -62,6 +62,8 @@ class AppLocalizations {
   String get notifications => _isFr ? 'Notifications' : 'Notifications';
   String get privacyPolicy =>
       _isFr ? 'Politique de confidentialité' : 'Privacy Policy';
+  String get privacySecurity =>
+      _isFr ? 'Confidentialité & Sécurité' : 'Privacy & Security';
   String get helpAndSupport => _isFr ? 'Aide & Support' : 'Help & Support';
   String get settings => _isFr ? 'Paramètres' : 'Settings';
   String get recentOrders =>

@@ -286,9 +286,6 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
     String tagline = 'Professional Photographer';
     if (prof?.bio != null && prof!.bio!.isNotEmpty) {
       tagline = prof.bio!;
-    } else if (providerDetails?.specialty != null &&
-        providerDetails!.specialty!.isNotEmpty) {
-      tagline = providerDetails.specialty!;
     } else if (widget.provider['description'] != null &&
         widget.provider['description'].toString().isNotEmpty) {
       tagline = widget.provider['description'].toString();
@@ -774,14 +771,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
         final List<String> languages =
             (prof?.language?.map((e) => e.toString()).toList() ?? []) +
             (user?.languages ?? []);
-        final List<String> specializations =
-            (prof?.specialties?.map((e) => e.toString()).toList() ?? []) +
-            (prof?.specialty != null && prof!.specialty!.isNotEmpty
-                ? [prof.specialty!]
-                : []) +
-            (user?.specialty != null && user!.specialty!.isNotEmpty
-                ? [user.specialty!]
-                : []);
+
 
         final location =
             user?.location ?? widget.provider['location']?.toString() ?? 'N/A';
@@ -896,23 +886,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                     .toList(),
               ),
             ],
-            if (specializations.isNotEmpty) ...[
-              SizedBox(height: 25.h),
-              Text(
-                'Specializations',
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10.h),
-              Wrap(
-                spacing: 10.w,
-                runSpacing: 10.h,
-                children: specializations
-                    .toSet()
-                    .where((s) => s.isNotEmpty)
-                    .map((s) => _buildChip(s))
-                    .toList(),
-              ),
-            ],
+
 
             SizedBox(height: 20.h),
           ],

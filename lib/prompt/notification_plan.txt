@@ -1,0 +1,40 @@
+Developer Integration Guide: Photopya Notification & Preferences Engine
+This document provides a comprehensive integration manual for both Frontend (React) and Mobile (Flutter) developers to connect with the newly implemented, highly prioritized, multi-channel notification engine.
+1. Architectural Feature Matrix
+Our backend now enforces the following production-grade rules:
+Anti-Spam frequency rules: Suppresses duplicate notifications of the same type and content to a user within 1 hour (exempting chat, video calls, payment confirmations, and system alerts).
+Quiet Hours Suppression: Automatically calculates the local hour of the user based on their registered timezone property (falls back to UTC on errors). Suppresses non-urgent push alerts between the user's custom quiet hours range (default: 10:00 PM to 8:00 AM).
+Do Not Disturb (DND): If DND is enabled on the user's settings profile, all push notifications are suppressed except for URGENT triggers (e.g., incoming video calls).
+Twilio SMS Routing: Routes priority/critical reminders via Twilio SMS when SMS or ALL is selected as the notification channel.
+2. Database User Settings Schema
+The User model now contains the following schema structure for settings. All fields are pre-populated with standard defaults during creation:
+typescriptsettings?: {  pushNotification?: boolean       // Default: true  emailNotification?: boolean      // Default: true  smsNotification?: boolean        // Default: true (New)  locationService?: boolean        // Default: true  profileStatus: 'public' | 'private'    // Advanced Notification Settings:  dndMode?: boolean                // Default: false (New)  quietHoursEnabled?: boolean      // Default: true (New)  quietHoursStart?: string         // Default: '22:00' (New, Format: HH:MM)  quietHoursEnd?: string           // Default: '08:00' (New, Format: HH:MM)  disabledCategories?: string[]    // Default: [] (New, unsubscribe options)}
+3. Endpoints & API Payloads
+Developers can read and update these custom settings directly using the standard profile route.
+A. Fetch User Preferences (GET Profile)
+Endpoint: GET /api/v1/users/profile
+Authentication: Required (Bearer Token)
+Response Payload Sample:
+json{  "success": true,  "statusCode": 200,  "message": "Profile retrieved successfully",  "data": {    "_id": "60d5ec4931f6d328ecdc8b5e",    "name": "John Doe",    "email": "johndoe@photopya.com",    "phone": "+12345678901",    "timezone": "Europe/Paris",    "settings": {      "pushNotification": true,      "emailNotification": true,      "smsNotification": true,      "locationService": true,      "profileStatus": "public",      "dndMode": false,      "quietHoursEnabled": true,      "quietHoursStart": "22:00",      "quietHoursEnd": "08:00",      "disabledCategories": []    }  }}
+B. Update User Preferences (PATCH Profile)
+Endpoint: PATCH /api/v1/users/profile
+Authentication: Required (Bearer Token)
+Content-Type: application/json
+Request Payload Sample:
+json{  "settings": {    "smsNotification": true,    "dndMode": false,    "quietHoursEnabled": true,    "quietHoursStart": "23:00",    "quietHoursEnd": "07:30"  }}
+Response Payload Sample:
+json{  "success": true,  "statusCode": 200,  "message": "Profile updated successfully."}
+4. Frontend & Mobile Integration Tasks
+To implement the notification preferences settings interface in your client applications:
+A. UI Elements Needed on Settings Screen
+DND Mode Toggle: A switch button to quickly mute all notifications.
+SMS Alerts Toggle: A switch button labeled "Receive critical booking alerts via SMS".
+Quiet Hours Enable Toggle: A switch button labeled "Enable Quiet Hours".
+Start & End Time Pickers: Accessible only when Quiet Hours Toggle is active. Allows selecting times using a standard 24-hour timepicker widget.
+B. Code Integration Example (Flutter/Dart)
+dartFuture<void> updateNotificationSettings(Map<String, dynamic> settingsPayload) async {  final url = Uri.parse('https://api.photopya.com/api/v1/users/profile');  final response = await http.patch(    url,    headers: {      'Content-Type': 'application/json',      'Authorization': 'Bearer $userAccessToken',    },    body: jsonEncode({      'settings': settingsPayload,    }),  );  if (response.statusCode == 200) {    print('Settings successfully synchronized with backend!');  } else {    throw Exception('Failed to update settings');  }}
+5. Production Environment Setup
+For the SMS notification channel to function in production, ensure that the following Twilio parameters are configured in the .env server variables:
+bash# Twilio Integration ParametersTWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTWILIO_AUTH_TOKEN=your_auth_token_hereTWILIO_PHONE_NUMBER=+1234567890
+NOTE
+Graceful Simulation Mode: If any of these keys are missing or invalid in the environment, the backend will automatically fallback into Simulation Mode (printing the SMS outputs directly in the console logs) to prevent API failures or server crashes, ensuring constant availability.

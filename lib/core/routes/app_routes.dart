@@ -21,6 +21,8 @@ import 'package:photopya/features/provider/screen/BottomNavigationBar/bottom_nav
 import 'package:photopya/features/provider/screen/provider_onboarding_screen.dart';
 import 'package:photopya/features/provider/screen/provider_subscription_screen.dart';
 
+import 'package:photopya/features/client/privacy_security_screen.dart';
+
 class AppRoutes {
   static const String sign_up = SignUpScreen.name;
   static const String forgot_password = ForgotPasswordScreen.name;
@@ -45,6 +47,7 @@ class AppRoutes {
   static const String splash = "/";
   static const String provider_subscription = ProviderSubscriptionScreen.name;
   static const String provider_onboarding = ProviderOnboardingScreen.name;
+  static const String privacy_security = PrivacySecurityScreen.name;
 
   static Map<String, WidgetBuilder> get routes => {
     sign_up: (context) => const SignUpScreen(),
@@ -91,5 +94,6 @@ class AppRoutes {
         const ProviderBottomNavigationScreen(),
     provider_subscription: (context) => const ProviderSubscriptionScreen(),
     provider_onboarding: (context) => const ProviderOnboardingScreen(),
+    privacy_security: (context) => const PrivacySecurityScreen(),
   };
 }

@@ -223,19 +223,35 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   }
 
   Widget _buildHeaderSection() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primary.withOpacity(0.8),
-          ],
+          colors: isDark
+              ? [
+                  theme.colorScheme.surface,
+                  theme.colorScheme.surface.withOpacity(0.8),
+                ]
+              : [
+                  theme.colorScheme.primary,
+                  theme.colorScheme.primary.withOpacity(0.8),
+                ],
         ),
         borderRadius: BorderRadius.circular(20.r),
+        border: isDark
+            ? Border.all(
+                color: theme.colorScheme.onSurface.withOpacity(0.08),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : theme.colorScheme.primary.withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -246,12 +262,16 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         children: [
           Row(
             children: [
-              Icon(Icons.notifications_outlined, color: Colors.white, size: 28.sp),
+              Icon(
+                Icons.notifications_outlined,
+                color: isDark ? theme.colorScheme.primary : Colors.white,
+                size: 28.sp,
+              ),
               SizedBox(width: 12.w),
               Text(
                 'Stay Connected',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? theme.colorScheme.onSurface : Colors.white,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                 ),
@@ -262,7 +282,9 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
           Text(
             'Customize how and when you want to receive updates from Photopia.',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: isDark
+                  ? theme.colorScheme.onSurface.withOpacity(0.7)
+                  : Colors.white.withOpacity(0.9),
               fontSize: 13.sp,
               height: 1.4,
             ),

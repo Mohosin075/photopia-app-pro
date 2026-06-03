@@ -111,10 +111,18 @@ class ServiceController extends ChangeNotifier {
       // Add fields
       request.fields['data'] = jsonEncode(cleanedData);
 
-      // Add images (First one as coverPhoto, others as images)
+      // Add images (First image as coverPhoto, others as images)
       if (images.isNotEmpty) {
-        // coverPhoto
-        final coverFile = images[0];
+        // Find the first image to use as coverPhoto
+        File coverFile = images[0];
+        for (var file in images) {
+          final String? mime = lookupMimeType(file.path);
+          if (mime != null && mime.startsWith('image/')) {
+            coverFile = file;
+            break;
+          }
+        }
+
         final String? coverMime = lookupMimeType(coverFile.path);
 
         request.files.add(
@@ -297,7 +305,14 @@ class ServiceController extends ChangeNotifier {
             serviceData.coverMedia == null || serviceData.coverMedia!.isEmpty;
 
         if (shouldAddCoverPhoto) {
-          final coverFile = newImages[0];
+          File coverFile = newImages[0];
+          for (var file in newImages) {
+            final String? mime = lookupMimeType(file.path);
+            if (mime != null && mime.startsWith('image/')) {
+              coverFile = file;
+              break;
+            }
+          }
           final String? coverMime = lookupMimeType(coverFile.path);
 
           request.files.add(

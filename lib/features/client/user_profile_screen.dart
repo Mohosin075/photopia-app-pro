@@ -16,6 +16,7 @@ import 'package:photopya/controller/client/notification_controller.dart';
 import 'package:photopya/controller/client/booking_controller.dart';
 import 'package:photopya/data/models/booking_model.dart';
 import 'package:photopya/features/client/privacy_policy_screen.dart';
+import 'package:photopya/features/client/privacy_security_screen.dart';
 import 'package:photopya/features/client/order_history_screen.dart';
 import 'package:photopya/features/client/edit_profile_screen.dart';
 import 'package:photopya/features/client/chat_screen.dart';
@@ -572,11 +573,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 _buildMenuItem(
                   Icons.lock_outline,
-                  context.l10n.privacyPolicy,
+                  context.l10n.privacySecurity,
                   onTap: () {
                   Navigator.push(
                     context,
-                    AppTransitions.createPremiumRoute(const PrivacyPolicyScreen()),
+                    AppTransitions.createPremiumRoute(const PrivacySecurityScreen()),
                   );
                   },
                 ),

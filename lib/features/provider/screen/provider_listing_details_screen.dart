@@ -6,6 +6,7 @@ import 'package:photopya/core/constants/app_typography.dart';
 import 'package:photopya/core/network/urls.dart';
 import 'package:photopya/core/widgets/custom_network_image.dart';
 import 'package:photopya/core/widgets/my_loader.dart';
+import 'package:photopya/core/widgets/video_player_screen.dart';
 import 'package:photopya/features/provider/screen/provider_create_listing_screen.dart';
 import 'package:photopya/data/models/service_duration.dart';
 import 'package:provider/provider.dart';
@@ -135,6 +136,28 @@ class _ProviderListingDetailsScreenState
                                   setState(() => _currentImageIndex = index);
                                 },
                                 itemBuilder: (context, index) {
+                                  if (_isVideo(images[index])) {
+                                    return GestureDetector(
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => VideoPlayerScreen(
+                                            videoUrl: images[index],
+                                          ),
+                                        ),
+                                      ),
+                                      child: Container(
+                                        color: Colors.black,
+                                        width: double.infinity,
+                                        height: 200.h,
+                                        child: Icon(
+                                          Icons.play_circle_fill,
+                                          color: Colors.white,
+                                          size: 50.sp,
+                                        ),
+                                      ),
+                                    );
+                                  }
                                   return CustomNetworkImage(
                                     imageUrl: images[index],
                                     height: 200.h,
@@ -685,6 +708,15 @@ class _ProviderListingDetailsScreenState
       ),
       bottomNavigationBar: null,
     );
+  }
+
+  bool _isVideo(String url) {
+    final String lower = url.toLowerCase();
+    return lower.endsWith('.mp4') ||
+        lower.endsWith('.mov') ||
+        lower.endsWith('.avi') ||
+        lower.endsWith('.mkv') ||
+        lower.endsWith('.webm');
   }
 
   void _showDeleteConfirmationDialog(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
+import 'package:photopya/core/utils/theme_formatter.dart';
 
 import 'package:photopya/data/models/category_model.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +40,7 @@ class CategoryBar extends StatelessWidget {
 
           final String theme = themes[index];
           final bool isAll = theme == 'ALL';
-          final String label = isAll ? 'All' : theme;
+          final String label = ThemeFormatter.format(theme);
           final bool isSelected = categoryController.selectedTheme == theme || 
                                  (isAll && (categoryController.selectedTheme == null || categoryController.selectedTheme == 'ALL'));
 
