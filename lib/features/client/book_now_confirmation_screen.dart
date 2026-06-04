@@ -10,6 +10,7 @@ import 'package:photopya/controller/client/payment_controller.dart';
 import 'package:photopya/data/models/calender_availibility_model.dart';
 import 'package:provider/provider.dart';
 
+import 'package:photopya/core/localization/app_localizations.dart';
 import 'package:photopya/data/models/payment_method_model.dart';
 
 class BookingConfirmationScreen extends StatefulWidget {
@@ -369,7 +370,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 },
               ),
               Text(
-                'Step ${_currentStep + 1} of 4',
+                context.l10n.stepXofY('${_currentStep + 1}', '4'),
                 style: TextStyle(
                   fontSize: 14.sp.clamp(14, 16),
                   color: Theme.of(
@@ -421,7 +422,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           _buildStep1Tabs(),
           SizedBox(height: 25.h),
           Text(
-            'Available Dates',
+            context.l10n.availableDates,
             style: TextStyle(
               fontSize: 14.sp.clamp(14, 16),
               fontWeight: FontWeight.bold,
@@ -464,7 +465,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                     children: [
                       SizedBox(height: 15.h), // Reduced from 30.h
                       Text(
-                        'Time Slot',
+                        context.l10n.timeSlot,
                         style: TextStyle(
                           fontSize: 14.sp.clamp(14, 16),
                           fontWeight: FontWeight.bold,
@@ -501,7 +502,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Select Date & Time',
+            context.l10n.selectDateAndTime,
             style: TextStyle(
               fontSize: 16.sp.clamp(16, 18),
               fontWeight: FontWeight.bold,
@@ -509,7 +510,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           ),
           SizedBox(height: 8.h),
           Text(
-            'Choose your preferred date and time slot',
+            context.l10n.choosePreferredDateTimeSlot,
             style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Colors.grey),
           ),
           SizedBox(height: 25.h),
@@ -523,7 +524,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   }
 
   Widget _buildStep1Tabs() {
-    final tabs = ['Time Slots', 'Full Day'];
+    final tabs = [context.l10n.timeSlots, context.l10n.fullDay];
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
@@ -719,7 +720,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Location Details',
+                    context.l10n.locationDetails,
                     style: TextStyle(
                       fontSize: 16.sp.clamp(16, 18),
                       fontWeight: FontWeight.bold,
@@ -727,7 +728,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'Where should the session take place?',
+                    context.l10n.whereSessionTakePlace,
                     style: TextStyle(
                       fontSize: 13.sp.clamp(13, 14),
                       color: Colors.grey,
@@ -772,10 +773,10 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             ],
           ),
           SizedBox(height: 25.h),
-          _buildInputLabel('Location Address'),
+          _buildInputLabel(context.l10n.locationAddress),
           _buildTextField(
             controller: _locationController,
-            hint: 'Enter or detect your location',
+            hint: context.l10n.enterOrDetectLocation,
             icon: Icons.location_on_outlined,
             onChanged: (val) {
               setState(() {
@@ -810,10 +811,10 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             },
           ),
           SizedBox(height: 25.h),
-          _buildInputLabel('Special Requests (Optional)'),
+          _buildInputLabel(context.l10n.specialRequestsOptional),
           _buildTextField(
             controller: _specialRequestsController,
-            hint: 'Any specific requirements or notes for the photographer',
+            hint: context.l10n.specialRequestsHint,
             maxLines: 5,
             onChanged: (val) => setState(() => _specialRequests = val),
           ),
@@ -840,7 +841,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
       children: [
         SizedBox(height: 30.h),
         Text(
-          'Select Add-ons',
+          context.l10n.selectAddons,
           style: TextStyle(
             fontSize: 16.sp.clamp(16, 18),
             fontWeight: FontWeight.bold,
@@ -849,7 +850,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         ),
         SizedBox(height: 8.h),
         Text(
-          'Customize your booking with extra services',
+          context.l10n.customizeBookingAddons,
           style: TextStyle(
             fontSize: 12.sp,
             color: theme.colorScheme.onSurface.withOpacity(0.5),
@@ -1027,7 +1028,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Review Booking',
+            context.l10n.reviewBooking,
             style: TextStyle(
               fontSize: 16.sp.clamp(16, 18),
               fontWeight: FontWeight.bold,
@@ -1036,7 +1037,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           ),
           SizedBox(height: 8.h),
           Text(
-            'Please confirm your booking details',
+            context.l10n.confirmBookingDetails,
             style: TextStyle(
               fontSize: 13.sp.clamp(13, 14),
               color: theme.colorScheme.onSurface.withOpacity(0.6),
@@ -1059,7 +1060,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                       Icon(Icons.lock_clock_outlined, color: Colors.amber.shade700, size: 18.sp),
                       SizedBox(width: 8.w),
                       Text(
-                        'Deposit Required to Confirm',
+                        context.l10n.depositRequiredToConfirm,
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
@@ -1070,7 +1071,13 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'This provider requires a ${(_depositPercentage * 100).toInt()}% upfront deposit to secure your booking. Pay $currencySymbol${_depositAmount.toStringAsFixed(2)} now — the remaining $currencySymbol${_balanceAmount.toStringAsFixed(2)} is settled after the session.',
+                    context.l10n.depositExplanation(
+                      '${(_depositPercentage * 100).toInt()}',
+                      currencySymbol,
+                      _depositAmount.toStringAsFixed(2),
+                      currencySymbol,
+                      _balanceAmount.toStringAsFixed(2),
+                    ),
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: isDark ? Colors.amber[100] : Colors.amber.shade900,
@@ -1296,7 +1303,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Payment',
+            context.l10n.payment,
             style: TextStyle(
               fontSize: 16.sp.clamp(16, 18),
               fontWeight: FontWeight.bold,
@@ -1306,8 +1313,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           SizedBox(height: 8.h),
           Text(
             _hasDeposit
-                ? 'Secure your booking with a partial payment'
-                : 'Complete your booking with payment',
+                ? context.l10n.secureBookingPartialPayment
+                : context.l10n.completeBookingPayment,
             style: TextStyle(
               fontSize: 13.sp.clamp(13, 14),
               color: theme.colorScheme.onSurface.withOpacity(0.5),
@@ -1345,7 +1352,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                       ),
                       SizedBox(width: 10.w),
                       Text(
-                        'How Deposit Billing Works',
+                        context.l10n.howDepositBillingWorks,
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
@@ -1355,11 +1362,11 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                     ],
                   ),
                   SizedBox(height: 12.h),
-                  _buildDepositStep('1', 'Pay $currencySymbol${_depositAmount.toStringAsFixed(2)} now (${(_depositPercentage * 100).toInt()}% deposit) to confirm.', Colors.blue),
+                  _buildDepositStep('1', context.l10n.depositStep1Explanation(currencySymbol, _depositAmount.toStringAsFixed(2), '${(_depositPercentage * 100).toInt()}'), Colors.blue),
                   SizedBox(height: 6.h),
-                  _buildDepositStep('2', 'Your session is locked in. Provider is notified immediately.', Colors.green),
+                  _buildDepositStep('2', context.l10n.depositStep2Explanation, Colors.green),
                   SizedBox(height: 6.h),
-                  _buildDepositStep('3', 'Pay remaining $currencySymbol${_balanceAmount.toStringAsFixed(2)} after your session is complete.', Colors.orange),
+                  _buildDepositStep('3', context.l10n.depositStep3Explanation(currencySymbol, _balanceAmount.toStringAsFixed(2)), Colors.orange),
                 ],
               ),
             ),
@@ -1561,7 +1568,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           ),
           SizedBox(height: 20.h),
           Text(
-            'Booking Confirmed!',
+            context.l10n.bookingConfirmed,
             style: TextStyle(
               fontSize: 20.sp.clamp(18, 24),
               fontWeight: FontWeight.bold,
@@ -1570,7 +1577,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
           ),
           SizedBox(height: 10.h),
           Text(
-            "Your session has been successfully booked.\nYou'll receive a confirmation email shortly.",
+            context.l10n.bookingConfirmedSubtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13.sp.clamp(12, 14),

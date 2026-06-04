@@ -46,9 +46,11 @@ class NetworkCaller {
     String? token,
     bool addBearer = true,
   }) async {
+    final String lang = GetStorage().read<String>('app_language') ?? 'en';
     final Map<String, String> headers = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+      'Accept-Language': lang,
     };
 
     String? tokenToUse = token;

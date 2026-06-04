@@ -158,6 +158,18 @@
       "languageVersion": "3.8"
     },
     {
+      "name": "easy_localization",
+      "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/easy_localization-3.0.8",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "easy_logger",
+      "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/easy_logger-0.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "fake_async",
       "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/fake_async-1.3.3",
       "packageUri": "lib/",

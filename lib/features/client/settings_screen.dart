@@ -9,7 +9,7 @@ import 'package:photopya/controller/client/delete_account_controller.dart';
 import 'package:photopya/controller/auth_controller.dart';
 import 'package:photopya/controller/client/change_password_controller.dart';
 import 'package:photopya/controller/language_controller.dart';
-import 'package:photopya/controller/language_controller.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:photopya/features/client/chat_screen.dart';
 import 'package:photopya/data/models/conversation_model.dart';
 import 'package:photopya/core/widgets/custom_snacbar.dart';
@@ -613,6 +613,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isSelected: !controller.isFrench,
               onTap: () {
                 controller.setEnglish();
+                context.setLocale(const Locale('en'));
                 Navigator.pop(ctx);
               },
             ),
@@ -621,6 +622,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isSelected: controller.isFrench,
               onTap: () {
                 controller.setFrench();
+                context.setLocale(const Locale('fr'));
                 Navigator.pop(ctx);
               },
             ),

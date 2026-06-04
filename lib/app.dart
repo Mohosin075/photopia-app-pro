@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -118,13 +119,11 @@ class _PhotopiaState extends State<Photopia> {
                 navigatorKey: navigatorKey,
                 debugShowCheckedModeBanner: false,
                 useInheritedMediaQuery: true,
-                locale: langController.locale,
-                supportedLocales: const [Locale('en'), Locale('fr')],
-                localizationsDelegates: const [
+                locale: context.locale,
+                supportedLocales: context.supportedLocales,
+                localizationsDelegates: [
                   AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
+                  ...context.localizationDelegates,
                 ],
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,
