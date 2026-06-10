@@ -15,6 +15,7 @@ import 'package:photopya/data/models/category_model.dart';
 import 'package:photopya/data/models/provider_service_model.dart';
 import 'package:photopya/data/models/service_duration.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:photopya/core/widgets/app_refresher.dart';
 import 'package:photopya/core/widgets/video_player_screen.dart';
 
@@ -110,11 +111,32 @@ class _ProviderCreateListingScreenState
       _selectedCountry = listing.location?.country;
       _selectedCity = listing.location?.city;
       if (listing.duration != null) {
-        _durationController.text = listing.duration!.value?.toString() ?? '';
-        final rawUnit = listing.duration!.unit?.toLowerCase() ?? 'hour';
+        int val = listing.duration!.value ?? 0;
+        final String rawUnit = listing.duration!.unit?.toLowerCase() ?? 'hour';
+        
         if (rawUnit == 'minute' || rawUnit == 'minutes') {
+          _durationController.text = val.toString();
           _durationUnitController.text = 'Minutes';
+        } else if (rawUnit == 'day' || rawUnit == 'days') {
+          _durationController.text = val.toString();
+          _durationUnitController.text = 'Days';
+        } else if (rawUnit == 'week' || rawUnit == 'weeks') {
+          _durationController.text = val.toString();
+          _durationUnitController.text = 'Weeks';
+        } else if (rawUnit == 'hour' || rawUnit == 'hours') {
+          // Check if we can convert back from hours to weeks or days
+          if (val > 0 && val % 168 == 0) {
+            _durationController.text = (val ~/ 168).toString();
+            _durationUnitController.text = 'Weeks';
+          } else if (val > 0 && val % 24 == 0) {
+            _durationController.text = (val ~/ 24).toString();
+            _durationUnitController.text = 'Days';
+          } else {
+            _durationController.text = val.toString();
+            _durationUnitController.text = 'Hours';
+          }
         } else {
+          _durationController.text = val.toString();
           _durationUnitController.text = 'Hours';
         }
       } else {
@@ -244,7 +266,17 @@ class _ProviderCreateListingScreenState
 
             // Set the theme in controller if available from the selected category
             if (_selectedCategory?.theme != null) {
-              categoryController.selectTheme(_selectedCategory!.theme);
+              final String theme = _selectedCategory!.theme!;
+              categoryController.selectTheme(theme);
+              
+              // Map theme back to Service Type for UI selection
+              if (theme == 'PHOTOGRAPHY') {
+                _selectedServiceType = 'Photography';
+              } else if (theme == 'VIDEOGRAPHY') {
+                _selectedServiceType = 'Videography';
+              } else if (theme == 'EDITING AND POST-PRODUCTION') {
+                _selectedServiceType = 'Editing';
+              }
             }
 
             // Use the new selectCategory logic to fetch subcategories
@@ -329,10 +361,10 @@ class _ProviderCreateListingScreenState
       errors['subCategory'] = "Sub-Category is required";
       isValid = false;
     }
-    if (_selectedServiceTypes.isEmpty) {
-      errors['serviceType'] = "At least one Service Type is required";
-      isValid = false;
-    }
+    // if (_selectedServiceTypes.isEmpty) {
+    //   errors['serviceType'] = "At least one Service Type is required";
+    //   isValid = false;
+    // }
     if (_locationController.text.trim().isEmpty) {
       errors['city'] = "City is required";
       isValid = false;
@@ -616,10 +648,10 @@ class _ProviderCreateListingScreenState
       errors['subCategory'] = "Sub-Category is required";
       isValid = false;
     }
-    if (_selectedServiceTypes.isEmpty) {
-      errors['serviceType'] = "At least one Service Type is required";
-      isValid = false;
-    }
+    // if (_selectedServiceTypes.isEmpty) {
+    //   errors['serviceType'] = "At least one Service Type is required";
+    //   isValid = false;
+    // }
     if (_descriptionController.text.trim().length < 10) {
       errors['description'] = "Description must be at least 10 characters";
       isValid = false;
@@ -696,7 +728,7 @@ class _ProviderCreateListingScreenState
       if (!isValid) {
         CustomSnackBar.show(
           context: context,
-          message: "Please fix the errors shown in red",
+          message: errors.values.first,
           isError: true,
         );
       }
@@ -717,7 +749,7 @@ class _ProviderCreateListingScreenState
       description: _descriptionController.text.trim(),
       category: _selectedCategory,
       subCategory: _selectedSubCategory?.id,
-      tags: [..._selectedServiceTypes, ..._customTags],
+      tags: [..._customTags],
       equipment: _equipment,
       pricingType: _selectedPricingModel == 'By Hour'
           ? "HOURLY"
@@ -735,7 +767,11 @@ class _ProviderCreateListingScreenState
           ) ?? 0,
       currency: "EUR",
       duration: ServiceDuration(
-        value: int.tryParse(_durationController.text.trim()) ?? 1,
+        value: (_durationUnitController.text.trim().toLowerCase().startsWith('day'))
+            ? (int.tryParse(_durationController.text.trim()) ?? 1) * 24
+            : (_durationUnitController.text.trim().toLowerCase().startsWith('week'))
+                ? (int.tryParse(_durationController.text.trim()) ?? 1) * 168
+                : int.tryParse(_durationController.text.trim()) ?? 1,
         unit: _durationUnitController.text.trim().toLowerCase().startsWith('minute') ? 'minute' : 'hour',
       ),
       serviceType: _normalizeServiceType(_selectedServiceType ?? "Photography"),
@@ -1020,23 +1056,23 @@ class _ProviderCreateListingScreenState
             _buildServiceTypeCard('Photography', Icons.camera_alt),
             _buildServiceTypeCard('Videography', Icons.videocam),
             _buildServiceTypeCard('Editing', Icons.content_cut),
-            _buildServiceTypeCard('Other Service', Icons.add),
+            // _buildServiceTypeCard('Other Service', Icons.add),
           ],
         ),
         
         if (_selectedServiceType != null) ...[
           SizedBox(height: 25.h),
-          _buildLabel('Theme', isRequired: true),
-          _buildThemeDropdown(errorText: _localFieldErrors['theme']),
-          SizedBox(height: 15.h),
+          // _buildLabel('Theme', isRequired: true),
+          // _buildThemeDropdown(errorText: _localFieldErrors['theme']),
+          // SizedBox(height: 15.h),
           _buildLabel('Category', isRequired: true),
           _buildCategoryDropdown(errorText: _localFieldErrors['category']),
           SizedBox(height: 15.h),
           _buildLabel('Sub-Category', isRequired: true),
           _buildSubCategoryDropdown(errorText: _localFieldErrors['subCategory']),
-          SizedBox(height: 15.h),
-          _buildLabel('Service Types (Select multiple)', isRequired: true),
-          _buildServiceTypeDropdown(errorText: _localFieldErrors['serviceType']),
+          // SizedBox(height: 15.h),
+          // _buildLabel('Service Types (Select multiple)', isRequired: true),
+          // _buildServiceTypeDropdown(errorText: _localFieldErrors['serviceType']),
         ],
 
         SizedBox(height: 30.h),
@@ -1080,9 +1116,9 @@ class _ProviderCreateListingScreenState
         SizedBox(height: 20.h),
         _buildPricingFields(),
         
-        SizedBox(height: 30.h),
-        _buildLabel('Deposit Required'),
-        _buildDepositDropdown(),
+        // SizedBox(height: 30.h),
+        // _buildLabel('Deposit Required'),
+        // _buildDepositDropdown(),
         
         SizedBox(height: 30.h),
         Row(
@@ -1095,8 +1131,15 @@ class _ProviderCreateListingScreenState
                   _availabilityControllers.add(AvailabilitySlotControllers());
                 });
               },
-              icon: Icon(Icons.add, size: 18.sp),
-              label: Text('Add Slot'),
+              icon: Icon(Icons.add, size: 18.sp, color: const Color(0xFF9C27B0)),
+              label: Text(
+                'Add Slot',
+                style: TextStyle(
+                  color: const Color(0xFF9C27B0),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14.sp,
+                ),
+              ),
             ),
           ],
         ),
@@ -1185,7 +1228,16 @@ class _ProviderCreateListingScreenState
 
         if (_availabilityControllers.isNotEmpty) ...[
           SizedBox(height: 20.h),
-          _buildSummarySection('Availability Slots', _availabilityControllers.map((slot) => '${slot.startDate.text} to ${slot.endDate.text} (${slot.startTime.text} - ${slot.endTime.text})').toList(), onEdit: () => _jumpToStep(2)),
+          _buildSummarySection(
+            'Availability Slots',
+            _availabilityControllers
+                .map(
+                  (slot) =>
+                      '${slot.rangeController.text.isEmpty ? "${slot.startDate.text} to ${slot.endDate.text}" : slot.rangeController.text} (${slot.startTime.text} - ${slot.endTime.text})',
+                )
+                .toList(),
+            onEdit: () => _jumpToStep(2),
+          ),
         ],
         
         SizedBox(height: 50.h),
@@ -1497,23 +1549,21 @@ class _ProviderCreateListingScreenState
         return Container(
           padding: EdgeInsets.all(15.w),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
             borderRadius: BorderRadius.circular(15.r),
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
             ),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Expanded(
-                    child: _buildDatePickerField(slot.startDate, 'Start Date'),
+                    child: _buildDateRangePickerField(slot),
                   ),
                   SizedBox(width: 10.w),
-                  Expanded(
-                    child: _buildDatePickerField(slot.endDate, 'End Date'),
-                  ),
                   IconButton(
                     onPressed: () {
                       setState(() {
@@ -1521,21 +1571,48 @@ class _ProviderCreateListingScreenState
                         _availabilityControllers.removeAt(index);
                       });
                     },
-                    icon: Icon(Icons.delete_outline, color: Colors.red[400]),
+                    icon: Icon(Icons.delete_outline, color: Colors.red[400], size: 20.sp),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
-              SizedBox(height: 10.h),
+              SizedBox(height: 15.h),
               Row(
                 children: [
                   Expanded(
-                    child: _buildTimePickerField(slot.startTime, 'Start Time'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Start Time',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          ),
+                        ),
+                        SizedBox(height: 5.h),
+                        _buildTimePickerField(slot.startTime, '09:00'),
+                      ],
+                    ),
                   ),
-                  SizedBox(width: 10.w),
+                  SizedBox(width: 15.w),
                   Expanded(
-                    child: _buildTimePickerField(slot.endTime, 'End Time'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'End Time',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          ),
+                        ),
+                        SizedBox(height: 5.h),
+                        _buildTimePickerField(slot.endTime, '18:00'),
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 48), // Match IconButton width for alignment
                 ],
               ),
             ],
@@ -1543,6 +1620,90 @@ class _ProviderCreateListingScreenState
         );
       },
     );
+  }
+
+  Widget _buildDateRangePickerField(AvailabilitySlotControllers slot) {
+    return GestureDetector(
+      onTap: () async {
+        final DateTimeRange? picked = await showDateRangePicker(
+          context: context,
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2030),
+          initialDateRange: (slot.startDate.text.isNotEmpty && slot.endDate.text.isNotEmpty)
+              ? DateTimeRange(
+                  start: DateTime.parse(slot.startDate.text),
+                  end: DateTime.parse(slot.endDate.text),
+                )
+              : null,
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: Theme.of(context).colorScheme.primary,
+                  onPrimary: Theme.of(context).colorScheme.onPrimary,
+                  surface: Theme.of(context).colorScheme.surface,
+                  onSurface: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+
+        if (picked != null) {
+          setState(() {
+            slot.startDate.text = DateFormat('yyyy-MM-dd').format(picked.start);
+            slot.endDate.text = DateFormat('yyyy-MM-dd').format(picked.end);
+            slot.rangeController.text = _formatDateRange(picked.start, picked.end);
+          });
+        }
+      },
+      child: AbsorbPointer(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  slot.rangeController.text.isEmpty ? 'Select Date Range' : slot.rangeController.text,
+                  style: TextStyle(
+                    color: slot.rangeController.text.isEmpty
+                        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
+                        : Theme.of(context).colorScheme.onSurface,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.calendar_today_outlined,
+                size: 16.sp,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDateRange(DateTime start, DateTime end) {
+    if (start.year == end.year) {
+      if (start.month == end.month) {
+        if (start.day == end.day) {
+          return DateFormat('MMM d, yyyy').format(start);
+        }
+        return "${DateFormat('MMM d').format(start)}-${end.day}, ${start.year}";
+      }
+      return "${DateFormat('MMM d').format(start)} - ${DateFormat('MMM d').format(end)}, ${start.year}";
+    }
+    return "${DateFormat('MMM d, yyyy').format(start)} - ${DateFormat('MMM d, yyyy').format(end)}";
   }
 
   Widget _buildDatePickerField(TextEditingController controller, String label) {
@@ -1556,7 +1717,7 @@ class _ProviderCreateListingScreenState
         );
         if (picked != null) {
           setState(() {
-            controller.text = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+            controller.text = DateFormat('yyyy-MM-dd').format(picked);
           });
         }
       },
@@ -1575,12 +1736,43 @@ class _ProviderCreateListingScreenState
         );
         if (picked != null) {
           setState(() {
-            controller.text = "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
+            final now = DateTime.now();
+            final dt = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+            controller.text = DateFormat('HH:mm').format(dt);
           });
         }
       },
       child: AbsorbPointer(
-        child: _buildTextField(controller, label),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  controller.text.isEmpty ? label : controller.text,
+                  style: TextStyle(
+                    color: controller.text.isEmpty
+                        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
+                        : Theme.of(context).colorScheme.onSurface,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.access_time,
+                size: 16.sp,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1590,13 +1782,25 @@ class _ProviderCreateListingScreenState
     return GestureDetector(
       onTap: () {
         if (_selectedServiceType != title) {
+          String? theme;
+          if (title == 'Photography') {
+            theme = 'PHOTOGRAPHY';
+          } else if (title == 'Videography') {
+            theme = 'VIDEOGRAPHY';
+          } else if (title == 'Editing') {
+            theme = 'EDITING AND POST-PRODUCTION';
+          }
+
           setState(() {
             _selectedServiceType = title;
             _selectedCategory = null;
             _selectedSubCategory = null;
             _selectedServiceTypes.clear();
+            if (theme != null) {
+              _localFieldErrors.remove('theme');
+            }
           });
-          context.read<CategoryController>().selectTheme(null);
+          context.read<CategoryController>().selectTheme(theme);
         }
       },
       child: Container(
@@ -1801,7 +2005,7 @@ class _ProviderCreateListingScreenState
   }
 
   Widget _buildDurationUnitDropdown() {
-    final units = ['Minutes', 'Hours'];
+    final units = ['Minutes', 'Hours', 'Days', 'Weeks'];
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
@@ -2782,6 +2986,7 @@ class _ProviderCreateListingScreenState
     );
   }
 
+  /*
   Widget _buildServiceTypeDropdown({String? errorText}) {
     final List<String> serviceTypes = [
       'photography',
@@ -2906,6 +3111,7 @@ class _ProviderCreateListingScreenState
       ],
     );
   }
+  */
 
   Widget _buildLocationTypeDropdown() {
     // Safety check: ensure selected value is in the options list
@@ -3765,6 +3971,7 @@ class AddonControllers {
 class AvailabilitySlotControllers {
   final TextEditingController startDate;
   final TextEditingController endDate;
+  final TextEditingController rangeController;
   final TextEditingController startTime;
   final TextEditingController endTime;
 
@@ -3775,12 +3982,18 @@ class AvailabilitySlotControllers {
     String endTime = '',
   }) : startDate = TextEditingController(text: startDate),
        endDate = TextEditingController(text: endDate),
+       rangeController = TextEditingController(
+         text: (startDate.isNotEmpty && endDate.isNotEmpty) 
+           ? "$startDate to $endDate" 
+           : ''
+       ),
        startTime = TextEditingController(text: startTime),
        endTime = TextEditingController(text: endTime);
 
   void dispose() {
     startDate.dispose();
     endDate.dispose();
+    rangeController.dispose();
     startTime.dispose();
     endTime.dispose();
   }

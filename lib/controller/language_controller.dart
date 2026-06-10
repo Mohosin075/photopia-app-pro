@@ -13,8 +13,10 @@ class LanguageController extends ChangeNotifier {
 
   Locale get locale => _locale;
 
-  String get languageName =>
-      _locale.languageCode == 'fr' ? 'French' : 'English';
+  String get languageName {
+    if (_locale.languageCode == 'fr') return 'Français';
+    return 'English';
+  }
 
   bool get isFrench => _locale.languageCode == 'fr';
 

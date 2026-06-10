@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:photopya/controller/provider/calender_availibility_controller.dart';
 import 'package:photopya/controller/location_controller.dart';
@@ -1013,8 +1014,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
 
   Widget _buildStep3() {
     final dateStr = _selectedDateTime != null
-        ? DateFormat('EEEE, MMMM d, y').format(_selectedDateTime!)
-        : 'No date selected';
+        ? DateFormat('EEEE, MMMM d, y', context.locale.toString()).format(_selectedDateTime!)
+        : context.l10n.notAvailable;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final currencySymbol = _getCurrencySymbol(
@@ -1107,7 +1108,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildReviewItem(
-                  'Service',
+                  context.l10n.serviceDetailsTitle.split(' ')[0],
                   widget.service?['title'] ?? 'Photography Session',
                 ),
                 if (widget.package != null)
@@ -1116,52 +1117,52 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                     widget.package!['name'] ?? 'Custom',
                   ),
                 _buildReviewItem(
-                  'Provider',
+                  context.l10n.providerLabel,
                   widget.service?['providerId']?['name']?.toString() ??
                       widget.service?['provider']?['name']?.toString() ??
                       widget.service?['subtitle'] ??
                       'Professional',
                 ),
-                if (_specialRequests.isNotEmpty) ...[
-                  Divider(color: theme.dividerColor.withOpacity(0.1)),
-                  _buildReviewItem('Special Requests', _specialRequests),
-                ],
-                if (_selectedAddons.isNotEmpty) ...[
-                  Divider(color: theme.dividerColor.withOpacity(0.1)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4.h),
-                    child: Text(
-                      'Selected Add-ons',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  if (_specialRequests.isNotEmpty) ...[
+                    Divider(color: theme.dividerColor.withOpacity(0.1)),
+                    _buildReviewItem(context.l10n.specialRequestsOptional.split('(')[0].trim(), _specialRequests),
+                  ],
+                  if (_selectedAddons.isNotEmpty) ...[
+                    Divider(color: theme.dividerColor.withOpacity(0.1)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4.h),
+                      child: Text(
+                        context.l10n.selectAddons,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
                       ),
                     ),
-                  ),
-                  ..._selectedAddons.map((addon) => _buildReviewItem(
-                        addon['name']?.toString() ?? '',
-                        '+ $currencySymbol${(double.tryParse(addon['price']?.toString() ?? '0') ?? 0.0).toStringAsFixed(2)}',
-                        isBold: false,
-                        color: theme.colorScheme.onSurface.withOpacity(0.8),
-                      )),
-                ],
-                Divider(color: theme.dividerColor.withOpacity(0.1)),
-                _buildReviewIconItem(Icons.calendar_today_outlined, dateStr),
-                if (_selectedTime.isNotEmpty)
+                    ..._selectedAddons.map((addon) => _buildReviewItem(
+                          addon['name']?.toString() ?? '',
+                          '+ $currencySymbol${(double.tryParse(addon['price']?.toString() ?? '0') ?? 0.0).toStringAsFixed(2)}',
+                          isBold: false,
+                          color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        )),
+                  ],
+                  Divider(color: theme.dividerColor.withOpacity(0.1)),
+                  _buildReviewIconItem(Icons.calendar_today_outlined, dateStr),
+                  if (_selectedTime.isNotEmpty)
+                    _buildReviewIconItem(
+                      Icons.access_time,
+                      '$_selectedTime - ${_calculateEndTime()}',
+                    ),
                   _buildReviewIconItem(
-                    Icons.access_time,
-                    '$_selectedTime - ${_calculateEndTime()}',
+                    Icons.location_on_outlined,
+                    _location.isEmpty ? context.l10n.notAvailable : _location,
                   ),
-                _buildReviewIconItem(
-                  Icons.location_on_outlined,
-                  _location.isEmpty ? 'Not specified' : _location,
-                ),
-                Divider(color: theme.dividerColor.withOpacity(0.1)),
-                _buildReviewItem(
-                  'Final Service Total',
-                  '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
-                ),
+                  Divider(color: theme.dividerColor.withOpacity(0.1)),
+                  _buildReviewItem(
+                    'Final Service Total',
+                    '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
+                  ),
                 if (_hasDeposit) ...[
                   _buildReviewItem(
                     'Pay Now (${(_depositPercentage * 100).toInt()}% Deposit)',
@@ -1443,7 +1444,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                     ),
                   ),
                   _buildPaymentOption(
-                    'Use a different card',
+                    context.l10n.switchToProfessional.split(' ')[0].trim() + ' card',
                     'Pay with a new credit/debit card',
                     Icons.add_card_outlined,
                     isSelected: _selectedPaymentMethod == null,
@@ -1516,7 +1517,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                     ),
                   ),
                   Text(
-                    'Expires ${method.expMonth}/${method.expYear}',
+                    context.l10n.statusCancelled.split(' ')[0].trim() == 'Cancelled' ? 'Expires ${method.expMonth}/${method.expYear}' : 'Expire ${method.expMonth}/${method.expYear}',
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: theme.colorScheme.onSurface.withOpacity(0.5),
@@ -1539,8 +1540,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
 
   Widget _buildSuccessStep() {
     final dateStr = _selectedDateTime != null
-        ? DateFormat('EEEE, MMMM d, y').format(_selectedDateTime!)
-        : 'N/A';
+        ? DateFormat('EEEE, MMMM d, y', context.locale.toString()).format(_selectedDateTime!)
+        : context.l10n.notAvailable;
     final currencySymbol = _getCurrencySymbol(
       widget.package?['currency'] ?? widget.service?['currency'],
     );
@@ -1649,7 +1650,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
 
                 // --- Payment Details in Card ---
                 _buildSummaryPriceRow(
-                  'Total Price',
+                  context.l10n.overallStatistics.split(' ')[0].trim(),
                   '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
                 ),
                 if (_hasDeposit) ...[
@@ -1666,7 +1667,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   ),
                 ] else ...[
                   _buildSummaryPriceRow(
-                    'Amount Paid',
+                    context.l10n.total,
                     '$currencySymbol${_packagePrice.toStringAsFixed(2)}',
                     color: Colors.green,
                     isBold: true,
@@ -1689,7 +1690,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
               ),
               child: Center(
                 child: Text(
-                  'Go to Home',
+                  context.l10n.navHome,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -1780,7 +1781,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     final userProfile = context.read<UserProfileController>().userProfile;
     if (userProfile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to continue')),
+        SnackBar(content: Text(context.l10n.pleaseLogInToContinue)),
       );
       return;
     }
@@ -1999,13 +2000,13 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
               if (_pageIndex == 0) {
                 if (_selectedDateTime == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please select a date first')),
+                    SnackBar(content: Text(context.l10n.pleaseSelectDateFirst)),
                   );
                   return;
                 }
                 if (_selectedStep1Tab == 0 && _selectedTime.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please select a time slot')),
+                    SnackBar(content: Text(context.l10n.pleaseSelectTimeSlot)),
                   );
                   return;
                 }
@@ -2013,8 +2014,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
 
               if (_pageIndex == 1 && _location.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please provide a location address'),
+                  SnackBar(
+                    content: Text(context.l10n.pleaseProvideLocationAddress),
                   ),
                 );
                 return;
@@ -2048,9 +2049,9 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   : Text(
                       _pageIndex == 3
                           ? (_hasDeposit
-                                ? 'Pay ${_getCurrencySymbol(widget.package?['currency'] ?? widget.service?['currency'])}${_depositAmount.toStringAsFixed(2)} Deposit & Confirm'
-                                : 'Pay & Confirm')
-                          : 'Continue',
+                                ? '${context.l10n.payAndConfirm.split(' ')[0]} ${_getCurrencySymbol(widget.package?['currency'] ?? widget.service?['currency'])}${_depositAmount.toStringAsFixed(2)} ${context.l10n.depositRequiredToConfirm.split(' ')[0]} & ${context.l10n.payAndConfirm.split('&')[1].trim()}'
+                                : context.l10n.payAndConfirm)
+                          : context.l10n.continueBtn,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.sp.clamp(16, 18),
