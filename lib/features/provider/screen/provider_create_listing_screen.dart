@@ -18,6 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:photopya/core/widgets/app_refresher.dart';
 import 'package:photopya/core/widgets/video_player_screen.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderCreateListingScreen extends StatefulWidget {
   final Data? existingListing;
@@ -52,8 +53,8 @@ class _ProviderCreateListingScreenState
   final PageController _pageController = PageController();
   int _currentStep = 0;
 
-  // Step 1: Service variables
-  String? _selectedServiceType; // Photography, Videography, Editing, Other
+  // Step 1: Service variables (internal English keys)
+  String? _selectedServiceTypeKey; // 'Photography', 'Videography', 'Editing'
 
   // Step 2: Details variables
   final TextEditingController _durationUnitController = TextEditingController(text: 'Hours');
@@ -271,11 +272,11 @@ class _ProviderCreateListingScreenState
               
               // Map theme back to Service Type for UI selection
               if (theme == 'PHOTOGRAPHY') {
-                _selectedServiceType = 'Photography';
+                _selectedServiceTypeKey = 'Photography';
               } else if (theme == 'VIDEOGRAPHY') {
-                _selectedServiceType = 'Videography';
+                _selectedServiceTypeKey = 'Videography';
               } else if (theme == 'EDITING AND POST-PRODUCTION') {
-                _selectedServiceType = 'Editing';
+                _selectedServiceTypeKey = 'Editing';
               }
             }
 
@@ -774,7 +775,7 @@ class _ProviderCreateListingScreenState
                 : int.tryParse(_durationController.text.trim()) ?? 1,
         unit: _durationUnitController.text.trim().toLowerCase().startsWith('minute') ? 'minute' : 'hour',
       ),
-      serviceType: _normalizeServiceType(_selectedServiceType ?? "Photography"),
+      serviceType: _normalizeServiceType(_selectedServiceTypeKey ?? "Photography"),
       location: Location(
         type: _selectedLocationType == 'Remote' ? 'REMOTE' : 'ONSITE',
         country: _countryController.text.trim(),
@@ -886,21 +887,25 @@ class _ProviderCreateListingScreenState
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
                 ),
-                Text(
-                  widget.existingListing != null ? 'Edit Listing' : 'Create Listing',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    widget.existingListing != null ? context.l10n.editListing : context.l10n.createListing,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 TextButton(
                   onPressed: inProgress ? null : _saveDraft,
                   child: Text(
-                    'Save Draft',
+                    context.l10n.saveDraft,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontSize: 14.sp,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -912,28 +917,35 @@ class _ProviderCreateListingScreenState
           ],
         ),
       ),
-      body: _isLoadingCategories
-          ? const Center(child: CircularProgressIndicator())
-          : PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (index) {
-                setState(() {
-                  _currentStep = index;
-                });
-              },
-              children: [
-                _buildStep1Service(inProgress),
-                _buildStep2Details(inProgress),
-                _buildStep3PricingAvailability(inProgress),
-                _buildStep4Review(inProgress),
-              ],
-            ),
+      body: SafeArea(
+        child: _isLoadingCategories
+            ? const Center(child: CircularProgressIndicator())
+            : PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentStep = index;
+                  });
+                },
+                children: [
+                  _buildStep1Service(inProgress),
+                  _buildStep2Details(inProgress),
+                  _buildStep3PricingAvailability(inProgress),
+                  _buildStep4Review(inProgress),
+                ],
+              ),
+      ),
     );
   }
 
   Widget _buildStepper() {
-    final steps = ['Service', 'Details', 'Pricing', 'Review'];
+    final steps = [
+      context.l10n.stepService,
+      context.l10n.stepDetails,
+      context.l10n.stepPricing,
+      context.l10n.stepReview
+    ];
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(
@@ -986,7 +998,7 @@ class _ProviderCreateListingScreenState
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
-                child: const Text('Back'),
+                child: Text(context.l10n.back),
               ),
             ),
           if (_currentStep > 0) SizedBox(width: 12.w),
@@ -1013,7 +1025,7 @@ class _ProviderCreateListingScreenState
                         strokeWidth: 2,
                       ),
                     )
-                  : Text(_currentStep == 3 ? 'Publish' : 'Continue'),
+                  : Text(_currentStep == 3 ? context.l10n.publishListing : context.l10n.continueBtn),
             ),
           ),
         ],
@@ -1027,7 +1039,7 @@ class _ProviderCreateListingScreenState
       padding: EdgeInsets.all(20.w),
       children: [
         Text(
-          'Service',
+          context.l10n.stepService,
           style: TextStyle(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
@@ -1036,7 +1048,7 @@ class _ProviderCreateListingScreenState
         ),
         SizedBox(height: 8.h),
         Text(
-          'Select your domain and category',
+          context.l10n.selectDomainAndCategory,
           style: TextStyle(
             fontSize: 14.sp,
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -1044,7 +1056,7 @@ class _ProviderCreateListingScreenState
         ),
         SizedBox(height: 30.h),
         
-        _buildLabel('Service Type'),
+        _buildLabel(context.l10n.serviceType),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -1053,22 +1065,22 @@ class _ProviderCreateListingScreenState
           crossAxisSpacing: 15.w,
           childAspectRatio: 1.5,
           children: [
-            _buildServiceTypeCard('Photography', Icons.camera_alt),
-            _buildServiceTypeCard('Videography', Icons.videocam),
-            _buildServiceTypeCard('Editing', Icons.content_cut),
+            _buildServiceTypeCard('Photography', context.l10n.photography, Icons.camera_alt),
+            _buildServiceTypeCard('Videography', context.l10n.videography, Icons.videocam),
+            _buildServiceTypeCard('Editing', context.l10n.editing, Icons.content_cut),
             // _buildServiceTypeCard('Other Service', Icons.add),
           ],
         ),
         
-        if (_selectedServiceType != null) ...[
+        if (_selectedServiceTypeKey != null) ...[
           SizedBox(height: 25.h),
           // _buildLabel('Theme', isRequired: true),
           // _buildThemeDropdown(errorText: _localFieldErrors['theme']),
           // SizedBox(height: 15.h),
-          _buildLabel('Category', isRequired: true),
+          _buildLabel(context.l10n.category, isRequired: true),
           _buildCategoryDropdown(errorText: _localFieldErrors['category']),
           SizedBox(height: 15.h),
-          _buildLabel('Sub-Category', isRequired: true),
+          _buildLabel(context.l10n.subCategory, isRequired: true),
           _buildSubCategoryDropdown(errorText: _localFieldErrors['subCategory']),
           // SizedBox(height: 15.h),
           // _buildLabel('Service Types (Select multiple)', isRequired: true),
@@ -1076,12 +1088,12 @@ class _ProviderCreateListingScreenState
         ],
 
         SizedBox(height: 30.h),
-        _buildSectionTitle('Service Location'),
-        _buildLabel('Enter your city or region'),
+        _buildSectionTitle(context.l10n.serviceLocation),
+        _buildLabel(context.l10n.enterCityOrRegion),
         _buildLocationAutocomplete(errorText: _localFieldErrors['city']),
         
         SizedBox(height: 20.h),
-        _buildLabel('Coverage Radius'),
+        _buildLabel(context.l10n.coverageRadius),
         _buildRadiusSelector(),
         
         SizedBox(height: 40.h),
@@ -1095,7 +1107,7 @@ class _ProviderCreateListingScreenState
       padding: EdgeInsets.all(20.w),
       children: [
         Text(
-          'Pricing & Availability',
+          context.l10n.pricingAndAvailability,
           style: TextStyle(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
@@ -1104,7 +1116,7 @@ class _ProviderCreateListingScreenState
         ),
         SizedBox(height: 8.h),
         Text(
-          'Set your rates and available slots',
+          context.l10n.setRatesAndSlots,
           style: TextStyle(
             fontSize: 14.sp,
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -1124,7 +1136,7 @@ class _ProviderCreateListingScreenState
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSectionTitle('Availability Slots'),
+            _buildSectionTitle(context.l10n.availabilitySlots),
             TextButton.icon(
               onPressed: () {
                 setState(() {
@@ -1133,7 +1145,7 @@ class _ProviderCreateListingScreenState
               },
               icon: Icon(Icons.add, size: 18.sp, color: const Color(0xFF9C27B0)),
               label: Text(
-                'Add Slot',
+                context.l10n.addSlot,
                 style: TextStyle(
                   color: const Color(0xFF9C27B0),
                   fontWeight: FontWeight.w600,
@@ -1165,7 +1177,7 @@ class _ProviderCreateListingScreenState
       padding: EdgeInsets.all(20.w),
       children: [
         Text(
-          'Review & Publish',
+          context.l10n.reviewAndPublish,
           style: TextStyle(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
@@ -1174,7 +1186,7 @@ class _ProviderCreateListingScreenState
         ),
         SizedBox(height: 8.h),
         Text(
-          'Double check everything before going live',
+          context.l10n.doubleCheckBeforeLive,
           style: TextStyle(
             fontSize: 14.sp,
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -1186,30 +1198,30 @@ class _ProviderCreateListingScreenState
         _buildListingPreviewCard(),
         
         SizedBox(height: 30.h),
-        _buildSummarySection('About Service & Details', [
-          'Description: ${_descriptionController.text.isEmpty ? "No description provided" : _descriptionController.text}',
-          'Primary Service Type: $_selectedServiceType',
-          'Theme: ${context.read<CategoryController>().selectedTheme ?? "N/A"}',
-          'Category: ${_selectedCategory?.name ?? "N/A"}',
-          'Sub-Category: ${_selectedSubCategory?.name ?? "N/A"}',
-          if ([..._selectedServiceTypes, ..._customTags].isNotEmpty) 'Tags: ${[..._selectedServiceTypes, ..._customTags].join(", ")}',
-          'Estimated Duration: ${_durationController.text.trim()} ${_durationUnitController.text}',
+        _buildSummarySection(context.l10n.aboutServiceDetails, [
+          '${context.l10n.description}: ${_descriptionController.text.isEmpty ? "No description provided" : _descriptionController.text}',
+          '${context.l10n.serviceType}: ${_getServiceTypeLabel(_selectedServiceTypeKey)}',
+          '${context.l10n.theme}: ${context.read<CategoryController>().selectedTheme ?? "N/A"}',
+          '${context.l10n.category}: ${_selectedCategory?.name ?? "N/A"}',
+          '${context.l10n.subCategory}: ${_selectedSubCategory?.name ?? "N/A"}',
+          if ([..._selectedServiceTypes, ..._customTags].isNotEmpty) '${context.l10n.tags}: ${[..._selectedServiceTypes, ..._customTags].join(", ")}',
+          '${context.l10n.serviceDuration}: ${_durationController.text.trim()} ${_durationUnitController.text}',
         ], onEdit: () => _jumpToStep(1)),
         
         SizedBox(height: 20.h),
-        _buildSummarySection('Location & Range', [
-          'Location Type: $_selectedLocationType',
-          'City/Country: ${_locationController.text}, ${_countryController.text}',
-          'Service Radius: ${_serviceRadius.toInt()} km',
+        _buildSummarySection(context.l10n.locationAndRange, [
+          '${context.l10n.location}: $_selectedLocationType',
+          '${context.l10n.city}/${context.l10n.country}: ${_locationController.text}, ${_countryController.text}',
+          '${context.l10n.coverageRadius}: ${_serviceRadius.toInt()} km',
           'Outside Range Booking: ${_acceptOutsideRadius ? "Accepted" : "Not Accepted"}',
         ], onEdit: () => _jumpToStep(0)),
         
         SizedBox(height: 20.h),
-        _buildSummarySection('Pricing & Packages', [
-          'Pricing Model: $_selectedPricingModel',
-          if (_selectedPricingModel == 'By Hour') 'Weekday Hourly Rate: €${_weekdayHourlyRateController.text}/hr',
-          if (_selectedPricingModel == 'By Hour') 'Weekend Hourly Rate: €${_weekendHourlyRateController.text}/hr',
-          if (_selectedPricingModel == 'By Day') 'Daily Rate: €${_dailyRateController.text}/day (${_dailyHoursController.text} hours included)',
+        _buildSummarySection(context.l10n.pricingAndPackages, [
+          '${context.l10n.pricingModel}: $_selectedPricingModel',
+          if (_selectedPricingModel == 'By Hour') '${context.l10n.weekdayHourlyRate}: €${_weekdayHourlyRateController.text}/hr',
+          if (_selectedPricingModel == 'By Hour') '${context.l10n.weekendHourlyRate}: €${_weekendHourlyRateController.text}/hr',
+          if (_selectedPricingModel == 'By Day') '${context.l10n.dailyRate}: €${_dailyRateController.text}/day (${_dailyHoursController.text} hours included)',
           if (_selectedPricingModel == 'By Service') 'Packages Added: ${_packageControllers.length}',
           if (_selectedPricingModel == 'By Service') ..._packageControllers.map((p) => '- ${p.name.text}: €${p.price.text} (${p.duration.text})'),
           'Required Booking Deposit: ${_depositPercentage ?? 0}%',
@@ -1218,18 +1230,18 @@ class _ProviderCreateListingScreenState
 
         if (_addonControllers.isNotEmpty) ...[
           SizedBox(height: 20.h),
-          _buildSummarySection('Add-ons Available', _addonControllers.map((a) => '${a.name.text}: €${a.price.text}').toList(), onEdit: () => _jumpToStep(1)),
+          _buildSummarySection(context.l10n.addonsAvailable, _addonControllers.map((a) => '${a.name.text}: €${a.price.text}').toList(), onEdit: () => _jumpToStep(1)),
         ],
 
         if (_equipment.isNotEmpty) ...[
           SizedBox(height: 20.h),
-          _buildSummarySection('Equipment Utilized', _equipment, onEdit: () => _jumpToStep(1)),
+          _buildSummarySection(context.l10n.equipmentUtilized, _equipment, onEdit: () => _jumpToStep(1)),
         ],
 
         if (_availabilityControllers.isNotEmpty) ...[
           SizedBox(height: 20.h),
           _buildSummarySection(
-            'Availability Slots',
+            context.l10n.availabilitySlots,
             _availabilityControllers
                 .map(
                   (slot) =>
@@ -1348,7 +1360,7 @@ class _ProviderCreateListingScreenState
                         borderRadius: BorderRadius.circular(6.r),
                       ),
                       child: Text(
-                        _selectedServiceType ?? 'Service Type',
+                        _getServiceTypeLabel(_selectedServiceTypeKey),
                         style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -1452,7 +1464,7 @@ class _ProviderCreateListingScreenState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(title, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
-            TextButton(onPressed: onEdit, child: Text('Edit', style: TextStyle(fontSize: 12.sp))),
+            TextButton(onPressed: onEdit, child: Text(context.l10n.editBtn, style: TextStyle(fontSize: 12.sp))),
           ],
         ),
         if (title == 'Equipment Utilized')
@@ -1777,22 +1789,22 @@ class _ProviderCreateListingScreenState
     );
   }
 
-  Widget _buildServiceTypeCard(String title, IconData icon) {
-    bool isSelected = _selectedServiceType == title;
+  Widget _buildServiceTypeCard(String key, String label, IconData icon) {
+    bool isSelected = _selectedServiceTypeKey == key;
     return GestureDetector(
       onTap: () {
-        if (_selectedServiceType != title) {
+        if (_selectedServiceTypeKey != key) {
           String? theme;
-          if (title == 'Photography') {
+          if (key == 'Photography') {
             theme = 'PHOTOGRAPHY';
-          } else if (title == 'Videography') {
+          } else if (key == 'Videography') {
             theme = 'VIDEOGRAPHY';
-          } else if (title == 'Editing') {
+          } else if (key == 'Editing') {
             theme = 'EDITING AND POST-PRODUCTION';
           }
 
           setState(() {
-            _selectedServiceType = title;
+            _selectedServiceTypeKey = key;
             _selectedCategory = null;
             _selectedSubCategory = null;
             _selectedServiceTypes.clear();
@@ -1833,7 +1845,7 @@ class _ProviderCreateListingScreenState
             ),
             SizedBox(height: 10.h),
             Text(
-              title,
+              label,
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
@@ -1848,12 +1860,24 @@ class _ProviderCreateListingScreenState
     );
   }
 
+  String _getServiceTypeLabel(String? key) {
+    switch (key) {
+      case 'Photography':
+        return context.l10n.photography;
+      case 'Videography':
+        return context.l10n.videography;
+      case 'Editing':
+        return context.l10n.editing;
+      default:
+        return 'Service Type';
+    }
+  }
+
   Widget _buildRadiusSelector() {
     final radii = [
       {'label': '30 km', 'value': 30},
       {'label': '50 km', 'value': 50},
       {'label': '100 km', 'value': 100},
-      {'label': 'National', 'value': 500},
     ];
     
     return Row(
@@ -1904,7 +1928,7 @@ class _ProviderCreateListingScreenState
       padding: EdgeInsets.all(20.w),
       children: [
         Text(
-          'Details',
+          context.l10n.stepDetails,
           style: TextStyle(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
@@ -1913,7 +1937,7 @@ class _ProviderCreateListingScreenState
         ),
         SizedBox(height: 8.h),
         Text(
-          'Add details about your service',
+          context.l10n.addDetailsAboutService,
           style: TextStyle(
             fontSize: 14.sp,
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -1921,7 +1945,7 @@ class _ProviderCreateListingScreenState
         ),
         SizedBox(height: 30.h),
         
-        _buildLabel('Listing Title', isRequired: true),
+        _buildLabel(context.l10n.listingTitle, isRequired: true),
         _buildTextField(
           _titleController,
           'e.g. Wedding Photography Premium Package',
@@ -1929,7 +1953,7 @@ class _ProviderCreateListingScreenState
         ),
         
         SizedBox(height: 20.h),
-        _buildLabel('Description', isRequired: true),
+        _buildLabel(context.l10n.description, isRequired: true),
         _buildTextField(
           _descriptionController,
           'Describe your service in detail...',
@@ -1938,7 +1962,7 @@ class _ProviderCreateListingScreenState
         ),
         
         SizedBox(height: 20.h),
-        _buildLabel('Estimated Duration'),
+        _buildLabel(context.l10n.serviceDuration),
         Row(
           children: [
             Expanded(
@@ -1962,18 +1986,18 @@ class _ProviderCreateListingScreenState
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSectionTitle('Add-ons'),
+            _buildSectionTitle(context.l10n.addons),
             TextButton.icon(
               onPressed: _showAddAddonSheet,
               icon: Icon(Icons.add, size: 18.sp),
-              label: Text('Add'),
+              label: Text(context.l10n.add),
             ),
           ],
         ),
         _buildAddonList(),
         
         SizedBox(height: 30.h),
-        _buildSectionTitle('Equipment'),
+        _buildSectionTitle(context.l10n.equipment),
         _buildEquipmentInput(),
         _buildEquipmentList(),
 
@@ -1981,11 +2005,11 @@ class _ProviderCreateListingScreenState
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSectionTitle('Tags'),
+            _buildSectionTitle(context.l10n.tags),
             TextButton.icon(
               onPressed: _showAddTagSheet,
               icon: Icon(Icons.add, size: 18.sp),
-              label: const Text('Add'),
+              label: Text(context.l10n.add),
             ),
           ],
         ),
@@ -2005,7 +2029,12 @@ class _ProviderCreateListingScreenState
   }
 
   Widget _buildDurationUnitDropdown() {
-    final units = ['Minutes', 'Hours', 'Days', 'Weeks'];
+    final units = {
+      'Minutes': context.l10n.minutes,
+      'Hours': context.l10n.hours,
+      'Days': context.l10n.days,
+      'Weeks': context.l10n.weeks,
+    };
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
@@ -2020,10 +2049,10 @@ class _ProviderCreateListingScreenState
           value: _durationUnitController.text,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down),
-          items: units.map((String unit) {
+          items: units.entries.map((entry) {
             return DropdownMenuItem<String>(
-              value: unit,
-              child: Text(unit),
+              value: entry.key,
+              child: Text(entry.value),
             );
           }).toList(),
           onChanged: (String? newValue) {
@@ -2071,7 +2100,7 @@ class _ProviderCreateListingScreenState
                 ),
               ),
               Text(
-                'Add Tag',
+                context.l10n.addTag,
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
@@ -2080,7 +2109,7 @@ class _ProviderCreateListingScreenState
               ),
               SizedBox(height: 6.h),
               Text(
-                'Add searchable tags for your service (e.g. drone_photography, wedding)',
+                context.l10n.addSearchableTags,
                 style: TextStyle(
                   fontSize: 12.sp,
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
@@ -2137,7 +2166,7 @@ class _ProviderCreateListingScreenState
                     ),
                   ),
                   child: Text(
-                    'Add Tag',
+                    context.l10n.addTag,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 15.sp,
@@ -2157,7 +2186,7 @@ class _ProviderCreateListingScreenState
   Widget _buildTagsList() {
     if (_customTags.isEmpty) {
       return Text(
-        'No tags added yet',
+        context.l10n.noTagsAdded,
         style: TextStyle(
           fontSize: 12.sp,
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
@@ -2241,7 +2270,7 @@ class _ProviderCreateListingScreenState
                 ),
               ),
               Text(
-                'Add Add-on',
+                context.l10n.addAddon,
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
@@ -2250,7 +2279,7 @@ class _ProviderCreateListingScreenState
               ),
               SizedBox(height: 20.h),
               Text(
-                'Name',
+                context.l10n.nameLabel,
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w500,
@@ -2283,7 +2312,7 @@ class _ProviderCreateListingScreenState
               ),
               SizedBox(height: 16.h),
               Text(
-                'Price (€)',
+                'Price (€)', // Keep as is or translate?
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w500,
@@ -2337,7 +2366,7 @@ class _ProviderCreateListingScreenState
                     ),
                   ),
                   child: Text(
-                    'Add',
+                    context.l10n.add,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 15.sp,
@@ -2938,7 +2967,7 @@ class _ProviderCreateListingScreenState
                   });
                 },
                 decoration: InputDecoration(
-                  hintText: 'Enter your city or region',
+                  hintText: context.l10n.enterCityOrRegion,
                   prefixIcon: Icon(Icons.location_on_outlined, size: 20.sp),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),

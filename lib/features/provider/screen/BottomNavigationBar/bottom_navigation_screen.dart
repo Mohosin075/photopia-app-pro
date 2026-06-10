@@ -11,6 +11,7 @@ import 'package:photopya/controller/common/bottom_nav_controller.dart';
 import 'package:provider/provider.dart';
 
 import 'package:photopya/core/notification/notification_service.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderBottomNavigationScreen extends StatefulWidget {
   final int initialIndex;
@@ -84,8 +85,8 @@ class _ProviderBottomNavigationScreenState
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text(
-                    'Press back again to exit',
+                  content: Text(
+                    context.l10n.pressBackToExit,
                     textAlign: TextAlign.center,
                   ),
                   duration: const Duration(seconds: 2),
@@ -93,7 +94,8 @@ class _ProviderBottomNavigationScreenState
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                   backgroundColor: const Color(0xFF1A1A1A),
                 ),
               );

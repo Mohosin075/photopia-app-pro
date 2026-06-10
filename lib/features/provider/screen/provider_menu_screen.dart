@@ -588,10 +588,10 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
       },
       child: Container(
         width: double.infinity,
-        height: 55.h,
+        height: 46.h,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary,
-          borderRadius: BorderRadius.circular(15).r,
+          borderRadius: BorderRadius.circular(12).r,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -599,14 +599,14 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
             Icon(
               Icons.camera_alt_outlined,
               color: Theme.of(context).colorScheme.onPrimary,
-              size: 20.sp,
+              size: 18.sp,
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 10.w),
             Text(
               context.l10n.switchToClient,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onPrimary,
-                fontSize: 16.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -757,10 +757,10 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                 },
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 15.h),
+            padding: EdgeInsets.symmetric(vertical: 10.h),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(15).r,
+              borderRadius: BorderRadius.circular(12).r,
               border: Border.all(
                 color: Theme.of(context).colorScheme.error.withOpacity(0.3),
               ),
@@ -788,8 +788,8 @@ class _ProviderMenuScreenState extends State<ProviderMenuScreen> {
                     context.l10n.logOut,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.error,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
