@@ -612,8 +612,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               label: 'English',
               isSelected: !controller.isFrench,
               onTap: () {
-                controller.setEnglish();
-                context.setLocale(const Locale('en'));
+                controller.setEnglish(context);
                 Navigator.pop(ctx);
               },
             ),
@@ -621,8 +620,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               label: 'Français',
               isSelected: controller.isFrench,
               onTap: () {
-                controller.setFrench();
-                context.setLocale(const Locale('fr'));
+                controller.setFrench(context);
                 Navigator.pop(ctx);
               },
             ),

@@ -115,6 +115,7 @@ class _PhotopiaState extends State<Photopia> {
           ],
           child: Consumer2<LanguageController, ThemeController>(
             builder: (context, langController, themeController, child) {
+              debugPrint('MaterialApp build: context.locale=${context.locale}, langController.locale=${langController.locale}');
               return MaterialApp(
                 navigatorKey: navigatorKey,
                 debugShowCheckedModeBanner: false,

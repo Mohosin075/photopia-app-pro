@@ -34,6 +34,11 @@ void main() async {
   
   await GetStorage.init();
   
+  // Read saved locale to synchronize startup state
+  final storage = GetStorage();
+  final String? savedLanguage = storage.read<String>('app_language');
+  final startLocale = savedLanguage != null ? Locale(savedLanguage) : const Locale('en');
+  
   // Initialize Offline and Network Services
   await LocalStorageService.init();
   ConnectivityService().init();
@@ -45,6 +50,7 @@ void main() async {
       supportedLocales: const [Locale('en'), Locale('fr')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
+      startLocale: startLocale,
       child: DevicePreview(
         enabled: false,
         builder: (context) => const Photopia(),

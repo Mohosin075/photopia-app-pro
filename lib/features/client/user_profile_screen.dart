@@ -27,7 +27,6 @@ import 'package:photopya/features/provider/screen/provider_profile_screen.dart'
     as provider_view;
 import 'package:photopya/core/widgets/full_screen_image_viewer.dart';
 import 'package:photopya/controller/language_controller.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:photopya/core/localization/app_localizations.dart';
 import 'package:photopya/core/services/translation_service.dart';
 import 'package:photopya/features/client/settings_screen.dart';
@@ -106,8 +105,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       : Icon(Icons.radio_button_unchecked,
                           color: Colors.grey[300], size: 20.sp),
                   onTap: () {
-                    langCtrl.setLanguage(lang['code']!);
-                    context.setLocale(Locale(lang['code']!));
+                    langCtrl.setLanguage(context, lang['code']!);
                     Navigator.pop(ctx);
                   },
                 );

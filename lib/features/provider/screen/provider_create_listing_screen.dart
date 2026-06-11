@@ -1060,15 +1060,14 @@ class _ProviderCreateListingScreenState
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 15.w,
-          crossAxisSpacing: 15.w,
-          childAspectRatio: 1.5,
+          crossAxisCount: 3,
+          mainAxisSpacing: 10.w,
+          crossAxisSpacing: 10.w,
+          childAspectRatio: 0.95,
           children: [
             _buildServiceTypeCard('Photography', context.l10n.photography, Icons.camera_alt),
             _buildServiceTypeCard('Videography', context.l10n.videography, Icons.videocam),
             _buildServiceTypeCard('Editing', context.l10n.editing, Icons.content_cut),
-            // _buildServiceTypeCard('Other Service', Icons.add),
           ],
         ),
         
@@ -1816,6 +1815,7 @@ class _ProviderCreateListingScreenState
         }
       },
       child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(15.r),
@@ -1838,16 +1838,19 @@ class _ProviderCreateListingScreenState
           children: [
             Icon(
               icon,
-              size: 30.sp,
+              size: 24.sp,
               color: isSelected 
                   ? Theme.of(context).colorScheme.primary 
                   : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             ),
-            SizedBox(height: 10.h),
+            SizedBox(height: 8.h),
             Text(
               label,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 12.sp,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 color: isSelected 
                     ? Theme.of(context).colorScheme.primary 

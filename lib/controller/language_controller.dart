@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LanguageController extends ChangeNotifier {
   static const String _storageKey = 'app_language';
@@ -27,13 +28,19 @@ class LanguageController extends ChangeNotifier {
     }
   }
 
-  void setLanguage(String langCode) {
-    if (_locale.languageCode == langCode) return;
+  void setLanguage(BuildContext context, String langCode) {
+    debugPrint('LanguageController.setLanguage: target=$langCode, controller_locale=${_locale.languageCode}, easy_locale=${context.locale.languageCode}');
+    if (_locale.languageCode == langCode && context.locale.languageCode == langCode) {
+      debugPrint('LanguageController.setLanguage: locales match, returning');
+      return;
+    }
     _locale = Locale(langCode);
     _storage.write(_storageKey, langCode);
+    debugPrint('LanguageController.setLanguage: calling context.setLocale(${_locale})');
+    context.setLocale(_locale);
     notifyListeners();
   }
 
-  void setEnglish() => setLanguage('en');
-  void setFrench() => setLanguage('fr');
+  void setEnglish(BuildContext context) => setLanguage(context, 'en');
+  void setFrench(BuildContext context) => setLanguage(context, 'fr');
 }
