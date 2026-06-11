@@ -1966,22 +1966,70 @@ class _ProviderCreateListingScreenState
         
         SizedBox(height: 20.h),
         _buildLabel(context.l10n.serviceDuration),
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              flex: 2,
-              child: _buildTextField(
-                _durationController,
-                'Value',
-                keyboardType: TextInputType.number,
-                errorText: _localFieldErrors['duration'],
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10.r),
+                      border: Border.all(
+                        color: _localFieldErrors['duration'] != null
+                            ? Colors.red
+                            : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                      ),
+                    ),
+                    child: TextField(
+                      controller: _durationController,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value.isNotEmpty) {
+                            _localFieldErrors.remove('duration');
+                          }
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Value',
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          fontSize: AppTypography.bodyLarge,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 12.h,
+                        ),
+                      ),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 15.w),
+                Expanded(
+                  flex: 3,
+                  child: _buildDurationUnitDropdown(),
+                ),
+              ],
+            ),
+            if (_localFieldErrors['duration'] != null)
+              Padding(
+                padding: EdgeInsets.only(top: 8.h),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                    SizedBox(width: 6.w),
+                    Text(
+                      _localFieldErrors['duration']!,
+                      style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(width: 15.w),
-            Expanded(
-              flex: 3,
-              child: _buildDurationUnitDropdown(),
-            ),
           ],
         ),
         
@@ -2614,20 +2662,20 @@ class _ProviderCreateListingScreenState
     String? errorText,
     TextInputType? keyboardType,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(
-          color: errorText != null
-              ? Colors.red
-              : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: errorText != null
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            ),
+          ),
+          child: TextField(
             controller: controller,
             maxLines: maxLines,
             keyboardType: keyboardType,
@@ -2647,16 +2695,22 @@ class _ProviderCreateListingScreenState
             ),
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
-          if (errorText != null)
-            Padding(
-              padding: EdgeInsets.only(left: 16.w, bottom: 8.h),
-              child: Text(
-                errorText,
-                style: TextStyle(color: Colors.red, fontSize: 12.sp),
-              ),
+        ),
+        if (errorText != null)
+          Padding(
+            padding: EdgeInsets.only(top: 8.h),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                SizedBox(width: 6.w),
+                Text(
+                  errorText,
+                  style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                ),
+              ],
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
@@ -2721,10 +2775,16 @@ class _ProviderCreateListingScreenState
         ),
         if (errorText != null)
           Padding(
-            padding: EdgeInsets.only(left: 4.w, top: 4.h),
-            child: Text(
-              errorText,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            padding: EdgeInsets.only(top: 8.h),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                SizedBox(width: 6.w),
+                Text(
+                  errorText,
+                  style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                ),
+              ],
             ),
           ),
       ],
@@ -2814,10 +2874,16 @@ class _ProviderCreateListingScreenState
         ),
         if (errorText != null)
           Padding(
-            padding: EdgeInsets.only(left: 4.w, top: 4.h),
-            child: Text(
-              errorText,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            padding: EdgeInsets.only(top: 8.h),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                SizedBox(width: 6.w),
+                Text(
+                  errorText,
+                  style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                ),
+              ],
             ),
           ),
       ],
@@ -2902,10 +2968,16 @@ class _ProviderCreateListingScreenState
         ),
         if (errorText != null)
           Padding(
-            padding: EdgeInsets.only(left: 4.w, top: 4.h),
-            child: Text(
-              errorText,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            padding: EdgeInsets.only(top: 8.h),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                SizedBox(width: 6.w),
+                Text(
+                  errorText,
+                  style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                ),
+              ],
             ),
           ),
       ],
@@ -3008,10 +3080,16 @@ class _ProviderCreateListingScreenState
         ),
         if (errorText != null)
           Padding(
-            padding: EdgeInsets.only(left: 4.w, top: 4.h),
-            child: Text(
-              errorText,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            padding: EdgeInsets.only(top: 8.h),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                SizedBox(width: 6.w),
+                Text(
+                  errorText,
+                  style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                ),
+              ],
             ),
           ),
       ],
@@ -3092,10 +3170,16 @@ class _ProviderCreateListingScreenState
         ),
         if (errorText != null)
           Padding(
-            padding: EdgeInsets.only(left: 4.w, top: 4.h),
-            child: Text(
-              errorText,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            padding: EdgeInsets.only(top: 8.h),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                SizedBox(width: 6.w),
+                Text(
+                  errorText,
+                  style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                ),
+              ],
             ),
           ),
         if (_selectedServiceTypes.isNotEmpty) ...[
@@ -3537,10 +3621,16 @@ class _ProviderCreateListingScreenState
         dropdown,
         if (errorText != null)
           Padding(
-            padding: EdgeInsets.only(left: 4.w, top: 4.h),
-            child: Text(
-              errorText,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            padding: EdgeInsets.only(top: 8.h),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                SizedBox(width: 6.w),
+                Text(
+                  errorText,
+                  style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                ),
+              ],
             ),
           ),
       ],
@@ -3799,10 +3889,16 @@ class _ProviderCreateListingScreenState
         ),
         if (errorText != null)
           Padding(
-            padding: EdgeInsets.only(left: 4.w, top: 4.h),
-            child: Text(
-              errorText,
-              style: TextStyle(color: Colors.red, fontSize: 12.sp),
+            padding: EdgeInsets.only(top: 8.h),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 14.sp),
+                SizedBox(width: 6.w),
+                Text(
+                  errorText,
+                  style: TextStyle(color: Colors.red, fontSize: 12.sp),
+                ),
+              ],
             ),
           ),
       ],

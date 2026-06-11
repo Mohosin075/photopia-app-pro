@@ -24,6 +24,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
   DateTime? _selectedDate;
   bool _isLoading = false;
   Data? _availabilityData;
+  Set<int> _bookedDays = {}; // To store days of the month that have bookings
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
   Future<void> _fetchAvailabilityData() async {
     setState(() => _isLoading = true);
     final availabilityController = context.read<CalenderAvailibilityController>();
+    final ordersController = context.read<ProviderOrdersController>();
     final profileController = context.read<UserProfileController>();
     
     if (profileController.userProfile == null) {
@@ -57,10 +59,30 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
     
     if (providerId != null) {
       final settingsModel = await availabilityController.getAvailabilitySettings(providerId: providerId);
+      await ordersController.getMyOrders(filterType: 'upcoming');
+      
       if (mounted && settingsModel != null) {
         debugPrint('✅ Availability Data Received: ${settingsModel.data?.defaultSchedule?.monday?.isActive}');
+        
+        // Extract booked days from upcoming orders
+        Set<int> bookedDays = {};
+        for (var booking in ordersController.upcomingOrders) {
+          if (booking['bookingDate'] != null) {
+            try {
+              DateTime bookingDate = DateTime.parse(booking['bookingDate']);
+              if (bookingDate.year == _currentDate.year && 
+                  bookingDate.month == _currentDate.month) {
+                bookedDays.add(bookingDate.day);
+              }
+            } catch (e) {
+              debugPrint('Error parsing booking date: $e');
+            }
+          }
+        }
+        
         setState(() {
           _availabilityData = settingsModel.data;
+          _bookedDays = bookedDays;
         });
       }
     }
@@ -111,6 +133,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         _currentDate = DateTime(_currentDate.year, _currentDate.month + 1);
       }
     });
+    _fetchAvailabilityData(); // Refresh booked days for new month
   }
 
   void _previousMonth() {
@@ -121,6 +144,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         _currentDate = DateTime(_currentDate.year, _currentDate.month - 1);
       }
     });
+    _fetchAvailabilityData(); // Refresh booked days for new month
   }
 
   @override
@@ -436,16 +460,17 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                      color: isWorking ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                    ),
                 ),
-                if (isWorking)
-                  Container(
-                    margin: EdgeInsets.only(top: 4.h),
-                    width: 4.w,
-                    height: 4.w,
-                    decoration: BoxDecoration(
-                      color: hasBlocked ? Colors.red : (hasPending ? Colors.orange : Colors.green),
-                      shape: BoxShape.circle,
-                    ),
+                Container(
+                  margin: EdgeInsets.only(top: 4.h),
+                  width: 4.w,
+                  height: 4.w,
+                  decoration: BoxDecoration(
+                    color: _bookedDays.contains(dayNum) 
+                        ? Colors.green 
+                        : (isWorking ? Colors.yellow : Colors.red),
+                    shape: BoxShape.circle,
                   ),
+                ),
               ],
             ),
           ),
