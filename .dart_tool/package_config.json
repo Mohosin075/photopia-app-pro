@@ -56,10 +56,22 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "checked_yaml",
+      "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/checked_yaml-2.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
       "name": "chewie",
       "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/chewie-1.13.0",
       "packageUri": "lib/",
       "languageVersion": "3.8"
+    },
+    {
+      "name": "cli_util",
+      "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/cli_util-0.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "clock",
@@ -306,6 +318,12 @@
       "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/flutter_image_compress_web-0.1.5",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_launcher_icons",
+      "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/flutter_launcher_icons-0.13.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
     },
     {
       "name": "flutter_lints",
@@ -657,7 +675,7 @@
     },
     {
       "name": "lints",
-      "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/lints-6.0.0",
+      "rootUri": "file:///Users/nightfurry/.pub-cache/hosted/pub.dev/lints-6.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.8"
     },

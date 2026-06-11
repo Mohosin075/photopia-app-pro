@@ -5,6 +5,7 @@ import 'package:photopya/core/constants/app_typography.dart';
 import 'package:photopya/features/provider/screen/provider_availability_settings_screen.dart';
 import 'package:photopya/features/provider/screen/booking_details_screen.dart';
 import 'package:photopya/controller/provider/calender_availibility_controller.dart';
+import 'package:photopya/controller/provider/provider_orders_controller.dart';
 import 'package:photopya/controller/client/user_profile_controller.dart';
 import 'package:photopya/data/models/calender_availibility_model.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,8 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchAvailabilityData();
       _fetchBookingsForDate(_selectedDate ?? _currentDate);
+      // Fetch upcoming orders for week view
+      Provider.of<ProviderOrdersController>(context, listen: false).getMyOrders(filterType: 'upcoming');
     });
   }
 
@@ -792,13 +795,44 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
            ),
         ),
         SizedBox(height: 15.h),
-        _buildScheduleItem(
-          title: 'Fashion Shoot',
-          client: 'Marc Jacobs',
-          time: '2:00 PM',
-          location: 'SoHo Studio',
-          cost: '€450',
-          status: 'pending',
+        Consumer<ProviderOrdersController>(
+          builder: (context, controller, child) {
+            if (controller.upcomingLoading && controller.upcomingOrders.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (controller.upcomingOrders.isEmpty) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.h),
+                child: Center(
+                  child: Text(
+                     context.l10n.noBookingsRightNow,
+                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 14.sp),
+                   ),
+                ),
+              );
+            }
+
+            return Column(
+              children: controller.upcomingOrders.map((booking) {
+                final pricing = booking['pricingDetails'];
+                final service = booking['serviceId'];
+                
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: _buildScheduleItem(
+                    title: service is Map ? service['title'] : booking['eventType'] ?? context.l10n.defaultBookingTitle,
+                    client: booking['clientName'] ?? (booking['clientId'] is Map ? booking['clientId']['name'] : null) ?? context.l10n.defaultClientName,
+                    time: booking['startTime'] ?? context.l10n.notAvailable,
+                    location: booking['eventLocation'] is Map ? booking['eventLocation']['address'] : null ?? context.l10n.locationNA,
+                    cost: '€${pricing?['subtotal'] ?? '0'}',
+                    status: booking['status'] ?? 'pending',
+                    bookingData: booking,
+                  ),
+                );
+              }).toList(),
+            );
+          },
         ),
         SizedBox(height: 20.h),
       ],

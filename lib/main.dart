@@ -17,16 +17,22 @@ import 'package:photopya/core/notification/notification_service.dart';
 import 'package:photopya/core/services/local_storage_service.dart';
 import 'package:photopya/core/services/connectivity_service.dart';
 import 'package:photopya/core/services/offline_sync_service.dart';
+import 'package:photopya/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
   try {
-    await Firebase.initializeApp();
+    debugPrint("🔵 Firebase: Initializing...");
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    debugPrint("🔵 Firebase: Initialized successfully! Apps: ${Firebase.apps.length}");
     FirebaseMessaging.onBackgroundMessage(NotificationService.backgroundHandler);
-  } catch (e) {
-    debugPrint("Firebase initialization failed: $e");
+  } catch (e, stackTrace) {
+    debugPrint("🔴 Firebase initialization failed: $e");
+    debugPrint("🔴 Stack trace: $stackTrace");
   }
   
   // TODO: Replace with your actual Stripe Publishable Key

@@ -5,11 +5,14 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:photopya/controller/auth_controller.dart';
 import 'package:photopya/core/network/Api_service/network_caller.dart';
 import 'package:photopya/core/network/urls.dart';
+import 'package:photopya/firebase_options.dart';
 
 // Top-level background message handler
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   debugPrint("Handling background message: ${message.messageId}");
 }
 

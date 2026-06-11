@@ -404,6 +404,7 @@
   "bookingsThisWeek": "+{} this week",
   "revenueVsLastMonth": "+{}% vs last month",
   "reviewCount": "{} reviews",
+  "pendingApproval": "Pending Approval",
   "requestsCount": "{} requests",
   "vsLastMonth": "{}{}% vs last month",
   "ratingHigherThanProviders": "Your rating is {}% higher than similar providers",

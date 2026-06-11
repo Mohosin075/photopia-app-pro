@@ -559,37 +559,37 @@ class _ProviderAvailabilitySettingsScreenState extends State<ProviderAvailabilit
                 _buildTimePickerField('End', schedule.end ?? '18:00', (time) {
                   setState(() => schedule.end = time);
                 }),
-                SizedBox(width: 15.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Jobs/Day', style: TextStyle(fontSize: 10.sp, color: Colors.grey)),
-                      SizedBox(height: 4.h),
-                      SizedBox(
-                        height: 35.h,
-                        child: TextField(
-                          onChanged: (val) => schedule.maxBookings = int.tryParse(val) ?? 1,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                          decoration: InputDecoration(
-                            isDense: true,
-                            hintText: schedule.maxBookings?.toString(),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.r),
-                              borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.r),
-                              borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // SizedBox(width: 15.w),
+                // Expanded(
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Text('Jobs/Day', style: TextStyle(fontSize: 10.sp, color: Colors.grey)),
+                //       SizedBox(height: 4.h),
+                //       SizedBox(
+                //         height: 35.h,
+                //         child: TextField(
+                //           onChanged: (val) => schedule.maxBookings = int.tryParse(val) ?? 1,
+                //           keyboardType: TextInputType.number,
+                //           textAlign: TextAlign.center,
+                //           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                //           decoration: InputDecoration(
+                //             isDense: true,
+                //             hintText: schedule.maxBookings?.toString(),
+                //             enabledBorder: OutlineInputBorder(
+                //               borderRadius: BorderRadius.circular(8.r),
+                //               borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+                //             ),
+                //             focusedBorder: OutlineInputBorder(
+                //               borderRadius: BorderRadius.circular(8.r),
+                //               borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ],

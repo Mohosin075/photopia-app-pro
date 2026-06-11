@@ -22,42 +22,71 @@ class ProviderOrdersScreen extends StatefulWidget {
   State<ProviderOrdersScreen> createState() => _ProviderOrdersScreenState();
 }
 
-class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _ProviderOrdersScreenState extends State<ProviderOrdersScreen> {
+  int _selectedViewIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(_handleTabSelection);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchCurrentTab();
     });
   }
 
-  void _handleTabSelection() {
-    if (!_tabController.indexIsChanging) {
-      _fetchCurrentTab();
-    }
-  }
-
   void _fetchCurrentTab() {
     final controller = context.read<ProviderOrdersController>();
-    if (_tabController.index == 0) {
+    if (_selectedViewIndex == 0) {
       controller.getMyOrders(filterType: 'today');
-    } else if (_tabController.index == 1) {
+    } else if (_selectedViewIndex == 1) {
       controller.getMyOrders(filterType: 'upcoming');
-    } else if (_tabController.index == 2) {
+    } else if (_selectedViewIndex == 2) {
       controller.getMyOrders(status: 'pending');
     }
   }
 
-  @override
-  void dispose() {
-    _tabController.removeListener(_handleTabSelection);
-    _tabController.dispose();
-    super.dispose();
+  Widget _buildViewToggle() {
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: Row(
+        children: [
+          _buildToggleItem(context.l10n.tabToday, 0),
+          _buildToggleItem(context.l10n.tabUpcoming, 1),
+          _buildToggleItem(context.l10n.tabPending, 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleItem(String label, int index) {
+    bool isSelected = _selectedViewIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() => _selectedViewIndex = index);
+          _fetchCurrentTab();
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 10.h),
+          decoration: BoxDecoration(
+            color: isSelected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: AppTypography.bodyLarge,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -111,83 +140,38 @@ class _ProviderOrdersScreenState extends State<ProviderOrdersScreen>
               ),
             ),
 
-            // Tabs
+            // Tabs (Same design as calendar's view toggle)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              child: Container(
-                height: 40.h,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  padding: EdgeInsets.all(4.w),
-                  indicator: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor: Theme.of(context).colorScheme.onPrimary,
-                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                  labelStyle: TextStyle(
-                    fontSize: 12.sp.clamp(11, 13),
-                    fontWeight: FontWeight.w600,
-                  ),
-                  unselectedLabelStyle: TextStyle(
-                    fontSize: 12.sp.clamp(11, 13),
-                    fontWeight: FontWeight.w500,
-                  ),
-                  dividerColor: Colors.transparent,
-                  overlayColor: WidgetStateProperty.all(Colors.transparent),
-                  tabs: [
-                    Tab(
-                      child: Center(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(context.l10n.tabToday),
-                        ),
-                      ),
-                    ),
-                    Tab(
-                      child: Center(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(context.l10n.tabUpcoming),
-                        ),
-                      ),
-                    ),
-                    Tab(
-                      child: Center(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(context.l10n.tabPending),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: _buildViewToggle(),
             ),
 
-            // Tab Bar View
+            // Tab View
             Expanded(
               child: Consumer<ProviderOrdersController>(
                 builder: (context, controller, child) {
-                  return TabBarView(
-                    controller: _tabController,
-                    children: [
-                      controller.todayLoading && controller.todayOrders.isEmpty
-                          ? _buildShimmerLoading()
-                          : _buildTodayTab(controller),
-                      controller.upcomingLoading && controller.upcomingOrders.isEmpty
-                          ? _buildShimmerLoading()
-                          : _buildUpcomingTab(controller),
-                      controller.pendingLoading && controller.pendingOrders.isEmpty
-                          ? _buildShimmerLoading()
-                          : _buildPendingTab(controller),
-                    ],
-                  );
+                  Widget buildContent() {
+                    switch (_selectedViewIndex) {
+                      case 0:
+                        if (controller.todayLoading && controller.todayOrders.isEmpty) {
+                          return _buildShimmerLoading();
+                        }
+                        return _buildTodayTab(controller);
+                      case 1:
+                        if (controller.upcomingLoading && controller.upcomingOrders.isEmpty) {
+                          return _buildShimmerLoading();
+                        }
+                        return _buildUpcomingTab(controller);
+                      case 2:
+                        if (controller.pendingLoading && controller.pendingOrders.isEmpty) {
+                          return _buildShimmerLoading();
+                        }
+                        return _buildPendingTab(controller);
+                      default:
+                        return const SizedBox();
+                    }
+                  }
+                  return buildContent();
                 },
               ),
             ),
