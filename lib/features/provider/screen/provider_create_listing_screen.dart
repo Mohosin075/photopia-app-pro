@@ -407,7 +407,7 @@ class _ProviderCreateListingScreenState
 
     if (_selectedPricingModel == 'By Hour' || _selectedPricingModel == 'By Day') {
       if (_durationController.text.trim().isEmpty) {
-        errors['duration'] = "Duration is required";
+        errors['duration'] = "Please enter a duration value";
         isValid = false;
       }
     }
@@ -669,7 +669,7 @@ class _ProviderCreateListingScreenState
         isValid = false;
       }
       if (_durationController.text.trim().isEmpty) {
-        errors['duration'] = "Duration is required";
+        errors['duration'] = "Please enter a duration value";
         isValid = false;
       }
     } else if (_selectedPricingModel == 'By Day') {
@@ -682,7 +682,7 @@ class _ProviderCreateListingScreenState
         isValid = false;
       }
       if (_durationController.text.trim().isEmpty) {
-        errors['duration'] = "Duration is required";
+        errors['duration'] = "Please enter a duration value";
         isValid = false;
       }
     } else if (_selectedPricingModel == 'By Service') {
@@ -1056,7 +1056,7 @@ class _ProviderCreateListingScreenState
         ),
         SizedBox(height: 30.h),
         
-        _buildLabel(context.l10n.serviceType),
+        _buildLabel(context.l10n.serviceType, isRequired: true),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -1088,7 +1088,7 @@ class _ProviderCreateListingScreenState
 
         SizedBox(height: 30.h),
         _buildSectionTitle(context.l10n.serviceLocation),
-        _buildLabel(context.l10n.enterCityOrRegion),
+        _buildLabel(context.l10n.enterCityOrRegion, isRequired: true),
         _buildLocationAutocomplete(errorText: _localFieldErrors['city']),
         
         SizedBox(height: 20.h),
@@ -1965,56 +1965,62 @@ class _ProviderCreateListingScreenState
         ),
         
         SizedBox(height: 20.h),
-        _buildLabel(context.l10n.serviceDuration),
+        _buildLabel(context.l10n.serviceDuration, isRequired: true),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(
-                        color: _localFieldErrors['duration'] != null
-                            ? Colors.red
-                            : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: _localFieldErrors['duration'] != null
+                              ? Colors.red
+                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                        ),
                       ),
-                    ),
-                    child: TextField(
-                      controller: _durationController,
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) {
-                        setState(() {
-                          if (value.isNotEmpty) {
-                            _localFieldErrors.remove('duration');
-                          }
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Value',
-                        hintStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                      child: TextField(
+                        controller: _durationController,
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          setState(() {
+                            if (value.isNotEmpty) {
+                              _localFieldErrors.remove('duration');
+                            }
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Value',
+                          hintStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                            fontSize: AppTypography.bodyLarge,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 12.h,
+                          ),
+                        ),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: AppTypography.bodyLarge,
                         ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
-                        ),
                       ),
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ),
-                ),
-                SizedBox(width: 15.w),
-                Expanded(
-                  flex: 3,
-                  child: _buildDurationUnitDropdown(),
-                ),
-              ],
+                  SizedBox(width: 15.w),
+                  Expanded(
+                    flex: 3,
+                    child: _buildDurationUnitDropdown(),
+                  ),
+                ],
+              ),
             ),
             if (_localFieldErrors['duration'] != null)
               Padding(
@@ -2087,6 +2093,7 @@ class _ProviderCreateListingScreenState
       'Weeks': context.l10n.weeks,
     };
     return Container(
+      alignment: Alignment.center,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -2098,12 +2105,26 @@ class _ProviderCreateListingScreenState
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _durationUnitController.text,
+          dropdownColor: Theme.of(context).colorScheme.surface,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down),
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+          ),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: AppTypography.bodyLarge,
+          ),
           items: units.entries.map((entry) {
             return DropdownMenuItem<String>(
               value: entry.key,
-              child: Text(entry.value),
+              child: Text(
+                entry.value,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: AppTypography.bodyLarge,
+                ),
+              ),
             );
           }).toList(),
           onChanged: (String? newValue) {
@@ -3330,7 +3351,7 @@ class _ProviderCreateListingScreenState
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLabel('Weekday Hourly Rate (EUR)'),
+          _buildLabel('Weekday Hourly Rate (EUR)', isRequired: true),
           _buildTextField(
             _weekdayHourlyRateController,
             'e.g. 50',
@@ -3341,7 +3362,7 @@ class _ProviderCreateListingScreenState
                     .fieldErrors['weekdayHourlyRate'],
           ),
           SizedBox(height: 15.h),
-          _buildLabel('Weekend Hourly Rate (EUR)'),
+          _buildLabel('Weekend Hourly Rate (EUR)', isRequired: true),
           _buildTextField(
             _weekendHourlyRateController,
             'e.g. 75',
@@ -3357,7 +3378,7 @@ class _ProviderCreateListingScreenState
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLabel('Daily Rate (EUR)'),
+          _buildLabel('Daily Rate (EUR)', isRequired: true),
           _buildTextField(
             _dailyRateController,
             'e.g. 350',
@@ -3366,7 +3387,7 @@ class _ProviderCreateListingScreenState
                 context.watch<ServiceController>().fieldErrors['dailyRate'],
           ),
           SizedBox(height: 15.h),
-          _buildLabel('Hours per Day'),
+          _buildLabel('Hours per Day', isRequired: true),
           _buildTextField(
             _dailyHoursController,
             'e.g. 8',
