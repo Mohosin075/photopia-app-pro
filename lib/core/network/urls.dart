@@ -1,6 +1,6 @@
 class Urls {
   //live url -https://mohosin5003.binarybards.online
-  static const String _rootUrl = 'https://mohosin5003.binarybards.online';
+  static const String _rootUrl = 'http://10.10.26.173:5003';
   static const String baseUrl = '$_rootUrl/uploads';
   //local url - http://10.10.7.50:4003
   //authentication API

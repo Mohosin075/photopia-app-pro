@@ -1,0 +1,170 @@
+# Flutter Integration Guide: Date-Range Availability & Blocked Ranges
+ 
+This guide describes how to update the Flutter app to integrate with the new date-range availability slots and blocked ranges features on the backend.
+ 
+---
+ 
+## 1. Overview of the New Fields
+ 
+The `Availability` configuration now accepts arrays of date ranges, so you no longer need to expand ranges (like Jan 15-20) into individual days on the mobile client. You can send the range directly.
+ 
+1. **`availabilityPeriods`**: Used to define specific ranges of dates when a service is active (useful for manual slot management).
+2. **`blockedDateRanges`**: Used to block booking across a range of dates (e.g., holidays, vacations) for either a specific service or globally.
+ 
+---
+ 
+## 2. API Endpoints & Request Payloads
+ 
+### A. Saving Availability (Create or Update)
+To save these settings from the Professional app, send a `POST` request.
+ 
+* **Endpoint:** `POST /api/v1/availability/create-availability` (or your configured create route)
+* **Headers:** `Authorization: Bearer <TOKEN>`
+* **Request Payload (Example):**
+ 
+```json
+{
+  "serviceId": "651a2b3c4d5e6f7a8b9c0d1e", // Optional: Pass to make these slots specific to this service
+  "availabilityPeriods": [
+    {
+      "startDate": "2025-01-15T00:00:00.000Z",
+      "endDate": "2025-01-20T00:00:00.000Z",
+      "startTime": "09:00",
+      "endTime": "18:00",
+      "priceOverride": 150.00
+    },
+    {
+      "startDate": "2025-02-01T00:00:00.000Z",
+      "endDate": "2025-02-15T00:00:00.000Z",
+      "startTime": "10:00",
+      "endTime": "17:00"
+    }
+  ],
+  "blockedDateRanges": [
+    {
+      "startDate": "2024-12-24T00:00:00.000Z",
+      "endDate": "2024-12-26T00:00:00.000Z",
+      "note": "Christmas Holiday"
+    },
+    {
+      "startDate": "2025-01-01T00:00:00.000Z",
+      "endDate": "2025-01-01T00:00:00.000Z",
+      "note": "New Year"
+    }
+  ],
+  "bufferMinutes": 30
+}
+```
+ 
+*Note: Dates must be valid ISO 8601 strings.*
+ 
+---
+ 
+### B. Fetching Availability Settings
+To retrieve a provider's settings to display on the professional settings screen:
+ 
+* **Retrieve Global Availability:**
+  ```http
+  GET /api/v1/availability/my-availability
+  ```
+* **Retrieve Service-Specific Availability:**
+  ```http
+  GET /api/v1/availability/my-availability?serviceId=YOUR_SERVICE_ID
+  ```
+ 
+* **Response Format (Example snippet):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "675dba054a75d8de7ffc6e09",
+    "providerId": "675dba054a75d8de7ffc6e03",
+    "serviceId": "675dba054a75d8de7ffc6e05",
+    "availabilityPeriods": [
+      {
+        "startDate": "2025-01-15T00:00:00.000Z",
+        "endDate": "2025-01-20T00:00:00.000Z",
+        "startTime": "09:00",
+        "endTime": "18:00",
+        "priceOverride": 150
+      }
+    ],
+    "blockedDateRanges": [
+      {
+        "startDate": "2024-12-24T00:00:00.000Z",
+        "endDate": "2024-12-26T00:00:00.000Z",
+        "note": "Christmas Holiday"
+      }
+    ],
+    "bufferMinutes": 30
+  }
+}
+```
+ 
+---
+ 
+### C. Client Fetching Slots
+When a client selects a date on the calendar, call the time slots endpoint. The backend automatically calculates overrides, blocked ranges, and active availability periods.
+ 
+* **Endpoint:**
+  ```http
+  GET /api/v1/availability/slots/PROVIDER_ID?date=2025-01-16&duration=60&serviceId=SERVICE_ID
+  ```
+* **Response (Example):**
+  ```json
+  {
+    "success": true,
+    "message": "Available time slots retrieved successfully",
+    "data": {
+      "slots": ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30"]
+    }
+  }
+  ```
+ 
+---
+ 
+## 3. Backend Priority Logic (For Reference)
+ 
+When validating a booking or fetching slots for a specific date, the backend checks the configuration in this exact priority:
+ 
+1. **Blocked Date Ranges:** If the date is inside any `blockedDateRanges` (e.g. Dec 24-26), it returns `isAvailable: false`.
+2. **Custom Date Override:** If the date matches a specific `customDates` single-day override, it applies that override.
+3. **Availability Periods:** If there are any `availabilityPeriods` configured:
+   - It checks if the date falls inside any range (inclusive).
+   - If yes, it uses the specific hours (e.g. 10:00-17:00) and pricing overrides.
+   - If no, it blocks the booking (outside valid ranges).
+4. **Fallback:** If no `availabilityPeriods` are configured, it falls back to the default weekly schedule (`defaultSchedule`) and recurring weekly rules.
+
+
+আমি প্ল্যানটি বিস্তারিত পড়েছি। এখানে ক্যালেন্ডারের "অ্যাভেইলিবিলিটি (Availability)" এবং "ব্লকড ডেট রেঞ্জ (Blocked Date Ranges)" কীভাবে ব্যাকএন্ডে হ্যান্ডেল করা হয়েছে, তা নিয়ে বলা আছে।
+
+পুরো প্ল্যানটি বাংলায় সহজ করে নিচে ব্যাখ্যা করা হলো:
+
+১. নতুন ফিল্ডগুলোর কাজ
+আগে কোনো নির্দিষ্ট দিন ব্লক করতে বা অ্যাভেইলিবল করতে হলে প্রত্যেকটা দিন আলাদা করে সিলেক্ট করতে হতো (যেমন: ১৫-২০ তারিখের জন্য ৫ বার)। এখন সেটা রেঞ্জ হিসেবে পাঠানো যাবে। এর জন্য দুটি নতুন ফিল্ড যোগ করা হয়েছে:
+
+availabilityPeriods: এটা দিয়ে বোঝানো হবে কোন নির্দিষ্ট তারিখ থেকে কোন তারিখ পর্যন্ত (যেমন: ১৫ জানুয়ারি থেকে ২০ জানুয়ারি) প্রোভাইডার সার্ভিস দেওয়ার জন্য অ্যাভেইলিবল (Available) আছেন। চাইলে এর ভেতরে নির্দিষ্ট সময় (যেমন সকাল ৯টা থেকে সন্ধ্যা ৬টা) এবং আলাদা প্রাইস (priceOverride) সেট করে দেওয়া যাবে।
+blockedDateRanges: এটা দিয়ে প্রোভাইডার চাইলে নির্দিষ্ট কোনো ছুটির দিন বা ভ্যাকেশনের পুরো রেঞ্জ একবারে ব্লক (Block) করে রাখতে পারবেন (যেমন: ২৪-২৬ ডিসেম্বর ক্রিসমাসের ছুটি)। এর সাথে একটা note (কারণ) লিখে রাখার অপশনও দেওয়া হয়েছে।
+২. এপিআই ইন্টিগ্রেশন
+আমাদের অ্যাপে এই সুবিধা যুক্ত করতে ৩টি কাজ করতে হবে:
+
+ক. ডাটা সেভ করা (প্রোভাইডার অ্যাপ): প্রোভাইডার যখন ক্যালেন্ডারে কোনো রেঞ্জ ব্লক বা অ্যাভেইলিবল করবেন, তখন আমাদের POST /api/v1/availability/create-availability এন্ডপয়েন্টে ডাটা পাঠাতে হবে। রিকোয়েস্টে availabilityPeriods (কবে অ্যাভেইলিবল) এবং blockedDateRanges (কবে ব্লক) লিস্ট আকারে পাঠাতে হবে।
+
+খ. ডাটা দেখানো (প্রোভাইডার অ্যাপ): প্রোভাইডারের ক্যালেন্ডার স্ক্রিনে তার আগের সেট করা ব্লকড বা অ্যাভেইলিবল দিনগুলো দেখাতে হলে GET /api/v1/availability/my-availability কল করতে হবে।
+
+গ. ক্লায়েন্টের জন্য টাইম স্লট দেখানো (ক্লায়েন্ট অ্যাপ): ক্লায়েন্ট যখন বুকিং করার জন্য কোনো দিন সিলেক্ট করবে, তখন আমরা GET /api/v1/availability/slots/PROVIDER_ID?date=... কল করব। ব্যাকএন্ড নিজে থেকেই হিসাব করে বলে দেবে ওই দিন প্রোভাইডার অ্যাভেইলিবল আছেন কিনা এবং থাকলে কোন কোন টাইম স্লট ফাঁকা আছে।
+
+৩. ব্যাকএন্ড কীভাবে কাজ করে (Priority Logic)
+ব্যাকএন্ড ডাটা চেক করার সময় একটা নির্দিষ্ট সিরিয়াল মেনে চলে:
+
+সবার আগে দেখে ক্লায়েন্ট যে দিন বুক করতে চাইছে, সেটা প্রোভাইডারের blockedDateRanges এর ভেতরে পড়ে কিনা। পড়লে সরাসরি ব্লক করে দেবে।
+এরপর দেখে কোনো সিঙ্গেল ডে (Custom Date) ওভাররাইড করা আছে কিনা।
+তারপরে দেখে দিনটি প্রোভাইডারের দেওয়া availabilityPeriods রেঞ্জের ভেতরে পড়ে কিনা। পড়লে সেই অনুযায়ী টাইম ও প্রাইস দেখাবে।
+উপরের কিছুই না থাকলে, প্রোভাইডার অ্যাপ খোলার সময় যে সাধারণ সাপ্তাহিক শিডিউল (সপ্তাহের কোন দিন কয়টা থেকে কয়টা) দিয়েছিলেন, সেটার ওপর ভিত্তি করে টাইম স্লট দেখাবে।
+আমাদের নেক্সট স্টেপ কী হতে পারে? আমাদের এখন প্রোভাইডারের ক্যালেন্ডার স্ক্রিনে এমন একটা ইউআই বানাতে হবে বা আপডেট করতে হবে, যেখানে প্রোভাইডার চাইলে:
+
+একাধিক দিন সিলেক্ট করে একসাথে Block করতে পারেন (যা blockedDateRanges এ সেভ হবে)।
+একাধিক দিন সিলেক্ট করে একসাথে Available করতে পারেন (যা availabilityPeriods এ সেভ হবে)।
+আপনি কি চান আমি ইউআই বা লজিক ইমপ্লিমেন্টেশনের কাজ শুরু করব? নাকি অন্য কোনো প্রশ্ন আছে?
+
+6:23
