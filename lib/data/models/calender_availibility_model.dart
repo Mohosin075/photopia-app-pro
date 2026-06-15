@@ -35,6 +35,8 @@ class Data {
   String? serviceId;
   List<CustomDates>? customDates;
   List<RecurringRules>? recurringRules;
+  List<AvailabilityPeriods>? availabilityPeriods;
+  List<BlockedDateRanges>? blockedDateRanges;
   int? bufferMinutes;
   int? advanceNoticeHours;
   int? maxBookingsPerDay;
@@ -55,6 +57,8 @@ class Data {
       this.serviceId,
       this.customDates,
       this.recurringRules,
+      this.availabilityPeriods,
+      this.blockedDateRanges,
       this.bufferMinutes,
       this.advanceNoticeHours,
       this.maxBookingsPerDay,
@@ -90,6 +94,18 @@ class Data {
         recurringRules!.add(new RecurringRules.fromJson(v));
       });
     }
+    if (json['availabilityPeriods'] != null) {
+      availabilityPeriods = <AvailabilityPeriods>[];
+      json['availabilityPeriods'].forEach((v) {
+        availabilityPeriods!.add(new AvailabilityPeriods.fromJson(v));
+      });
+    }
+    if (json['blockedDateRanges'] != null) {
+      blockedDateRanges = <BlockedDateRanges>[];
+      json['blockedDateRanges'].forEach((v) {
+        blockedDateRanges!.add(new BlockedDateRanges.fromJson(v));
+      });
+    }
     bufferMinutes = json['bufferMinutes'];
     advanceNoticeHours = json['advanceNoticeHours'];
     maxBookingsPerDay = json['maxBookingsPerDay'];
@@ -113,9 +129,9 @@ class Data {
     if (this.googleCalendarSync != null) {
       data['googleCalendarSync'] = this.googleCalendarSync!.toJson();
     }
-    data['_id'] = this.sId;
-    data['providerId'] = this.providerId;
-    data['serviceId'] = this.serviceId;
+    if (this.sId != null) data['_id'] = this.sId;
+    if (this.providerId != null) data['providerId'] = this.providerId;
+    if (this.serviceId != null) data['serviceId'] = this.serviceId;
     if (this.customDates != null) {
       data['customDates'] = this.customDates!.map((v) => v.toJson()).toList();
     }
@@ -123,16 +139,24 @@ class Data {
       data['recurringRules'] =
           this.recurringRules!.map((v) => v.toJson()).toList();
     }
-    data['bufferMinutes'] = this.bufferMinutes;
-    data['advanceNoticeHours'] = this.advanceNoticeHours;
-    data['maxBookingsPerDay'] = this.maxBookingsPerDay;
-    data['maxBookingsPerWeek'] = this.maxBookingsPerWeek;
-    data['autoBlockAfterBooking'] = this.autoBlockAfterBooking;
-    data['autoBlockDuration'] = this.autoBlockDuration;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['__v'] = this.iV;
-    data['id'] = this.id;
+    if (this.availabilityPeriods != null) {
+      data['availabilityPeriods'] =
+          this.availabilityPeriods!.map((v) => v.toJson()).toList();
+    }
+    if (this.blockedDateRanges != null) {
+      data['blockedDateRanges'] =
+          this.blockedDateRanges!.map((v) => v.toJson()).toList();
+    }
+    if (this.bufferMinutes != null) data['bufferMinutes'] = this.bufferMinutes;
+    if (this.advanceNoticeHours != null) data['advanceNoticeHours'] = this.advanceNoticeHours;
+    if (this.maxBookingsPerDay != null) data['maxBookingsPerDay'] = this.maxBookingsPerDay;
+    if (this.maxBookingsPerWeek != null) data['maxBookingsPerWeek'] = this.maxBookingsPerWeek;
+    if (this.autoBlockAfterBooking != null) data['autoBlockAfterBooking'] = this.autoBlockAfterBooking;
+    if (this.autoBlockDuration != null) data['autoBlockDuration'] = this.autoBlockDuration;
+    if (this.createdAt != null) data['createdAt'] = this.createdAt;
+    if (this.updatedAt != null) data['updatedAt'] = this.updatedAt;
+    if (this.iV != null) data['__v'] = this.iV;
+    if (this.id != null) data['id'] = this.id;
     return data;
   }
 }
@@ -302,14 +326,14 @@ class CustomDates {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['date'] = this.date;
-    data['type'] = this.type;
-    data['start'] = this.start;
-    data['end'] = this.end;
-    data['maxBookings'] = this.maxBookings;
-    data['note'] = this.note;
-    data['rateMultiplier'] = this.rateMultiplier;
-    data['_id'] = this.sId;
+    if (this.date != null) data['date'] = this.date;
+    if (this.type != null) data['type'] = this.type;
+    if (this.start != null) data['start'] = this.start;
+    if (this.end != null) data['end'] = this.end;
+    if (this.maxBookings != null) data['maxBookings'] = this.maxBookings;
+    if (this.note != null) data['note'] = this.note;
+    if (this.rateMultiplier != null) data['rateMultiplier'] = this.rateMultiplier;
+    if (this.sId != null) data['_id'] = this.sId;
     return data;
   }
 }
@@ -350,6 +374,66 @@ class RecurringRules {
     data['start'] = this.start;
     data['end'] = this.end;
     data['maxBookings'] = this.maxBookings;
+    return data;
+  }
+}
+
+class AvailabilityPeriods {
+  String? startDate;
+  String? endDate;
+  String? startTime;
+  String? endTime;
+  double? priceOverride;
+
+  AvailabilityPeriods({
+    this.startDate,
+    this.endDate,
+    this.startTime,
+    this.endTime,
+    this.priceOverride,
+  });
+
+  AvailabilityPeriods.fromJson(Map<String, dynamic> json) {
+    startDate = json['startDate'];
+    endDate = json['endDate'];
+    startTime = json['startTime'];
+    endTime = json['endTime'];
+    priceOverride = (json['priceOverride'] as num?)?.toDouble();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['startDate'] = startDate;
+    data['endDate'] = endDate;
+    data['startTime'] = startTime;
+    data['endTime'] = endTime;
+    data['priceOverride'] = priceOverride;
+    return data;
+  }
+}
+
+class BlockedDateRanges {
+  String? startDate;
+  String? endDate;
+  String? note;
+
+  BlockedDateRanges({
+    this.startDate,
+    this.endDate,
+    this.note,
+  });
+
+  BlockedDateRanges.fromJson(Map<String, dynamic> json) {
+    startDate = json['startDate'];
+    endDate = json['endDate'];
+    note = json['note'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['startDate'] = startDate;
+    data['endDate'] = endDate;
+    data['note'] = note;
     return data;
   }
 }

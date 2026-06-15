@@ -5,6 +5,7 @@ import 'package:photopya/core/constants/app_typography.dart';
 import 'package:photopya/features/provider/screen/provider_create_listing_screen.dart';
 import 'package:photopya/features/provider/screen/provider_listing_details_screen.dart';
 import 'package:photopya/features/provider/screen/provider_edit_profile_screen.dart';
+import 'package:photopya/features/provider/screen/provider_availability_settings_screen.dart';
 import 'package:photopya/controller/provider/my_listing_controller.dart';
 import 'package:photopya/controller/provider/service_controller.dart';
 import 'package:photopya/controller/provider/provider_profile_controller.dart';
@@ -201,9 +202,93 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
     );
   }
 
+  Widget _buildListingPopupMenu(Listing listing) {
+    return PopupMenuButton<String>(
+      icon: Icon(
+        Icons.more_vert,
+        size: 20.sp,
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12).r,
+      ),
+      elevation: 3,
+      onSelected: (value) async {
+        if (value == 'edit') {
+          final success = await context
+              .read<MyListingController>()
+              .getSingleListing(listing.sId ?? '');
+
+          if (success && mounted) {
+            final fullListing = context
+                .read<MyListingController>()
+                .singleListingData;
+
+            Navigator.of(context, rootNavigator: true).push(
+              AppTransitions.createPremiumRoute(
+                ProviderCreateListingScreen(
+                  existingListing: fullListing,
+                ),
+              ),
+            ).then((value) {
+              if (value == true) {
+                context.read<MyListingController>().getMyListings();
+              }
+            });
+          }
+        } else if (value == 'availability') {
+          Navigator.push(
+            context,
+            AppTransitions.createPremiumRoute(
+              ProviderAvailabilitySettingsScreen(),
+            ),
+          );
+        } else if (value == 'delete') {
+          _showDeleteConfirmationDialog(context, listing.sId ?? '');
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'edit',
+          child: Row(
+            children: [
+              Icon(Icons.edit_outlined, size: 18.sp),
+              SizedBox(width: 8.w),
+              Text(context.l10n.editBtn),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'availability',
+          child: Row(
+            children: [
+              Icon(Icons.calendar_month_outlined, size: 18.sp),
+              SizedBox(width: 8.w),
+              Text('Availability Settings'),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem<String>(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(Icons.delete_outline, size: 18.sp, color: Colors.redAccent),
+              SizedBox(width: 8.w),
+              Text(
+                'Delete Listing',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildListingCard(Listing listing) {
     return Container(
-      margin: EdgeInsets.only(bottom: 5.h),
+      margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -235,20 +320,26 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 ),
               ),
               SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.2) : const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Text(
-                  listing.status ?? 'Active',
-                  style: TextStyle(
-                    fontSize: AppTypography.bodySmall,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32),
-                    fontWeight: FontWeight.w600,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.green.withOpacity(0.2) : const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(6.r),
+                    ),
+                    child: Text(
+                      listing.status ?? 'Active',
+                      style: TextStyle(
+                        fontSize: AppTypography.bodySmall,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                ),
+                  _buildListingPopupMenu(listing),
+                ],
               ),
             ],
           ),
@@ -314,7 +405,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
           Row(
             children: [
               Expanded(
-                flex: 2,
+                flex: 1,
                 child: _buildListingButton(
                   icon: Icons.visibility_outlined,
                   label: context.l10n.viewBtn,
@@ -332,45 +423,17 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               ),
               SizedBox(width: 12.w),
               Expanded(
-                flex: 2,
-                child: _buildListingButton(
-                  icon: Icons.edit_outlined,
-                  label: context.l10n.editBtn,
-                  onTap: () async {
-                    // We need full details to edit, so we fetch it first
-                    final success = await context
-                        .read<MyListingController>()
-                        .getSingleListing(listing.sId ?? '');
-
-                    if (success && mounted) {
-                      final fullListing = context
-                          .read<MyListingController>()
-                          .singleListingData;
-
-                      Navigator.of(context, rootNavigator: true).push(
-                        AppTransitions.createPremiumRoute(
-                          ProviderCreateListingScreen(
-                            existingListing: fullListing,
-                          ),
-                        ),
-                      ).then((value) {
-                        if (value == true) {
-                          context.read<MyListingController>().getMyListings();
-                        }
-                      });
-                    }
-                  },
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
                 flex: 1,
                 child: _buildListingButton(
-                  icon: Icons.delete_outline,
-                  label: '',
-                  isDelete: true,
+                  icon: Icons.calendar_month_outlined,
+                  label: 'Availability',
                   onTap: () {
-                    _showDeleteConfirmationDialog(context, listing.sId ?? '');
+                    Navigator.push(
+                      context,
+                      AppTransitions.createPremiumRoute(
+                        ProviderAvailabilitySettingsScreen(),
+                      ),
+                    );
                   },
                 ),
               ),

@@ -44,6 +44,8 @@ class Urls {
       '$_rootUrl/api/v1/services/provider/$providerId';
   //Calender and availibility
   static const String calenderSettings = '$_rootUrl/api/v1/availability';
+  static const String createAvailability = '$_rootUrl/api/v1/availability';
+  static const String myAvailability = '$_rootUrl/api/v1/availability/my-availability';
   //get provider availibility
   static String getProviderAvailability(String providerId) =>
       '$_rootUrl/api/v1/availability/$providerId';

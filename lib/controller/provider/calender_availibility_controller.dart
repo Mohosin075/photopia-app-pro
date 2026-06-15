@@ -11,6 +11,10 @@ class CalenderAvailibilityController extends ChangeNotifier {
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
 
+  CalenderSettingsModel? _availabilitySettings;
+  CalenderSettingsModel? get availabilitySettings => _availabilitySettings;
+  Data? get availabilityData => _availabilitySettings?.data;
+
   // Caching month calendar data to reduce load time
   final Map<String, List<dynamic>> _calendarCache = {};
 
@@ -83,17 +87,18 @@ class CalenderAvailibilityController extends ChangeNotifier {
         bodyStr = "${bodyStr.substring(0, 500)}... [Truncated]";
       }
 
-      debugPrint('🚀 Sending Availability Update to ${Urls.calenderSettings}');
+      debugPrint('🚀 Sending Availability Update to ${Urls.createAvailability}');
       debugPrint('📦 Body: $bodyStr');
 
       final NetworkResponse response = await NetworkCaller.postRequest(
-        url: Urls.calenderSettings,
+        url: Urls.createAvailability,
         body: body,
         requireAuth: true,
       );
 
       _inProgress = false;
       if (response.isSuccess) {
+        _calendarCache.clear();
         notifyListeners();
         return true;
       } else {
@@ -120,7 +125,7 @@ class CalenderAvailibilityController extends ChangeNotifier {
     try {
       final String url = providerId != null
           ? Urls.getProviderAvailability(providerId)
-          : Urls.calenderSettings;
+          : Urls.myAvailability;
 
       final NetworkResponse response = await NetworkCaller.getRequest(
         url: url,
@@ -129,8 +134,9 @@ class CalenderAvailibilityController extends ChangeNotifier {
 
       _inProgress = false;
       if (response.isSuccess && response.body != null) {
+        _availabilitySettings = CalenderSettingsModel.fromJson(response.body!);
         notifyListeners();
-        return CalenderSettingsModel.fromJson(response.body!);
+        return _availabilitySettings;
       } else {
         _errorMessage = response.errorMessage ?? 'Failed to fetch availability';
         notifyListeners();
@@ -220,5 +226,194 @@ class CalenderAvailibilityController extends ChangeNotifier {
     _inProgress = false;
     _errorMessage = null;
     notifyListeners();
+  }
+
+  Future<bool> resetDateToDefault(String providerId, DateTime date) async {
+    final data = availabilityData ?? Data(providerId: providerId);
+    final compareDate = DateTime(date.year, date.month, date.day);
+    final dateStr = date.toIso8601String().split('T')[0];
+
+    // 1. Remove from blockedDateRanges
+    if (data.blockedDateRanges != null) {
+      data.blockedDateRanges!.removeWhere((range) {
+        if (range.startDate == null || range.endDate == null) return false;
+        try {
+          final start = DateTime.parse(range.startDate!);
+          final end = DateTime.parse(range.endDate!);
+          final startZero = DateTime(start.year, start.month, start.day);
+          final endZero = DateTime(end.year, end.month, end.day);
+          return (compareDate.isAfter(startZero) || compareDate.isAtSameMomentAs(startZero)) &&
+                 (compareDate.isBefore(endZero) || compareDate.isAtSameMomentAs(endZero));
+        } catch (e) {
+          return false;
+        }
+      });
+    }
+
+    // 2. Remove from customDates
+    if (data.customDates != null) {
+      data.customDates!.removeWhere((cd) {
+        if (cd.date == null) return false;
+        return cd.date!.startsWith(dateStr);
+      });
+    }
+
+    // 3. Remove from availabilityPeriods
+    if (data.availabilityPeriods != null) {
+      data.availabilityPeriods!.removeWhere((range) {
+        if (range.startDate == null || range.endDate == null) return false;
+        try {
+          final start = DateTime.parse(range.startDate!);
+          final end = DateTime.parse(range.endDate!);
+          final startZero = DateTime(start.year, start.month, start.day);
+          final endZero = DateTime(end.year, end.month, end.day);
+          return (compareDate.isAfter(startZero) || compareDate.isAtSameMomentAs(startZero)) &&
+                 (compareDate.isBefore(endZero) || compareDate.isAtSameMomentAs(endZero));
+        } catch (e) {
+          return false;
+        }
+      });
+    }
+
+    return await updateAvailability(data);
+  }
+
+  Future<bool> blockDate(String providerId, DateTime date, {String? note}) async {
+    final data = availabilityData ?? Data(providerId: providerId);
+    data.blockedDateRanges ??= [];
+    
+    final dateStr = date.toIso8601String().split('T')[0] + 'T00:00:00.000Z';
+    bool exists = data.blockedDateRanges!.any((r) => 
+      r.startDate != null && r.startDate!.startsWith(dateStr.substring(0, 10))
+    );
+    if (!exists) {
+      data.blockedDateRanges!.add(BlockedDateRanges(
+        startDate: dateStr,
+        endDate: dateStr,
+        note: note ?? 'Blocked Day',
+      ));
+    }
+    
+    data.customDates?.removeWhere((cd) {
+      if (cd.date == null) return false;
+      return cd.date!.startsWith(dateStr.substring(0, 10));
+    });
+
+    return await updateAvailability(data);
+  }
+
+  Future<bool> blockDateRange(String providerId, DateTime startDate, DateTime endDate, {String? note}) async {
+    final data = availabilityData ?? Data(providerId: providerId);
+    data.blockedDateRanges ??= [];
+
+    final startStr = startDate.toIso8601String().split('T')[0] + 'T00:00:00.000Z';
+    final endStr = endDate.toIso8601String().split('T')[0] + 'T23:59:59.000Z';
+
+    data.blockedDateRanges!.add(BlockedDateRanges(
+      startDate: startStr,
+      endDate: endStr,
+      note: note ?? 'Blocked Range',
+    ));
+
+    final startCompare = DateTime(startDate.year, startDate.month, startDate.day);
+    final endCompare = DateTime(endDate.year, endDate.month, endDate.day);
+    
+    data.customDates?.removeWhere((cd) {
+      if (cd.date == null) return false;
+      try {
+        final d = DateTime.parse(cd.date!);
+        final dCompare = DateTime(d.year, d.month, d.day);
+        return (dCompare.isAfter(startCompare) || dCompare.isAtSameMomentAs(startCompare)) &&
+               (dCompare.isBefore(endCompare) || dCompare.isAtSameMomentAs(endCompare));
+      } catch (e) {
+        return false;
+      }
+    });
+
+    return await updateAvailability(data);
+  }
+
+  Future<bool> markDateAsAvailable(String providerId, DateTime date) async {
+    final data = availabilityData ?? Data(providerId: providerId);
+    final dateStr = date.toIso8601String().split('T')[0];
+
+    if (data.blockedDateRanges != null) {
+      data.blockedDateRanges!.removeWhere((range) {
+        if (range.startDate == null || range.endDate == null) return false;
+        try {
+          final start = DateTime.parse(range.startDate!);
+          final end = DateTime.parse(range.endDate!);
+          final startZero = DateTime(start.year, start.month, start.day);
+          final endZero = DateTime(end.year, end.month, end.day);
+          final compareDate = DateTime(date.year, date.month, date.day);
+          return (compareDate.isAfter(startZero) || compareDate.isAtSameMomentAs(startZero)) &&
+                 (compareDate.isBefore(endZero) || compareDate.isAtSameMomentAs(endZero));
+        } catch (e) {
+          return false;
+        }
+      });
+    }
+
+    data.customDates ??= [];
+    data.customDates!.removeWhere((cd) {
+      if (cd.date == null) return false;
+      return cd.date!.startsWith(dateStr);
+    });
+    
+    data.customDates!.add(CustomDates(
+      date: date.toIso8601String().split('T')[0] + 'T00:00:00.000Z',
+      type: 'special_hours',
+      start: '09:00',
+      end: '18:00',
+    ));
+
+    return await updateAvailability(data);
+  }
+
+  Future<bool> addAvailabilityPeriod(
+    String providerId, 
+    DateTime startDate, 
+    DateTime endDate, 
+    String startTime, 
+    String endTime, 
+    {double? priceOverride}
+  ) async {
+    final data = availabilityData ?? Data(providerId: providerId);
+    data.availabilityPeriods ??= [];
+
+    final startStr = startDate.toIso8601String().split('T')[0] + 'T00:00:00.000Z';
+    final endStr = endDate.toIso8601String().split('T')[0] + 'T23:59:59.000Z';
+
+    data.availabilityPeriods!.add(AvailabilityPeriods(
+      startDate: startStr,
+      endDate: endStr,
+      startTime: startTime,
+      endTime: endTime,
+      priceOverride: priceOverride,
+    ));
+
+    return await updateAvailability(data);
+  }
+
+  Future<bool> addManualReservation(
+    String providerId, 
+    DateTime date, 
+    String startTime, 
+    String endTime, 
+    String note
+  ) async {
+    final data = availabilityData ?? Data(providerId: providerId);
+    data.customDates ??= [];
+
+    final dateStr = date.toIso8601String().split('T')[0] + 'T00:00:00.000Z';
+    data.customDates!.add(CustomDates(
+      date: dateStr,
+      type: 'unavailable',
+      start: startTime,
+      end: endTime,
+      note: note,
+    ));
+
+    return await updateAvailability(data);
   }
 }

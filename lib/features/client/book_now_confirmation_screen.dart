@@ -148,8 +148,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     final List<DateTime> dates = [];
     for (var item in _apiAvailableDates) {
       final dateStr = item['date']?.toString();
-      final isAvailable = item['isAvailable'] == true;
-      if (dateStr != null && isAvailable) {
+      if (dateStr != null) {
         final parsedDate = DateTime.tryParse(dateStr);
         if (parsedDate != null) {
           // Only show future/today dates
@@ -174,6 +173,207 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     setState(() => _availableDates = dates);
   }
 
+  String? _getBlockedReason(DateTime date) {
+    if (_availabilityData == null) return null;
+    final compareDate = DateTime(date.year, date.month, date.day);
+    final dateStr = date.toIso8601String().split('T')[0];
+
+    // 1. Check Blocked Date Ranges
+    if (_availabilityData!.blockedDateRanges != null) {
+      for (var range in _availabilityData!.blockedDateRanges!) {
+        if (range.startDate != null && range.endDate != null) {
+          try {
+            final start = DateTime.parse(range.startDate!);
+            final end = DateTime.parse(range.endDate!);
+            final startZero = DateTime(start.year, start.month, start.day);
+            final endZero = DateTime(end.year, end.month, end.day);
+            if ((compareDate.isAfter(startZero) || compareDate.isAtSameMomentAs(startZero)) &&
+                (compareDate.isBefore(endZero) || compareDate.isAtSameMomentAs(endZero))) {
+              return range.note?.isNotEmpty == true ? range.note : "This day is provider not available";
+            }
+          } catch (_) {}
+        }
+      }
+    }
+
+    // 2. Check Custom Dates (Exceptions)
+    if (_availabilityData!.customDates != null) {
+      for (var cd in _availabilityData!.customDates!) {
+        if (cd.date != null && cd.date!.startsWith(dateStr)) {
+          if (cd.type != 'special_hours') {
+            return cd.note?.isNotEmpty == true ? cd.note : "This day is provider not available";
+          }
+        }
+      }
+    }
+
+    // 3. Check Default Schedule active status
+    Monday? daySchedule;
+    switch (date.weekday) {
+      case DateTime.monday:
+        daySchedule = _availabilityData!.defaultSchedule?.monday;
+        break;
+      case DateTime.tuesday:
+        daySchedule = _availabilityData!.defaultSchedule?.tuesday;
+        break;
+      case DateTime.wednesday:
+        daySchedule = _availabilityData!.defaultSchedule?.wednesday;
+        break;
+      case DateTime.thursday:
+        daySchedule = _availabilityData!.defaultSchedule?.thursday;
+        break;
+      case DateTime.friday:
+        daySchedule = _availabilityData!.defaultSchedule?.friday;
+        break;
+      case DateTime.saturday:
+        daySchedule = _availabilityData!.defaultSchedule?.saturday;
+        break;
+      case DateTime.sunday:
+        daySchedule = _availabilityData!.defaultSchedule?.sunday;
+        break;
+    }
+    if (daySchedule != null && daySchedule.isActive == false) {
+      return "This day is provider not available";
+    }
+
+    return null;
+  }
+
+  void _showBlockedDayBottomSheet(DateTime date, String reason) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ).r,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 10,
+                spreadRadius: 2,
+              )
+            ],
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Pull handler line
+              Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  borderRadius: BorderRadius.circular(2).r,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              // Beautiful Warning Icon
+              Container(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50.withOpacity(isDark ? 0.08 : 0.8),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.event_busy_outlined,
+                  color: Colors.red.shade500,
+                  size: 40.sp,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              // Title
+              Text(
+                "Date Unavailable",
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                DateFormat('EEEE, MMMM dd, yyyy').format(date),
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? Colors.white60 : Colors.black54,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              // Reason Box
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white.withOpacity(0.03) : Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12).r,
+                  border: Border.all(
+                    color: isDark ? Colors.white12 : Colors.grey.shade200,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Provider's Note:",
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red.shade400,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    SizedBox(height: 6.h),
+                    Text(
+                      reason,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
+                        height: 1.4,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 24.h),
+              // Action Button
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: double.infinity,
+                  height: 46.h,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1F1F1F),
+                    borderRadius: BorderRadius.circular(12).r,
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Choose Another Date",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _onDateSelected(DateTime date) {
     if (_selectedDateTime != date) {
       setState(() {
@@ -181,7 +381,18 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         _selectedTime = '';
         _createdBookingId = null; // Reset booking ID if date changes
       });
-      _fetchTimeSlotsFromApi(date);
+      
+      final blockedReason = _getBlockedReason(date);
+      if (blockedReason != null) {
+        _showBlockedDayBottomSheet(date, blockedReason);
+      } else {
+        _fetchTimeSlotsFromApi(date);
+      }
+    } else {
+      final blockedReason = _getBlockedReason(date);
+      if (blockedReason != null) {
+        _showBlockedDayBottomSheet(date, blockedReason);
+      }
     }
   }
 
@@ -416,6 +627,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   int _selectedStep1Tab = 0; // 0 for Time Slots, 1 for Full Day
 
   Widget _buildStep1() {
+    final hasBlockedReason = _selectedDateTime != null && _getBlockedReason(_selectedDateTime!) != null;
+
     return _buildStepScaffold(
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -459,35 +672,46 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 ),
               );
             },
-            child: (_selectedStep1Tab == 0 && _selectedDateTime != null)
-                ? Column(
-                    key: const ValueKey('time_slots_section'),
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 15.h), // Reduced from 30.h
-                      Text(
-                        context.l10n.timeSlot,
-                        style: TextStyle(
-                          fontSize: 14.sp.clamp(14, 16),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 12.h), // Adjusted spacing
-                      Container(
-                        constraints: BoxConstraints(minHeight: 100.h),
-                        child: _isLoadingSlots
-                            ? SizedBox(
-                                height: 100.h,
-                                child: const Center(
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
+            child: _selectedDateTime != null
+                ? (hasBlockedReason
+                    ? Column(
+                        key: const ValueKey('blocked_reason_section'),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 15.h),
+                          _buildTimeSlotGrid(),
+                        ],
+                      )
+                    : (_selectedStep1Tab == 0
+                        ? Column(
+                            key: const ValueKey('time_slots_section'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 15.h),
+                              Text(
+                                context.l10n.timeSlot,
+                                style: TextStyle(
+                                  fontSize: 14.sp.clamp(14, 16),
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              )
-                            : _buildTimeSlotGrid(),
-                      ),
-                    ],
-                  )
+                              ),
+                              SizedBox(height: 12.h),
+                              Container(
+                                constraints: BoxConstraints(minHeight: 100.h),
+                                child: _isLoadingSlots
+                                    ? SizedBox(
+                                        height: 100.h,
+                                        child: const Center(
+                                          child: const CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      )
+                                    : _buildTimeSlotGrid(),
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink()))
                 : const SizedBox.shrink(),
           ),
         ],
@@ -601,7 +825,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         crossAxisCount: 3,
         mainAxisSpacing: 10.h,
         crossAxisSpacing: 10.w,
-        childAspectRatio: 2.1, // Increased to make containers shorter
+        childAspectRatio: 2.1,
       ),
       itemCount: _availableDates.length,
       itemBuilder: (context, index) {
@@ -611,17 +835,24 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             _selectedDateTime!.year == date.year &&
             _selectedDateTime!.month == date.month &&
             _selectedDateTime!.day == date.day;
+        final isBlocked = _getBlockedReason(date) != null;
 
         return GestureDetector(
           onTap: () => _onDateSelected(date),
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onSurface
+                  : (isBlocked 
+                      ? Theme.of(context).dividerColor.withOpacity(0.02)
+                      : Theme.of(context).colorScheme.surface),
               borderRadius: BorderRadius.circular(10).r,
               border: Border.all(
                 color: isSelected
                     ? Theme.of(context).colorScheme.onSurface
-                    : Theme.of(context).dividerColor.withOpacity(0.1),
+                    : (isBlocked 
+                        ? Theme.of(context).dividerColor.withOpacity(0.08) 
+                        : Theme.of(context).dividerColor.withOpacity(0.1)),
                 width: isSelected ? 1.5 : 1,
               ),
             ),
@@ -632,18 +863,38 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   DateFormat('EEE').format(date), // Mon, Tue...
                   style: TextStyle(
                     fontSize: 10.sp,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.4),
+                    color: isSelected
+                        ? Colors.white.withOpacity(0.6)
+                        : (isBlocked
+                            ? Theme.of(context).colorScheme.onSurface.withOpacity(0.3)
+                            : Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
                   ),
                 ),
-                Text(
-                  DateFormat('MMM dd').format(date), // Jun 17
-                  style: TextStyle(
-                    fontSize: 12.sp.clamp(12, 13),
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (isBlocked) ...[
+                      Icon(
+                        Icons.remove_circle_outline, 
+                        size: 10.sp, 
+                        color: isSelected ? Colors.white60 : Colors.red.withOpacity(0.6)
+                      ),
+                      SizedBox(width: 4.w),
+                    ],
+                    Text(
+                      DateFormat('MMM dd').format(date), // Jun 17
+                      style: TextStyle(
+                        fontSize: 12.sp.clamp(12, 13),
+                        fontWeight: FontWeight.bold,
+                        decoration: isBlocked ? TextDecoration.lineThrough : null,
+                        color: isSelected
+                            ? Colors.white
+                            : (isBlocked
+                                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
+                                : Theme.of(context).colorScheme.onSurface),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -656,6 +907,23 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   // ─── Time Slot Grid (Dynamic) ─────────────────────────────────────────────
 
   Widget _buildTimeSlotGrid() {
+    final blockedReason = _selectedDateTime != null ? _getBlockedReason(_selectedDateTime!) : null;
+    if (blockedReason != null) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 20.h),
+          child: Text(
+            'This date is unavailable. Tap date to see why.',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              fontSize: 13.sp,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      );
+    }
+
     if (_timeSlots.isEmpty) {
       return Center(
         child: Padding(
@@ -1992,6 +2260,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   Widget _buildBottomButton() {
     return Consumer<BookingController>(
       builder: (context, bookingCtrl, child) {
+        final isBlocked = _pageIndex == 0 && _selectedDateTime != null && _getBlockedReason(_selectedDateTime!) != null;
+
         return GestureDetector(
           onTap: () {
             if (bookingCtrl.isLoading) return;
@@ -2001,6 +2271,15 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 if (_selectedDateTime == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(context.l10n.pleaseSelectDateFirst)),
+                  );
+                  return;
+                }
+                if (isBlocked) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(_getBlockedReason(_selectedDateTime!)!),
+                      backgroundColor: Colors.redAccent,
+                    ),
                   );
                   return;
                 }
@@ -2040,7 +2319,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
             width: double.infinity,
             height: 46.h,
             decoration: BoxDecoration(
-              color: const Color(0xFF1F1F1F),
+              color: isBlocked ? Colors.grey.shade400 : const Color(0xFF1F1F1F),
               borderRadius: BorderRadius.circular(12).r,
             ),
             child: Center(
@@ -2053,7 +2332,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                                 : context.l10n.payAndConfirm)
                           : context.l10n.continueBtn,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: isBlocked ? Colors.white70 : Colors.white,
                         fontSize: 16.sp.clamp(16, 18),
                         fontWeight: FontWeight.bold,
                       ),

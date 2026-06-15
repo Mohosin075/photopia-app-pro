@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -179,6 +180,14 @@ class NotificationService {
     }
 
     try {
+      if (Platform.isIOS) {
+        final apnsToken = await _fcm.getAPNSToken();
+        if (apnsToken == null) {
+          debugPrint("🔔 NotificationService: iOS APNs token not set yet. This is expected on simulators or initial app launches without APNs setup.");
+          return;
+        }
+      }
+
       debugPrint("🔔 NotificationService: Fetching FCM token from Firebase...");
       String? token = await _fcm.getToken();
       if (token != null) {

@@ -10,6 +10,7 @@ import 'package:photopya/controller/client/user_profile_controller.dart';
 import 'package:photopya/data/models/calender_availibility_model.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:photopya/core/widgets/custom_snacbar.dart';
 
 class ProviderCalendarScreen extends StatefulWidget {
   const ProviderCalendarScreen({super.key});
@@ -90,27 +91,79 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
     if (mounted) setState(() => _isLoading = false);
   }
 
-  // Helper to check if a specific date is "Working"
   bool _isDayWorking(DateTime date) {
     if (_availabilityData == null) return true;
 
-    // 1. Check Custom Dates (Exceptions) first
-    
-    if (_availabilityData!.customDates != null) {
-      for (var cd in _availabilityData!.customDates!) {
-        if (cd.date != null) {
-          DateTime? exceptionDate = DateTime.tryParse(cd.date!);
-          if (exceptionDate != null && 
-              exceptionDate.year == date.year && 
-              exceptionDate.month == date.month && 
-              exceptionDate.day == date.day) {
-            return cd.type == 'available';
+    final compareDate = DateTime(date.year, date.month, date.day);
+
+    // 1. Check Blocked Date Ranges
+    if (_availabilityData!.blockedDateRanges != null) {
+      for (var range in _availabilityData!.blockedDateRanges!) {
+        if (range.startDate != null && range.endDate != null) {
+          try {
+            final start = DateTime.parse(range.startDate!);
+            final end = DateTime.parse(range.endDate!);
+            final startZero = DateTime(start.year, start.month, start.day);
+            final endZero = DateTime(end.year, end.month, end.day);
+            
+            if ((compareDate.isAfter(startZero) || compareDate.isAtSameMomentAs(startZero)) &&
+                (compareDate.isBefore(endZero) || compareDate.isAtSameMomentAs(endZero))) {
+              return false;
+            }
+          } catch (e) {
+            debugPrint('Error parsing blocked range date: $e');
           }
         }
       }
     }
 
-    // 2. Check Default Schedule using weekday integer (1=Mon, 7=Sun)
+    // 2. Check Custom Dates (Exceptions)
+    if (_availabilityData!.customDates != null) {
+      for (var cd in _availabilityData!.customDates!) {
+        if (cd.date != null) {
+          try {
+            DateTime? exceptionDate = DateTime.tryParse(cd.date!);
+            if (exceptionDate != null) {
+              final exceptionZero = DateTime(exceptionDate.year, exceptionDate.month, exceptionDate.day);
+              if (exceptionZero.isAtSameMomentAs(compareDate)) {
+                return cd.type == 'special_hours';
+              }
+            }
+          } catch (e) {
+            debugPrint('Error parsing custom date: $e');
+          }
+        }
+      }
+    }
+
+    // 3. Check Availability Periods
+    if (_availabilityData!.availabilityPeriods != null && _availabilityData!.availabilityPeriods!.isNotEmpty) {
+      bool insidePeriod = false;
+      for (var range in _availabilityData!.availabilityPeriods!) {
+        if (range.startDate != null && range.endDate != null) {
+          try {
+            final start = DateTime.parse(range.startDate!);
+            final end = DateTime.parse(range.endDate!);
+            final startZero = DateTime(start.year, start.month, start.day);
+            final endZero = DateTime(end.year, end.month, end.day);
+            
+            if ((compareDate.isAfter(startZero) || compareDate.isAtSameMomentAs(startZero)) &&
+                (compareDate.isBefore(endZero) || compareDate.isAtSameMomentAs(endZero))) {
+              insidePeriod = true;
+              break;
+            }
+          } catch (e) {
+            debugPrint('Error parsing availability period date: $e');
+          }
+        }
+      }
+      if (!insidePeriod) {
+        return false;
+      }
+      return true;
+    }
+
+    // 4. Check Default Schedule using weekday integer (1=Mon, 7=Sun)
     Monday? daySchedule;
     switch (date.weekday) {
       case DateTime.monday: daySchedule = _availabilityData!.defaultSchedule?.monday; break;
@@ -432,10 +485,6 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         DateTime date = DateTime(_currentDate.year, _currentDate.month, dayNum);
         bool isWorking = _isDayWorking(date);
         
-        // Mock data for blocked/pending indicators for now
-        bool hasBlocked = dayNum == 21; 
-        bool hasPending = dayNum == 22;
-
         return GestureDetector(
           onTap: () {
             setState(() {
@@ -486,158 +535,337 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.all(24.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 24.w,
+            right: 24.w,
+            top: 24.h,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24.h,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.calendar_today, size: 20.sp, color: Theme.of(context).colorScheme.primary),
-                SizedBox(width: 10.w),
-                Text(
-                  formattedDate,
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today, size: 20.sp, color: Theme.of(context).colorScheme.primary),
+                    SizedBox(width: 10.w),
+                    Text(
+                      formattedDate,
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.h),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: isWorking ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(
+                    isWorking ? 'Currently: Available' : 'Currently: Blocked',
+                    style: TextStyle(
+                      color: isWorking ? Colors.green : Colors.red,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
+                SizedBox(height: 20.h),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.block, color: Colors.red, size: 20.sp),
+                  ),
+                  title: Text(
+                    'Block Date(s)',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
+                  ),
+                  subtitle: Text('Block a single day or a range of days', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _showBlockDateRangePicker();
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.check_circle_outline, color: Colors.green, size: 20.sp),
+                  ),
+                  title: Text(
+                    'Mark as Available',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
+                  ),
+                  subtitle: Text('Open this day for bookings / remove blocks', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _resetSelectedDayToDefault();
+                  },
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.event_note, color: Colors.blue, size: 20.sp),
+                  ),
+                  title: Text(
+                    'Manual Reservation',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
+                  ),
+                  subtitle: Text('Add a personal booking or event', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _showManualReservationDialog(context);
+                  },
+                ),
+                const Divider(),
+                SizedBox(height: 10.h),
               ],
             ),
-            SizedBox(height: 8.h),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: isWorking ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Text(
-                isWorking ? 'Currently: Available' : 'Currently: Blocked',
-                style: TextStyle(
-                  color: isWorking ? Colors.green : Colors.red,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            SizedBox(height: 20.h),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.block, color: Colors.red, size: 20.sp),
-              ),
-              title: Text(
-                'Block This Day',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
-              ),
-              subtitle: Text('Mark as unavailable for clients', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
-              onTap: () {
-                Navigator.pop(ctx);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProviderAvailabilitySettingsScreen(),
-                  ),
-                ).then((_) => _fetchAvailabilityData());
-              },
-            ),
-            const Divider(),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.check_circle_outline, color: Colors.green, size: 20.sp),
-              ),
-              title: Text(
-                'Mark as Available',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
-              ),
-              subtitle: Text('Open this day for bookings', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
-              onTap: () {
-                Navigator.pop(ctx);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProviderAvailabilitySettingsScreen(),
-                  ),
-                ).then((_) => _fetchAvailabilityData());
-              },
-            ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.event_note, color: Colors.blue, size: 20.sp),
-              ),
-              title: Text(
-                'Manual Reservation',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
-              ),
-              subtitle: Text('Add a personal booking or event', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
-              onTap: () {
-                Navigator.pop(ctx);
-                _showManualReservationDialog(context);
-              },
-            ),
-            const Divider(),
-            SizedBox(height: 10.h),
-          ],
+          ),
         ),
       ),
     );
   }
 
+  Future<void> _resetSelectedDayToDefault() async {
+    final profileController = context.read<UserProfileController>();
+    final providerId = profileController.userProfile?.id;
+    if (providerId == null) return;
+
+    setState(() => _isLoading = true);
+    final controller = context.read<CalenderAvailibilityController>();
+    final success = await controller.resetDateToDefault(providerId, _selectedDate!);
+    
+    if (mounted) {
+      setState(() => _isLoading = false);
+      CustomSnackBar.show(
+        context: context,
+        message: success ? 'Day reset to default schedule' : 'Failed to reset day',
+        isError: !success,
+      );
+      _fetchAvailabilityData();
+    }
+  }
+
+
+  Future<void> _showBlockDateRangePicker() async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDateRange: DateTimeRange(
+        start: _selectedDate ?? DateTime.now(),
+        end: _selectedDate ?? DateTime.now(),
+      ),
+      saveText: 'Block',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: Theme.of(context).colorScheme.onSurface,
+                  onPrimary: Theme.of(context).colorScheme.surface,
+                ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final noteController = TextEditingController();
+      final isSingleDay = picked.start.year == picked.end.year &&
+          picked.start.month == picked.end.month &&
+          picked.start.day == picked.end.day;
+
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (dialogCtx) => AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text(isSingleDay ? 'Block Date' : 'Block Date Range'),
+          content: TextField(
+            controller: noteController,
+            decoration: InputDecoration(
+              labelText: 'Reason / Note (optional)',
+              hintText: isSingleDay ? 'e.g. Day off, Personal work' : 'e.g. Vacation, Holiday',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(dialogCtx);
+                final profileController = context.read<UserProfileController>();
+                final providerId = profileController.userProfile?.id;
+                if (providerId == null) return;
+
+                setState(() => _isLoading = true);
+                final controller = context.read<CalenderAvailibilityController>();
+                final success = await controller.blockDateRange(
+                  providerId,
+                  picked.start,
+                  picked.end,
+                  note: noteController.text.isNotEmpty 
+                      ? noteController.text 
+                      : (isSingleDay ? 'Blocked Day' : 'Blocked Range'),
+                );
+
+                if (mounted) {
+                  setState(() => _isLoading = false);
+                  CustomSnackBar.show(
+                    context: context,
+                    message: success 
+                        ? (isSingleDay ? 'Date blocked successfully' : 'Date range blocked successfully') 
+                        : (isSingleDay ? 'Failed to block date' : 'Failed to block date range'),
+                    isError: !success,
+                  );
+                  _fetchAvailabilityData();
+                }
+              },
+              child: const Text('Block'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+
+
   void _showManualReservationDialog(BuildContext context) {
     final titleController = TextEditingController();
-    final timeController = TextEditingController(text: '10:00 AM');
+    final startTimeController = TextEditingController(text: '10:00');
+    final endTimeController = TextEditingController(text: '12:00');
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: const Text('Manual Reservation'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: 'Event Title (e.g. Private Shoot)'),
-            ),
-            SizedBox(height: 10.h),
-            TextField(
-              controller: timeController,
-              decoration: const InputDecoration(labelText: 'Time'),
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Event Title (e.g. Private Shoot)',
+                  hintText: 'Private shoot or custom task',
+                ),
+              ),
+              SizedBox(height: 10.h),
+              GestureDetector(
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: ctx,
+                    initialTime: const TimeOfDay(hour: 10, minute: 0),
+                  );
+                  if (time != null) {
+                    startTimeController.text = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: startTimeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Start Time',
+                      suffixIcon: Icon(Icons.access_time),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.h),
+              GestureDetector(
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: ctx,
+                    initialTime: const TimeOfDay(hour: 12, minute: 0),
+                  );
+                  if (time != null) {
+                    endTimeController.text = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: endTimeController,
+                    decoration: const InputDecoration(
+                      labelText: 'End Time',
+                      suffixIcon: Icon(Icons.access_time),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           TextButton(
-            onPressed: () {
-              // TODO: Save this to backend or local storage
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Reservation added successfully!')),
-              );
+            onPressed: () async {
+              if (titleController.text.trim().isEmpty) {
+                CustomSnackBar.show(
+                  context: context,
+                  message: 'Please enter an event title',
+                  isError: true,
+                );
+                return;
+              }
               Navigator.pop(ctx);
+              
+              final profileController = context.read<UserProfileController>();
+              final providerId = profileController.userProfile?.id;
+              if (providerId == null) return;
+
+              setState(() => _isLoading = true);
+              final controller = context.read<CalenderAvailibilityController>();
+              final success = await controller.addManualReservation(
+                providerId,
+                _selectedDate!,
+                startTimeController.text,
+                endTimeController.text,
+                titleController.text,
+              );
+
+              if (mounted) {
+                setState(() => _isLoading = false);
+                CustomSnackBar.show(
+                  context: context,
+                  message: success ? 'Manual reservation added' : 'Failed to add reservation',
+                  isError: !success,
+                );
+                _fetchAvailabilityData();
+              }
             },
             child: const Text('Save'),
           ),
