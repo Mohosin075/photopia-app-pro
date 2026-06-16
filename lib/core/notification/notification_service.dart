@@ -92,6 +92,14 @@ class NotificationService {
         debugPrint(
           "🔔 NotificationService: Android Notification Channel Created: ${channel.id}",
         );
+        try {
+          final bool? granted = await androidImplementation.requestNotificationsPermission();
+          debugPrint(
+            "🔔 NotificationService: Android 13+ Notification Permission Granted: $granted",
+          );
+        } catch (e) {
+          debugPrint("🔔 NotificationService: Error requesting Android notifications permission: $e");
+        }
       }
 
       await _localNotifications.initialize(
@@ -230,12 +238,22 @@ class NotificationService {
 
   void _showLocalNotification(RemoteMessage message) async {
     RemoteNotification? notification = message.notification;
+    String? title = notification?.title;
+    String? body = notification?.body;
 
-    if (notification != null) {
+    // Fallback to data fields if notification payload is null (common in data-only notifications)
+    if (title == null && body == null && message.data.isNotEmpty) {
+      title = message.data['title'] ?? message.data['message'] ?? message.data['subject'] ?? message.data['content_title'];
+      body = message.data['body'] ?? message.data['content'] ?? message.data['text'] ?? message.data['content_body'];
+    }
+
+    if ((title != null && title.isNotEmpty) || (body != null && body.isNotEmpty)) {
+      final int notificationId = message.messageId?.hashCode ?? message.hashCode;
+
       await _localNotifications.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
+        notificationId,
+        title,
+        body,
         NotificationDetails(
           android: AndroidNotificationDetails(
             'high_importance_channel',
@@ -250,6 +268,8 @@ class NotificationService {
         ),
         payload: message.data['actionUrl'],
       );
+    } else {
+      debugPrint("🔔 NotificationService: No displayable content (title/body empty) for message: ${message.messageId}");
     }
   }
 

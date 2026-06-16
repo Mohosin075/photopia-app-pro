@@ -249,9 +249,10 @@ class ProviderOnboardingController extends ChangeNotifier {
       // 1. Try to fetch existing profile first to check if it exists
       final checkResponse = await NetworkCaller.getRequest(url: Urls.professionalProfile);
       
+      final bool exists = checkResponse.isSuccess && _doesProfileExist(checkResponse.body);
       NetworkResponse response;
-      if (checkResponse.statusCode == 404 || checkResponse.body?['data'] == null) {
-        // If profile doesn't exist (404), use POST to create it
+      if (!exists) {
+        // If profile doesn't exist, use POST to create it
         debugPrint('📋 Profile not found, creating new profile with POST');
         response = await NetworkCaller.postRequest(
           url: Urls.professionalProfile,
@@ -298,5 +299,29 @@ class ProviderOnboardingController extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  bool _doesProfileExist(Map<String, dynamic>? body) {
+    if (body == null) return false;
+    final data = body['data'];
+    if (data == null) {
+      return body.containsKey('_id') || body.containsKey('id');
+    }
+    if (data is List) {
+      return data.isNotEmpty;
+    }
+    if (data is Map<String, dynamic>) {
+      if (data.containsKey('data')) {
+        final nestedData = data['data'];
+        if (nestedData is List) {
+          return nestedData.isNotEmpty;
+        }
+        if (nestedData is Map<String, dynamic>) {
+          return nestedData.containsKey('_id') || nestedData.containsKey('id');
+        }
+      }
+      return data.containsKey('_id') || data.containsKey('id');
+    }
+    return false;
   }
 }

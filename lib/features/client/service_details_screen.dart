@@ -254,14 +254,27 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProviderProfileScreen(
-              provider: {
-                'name': name,
-                'avatar': avatar,
-                'id': widget.service['providerId'] is Map ? widget.service['providerId']['_id']?.toString() : widget.service['providerId']?.toString(),
-                '_id': widget.service['providerId'] is Map ? widget.service['providerId']['_id']?.toString() : widget.service['providerId']?.toString(),
-              },
-            ),
+            builder: (context) {
+                final providerIdField = widget.service['providerId'];
+                final Map<String, dynamic> providerMap;
+                if (providerIdField is Map<String, dynamic>) {
+                  // providerId is a full user object: { _id: userId, name, profile, ... }
+                  // Top-level _id = userId, so ProviderProfileScreen fallback (step 3) works correctly.
+                  providerMap = {
+                    ...providerIdField,
+                    'name': name,
+                    'profile': avatar,
+                  };
+                } else {
+                  providerMap = {
+                    '_id': providerIdField?.toString(),
+                    'id': providerIdField?.toString(),
+                    'name': name,
+                    'profile': avatar,
+                  };
+                }
+                return ProviderProfileScreen(provider: providerMap);
+              }
           ),
         );
       },

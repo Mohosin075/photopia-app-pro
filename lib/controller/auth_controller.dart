@@ -74,6 +74,9 @@ class AuthController extends ChangeNotifier {
   Future<void> logoutAndClear() async {
     await GetStorage().remove(_tokenKey);
     await GetStorage().remove(_roleKey);
+    await GetStorage().remove(_userIdKey);
+    await GetStorage().remove(_cookieKey);
+    await GetStorage().remove('onboarding_completed');
     accessToken = null;
     activeRole = null;
     userId = null;
@@ -117,6 +120,8 @@ class AuthController extends ChangeNotifier {
       await GetStorage().remove(_tokenKey);
       await GetStorage().remove(_roleKey);
       await GetStorage().remove(_userIdKey);
+      await GetStorage().remove(_cookieKey);
+      await GetStorage().remove('onboarding_completed');
       accessToken = null;
       activeRole = null;
       userId = null;

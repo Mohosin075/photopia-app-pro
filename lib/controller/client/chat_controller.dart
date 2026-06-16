@@ -90,7 +90,7 @@ class ChatController extends ChangeNotifier {
     final String token = AuthController.accessToken ?? '';
 
     print('!!! [SOCKET_DEBUG] Attempting connection...');
-    print('!!! [SOCKET_DEBUG] URL: ${Urls.baseUrl}');
+    print('!!! [SOCKET_DEBUG] URL: ${Urls.socketUrl}');
     print('!!! [SOCKET_DEBUG] UserId: $userId');
     print('!!! [SOCKET_DEBUG] Token exists: ${token.isNotEmpty}');
 
@@ -99,7 +99,7 @@ class ChatController extends ChangeNotifier {
       return;
     }
 
-    _socket = IO.io(Urls.baseUrl, <String, dynamic>{
+    _socket = IO.io(Urls.socketUrl, <String, dynamic>{
       'transports': [
         'websocket',
         'polling',

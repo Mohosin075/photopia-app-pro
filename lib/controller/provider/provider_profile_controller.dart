@@ -30,10 +30,15 @@ class ProviderProfileController extends ChangeNotifier {
   String get aboutMe =>
       _professionalProfile?.user?.description ??
       _userProfile?.description ??
+      _professionalProfile?.miniBio ??
+      _professionalProfile?.bio ??
       'Professional wedding and event photographer with 10+ years of experience.';
   String get profileTagline {
     if (_professionalProfile?.bio != null && _professionalProfile!.bio!.isNotEmpty) {
       return _professionalProfile!.bio!;
+    }
+    if (_professionalProfile?.miniBio != null && _professionalProfile!.miniBio!.isNotEmpty) {
+      return _professionalProfile!.miniBio!;
     }
     if (_userProfile?.specialty != null && _userProfile!.specialty!.isNotEmpty) {
       return _userProfile!.specialty!;
@@ -41,7 +46,7 @@ class ProviderProfileController extends ChangeNotifier {
     return 'Professional Photographer';
   }
 
-  String get shortBio => _professionalProfile?.bio ?? '';
+  String get shortBio => _professionalProfile?.bio ?? _professionalProfile?.miniBio ?? '';
 
   String get specialty =>
       _userProfile?.specialty ??
@@ -110,10 +115,20 @@ class ProviderProfileController extends ChangeNotifier {
 
     if (professionalProfileResponse.isSuccess) {
       final data = professionalProfileResponse.body?['data'];
-      if (data != null) {
+      debugPrint("📥 [PROFILE] Prof data type: ${data?.runtimeType}, keys: ${data is Map ? (data as Map).keys.toList() : 'N/A'}");
+      if (data is Map<String, dynamic> && (data.containsKey('_id') || data.containsKey('id'))) {
+        // Direct object response: { _id, coverPhoto, user, ... }
         _professionalProfile = ProfessionalProfileModel.fromJson(data);
-        debugPrint("✅ Parsed Prof Profile: Bookings=${_professionalProfile?.statistics?.bookings?.count}, ThisWeek=${_professionalProfile?.statistics?.bookings?.thisWeek}");
+        debugPrint("✅ [PROFILE] coverPhoto from API: ${_professionalProfile?.coverPhoto}");
+      } else if (data is List && data.isNotEmpty && data[0] is Map<String, dynamic>) {
+        // Defensive: handle if backend ever wraps in a list
+        _professionalProfile = ProfessionalProfileModel.fromJson(data[0]);
+      } else {
+        _professionalProfile = null;
+        debugPrint("⚠️ [PROFILE] Unexpected prof data structure: $data");
       }
+    } else {
+      _professionalProfile = null;
     }
 
     notifyListeners();
@@ -171,18 +186,56 @@ class ProviderProfileController extends ChangeNotifier {
       if (hasProfChanges) {
         debugPrint('👔 Updating Prof Profile with new additions...');
         String? token = AuthController.accessToken;
-        final Uri uri = Uri.parse(Urls.professionalProfile);
-        final request = http.MultipartRequest('PATCH', uri);
 
-        if (token != null && token.isNotEmpty) {
-          request.headers['Authorization'] = token.startsWith('Bearer ') ? token : 'Bearer $token';
+        // Check if professional profile exists on backend
+        final checkResponse = await NetworkCaller.getRequest(url: Urls.professionalProfile);
+        bool exists = checkResponse.isSuccess && _doesProfileExist(checkResponse.body);
+
+        if (!exists) {
+          debugPrint('👔 Profile not found, creating base professional profile via JSON POST first...');
+          final Map<String, dynamic> createBody = {
+            'dateOfBirth': '1995-01-01',
+            'primaryDomain': ['Photography'],
+            'notificationPreferences': {
+              'emailNewRequests': true,
+              'smsUrgentRequests': true,
+              'newsletterPros': true,
+              'customerReviewReminder': true,
+            },
+            'legalNotice': {
+              'acceptedTerms': true,
+              'privacyPolicy': true,
+              'gdprAuthorization': true,
+            },
+          };
+          final createResponse = await NetworkCaller.postRequest(
+            url: Urls.professionalProfile,
+            body: createBody,
+          );
+          
+          if (createResponse.isSuccess) {
+            debugPrint('👔 Base professional profile created successfully via JSON POST.');
+            exists = true;
+          } else {
+            debugPrint('❌ Failed to create base professional profile: ${createResponse.errorMessage}');
+            _errorMessage = createResponse.errorMessage ?? "Failed to initialize professional profile.";
+            profProfileSuccess = false;
+          }
         }
-        request.headers['Accept'] = 'application/json';
 
-        if (bio != null) request.fields['bio'] = bio;
-        
-        // Add cover photo if present
-        if (coverPhoto != null) {
+        if (profProfileSuccess && exists) {
+          final Uri uri = Uri.parse(Urls.professionalProfile);
+          final request = http.MultipartRequest('PATCH', uri);
+
+          if (token != null && token.isNotEmpty) {
+            request.headers['Authorization'] = token.startsWith('Bearer ') ? token : 'Bearer $token';
+          }
+          request.headers['Accept'] = 'application/json';
+
+          if (bio != null) request.fields['bio'] = bio;
+          
+          // Add cover photo if present
+          if (coverPhoto != null) {
           final tempDir = await getTemporaryDirectory();
           final targetPath = p.join(tempDir.path, "temp_cover_${DateTime.now().millisecondsSinceEpoch}.jpg");
           
@@ -268,6 +321,7 @@ class ProviderProfileController extends ChangeNotifier {
           profProfileSuccess = false;
         }
       }
+    }
 
       bool userProfileSuccess = true;
       if (description != null || name != null || profilePhoto != null) {
@@ -401,5 +455,29 @@ class ProviderProfileController extends ChangeNotifier {
     _inProgress = false;
     _errorMessage = null;
     notifyListeners();
+  }
+
+  bool _doesProfileExist(Map<String, dynamic>? body) {
+    if (body == null) return false;
+    final data = body['data'];
+    if (data == null) {
+      return body.containsKey('_id') || body.containsKey('id');
+    }
+    if (data is List) {
+      return data.isNotEmpty;
+    }
+    if (data is Map<String, dynamic>) {
+      if (data.containsKey('data')) {
+        final nestedData = data['data'];
+        if (nestedData is List) {
+          return nestedData.isNotEmpty;
+        }
+        if (nestedData is Map<String, dynamic>) {
+          return nestedData.containsKey('_id') || nestedData.containsKey('id');
+        }
+      }
+      return data.containsKey('_id') || data.containsKey('id');
+    }
+    return false;
   }
 }

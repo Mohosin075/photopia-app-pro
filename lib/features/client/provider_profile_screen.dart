@@ -43,35 +43,63 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Robust ID extraction
-      dynamic rawId = widget.provider['_id'] ?? widget.provider['id'];
+      // IMPORTANT: widget.provider can be:
+      //   - A professional profile object (from availableNow/superPros):
+      //       { _id: <profProfileId>, user: { _id: <userId> }, coverPhoto, specialties, ... }
+      //   - A service's providerId object (spread from service):
+      //       { _id: <userId>, name, profile, ... }
+      //   - A plain user object:
+      //       { _id: <userId>, name, ... }
+      //
+      // Priority for userId: user._id > providerId._id > top-level _id
 
-      if (rawId is Map) {
-        rawId = rawId['_id'] ?? rawId['id'];
+      String? userId;
+
+      // 1. Nested user object (professional profile objects from home screen)
+      final userField = widget.provider['user'];
+      if (userField is Map && userField.isNotEmpty) {
+        userId = (userField['_id'] ?? userField['id'])?.toString();
       }
 
-      // If still null, check if there's a nested providerId/user object
-      if (rawId == null) {
-        if (widget.provider['providerId'] != null) {
-          rawId = widget.provider['providerId'] is Map
-              ? widget.provider['providerId']['_id']
-              : widget.provider['providerId'];
-        } else if (widget.provider['user'] != null) {
-          rawId = widget.provider['user'] is Map
-              ? widget.provider['user']['_id']
-              : widget.provider['user'];
+      // 2. Nested providerId object (service objects)
+      if (userId == null || userId.isEmpty) {
+        final providerIdField = widget.provider['providerId'];
+        if (providerIdField is Map) {
+          userId = (providerIdField['_id'] ?? providerIdField['id'])?.toString();
+        } else if (providerIdField is String && providerIdField.isNotEmpty) {
+          userId = providerIdField;
         }
       }
 
-      _providerId = rawId?.toString();
-      debugPrint("🚀 [SCREEN] Navigated to Provider: $_providerId");
+      // 3. Fallback: top-level _id (plain user object or spread providerId)
+      if (userId == null || userId.isEmpty) {
+        dynamic rawId = widget.provider['_id'] ?? widget.provider['id'];
+        if (rawId is Map) rawId = rawId['_id'] ?? rawId['id'];
+        userId = rawId?.toString();
+      }
+
+      _providerId = userId;
+      debugPrint("🚀 [SCREEN] Provider userId resolved: $_providerId");
+      debugPrint("🔍 [SCREEN] Provider object keys: ${widget.provider.keys.toList()}");
+
+      final detailsController = context.read<ProviderDetailsController>();
+
+      // If widget.provider already has professional profile data (coverPhoto, specialties etc.)
+      // parse it directly — avoids calling the API which returns the *logged-in user's* profile.
+      final bool hasProfData = widget.provider.containsKey('coverPhoto') ||
+          widget.provider.containsKey('specialties') ||
+          widget.provider.containsKey('primaryDomain') ||
+          widget.provider.containsKey('miniBio');
+
+      if (hasProfData) {
+        debugPrint("✅ [SCREEN] Parsing professional profile directly from provider map");
+        detailsController.setFromProviderMap(widget.provider);
+      }
 
       if (_providerId != null && _providerId!.isNotEmpty) {
-        // Clear old state before fetching new data to avoid UI flickers or double calls
         context.read<ServiceListController>().getProviderServices(_providerId!);
-        context.read<ProviderDetailsController>().getProviderDetails(
-          _providerId!,
-        );
+        // getProviderDetails now only fetches the public user profile
+        detailsController.getProviderDetails(_providerId!);
         context.read<ReviewController>().getProviderReviews(_providerId!);
         setState(() {});
       }
@@ -153,9 +181,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await context.read<ProviderDetailsController>().getProviderDetails(
-            widget.provider['_id'] ?? widget.provider['id'] ?? '',
-          );
+          if (_providerId != null && _providerId!.isNotEmpty) {
+            await context.read<ProviderDetailsController>().getProviderDetails(
+              _providerId!,
+            );
+          }
         },
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
@@ -286,6 +316,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
     String tagline = 'Professional Photographer';
     if (prof?.bio != null && prof!.bio!.isNotEmpty) {
       tagline = prof.bio!;
+    } else if (prof?.miniBio != null && prof!.miniBio!.isNotEmpty) {
+      tagline = prof.miniBio!;
     } else if (widget.provider['description'] != null &&
         widget.provider['description'].toString().isNotEmpty) {
       tagline = widget.provider['description'].toString();
@@ -763,6 +795,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
           description = prof.user!.description!;
         } else if (prof?.bio != null && prof!.bio!.isNotEmpty) {
           description = prof.bio!;
+        } else if (prof?.miniBio != null && prof!.miniBio!.isNotEmpty) {
+          description = prof.miniBio!;
         } else if (widget.provider['description'] != null &&
             widget.provider['description'].toString().isNotEmpty) {
           description = widget.provider['description'].toString();

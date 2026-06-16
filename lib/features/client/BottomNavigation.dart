@@ -278,7 +278,11 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 letterSpacing: 0.2,
               ),
-              child: Text(label),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             if (isSelected)
               Container(
