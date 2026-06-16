@@ -590,47 +590,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 _buildMenuItem(
                   Icons.help_outline,
                   context.l10n.helpAndSupport,
-                  onTap: () async {
-                    final chatController = context.read<ChatController>();
-                    final chatId = await chatController.contactAdmin();
-
-                    if (chatId != null && mounted) {
-                      // Try to find the real conversation from the updated list
-                      Conversation? conversation;
-                      try {
-                        final chatRoom = chatController.chats.firstWhere(
-                          (c) => c.sId == chatId,
-                        );
-                        conversation = chatRoom.toConversation(
-                          AuthController.userId,
-                        );
-                      } catch (_) {
-                        // Fallback if not found yet (race condition)
-                        conversation = Conversation(
-                          id: chatId,
-                          name: 'Admin Support',
-                          lastMessage: '',
-                          avatarUrl: '',
-                          lastMessageTime: DateTime.now(),
-                        );
-                      }
-
-                      Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ChatScreen(conversation: conversation!),
-                        ),
-                      );
-                    } else if (mounted) {
-                      CustomSnackBar.show(
-                        context: context,
-                        message: chatController.errorMessage.isNotEmpty
-                            ? chatController.errorMessage
-                            : 'Failed to contact admin',
-                        isError: true,
-                      );
-                    }
-                  },
+                  onTap: () => _showHelpSheet(),
                 ),
                 _buildMenuItem(
                   Icons.settings_outlined,
@@ -706,6 +666,170 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ),
         if (!isLast) const Divider(height: 1, indent: 50),
       ],
+    );
+  }
+
+  // ── Help & Support Bottom Sheet ────────────────────────────────────────────
+
+  void _showHelpSheet() {
+    final l = context.l10n;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).dividerColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              l.helpAndSupport,
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            _helpTile(
+              icon: Icons.mail_outline,
+              title: l.settingsContact,
+              subtitle: l.settingsContactSubtitle,
+              onTap: () async {
+                Navigator.pop(ctx);
+                final chatController = context.read<ChatController>();
+                final chatId = await chatController.contactAdmin();
+
+                if (chatId != null && mounted) {
+                  Conversation? conversation;
+                  try {
+                    final chatRoom = chatController.chats.firstWhere(
+                      (c) => c.sId == chatId,
+                    );
+                    conversation = chatRoom.toConversation(
+                      AuthController.userId,
+                    );
+                  } catch (_) {
+                    conversation = Conversation(
+                      id: chatId,
+                      name: 'Admin Support',
+                      lastMessage: '',
+                      avatarUrl: '',
+                      lastMessageTime: DateTime.now(),
+                    );
+                  }
+
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ChatScreen(conversation: conversation!),
+                    ),
+                  );
+                } else if (mounted) {
+                  CustomSnackBar.show(
+                    context: context,
+                    message: chatController.errorMessage.isNotEmpty
+                        ? chatController.errorMessage
+                        : 'Failed to contact admin',
+                    isError: true,
+                  );
+                }
+              },
+            ),
+            SizedBox(height: 12.h),
+            _helpTile(
+              icon: Icons.quiz_outlined,
+              title: l.settingsFaq,
+              subtitle: l.settingsFaqSubtitle,
+              onTap: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${l.settingsFaq} – ${l.comingSoon}'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _helpTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(14.r),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10.w),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 20.sp,
+              ),
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  SizedBox(height: 3.h),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14.sp,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

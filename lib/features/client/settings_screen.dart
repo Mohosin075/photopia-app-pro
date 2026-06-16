@@ -10,10 +10,7 @@ import 'package:photopya/controller/auth_controller.dart';
 import 'package:photopya/controller/client/change_password_controller.dart';
 import 'package:photopya/controller/language_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:photopya/features/client/chat_screen.dart';
-import 'package:photopya/data/models/conversation_model.dart';
 import 'package:photopya/core/widgets/custom_snacbar.dart';
-import 'package:photopya/controller/client/chat_controller.dart';
 import 'package:photopya/features/client/terms_of_service_screen.dart';
 import 'package:photopya/features/common/screens/notification_settings_screen.dart';
 class SettingsScreen extends StatefulWidget {
@@ -494,7 +491,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           SizedBox(height: 16.h),
 
-          // ── Legal & Help Section ──────────────────────────────────────────
+          // ── Legal Section ──────────────────────────────────────────
           _sectionLabel(l.settingsLegal),
           _card([
             _tile(
@@ -515,17 +512,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 context,
                 MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
               ),
-            ),
-            _divider(),
-            _tile(
-              icon: Icons.help_outline,
-              title: l.settingsHelpSupport,
-              trailing: Icon(
-                Icons.arrow_forward_ios,
-                size: 14.sp,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-              ),
-              onTap: () => _showHelpSheet(),
             ),
           ]),
 
@@ -647,159 +633,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       trailing: isSelected
           ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary)
           : null,
-    );
-  }
-
-  // ── Help & Support Bottom Sheet ────────────────────────────────────────────
-
-  void _showHelpSheet() {
-    final l = context.l10n;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Container(
-                width: 40.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).dividerColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Text(
-              l.settingsHelpSupport,
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            SizedBox(height: 20.h),
-            _helpTile(
-              icon: Icons.mail_outline,
-              title: l.settingsContact,
-              subtitle: l.settingsContactSubtitle,
-              onTap: () async {
-                Navigator.pop(ctx);
-                final chatController = context.read<ChatController>();
-                final chatId = await chatController.contactAdmin();
-
-                if (chatId != null && context.mounted) {
-                  Conversation? conversation;
-                  try {
-                    final chatRoom = chatController.chats.firstWhere(
-                      (c) => c.sId == chatId,
-                    );
-                    conversation = chatRoom.toConversation(
-                      AuthController.userId,
-                    );
-                  } catch (_) {
-                    conversation = Conversation(
-                      id: chatId,
-                      name: 'Admin Support',
-                      lastMessage: '',
-                      avatarUrl: '',
-                      lastMessageTime: DateTime.now(),
-                    );
-                  }
-
-                  Navigator.of(context, rootNavigator: true).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ChatScreen(conversation: conversation!),
-                    ),
-                  );
-                }
-              },
-            ),
-            SizedBox(height: 12.h),
-            _helpTile(
-              icon: Icons.quiz_outlined,
-              title: l.settingsFaq,
-              subtitle: l.settingsFaqSubtitle,
-              onTap: () {
-                Navigator.pop(ctx);
-                _showComingSoon(l.settingsFaq);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _helpTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(14.r),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(10.w),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.onSurface,
-                size: 20.sp,
-              ),
-            ),
-            SizedBox(width: 14.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                  SizedBox(height: 3.h),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 14.sp,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

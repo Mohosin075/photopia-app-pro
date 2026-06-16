@@ -1,0 +1,5229 @@
+{
+  "info": {
+    "_postman_id": "ecaa61c1-c65b-4eef-86c3-f95bd8d8f561",
+    "name": "Photopia",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45907329",
+    "_collection_link": "https://go.postman.co/collection/45907329-ecaa61c1-c65b-4eef-86c3-f95bd8d8f561?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "signup",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"temp\" ,\r\n    \"email\": \"piled27522@codoteam.com\",\r\n    \"password\": \"12345678\"\r\n    // \"role\": \"professional\",\r\n    // \"phone\" : \"+8801712345677\"\r\n}\r\n\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/signup",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "verify account",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"piled27522@codoteam.com\",\r\n    \"oneTimeCode\" : \"724210\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/verify-account",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "verify-account"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "forget password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"mohosinali075@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/forget-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forget-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "resend-otp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"user2@gmail.com\",\r\n    \"authType\": \"resetPassword\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/resend-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "resend-otp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "reset password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "2d072cdf9bbfad54b9bbf9b19294f9d172c3c0071e08d525db70e7101bc9282c",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"newPassword\" : \"12345678\",\r\n    \"confirmPassword\" : \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"password\" : \"987654321\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/delete-account",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "delete-account"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "change password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"currentPassword\" : \"12345678\",\r\n    \"newPassword\" : \"123456789\",\r\n    \"confirmPassword\" : \"123456789\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "refresh-token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/refresh-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "// {\r\n//     \"email\" : \"web.mohosin@gmail.com\",\r\n//     \"password\" : \"12345678\",\r\n//     \"rememberMe\" : true\r\n// }\r\n// {\r\n//     \"email\" : \"mohosinali075@gmail.com\",\r\n//     \"password\" : \"12345678\",\r\n//     \"rememberMe\" : true\r\n// }\r\n// {\r\n//     \"email\" : \"cijosi7843@him6.com\",\r\n//     \"password\" : \"12341234\",\r\n//     \"rememberMe\" : true\r\n// }\r\n{\r\n    \"email\" : \"cijosi7843@him6.com\",\r\n    \"password\" : \"12341234\",\r\n    \"rememberMe\" : true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "admin login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"web.mohosin@gmail.com\",\r\n    \"password\" : \"12345678\",\r\n    \"rememberMe\" : true\r\n}\r\n// {\r\n//     \"email\" : \"mohosinali075@gmail.com\",\r\n//     \"password\" : \"12345678\",\r\n//     \"rememberMe\" : true\r\n// }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/admin-login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "admin-login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "google  login",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/google",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "google"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "social login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"appId\" : \"1320349029797432\",\r\n    \"deviceToken\" : \"dk\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/social-login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "social-login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"password\" : \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "user",
+      "item": [
+        {
+          "name": "update profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "checked",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "/C:/Users/Mohosin/Downloads/profile-icon-design-free-vector.jpg"
+                },
+                {
+                  "key": "email",
+                  "value": "zaymaxbxof@xkxkud.com",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "description",
+                  "value": "slijf sdfk  sdfk sdl",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "specialty",
+                  "value": "cleening",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "phone",
+                  "value": "0198138138",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all user",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users?activeRole=user",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "activeRole",
+                  "value": "user"
+                },
+                {
+                  "key": "status",
+                  "value": "inactive",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "organizer",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "switch role",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"role\" : \"professional\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/switch-role",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "switch-role"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get user by id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/6962d0f3c388d1abf0a74f88",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "6962d0f3c388d1abf0a74f88"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get user profile",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "profile"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "get user profile",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{admin}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/user/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "user",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Date",
+                  "value": "Thu, 04 Sep 2025 21:28:29 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "access-control-allow-credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"1a0-xL/eh1k2Zp9zElLWyn7FejwcIT0\""
+                },
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "cf-cache-status",
+                  "value": "DYNAMIC"
+                },
+                {
+                  "key": "Nel",
+                  "value": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}"
+                },
+                {
+                  "key": "Report-To",
+                  "value": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=vuleRmUrQ3oYI9z2IHN7wHSQ6ouy6R8GCt5y21Nelc4mjH7q6J4rV7itiCfCQ3NtxwbhtgnYVa9YXtdTJ%2FpqKNrJB7esd8YB%2BbD9401DUajL9qEInkBg8E6BxQNkTQ%3D%3D\"}]}"
+                },
+                {
+                  "key": "Content-Encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "Server",
+                  "value": "cloudflare"
+                },
+                {
+                  "key": "CF-RAY",
+                  "value": "97a093af4e90770f-DAC"
+                },
+                {
+                  "key": "alt-svc",
+                  "value": "h3=\":443\"; ma=86400"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"User profile retrieved successfully\",\n    \"data\": {\n        \"_id\": \"68b1fd9e3a485a0f4fc4b527\",\n        \"name\": \"Md Mohosin\",\n        \"email\": \"web.mohosin@gmail.com\",\n        \"status\": \"active\",\n        \"verified\": true,\n        \"role\": \"admin\",\n        \"createdAt\": \"2025-08-29T19:21:02.213Z\",\n        \"updatedAt\": \"2025-09-03T18:39:22.982Z\",\n        \"id\": \"68b1fd9e3a485a0f4fc4b527\",\n        \"platforms\": [\n            \"facebook\",\n            \"instagram\",\n            \"instagram\"\n        ],\n        \"preferredLanguages\": [\n            \"en\",\n            \"bn\"\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "delete my profile",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"password\" : \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deactivate-profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"password\" : \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/deactivate-profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "deactivate-profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete user by id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\" : \"Md Mohosin Ali\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/68b9eae85bf3094e97acd28b",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "68b9eae85bf3094e97acd28b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update user status by id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\" : \"inactive\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/6897a6ca11b2927166ac5c7a",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "6897a6ca11b2927166ac5c7a"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "public",
+      "item": [
+        {
+          "name": "faq",
+          "item": [
+            {
+              "name": "create faq",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{admin}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"question\": \"How do I reset my password?\",\r\n    \"answer\": \"Click on 'Forgot Password' at the login page and follow the instructions.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/v1/public/faq",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "public",
+                    "faq"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update faq",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{admin}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"question\": \"How do I reset my password? update \",\r\n    \"answer\": \"Click on 'Forgot Password' at the login page and follow the instructions.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/public/faq/6897bf3b1fd6441a9eee6d25",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "public",
+                    "faq",
+                    "6897bf3b1fd6441a9eee6d25"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get faq by id",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{admin}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"question\": \"How do I reset my password?\",\r\n    \"answer\": \"Click on 'Forgot Password' at the login page and follow the instructions.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/public/faq/single/6897bf3b1fd6441a9eee6d25",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "public",
+                    "faq",
+                    "single",
+                    "6897bf3b1fd6441a9eee6d25"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get all faq",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{admin}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"question\": \"How do I reset my password?\",\r\n    \"answer\": \"Click on 'Forgot Password' at the login page and follow the instructions.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/public/faq/all",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "public",
+                    "faq",
+                    "all"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete faq",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{admin}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"question\": \"How do I reset my password?\",\r\n    \"answer\": \"Click on 'Forgot Password' at the login page and follow the instructions.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/public/faq/6897bf3b1fd6441a9eee6d25",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "public",
+                    "faq",
+                    "6897bf3b1fd6441a9eee6d25"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "contact",
+          "item": [
+            {
+              "name": "create contact",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Appon Ahmed\",\r\n  \"email\": \"apponislamdev@gmail.com\",\r\n  \"phone\": \"+880123456789\",\r\n  \"country\": \"Bangladesh\",\r\n  \"message\": \"Hey, I’m interested in learning more about your backend services!\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/public/contact",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "public",
+                    "contact"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "create terms-and-condition",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"content\" : \"It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like\",\r\n    \"type\" : \"terms-and-condition\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create privacy-policy",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"content\" : \"It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like\",\r\n    \"type\" : \"privacy-policy\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update public",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"content\" : \"updated dsfsd\",\r\n    \"type\" : \"privacy-sdf\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/update/6897b74fe0ee2c1ee0f0060b",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "update",
+                "6897b74fe0ee2c1ee0f0060b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create about",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"content\" : \"It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like\",\r\n    \"type\" : \"about\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get terms-and-condition",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/terms-and-condition",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "terms-and-condition"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get privacy-policy",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/privacy-policy",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "privacy-policy"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete public",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/6897b74fe0ee2c1ee0f0060b",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "6897b74fe0ee2c1ee0f0060b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "payments",
+      "item": [
+        {
+          "name": "get all payments",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "my-payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get single  payment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create-checkout-session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bookingId\": \"69ffd3c2ef8fcf8527c0c4e9\",\r\n    \"amount\" : 1.38\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/create-checkout-session",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "create-checkout-session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create-payment-intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bookingId\": \"6a00c0b7f67d01d483df58a5\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/create-payment-intent",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "create-payment-intent"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create-setup-intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bookingId\": \"69b1bc716d427e3b9e085a64\",\r\n    \"amount\" : 20\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/create-setup-intent",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "create-setup-intent"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getMyPaymentMethods",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/methods",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "methods"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "setDefaultPaymentMethod",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/methods/{{methodId}}/default",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "methods",
+                "{{methodId}}",
+                "default"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update payments",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "refund payments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/{{payment}}/refund",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "{{payment}}",
+                "refund"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "invoice generate",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payment/{{payment}}/invoice",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "{{payment}}",
+                "invoice"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "support",
+      "item": [
+        {
+          "name": "get all supports",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/support",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "support"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get supports by id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/support/692b7c2d496ea899f3406920",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "support",
+                "692b7c2d496ea899f3406920"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete suppport",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/support/692f1d734e94350597214dfa",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "support",
+                "692f1d734e94350597214dfa"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update support",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\" : \"solved\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/support/692f1d5b78c9e028fabba2c1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "support",
+                "692f1d5b78c9e028fabba2c1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create support",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"message\": \"Check how to solve this\",\r\n    \"contentType\" : \"comment\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/support",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "support"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "notification",
+      "item": [
+        {
+          "name": "get all notification",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "test email",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"template\": \"welcome\",\r\n    \"to\": [\r\n        \"mohosinali075@gmail.com\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/test-email",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "test-email"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get my notification",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/my",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "my"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get notification stats",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get notification by id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/gfhfgh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "gfhfgh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update notification",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"isArchived\" : false\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/69306d87a7f534052c67cce2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "69306d87a7f534052c67cce2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "archive notification",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/{{id}}/archive",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "{{id}}",
+                "archive"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete notification",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/69306d87a7f534052c67cce2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "69306d87a7f534052c67cce2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "mark as read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/{{id}}/read",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "{{id}}",
+                "read"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "mark all read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/read-all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "read-all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create notification",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Event Notification\",\r\n  \"content\": \"Your event has been successfully created.\",\r\n  \"type\": \"NEW_MESSAGE\",\r\n  \"userId\" : \"69d9574c21a62743f7ffd06e\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "message",
+      "item": [
+        {
+          "name": "sent message",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "chatId",
+                  "value": "695032ec4053960c7b3c4048",
+                  "type": "text"
+                },
+                {
+                  "key": "text",
+                  "value": "udpatedddd",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "/C:/Users/Mohosin/Downloads/Screenshot.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/message",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "message"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get message",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/message/{{chatId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "message",
+                "{{chatId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "chat",
+      "item": [
+        {
+          "name": "create chat",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/chat/{{other_user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chat",
+                "{{other_user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createAdminChat",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/chat/contact-admin",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chat",
+                "contact-admin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get chat",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/chat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "temp",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "review",
+      "item": [
+        {
+          "name": "add review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bookingId\" : \"694072200b5f7ee29018e268\",\r\n    \"rating\" : 4,\r\n    \"review\": \"okey now\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/review",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "review"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all review",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/review",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "review"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get review by id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/review/6934b1ba931063bd74c75297",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "review",
+                "6934b1ba931063bd74c75297"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get review by booking id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/review/{{bookingId}}/event",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "review",
+                "{{bookingId}}",
+                "event"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update review by id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"rating\" : 5,\r\n    \"review\": \"okey now\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/review/692f385054598197ccab3026",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "review",
+                "692f385054598197ccab3026"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete review",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/review/692f385054598197ccab3026",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "review",
+                "692f385054598197ccab3026"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "stats",
+      "item": [
+        {
+          "name": "get Detailed Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/detailed-stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "detailed-stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "user-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/user-stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "user-stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "category-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/category-stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "category-stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getUserDetailsStats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/user-details/69b1b8a9a0559556cc73f80b",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "user-details",
+                "69b1b8a9a0559556cc73f80b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "moderation-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/moderation-stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "moderation-stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "moderation-reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/moderation-reports",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "moderation-reports"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getModerationReportDetails",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/moderation-reports/69b2dfbd71a9d9490129cf3d",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "moderation-reports",
+                "69b2dfbd71a9d9490129cf3d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "payment-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/payment-stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "payment-stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "recent-transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/recent-transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "recent-transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getTransactionDetails",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/recent-transactions/69b2ef5869c0442e90928fab",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "recent-transactions",
+                "69b2ef5869c0442e90928fab"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "subscription-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/subscription-stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "subscription-stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSubscriberList",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/subscribers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "subscribers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "advanced-analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/advanced-analytics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "advanced-analytics"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "export-users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/export-users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "export-users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "export-payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/export-payments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "export-payments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "locations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/locations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "locations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "handleModerationAction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"action\" : \"sdlfk\",\r\n    \"details\" : \"sldkf\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/moderation-reports/{{reportId}}/action",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "moderation-reports",
+                "{{reportId}}",
+                "action"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "warn User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\" : \"69b1b8a9a0559556cc73f80b\",\r\n    \"message\": \"dfsdfs\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/warn-user",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "warn-user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "suspend user",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/dashboard/user-status/69b1b8a9a0559556cc73f80b",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "user-status",
+                "69b1b8a9a0559556cc73f80b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "professional profile",
+      "item": [
+        {
+          "name": "get review by provider Id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{organizer}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/review/provider/{{providerId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "review",
+                "provider",
+                "{{providerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get profile",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/professional-profiles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "professional-profiles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get Detailed Statistics",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/professional-profiles/statistics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "professional-profiles",
+                "statistics"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "export Statistics Report",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/professional-profiles/statistics/export",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "professional-profiles",
+                "statistics",
+                "export"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update professional profile",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "portfolio",
+                  "type": "file",
+                  "uuid": "e5e65f32-a513-4e73-8202-c6cc89e6d7aa",
+                  "src": [
+                    "/C:/Users/Mohosin/Downloads/WhatsApp Image 2026-03-18 at 01.25.45.jpeg",
+                    "/C:/Users/Mohosin/Downloads/WhatsApp Image 2026-03-16 at 22.35.46.jpeg",
+                    "/C:/Users/Mohosin/Downloads/WhatsApp Image 2026-03-16 at 22.36.11.jpeg"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/professional-profiles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "professional-profiles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "remove items",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"field\" : \"portfolio\",\r\n    \"values\" : [\"\"]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/professional-profiles/remove-items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "professional-profiles",
+                "remove-items"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "category",
+      "item": [
+        {
+          "name": "create category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n    \"name\": \"Portrait & People\",\n    \"description\": \"Web, mobile, and software development services\",\n\"type\" : \"subcategory\",\n\"theme\" : \"PHOTOGRAPHY\"\n      }",
+                  "type": "text",
+                  "uuid": "e488414f-0e80-430e-82d9-effbda2f041b"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "uuid": "7ed99c98-1d82-4b88-a1ed-7b56f68bc502",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/category",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "category"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/category",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "category"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "category",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "subcategory",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "theme",
+                  "value": "EDITING %26 POST-PRODUCTION",
+                  "disabled": true
+                },
+                {
+                  "key": "parent",
+                  "value": "69e141b9139d03b898795b99",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "popular-categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/category/popular-categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "category",
+                "popular-categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TRENDING PROJECTS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/category",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "category"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get category by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/category/6966922d4a32233337ffb87c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "category",
+                "6966922d4a32233337ffb87c"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update category",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n    \"name\": \"Home & Kitchen 1\",\n    \"description\": \"Home appliances and kitchen tools\",\n    \"tags\": [\"art\"]\n}",
+                  "type": "text",
+                  "uuid": "bf1d552c-2439-4a1a-bd95-c3d4119cdb95"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "uuid": "dea61e32-a49d-428d-8081-b256203e8b3e",
+                  "src": "/C:/Users/Mohosin/Downloads/bird.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/category/69669b8ae107f89c12ea4c9a",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "category",
+                "69669b8ae107f89c12ea4c9a"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/category/6966922d4a32233337ffb87c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "category",
+                "6966922d4a32233337ffb87c"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "service",
+      "item": [
+        {
+          "name": "create service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n    \"title\": \"Photography Package Service\",\n    \"description\": \"Flexible photography packages for personal and corporate events with professional editing.\",\n    \"category\": \"69dfda48f6cff7834990ce3a\",\n    \"serviceType\": \"video_editing\",\n    \"subCategory\": \"69dfda48f6cff7834990ce3e\",\n    \"tags\": [\"photo\", \"studio\"],\n    \"equipment\": [\"Nikon Z6\", \"Softbox\"],\n    \"price\": 120,\n    \"currency\": \"USD\",\n\n    \"pricingType\": \"PACKAGE\",\n    \"pricingModel\": {\n      \"type\": \"PACKAGE\",\n      \"packages\": [\n        {\n          \"name\": \"Basic\",\n          \"price\": 120,\n          \"duration\": 2,\n          \"description\": \"2 hour session\",\n          \"includes\": [\"50 edited photos\"]\n        },\n        {\n          \"name\": \"Premium\",\n          \"price\": 300,\n          \"duration\": 5,\n          \"description\": \"5 hour session\",\n          \"includes\": [\"150 edited photos\", \"online gallery\"]\n        }\n      ]\n    },\n\n    \"duration\": \"2-5 hours\",\n\n    \"location\": {\n      \"type\": \"ONSITE\",\n      \"country\": \"USA\",\n      \"city\": \"Chicago\",\n      \"address\": \"201 E Randolph St\",\n      \"coordinates\": {\n        \"lat\": 41.8826,\n        \"lng\": -87.6226\n      },\n      \"serviceRadiusKm\": 20\n    },\n\n    \"gallery\": [\n      \"https://images.unsplash.com/photo-1516035069371-29a1b244cc32\"\n    ],\n\n    \"status\": \"ACTIVE\"\n  }",
+                  "type": "text",
+                  "uuid": "e488414f-0e80-430e-82d9-effbda2f041b"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "uuid": "7ed99c98-1d82-4b88-a1ed-7b56f68bc502",
+                  "src": [
+                    "/C:/Users/Mohosin/Downloads/cat.png",
+                    "/C:/Users/Mohosin/Downloads/customer-satisfaction-service-care-problem-solving_53876-120094.png"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/services",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "services"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/services",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "services"
+              ],
+              "query": [
+                {
+                  "key": "searchTerm",
+                  "value": "sdfs",
+                  "disabled": true
+                },
+                {
+                  "key": "title",
+                  "value": "Photography",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "6967f8313c7a3a49e02c1fde",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "tags",
+                  "value": "video",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "minPrice",
+                  "value": "10",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "20",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "equipment",
+                  "value": "sdf",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "serviceType",
+                  "value": "videography",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get single services by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/services/69e14df4139d03b898796347",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "services",
+                "69e14df4139d03b898796347"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get Services By Provider",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/services/provider/{{providerId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "services",
+                "provider",
+                "{{providerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "my services",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/services/my/services",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "services",
+                "my",
+                "services"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "toggle Service Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"ACTIVE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/service/{{serviceId}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "service",
+                "{{serviceId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete service",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"ACTIVE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/services/{{serviceId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "services",
+                "{{serviceId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update service",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n    \"title\": \"PHOTOGRAPHyyyyyY\"\n}",
+                  "type": "text",
+                  "uuid": "871a0821-680b-444f-8c11-7200467d31bf"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "uuid": "4f7fedfe-ff2e-49b9-bd4e-fc145908bb6e",
+                  "src": "/C:/Users/Mohosin/Downloads/bird.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/services/{{serviceId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "services",
+                "{{serviceId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "favourite",
+      "item": [
+        {
+          "name": "my favourite",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/favourite/my-favourites",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "favourite",
+                "my-favourites"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add and remove favourite / toggle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"favouriteType\" : \"service\",\r\n    \"service\": \"69694ceadd586d8a09d961c8\"\r\n    // \"provider\": \"696534d5a1724d40f85fc5b4\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/favourite/toggle",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "favourite",
+                "toggle"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "booking",
+      "item": [
+        {
+          "name": "my booking",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/booking/my-bookings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "booking",
+                "my-bookings"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "disabled": true
+                },
+                {
+                  "key": "filterType",
+                  "value": "today",
+                  "disabled": true
+                },
+                {
+                  "key": "bookingDate",
+                  "value": "2026-04-05T00:00:00.000Z",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getMyBookingsByDate",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/booking/my-bookings-by-date?date=2026-04-05",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "booking",
+                "my-bookings-by-date"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "disabled": true
+                },
+                {
+                  "key": "date",
+                  "value": "2026-04-05"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update booking status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\" : \"completed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/booking/{{bookingid}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "booking",
+                "{{bookingid}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get single booking",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\" : \"confirmed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/booking/{{bookingid}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "booking",
+                "{{bookingid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "calculate-price",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"serviceId\": \"696fd31134e2febc5385a19c\",\r\n  \"startTime\": \"10:00\",\r\n  \"endTime\": \"12:00\",\r\n  \"date\": \"2026-01-22\",\r\n  \"distanceFromProviderKm\": 5.2\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/booking/calculate-price",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "booking",
+                "calculate-price"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"providerId\": \"69a874fb3dddb8394cbc4293\",\r\n    \"serviceId\": \"69e15579139d03b89879650f\",\r\n    \"bookingDate\": \"2026-08-20T00:00:00.000Z\",\r\n    \"startTime\": \"10:30\",\r\n    \"endTime\": \"12:00\",\r\n    \"eventLocation\": {\r\n      \"address\": \"Mohakhali cha 72\",\r\n      \"city\": \"Dhaka\",\r\n      \"country\": \"Bangladesh\",\r\n    //   \"coordinates\": {\r\n    //     \"lat\": 23.8103,\r\n    //     \"lng\": 90.4125\r\n    //   },\r\n    //   \"distanceFromProviderKm\": 5,\r\n      \"notes\": \"Near the big park\"\r\n    },\r\n    \"clientName\": \"Mohosin Ahmed\",\r\n    \"clientPhone\": \"+880123456789\",\r\n    \"eventType\": \"Birthday Party\",\r\n    \"specialRequests\": \"Please provide a projector\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/booking",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "booking"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Availability",
+      "item": [
+        {
+          "name": "get My Availability",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/availability/my-availability",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "availability",
+                "my-availability"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get Provider Availability",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/availability/{{providerId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "availability",
+                "{{providerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "check Date Availability",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/availability/check/{{providerId}}?date=2026-11-16",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "availability",
+                "check",
+                "{{providerId}}"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-11-16"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get Time Slots per day",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/availability/slots/{{providerId}}?date=2026-11-16&duration=30",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "availability",
+                "slots",
+                "{{providerId}}"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-11-16",
+                  "type": "text"
+                },
+                {
+                  "key": "duration",
+                  "value": "30",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get Month Calendar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/availability/calendar/{{providerId}}?month=11&year=2026",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "availability",
+                "calendar",
+                "{{providerId}}"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "11",
+                  "type": "text"
+                },
+                {
+                  "key": "year",
+                  "value": "2026",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create Or Update Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"providerId\": \"69769b2fa376b7caa03962b9\",\r\n\r\n  \"defaultSchedule\": {\r\n    \"monday\": {\r\n      \"start\": \"09:00\",\r\n      \"end\": \"18:00\",\r\n      \"isActive\": true,\r\n      \"maxBookings\": 2\r\n    },\r\n    \"tuesday\": {\r\n      \"start\": \"09:00\",\r\n      \"end\": \"18:00\",\r\n      \"isActive\": true,\r\n      \"maxBookings\": 2\r\n    },\r\n    \"wednesday\": {\r\n      \"start\": \"09:00\",\r\n      \"end\": \"18:00\",\r\n      \"isActive\": true,\r\n      \"maxBookings\": 2\r\n    },\r\n    \"thursday\": {\r\n      \"start\": \"09:00\",\r\n      \"end\": \"18:00\",\r\n      \"isActive\": true,\r\n      \"maxBookings\": 2\r\n    },\r\n    \"friday\": {\r\n      \"start\": \"09:00\",\r\n      \"end\": \"18:00\",\r\n      \"isActive\": true,\r\n      \"maxBookings\": 2\r\n    },\r\n    \"saturday\": {\r\n      \"start\": \"10:00\",\r\n      \"end\": \"16:00\",\r\n      \"isActive\": true,\r\n      \"maxBookings\": 1\r\n    },\r\n    \"sunday\": {\r\n      \"start\": \"10:00\",\r\n      \"end\": \"16:00\",\r\n      \"isActive\": false,\r\n      \"maxBookings\": 1\r\n    }\r\n  },\r\n\r\n  \"customDates\": [\r\n    {\r\n      \"date\": \"2026-02-14T00:00:00.000Z\",\r\n      \"type\": \"special_hours\",\r\n      \"start\": \"12:00\",\r\n      \"end\": \"20:00\",\r\n      \"maxBookings\": 3,\r\n      \"note\": \"Valentine's Day extended hours\",\r\n      \"rateMultiplier\": 1.5\r\n    },\r\n    {\r\n      \"date\": \"2026-02-21T00:00:00.000Z\",\r\n      \"type\": \"blocked\",\r\n      \"note\": \"Personal leave\"\r\n    }\r\n  ],\r\n\r\n  \"recurringRules\": [\r\n    {\r\n      \"type\": \"block_weekly\",\r\n      \"dayOfWeek\": 0,\r\n      \"active\": true\r\n    },\r\n    {\r\n      \"type\": \"special_hours_weekly\",\r\n      \"dayOfWeek\": 5,\r\n      \"start\": \"14:00\",\r\n      \"end\": \"18:00\",\r\n      \"maxBookings\": 2,\r\n      \"active\": true\r\n    }\r\n  ],\r\n\r\n  \"bufferMinutes\": 15,\r\n  \"advanceNoticeHours\": 24,\r\n  \"maxBookingsPerDay\": 3,\r\n  \"maxBookingsPerWeek\": 10,\r\n  \"autoBlockAfterBooking\": true,\r\n  \"autoBlockDuration\": 30,\r\n\r\n  \"googleCalendarSync\": {\r\n    \"calendarId\": \"primary\",\r\n    \"syncEnabled\": false\r\n  }\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/availability",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "availability"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "wallet",
+      "item": [
+        {
+          "name": "my-wallet",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/wallet/my-wallet",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallet",
+                "my-wallet"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "stripe-connect-onboarding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/stripe-connect-onboarding",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "stripe-connect-onboarding"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "stripe-connect-return",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/stripe-connect-return",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "stripe-connect-return"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "stripe-connect-status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/stripe-connect-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "stripe-connect-status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "withdrawal",
+      "item": [
+        {
+          "name": "get My Withdrawals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/withdrawal/my-withdrawals",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "withdrawal",
+                "my-withdrawals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create Withdrawal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 100\r\n//   \"currency\": \"USD\",\r\n//   \"bankAccountDetails\": {\r\n//     \"accountHolderName\": \"John Doe\",\r\n//     \"bankName\": \"Chase Bank\",\r\n//     \"iban\": \"acct_1RcvK8GdOsJASBMC\",\r\n//     \"swiftCode\": \"acct_1RcvK8GdOsJASBMC\"\r\n//   }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/withdrawal",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "withdrawal"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get All Withdrawals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/withdrawal/all-withdrawals",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "withdrawal",
+                "all-withdrawals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update Withdrawal Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\" : \"completed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/withdrawal/{{withdrawalId}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "withdrawal",
+                "{{withdrawalId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "subscription",
+      "item": [
+        {
+          "name": "createSubscriptionPlan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Pro Plan\",\r\n    \"description\": \"Best plan for growing teams with advanced features\",\r\n    \"price\": 29.99,\r\n    \"currency\": \"usd\",\r\n    \"interval\": \"month\",\r\n    \"intervalCount\": 1,\r\n    \"trialPeriodDays\": 10,\r\n    \"features\": [\r\n        \"Unlimited projects\",\r\n        \"Priority support\",\r\n        \"Advanced analytics\",\r\n        \"Team collaboration tools\"\r\n    ],\r\n    \"maxTeamMembers\": 5,\r\n    \"maxServices\": 10,\r\n    \"userTypes\": [\r\n        \"user\",\r\n        \"professional\"\r\n    ],\r\n    \"priority\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/subscription/admin/plans",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscription",
+                "admin",
+                "plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createSubscription using sdk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"planId\" : \"69c858834b48f3070d1ba609\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/subscription/create",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscription",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllPlans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/subscription/admin/plans",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscription",
+                "admin",
+                "plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAvailablePlans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/subscription/plans",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscription",
+                "plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createCheckoutSession for subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"planId\": \"69c858834b48f3070d1ba609\",\r\n  \"successUrl\": \"https://mohosin5003.binarybards.online?payment-success=true\",\r\n  \"cancelUrl\": \"https://mohosin5003.binarybards.online?payment-cancel=false\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/subscription/checkout-session",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscription",
+                "checkout-session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllSubscriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/subscription/admin/all-subscriptions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscription",
+                "admin",
+                "all-subscriptions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getUserSubscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/subscription/my-subscription",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscription",
+                "my-subscription"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "analytics",
+      "item": [
+        {
+          "name": "getPremiumAnalytics",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/premium",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "premium"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "track",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"providerId\": \"69d420e5c484df5db9ce0e94\",\r\n  \"serviceId\": \"69caa41216abd186049eb0c1\",\r\n  \"visitorId\": \"69d41f0ec484df5db9ce0db1\",\r\n  \"type\": \"view\",\r\n  \"timestamp\": \"2026-04-08T17:45:00.000Z\",\r\n  \"duration\": 45\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/premium",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "premium"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "recentlyViewed",
+      "item": [
+        {
+          "name": "getRecentlyViewed",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{professional}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/recently-viewed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "recently-viewed"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "temp",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "recordView",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{user1}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"serviceId\" : \"69e15579139d03b89879650f\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/recently-viewed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "recently-viewed"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "temp",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "home",
+      "item": [
+        {
+          "name": "getHomeData",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/home",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "home"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "locations",
+      "item": [
+        {
+          "name": "searchSuggestions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/locations/search?q=dhaka",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "locations",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "dhaka"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://192.168.0.102:5001"
+    },
+    {
+      "key": "admin",
+      "value": "{{vault:bearer-token}}"
+    },
+    {
+      "key": "professional",
+      "value": "Bearer {{vault:json-web-token}}"
+    },
+    {
+      "key": "user1",
+      "value": ""
+    },
+    {
+      "key": "super_admin",
+      "value": ""
+    },
+    {
+      "key": "messageId",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "chatId",
+      "value": ""
+    },
+    {
+      "key": "providerId",
+      "value": ""
+    },
+    {
+      "key": "serviceId",
+      "value": ""
+    },
+    {
+      "key": "other_user_id",
+      "value": ""
+    },
+    {
+      "key": "bookingid",
+      "value": ""
+    },
+    {
+      "key": "withdrawalId",
+      "value": ""
+    },
+    {
+      "key": "reportId",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,338 @@
+Photopya – Requested Adjustments & Improvements
+Status Labels
+
+Please add the following status indicators to help track progress:
+
+✅ Fully Completed
+🟡 Partially Completed
+❌ Not Completed
+1. Calendar & Availability
+Settings in Calendar
+Add a "Show All" button at the end of the listings row to display all created listings.
+2. Listing Creation Flow
+Service Selection
+Allow adding multiple services.
+Category should appear only after selecting a Service.
+Sub-category should appear only after selecting a Category.
+Add small category icons/images similar to the provided example.
+Location
+Keep the current Location & Radius functionality.
+City field should support autocomplete suggestions after typing 3 letters.
+Country should be selected from a dropdown list.
+Draft System
+Add a Save Draft button (Very Important).
+Listings should be visible in a Draft section.
+Multi-Step Listing Creation
+
+Split listing creation into multiple pages/steps for better usability.
+
+Step 1: Basic Information
+Listing Title
+Themes (multiple selection)
+Category
+Sub-category
+Hashtags
+Equipment
+Step 2: Pricing & Duration
+Pricing configuration
+Duration units:
+Minutes
+Hours
+Days
+Weeks
+Auto-accept rules
+Add-ons selectable by customers
+Deposit
+
+Hide deposit settings initially.
+Available options:
+
+0%
+20%
+25%
+50%
+
+(Default: 0%)
+
+Step 3: Availability
+Availability slots management
+Ability to create recurring availability
+Step 4: Media
+Cover Photo (Required)
+Minimum 3 photos
+Video upload support
+Free Users: Maximum 10 media files
+Premium Users: Maximum 20 media files
+3. General Application Improvements
+Branding
+Rename all instances of:
+"Photopia" ➜ "Photopya"
+Update incorrect logo.
+Navigation
+Android Back Button Bug
+
+Currently pressing the back button exits the application.
+
+Required:
+
+Return to the previous screen instead.
+Maintain navigation history for:
+Client Mode
+Professional Mode
+4. User Side Improvements
+Service Areas
+
+Display 3 service domains:
+
+Photography
+
+(Categories & subcategories)
+
+Videography
+
+(Categories & subcategories)
+
+Editing
+
+Replace:
+"Editing & Post-Production"
+
+With:
+"Editing"
+
+Text Formatting
+
+Titles should use normal capitalization:
+Example:
+
+Photography
+Videography
+Editing
+
+NOT:
+
+PHOTOGRAPHY
+VIDEOGRAPHY
+5. Onboarding Slides
+Slide 5 Text Update
+
+Replace:
+
+"Read reviews, check ratings, and hire verified professionals with confidence."
+
+With:
+
+"Read reviews, check ratings, and book verified professionals' services with confidence."
+
+6. Home Page
+UI Fixes
+Search icon alignment should match other icons.
+"Ideas for your project" section should use the new design version provided.
+Creator Requirements
+Profile photo should be mandatory.
+7. Profile & Interaction Improvements
+Media
+Allow enlarging:
+Banner images
+Profile photos
+Hashtags
+Hashtags should be clickable.
+Clicking a hashtag should open a dedicated search page.
+Results should be separated into:
+Profiles
+Services
+Messaging
+Allow document/file attachments in chat.
+8. Search Page
+
+After entering a category:
+
+Add a back button (←) at the top-left.
+Return to the main category selection page.
+9. Client Profile Area
+Fix Non-Working Features
+Settings button
+Privacy & Security
+Language
+
+Add:
+
+French
+
+Ensure French translations work consistently throughout the application.
+
+Order History
+Allow invoice download.
+Help & Support
+
+Add:
+
+Contact
+FAQ
+Settings
+
+Add:
+
+Dark Mode Toggle
+Change Password
+Deactivate Account
+Delete Account
+Payment Methods
+Add Payment Method
+Edit Payment Method
+Delete Payment Method
+Legal
+Terms of Service
+10. Switch to Professional Mode
+
+Professionals should complete onboarding questions.
+
+Section 1 – Personal Information (Required)
+First Name
+Last Name
+Email
+Phone Number
+Country
+City
+Address (Optional)
+Date of Birth (Minimum age: 16)
+Section 2 – Domain (Required)
+Photography
+Videography
+Editing
+Section 3 – Categories by Domain (Optional)
+
+Categories should change dynamically according to selected domain.
+
+Section 4 – Area of Intervention (Optional)
+Main City
+Department
+Radius:
+10km
+30km
+50km
+100km
+Entire France
+Available for Travel (Yes/No)
+Section 5 – Experience (Optional)
+Years of Experience
+Projects Completed
+Education
+Section 6 – Portfolio & Visibility (Optional)
+Bio (Max 500 characters)
+Portfolio URL
+Photos (Min 3, Max 20)
+
+Portfolio URL should be visible on profile.
+
+Section 7 – Profile Picture (Required)
+Section 8 – Notification Preferences (Required)
+Section 9 – Legal Notices (Required)
+Terms of Use
+Privacy Policy
+GDPR Authorization
+
+For optional sections add:
+"Skip this step"
+
+Questions should remain editable from Profile Settings.
+
+11. Professional Side
+Orders
+
+In Pending Orders:
+
+Professionals should be able to:
+
+Modify pricing
+Modify package features
+Customize offers for individual clients
+Calendar
+
+Fix:
+
+Reservation click navigation
+Create event by clicking a date
+Listing creation linked to selected dates
+
+Add:
+
+Mark dates as unavailable
+Recurring events
+Listings
+Required Order
+Listing Title
+Theme (Multiple)
+Category
+Sub-category
+
+Remove:
+
+Service Type
+Fixes
+Category/Sub-category must update based on selected theme.
+Address should be optional.
+Mandatory fields should show an asterisk (*).
+Publication bug where all fields become mandatory.
+Ability to publish with only required fields completed.
+12. Professional Menu
+Help & Support
+Contact
+FAQ
+Settings
+Dark Mode
+Change Password
+Deactivate Account
+Delete Account
+Payment & Remittance
+Payment Methods
+Add
+Edit
+Delete
+Bank Accounts
+Add Bank Account
+Legal
+Terms of Service
+13. Professional Profile Page
+Visibility
+Display only first name.
+About Section
+
+Remove:
+
+About Button
+
+Add:
+
+About Section below the statistics cards.
+
+Include:
+
+Short Description
+Equipment Used
+Location
+Reviews
+Ensure text stays on one line.
+Privacy
+
+Never display:
+
+Email Address
+Phone Number
+Sharing
+
+Add Share button beside Save button on:
+
+Professional profiles
+Project pages
+
+Display native sharing options.
+
+Remove
+View Profile button
+Message button on project cards
+"Free" badge beside professional names
+
+Only Premium users should display:
+
+Premium Badge
