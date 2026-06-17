@@ -8,7 +8,10 @@ class ThemeFormatter {
       return 'All';
     }
     if (trimmed.isEmpty) return '';
-    final String lower = trimmed.toLowerCase();
+    
+    String formatted = trimmed.replaceAll(RegExp(r'graphy', caseSensitive: false), '');
+    
+    final String lower = formatted.toLowerCase();
     return lower[0].toUpperCase() + lower.substring(1);
   }
 }
