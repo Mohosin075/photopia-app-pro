@@ -32,6 +32,13 @@ class ChatController extends ChangeNotifier {
   List<ChatRoom> get chats => _isSearching ? _filteredChats : (_chatData?.chats ?? []);
   List<ChatMessage> get messages => _messages;
 
+  int get totalUnreadCount {
+    if (_chatData?.totalUnreadChats != null && _chatData!.totalUnreadChats! > 0) {
+      return _chatData!.totalUnreadChats!;
+    }
+    return (_chatData?.chats ?? []).fold(0, (sum, chat) => sum + (chat.unreadCount ?? 0));
+  }
+
   void reset() {
     _isLoading = false;
     _errorMessage = '';

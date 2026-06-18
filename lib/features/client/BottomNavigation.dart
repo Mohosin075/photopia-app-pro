@@ -15,6 +15,7 @@ import 'package:photopya/core/localization/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/controller/client/booking_controller.dart';
 import 'package:photopya/core/notification/notification_service.dart';
+import 'package:photopya/controller/client/chat_controller.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
   const BottomNavigationScreen({super.key});
@@ -166,6 +167,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
                               index: 1,
                               iconAsset: 'assets/images/message_icon.png',
                               label: context.l10n.navMessages,
+                              badgeCount: context.watch<ChatController>().totalUnreadCount,
                             ),
                             // Empty space for the floating search button
                             const Expanded(child: SizedBox.shrink()),
@@ -243,6 +245,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
     required int index,
     String? iconAsset,
     required String label,
+    int badgeCount = 0,
   }) {
     bool isSelected = _selectedIndex == index;
 
@@ -254,18 +257,43 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedScale(
-              scale: isSelected ? 1.2 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutBack,
-              child: Image.asset(
-                iconAsset!,
-                width: 22.w,
-                height: 22.w,
-                color: isSelected 
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.grey[400],
-              ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AnimatedScale(
+                  scale: isSelected ? 1.2 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  child: Image.asset(
+                    iconAsset!,
+                    width: 22.w,
+                    height: 22.w,
+                    color: isSelected 
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey[400],
+                  ),
+                ),
+                if (badgeCount > 0)
+                  Positioned(
+                    right: -6.w,
+                    top: -6.h,
+                    child: Container(
+                      padding: EdgeInsets.all(4.w),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        badgeCount > 9 ? '9+' : badgeCount.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 8.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             SizedBox(height: 6.h),
             AnimatedDefaultTextStyle(
@@ -300,3 +328,4 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> with Ti
     );
   }
 }
+

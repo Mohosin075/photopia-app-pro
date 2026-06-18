@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photopya/core/localization/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:photopya/controller/client/chat_controller.dart';
 
 class ProviderCustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -59,6 +61,7 @@ class ProviderCustomBottomNavBar extends StatelessWidget {
                   iconAsset: 'assets/images/message_icon.png',
                   label: context.l10n.navMessages,
                   index: 3,
+                  badgeCount: context.watch<ChatController>().totalUnreadCount,
                 ),
                 _buildNavItem(
                   context: context,
@@ -79,6 +82,7 @@ class ProviderCustomBottomNavBar extends StatelessWidget {
     String? iconAsset,
     required String label,
     required int index,
+    int badgeCount = 0,
   }) {
     final isSelected = selectedIndex == index;
 
@@ -91,19 +95,44 @@ class ProviderCustomBottomNavBar extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (iconAsset != null)
-                Image.asset(
-                  iconAsset,
-                  width: 22.sp.clamp(20, 24),
-                  height: 22.sp.clamp(20, 24),
-                  color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                )
-              else if (icon != null)
-                Icon(
-                  icon,
-                  size: 22.sp.clamp(20, 24),
-                  color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  if (iconAsset != null)
+                    Image.asset(
+                      iconAsset,
+                      width: 22.sp.clamp(20, 24),
+                      height: 22.sp.clamp(20, 24),
+                      color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                    )
+                  else if (icon != null)
+                    Icon(
+                      icon,
+                      size: 22.sp.clamp(20, 24),
+                      color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                    ),
+                  if (badgeCount > 0)
+                    Positioned(
+                      right: -6.w,
+                      top: -6.h,
+                      child: Container(
+                        padding: EdgeInsets.all(4.w),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          badgeCount > 9 ? '9+' : badgeCount.toString(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
               SizedBox(height: 4.h.clamp(3, 5)),
               Text(
                 label,

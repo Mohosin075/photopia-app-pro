@@ -121,7 +121,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _refreshData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshData();
+    });
   }
 
   Future<void> _refreshData() async {
@@ -895,7 +897,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                   SizedBox(width: 10.w),
                   Text(
-                    'Switch to Professional',
+                    context.l10n.switchToProfessional,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 14.sp,
