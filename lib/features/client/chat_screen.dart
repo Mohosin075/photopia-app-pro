@@ -18,6 +18,7 @@ import 'package:photopya/core/widgets/document_viewer_screen.dart';
 import 'package:photopya/features/client/provider_profile_screen.dart';
 import 'package:photopya/features/client/view_profile_screen.dart';
 import 'package:photopya/controller/auth_controller.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ChatScreen extends StatefulWidget {
   final Conversation conversation;
@@ -152,7 +153,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 _buildAttachmentOption(
                   icon: Icons.image,
-                  label: 'Image',
+                  label: context.l10n.labelImage,
                   color: Colors.blue,
                   onTap: () {
                     Navigator.pop(context);
@@ -161,7 +162,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 _buildAttachmentOption(
                   icon: Icons.videocam,
-                  label: 'Video',
+                  label: context.l10n.labelVideo,
                   color: Colors.red,
                   onTap: () {
                     Navigator.pop(context);
@@ -170,7 +171,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 _buildAttachmentOption(
                   icon: Icons.camera_alt,
-                  label: 'Camera',
+                  label: context.l10n.labelCamera,
                   color: Colors.green,
                   onTap: () {
                     Navigator.pop(context);
@@ -179,7 +180,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 _buildAttachmentOption(
                   icon: Icons.insert_drive_file,
-                  label: 'Document',
+                  label: context.l10n.labelDocument,
                   color: Colors.orange,
                   onTap: () {
                     Navigator.pop(context);
@@ -353,7 +354,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      widget.conversation.isOnline ? 'Online' : 'Offline',
+                      widget.conversation.isOnline ? context.l10n.online : context.l10n.offline,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 11.sp),
                     ),
                   ],
@@ -373,7 +374,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Icon(Icons.chat_bubble_outline, size: 64.sp, color: Theme.of(context).dividerColor.withOpacity(0.1)),
           SizedBox(height: 16.h),
-          Text('No messages yet', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 16.sp)),
+          Text(context.l10n.noMessagesYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 16.sp)),
         ],
       ),
     );
@@ -501,7 +502,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Icon(Icons.attach_file, color: message.isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 20.sp),
             SizedBox(width: 8.w),
-            Flexible(child: Text(message.fileName ?? 'File', style: TextStyle(color: message.isMe ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface, fontSize: 13.sp), overflow: TextOverflow.ellipsis)),
+            Flexible(child: Text(message.fileName ?? context.l10n.labelFile, style: TextStyle(color: message.isMe ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface, fontSize: 13.sp), overflow: TextOverflow.ellipsis)),
           ],
         ),
       ),
@@ -521,7 +522,7 @@ class _ChatScreenState extends State<ChatScreen> {
               decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(24).r, border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1))),
               child: TextField(
                 controller: _messageController,
-                decoration: InputDecoration(hintText: 'Type a message...', border: InputBorder.none, hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
+                decoration: InputDecoration(hintText: context.l10n.typeAMessage, border: InputBorder.none, hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
                 onSubmitted: (_) => _handleSendMessage(),
               ),
             ),

@@ -215,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       AppTransitions.createPremiumRoute(
                         SearchResultScreen(
                           filters: {'theme': item.title},
-                          title: item.title,
+                          title: context.l10n.translateCategory(item.title),
                         ),
                       ),
                     );
@@ -298,7 +298,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    item.title ?? '',
+                                    context.l10n.translateCategory(item.title),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 22.sp,
@@ -881,7 +881,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                item.name ?? '',
+                                context.l10n.translateCategory(item.name),
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.sp,
@@ -892,7 +892,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               SizedBox(height: 4.h),
                               Text(
-                                item.parent?['name'] ?? 'Maximize your organic reach',
+                                item.parent?['name'] != null ? context.l10n.translateCategory(item.parent?['name']) : 'Maximize your organic reach',
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.8),
                                   fontSize: 13.sp,
@@ -1033,7 +1033,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               SizedBox(height: 2.h),
                               Text(
-                                '${item.category?.name ?? 'Expert'} • Response <30min',
+                                '${context.l10n.translateCategory(item.category?.name ?? 'Expert')} • ${Localizations.localeOf(context).languageCode == 'fr' ? 'Réponse < 30 min' : 'Response < 30min'}',
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -1128,7 +1128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       SizedBox(height: 8.h),
                       Text(
-                        item.name ?? '',
+                        context.l10n.translateCategory(item.name),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12.sp,

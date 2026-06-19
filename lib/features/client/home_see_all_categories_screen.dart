@@ -95,7 +95,7 @@ class HomeSeeAllCategoriesScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8.h),
                       Text(
-                        item.name ?? '',
+                        context.l10n.translateCategory(item.name),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12.sp,

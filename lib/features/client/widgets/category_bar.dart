@@ -6,6 +6,7 @@ import 'package:photopya/core/utils/theme_formatter.dart';
 import 'package:photopya/data/models/category_model.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/controller/category_controller.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class CategoryBar extends StatelessWidget {
   final bool isLoading;
@@ -86,7 +87,7 @@ class CategoryBar extends StatelessWidget {
                   ),
                   SizedBox(width: 8.w),
                   Text(
-                    label,
+                    context.l10n.translateCategory(label),
                     style: TextStyle(
                       fontSize: 14.sp.clamp(14, 15),
                       fontWeight: FontWeight.w600,

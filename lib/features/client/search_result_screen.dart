@@ -5,6 +5,7 @@ import 'package:photopya/features/client/widgets/service_card.dart';
 import 'package:photopya/features/client/widgets/shimmer_skeletons.dart';
 import 'package:photopya/features/client/service_details_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class SearchResultScreen extends StatefulWidget {
   final Map<String, dynamic> filters;
@@ -26,22 +27,22 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
   }
 
   String _getDynamicTitle() {
-    if (widget.title != null) return widget.title!;
+    if (widget.title != null) return context.l10n.translateCategory(widget.title!);
     
     if (widget.filters.containsKey('searchTerm') && widget.filters['searchTerm'].toString().isNotEmpty) {
-      return widget.filters['searchTerm'];
+      return context.l10n.translateCategory(widget.filters['searchTerm']);
     }
     if (widget.filters.containsKey('theme')) {
-      return widget.filters['theme'];
+      return context.l10n.translateCategory(widget.filters['theme']);
     }
     if (widget.filters.containsKey('city')) {
       return widget.filters['city'];
     }
     if (widget.filters.containsKey('categoryName')) {
-      return widget.filters['categoryName'];
+      return context.l10n.translateCategory(widget.filters['categoryName']);
     }
     
-    return 'Search Results';
+    return context.l10n.searchResults;
   }
 
   @override
@@ -96,7 +97,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   Icon(Icons.search_off, size: 80.sp, color: Colors.grey[300]),
                   SizedBox(height: 16.h),
                   Text(
-                    'No services found',
+                    context.l10n.noServicesFound,
                     style: TextStyle(fontSize: 16.sp, color: Colors.grey),
                   ),
                 ],

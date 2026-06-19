@@ -6,7 +6,6 @@ import 'package:photopya/features/client/chat_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/controller/client/chat_controller.dart';
 import 'package:photopya/controller/auth_controller.dart';
-import 'package:photopya/core/widgets/app_refresher.dart';
 import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderMessageScreen extends StatefulWidget {
@@ -121,24 +120,25 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
       child: Container(
-        height: 48.h,
+        height: 44.h.clamp(40, 48),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(24.r),
+          borderRadius: BorderRadius.circular(15).r,
           border: Border.all(
             color: Theme.of(context).dividerColor.withOpacity(0.1),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
+              color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.2 : 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: TextField(
           controller: _searchController,
+          textAlignVertical: TextAlignVertical.center,
           onChanged: (value) {
             context.read<ChatController>().searchChats(value);
           },
@@ -153,15 +153,20 @@ class _ProviderMessageScreenState extends State<ProviderMessageScreen> {
               fontSize: 14.sp,
             ),
             prefixIcon: Padding(
-              padding: EdgeInsets.only(left: 15.w, right: 10.w),
+              padding: EdgeInsets.only(left: 12.w, right: 8.w),
               child: Icon(
                 Icons.search_rounded,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 size: 22.sp,
               ),
             ),
+            prefixIconConstraints: BoxConstraints(
+              minWidth: 35.w,
+              minHeight: 44.h.clamp(40, 48),
+            ),
             border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
           ),
         ),
       ),

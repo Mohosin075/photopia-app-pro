@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -42,7 +43,7 @@ class SectionHeader extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
                 child: Text(
-                  'See All',
+                  context.l10n.viewAll,
                   style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,

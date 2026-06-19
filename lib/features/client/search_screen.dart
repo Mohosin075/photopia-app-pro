@@ -220,7 +220,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          cat.name,
+                          context.l10n.translateCategory(cat.name),
                           style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500),
                         ),
                       ),
@@ -251,7 +251,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 final selected = controller.categories.firstWhere(
                   (c) => c.id == controller.selectedCategoryId,
                 );
-                headerTitle = selected.name;
+                headerTitle = context.l10n.translateCategory(selected.name);
               } catch (_) {
                 headerTitle = context.l10n.categories;
               }
@@ -360,7 +360,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                            category.name,
+                            context.l10n.translateCategory(category.name),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: AppTypography.bodySmall,

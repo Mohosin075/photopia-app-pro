@@ -142,7 +142,7 @@ class HomeSeeAllSubcategoriesScreen extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  item.name ?? '',
+                                  context.l10n.translateCategory(item.name),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18.sp,
@@ -153,7 +153,7 @@ class HomeSeeAllSubcategoriesScreen extends StatelessWidget {
                                 ),
                                 SizedBox(height: 4.h),
                                 Text(
-                                  item.parent?['name'] ?? 'Explore trending services',
+                                  item.parent?['name'] != null ? context.l10n.translateCategory(item.parent?['name']) : 'Explore trending services',
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.8),
                                     fontSize: 12.sp,

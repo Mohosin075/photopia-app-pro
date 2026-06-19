@@ -2782,7 +2782,7 @@ class _ProviderCreateListingScreenState
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(
-                        ThemeFormatter.format(value),
+                        context.l10n.translateCategory(ThemeFormatter.format(value)),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 13.sp,

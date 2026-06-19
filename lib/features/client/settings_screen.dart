@@ -76,13 +76,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     obscureText: obscureOld,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
-                      labelText: 'Current Password',
+                      labelText: context.l10n.currentPassword,
                       suffixIcon: IconButton(
                         icon: Icon(obscureOld ? Icons.visibility_off : Icons.visibility),
                         onPressed: () => setDialogState(() => obscureOld = !obscureOld),
                       ),
                     ),
-                    validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                    validator: (v) => (v == null || v.isEmpty) ? context.l10n.requiredField : null,
                   ),
                   SizedBox(height: 16.h),
                   TextFormField(
@@ -90,13 +90,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     obscureText: obscureNew,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
-                      labelText: 'New Password',
+                      labelText: context.l10n.newPassword,
                       suffixIcon: IconButton(
                         icon: Icon(obscureNew ? Icons.visibility_off : Icons.visibility),
                         onPressed: () => setDialogState(() => obscureNew = !obscureNew),
                       ),
                     ),
-                    validator: (v) => (v == null || v.length < 6) ? 'Min 6 characters' : null,
+                    validator: (v) => (v == null || v.length < 6) ? context.l10n.min6Chars : null,
                   ),
                   SizedBox(height: 16.h),
                   TextFormField(
@@ -104,13 +104,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     obscureText: obscureConfirm,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
-                      labelText: 'Confirm New Password',
+                      labelText: context.l10n.confirmNewPassword,
                       suffixIcon: IconButton(
                         icon: Icon(obscureConfirm ? Icons.visibility_off : Icons.visibility),
                         onPressed: () => setDialogState(() => obscureConfirm = !obscureConfirm),
                       ),
                     ),
-                    validator: (v) => v != newPasswordController.text ? 'Passwords do not match' : null,
+                    validator: (v) => v != newPasswordController.text ? context.l10n.passwordsDoNotMatch : null,
                   ),
                 ],
               ),
@@ -136,13 +136,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Navigator.pop(ctx);
                               CustomSnackBar.show(
                                 context: context,
-                                message: 'Password changed successfully',
+                                message: context.l10n.passwordChangedSuccess,
                                 isError: false,
                               );
                             } else if (mounted) {
                               CustomSnackBar.show(
                                 context: context,
-                                message: controller.errorMessage ?? 'Failed to change password',
+                                message: controller.errorMessage ?? context.l10n.failedToChangePassword,
                                 isError: true,
                               );
                             }
@@ -154,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           width: 20.h,
                           child: const CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Update'),
+                      : Text(context.l10n.updateBtn),
                 );
               },
             ),
@@ -217,7 +217,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                      hintText: 'Enter your password',
+                      hintText: context.l10n.enterYourPassword,
                       hintStyle: TextStyle(fontSize: 13.sp),
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 16.w,
@@ -234,7 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password is required';
+                        return context.l10n.passwordIsRequired;
                       }
                       return null;
                     },
@@ -339,7 +339,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Navigator.pop(dialogContext);
         CustomSnackBar.show(
           context: context,
-          message: 'Account deleted successfully',
+          message: context.l10n.accountDeletedSuccess,
           isError: false,
         );
         await AuthController.forceLogout();
@@ -348,7 +348,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         CustomSnackBar.show(
           context: context,
-          message: controller.errorMessage ?? 'Failed to delete account',
+          message: controller.errorMessage ?? context.l10n.failedToDeleteAccount,
           isError: true,
         );
       }
@@ -367,7 +367,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Navigator.pop(dialogContext);
         CustomSnackBar.show(
           context: context,
-          message: 'Account deactivated successfully',
+          message: context.l10n.accountDeactivatedSuccess,
           isError: false,
         );
         await AuthController.forceLogout();
@@ -376,7 +376,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         CustomSnackBar.show(
           context: context,
-          message: controller.errorMessage ?? 'Failed to deactivate account',
+          message: controller.errorMessage ?? context.l10n.failedToDeactivateAccount,
           isError: true,
         );
       }
@@ -457,7 +457,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _card([
             _tile(
               icon: Icons.notifications_none_outlined,
-              title: 'Notification Settings',
+              title: Localizations.localeOf(context).languageCode == 'fr' ? 'Paramètres de notification' : 'Notification Settings',
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),

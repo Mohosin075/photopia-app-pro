@@ -19,6 +19,35 @@ class AppLocalizations {
     return text;
   }
 
+  String translateCategory(String? name) {
+    if (name == null || name.isEmpty) return '';
+    final map = {
+      // Domains & Variations
+      'Photography': photography,
+      'Photo': photography,
+      'Videography': videography,
+      'Video': videography,
+      'Editing': editing,
+      'All': locale.languageCode == 'fr' ? 'Tout' : 'All',
+      
+      // Specialties / Categories
+      'Wedding Photography': catWeddingPhoto,
+      'Portrait': catPortrait,
+      'Event': catEvent,
+      'Product': catProduct,
+      'Fashion': catFashion,
+      'Wedding Video': catWeddingVideo,
+      'Cinematic': catCinematic,
+      'Event Coverage': catEventCoverage,
+      'Commercial': catCommercial,
+      'Photo Retouching': catPhotoRetouching,
+      'Color Grading': catColorGrading,
+      'Video Editing': catVideoEditing,
+      'Motion Graphics': catMotionGraphics,
+    };
+    return map[name] ?? name;
+  }
+
   // ── Navigation ────────────────────────────────────────────────────────────
   String get navHome => tr('navHome');
   String get navMessages => tr('navMessages');
@@ -538,6 +567,113 @@ class AppLocalizations {
   String get depositStep2Explanation => tr('depositStep2Explanation');
   String depositStep3Explanation(String symbol, String amount) =>
       tr('depositStep3Explanation', args: [symbol, amount]);
+
+  // ── Onboarding / Switch to Professional ───────────────────────────────────
+  String get onboardingPersonalInfo => tr('onboardingPersonalInfo');
+  String get onboardingProfession => tr('onboardingProfession');
+  String get onboardingWorkArea => tr('onboardingWorkArea');
+  String get onboardingExperience => tr('onboardingExperience');
+  String get onboardingPortfolio => tr('onboardingPortfolio');
+  String get onboardingPreferences => tr('onboardingPreferences');
+  String get onboardingVerifyIdentity => tr('onboardingVerifyIdentity');
+  String get onboardingWhatDoYouDo => tr('onboardingWhatDoYouDo');
+  String get onboardingWhereDoYouWork => tr('onboardingWhereDoYouWork');
+  String get onboardingShareBackground => tr('onboardingShareBackground');
+  String get onboardingShowcaseWork => tr('onboardingShowcaseWork');
+  String get onboardingConfirmFinish => tr('onboardingConfirmFinish');
+  String get skip => tr('skip');
+  String get finishAndStart => tr('finishAndStart');
+  String get fillRequiredPersonalInfo => tr('fillRequiredPersonalInfo');
+  String get profilePicRequired => tr('profilePicRequired');
+  String get acceptLegalTerms => tr('acceptLegalTerms');
+  String get failedToSaveRetry => tr('failedToSaveRetry');
+  String get firstName => tr('firstName');
+  String get lastName => tr('lastName');
+  String get emailAddress => tr('emailAddress');
+  String get phoneNumber => tr('phoneNumber');
+  String get dobSelectHint => tr('dobSelectHint');
+  String get optionalLabel => tr('optionalLabel');
+  String get primaryDomain => tr('primaryDomain');
+  String get categoriesSpecialties => tr('categoriesSpecialties');
+  String get selectAtLeastOneSpecialization => tr('selectAtLeastOneSpecialization');
+  String get catWeddingPhoto => tr('catWeddingPhoto');
+  String get catPortrait => tr('catPortrait');
+  String get catEvent => tr('catEvent');
+  String get catProduct => tr('catProduct');
+  String get catFashion => tr('catFashion');
+  String get catWeddingVideo => tr('catWeddingVideo');
+  String get catCinematic => tr('catCinematic');
+  String get catEventCoverage => tr('catEventCoverage');
+  String get catCommercial => tr('catCommercial');
+  String get catPhotoRetouching => tr('catPhotoRetouching');
+  String get catColorGrading => tr('catColorGrading');
+  String get catVideoEditing => tr('catVideoEditing');
+  String get catMotionGraphics => tr('catMotionGraphics');
+  String get mainCityWorkArea => tr('mainCityWorkArea');
+  String get departmentLabel => tr('departmentLabel');
+  String get interventionRadius => tr('interventionRadius');
+  String get canTravelOutside => tr('canTravelOutside');
+  String get wholeCountry => tr('wholeCountry');
+  String get yearsOfExperience => tr('yearsOfExperience');
+  String get projectsCompleted => tr('projectsCompleted');
+  String get expLess1Year => tr('expLess1Year');
+  String get exp1To3Years => tr('exp1To3Years');
+  String get exp3To5Years => tr('exp3To5Years');
+  String get exp5To10Years => tr('exp5To10Years');
+  String get exp10PlusYears => tr('exp10PlusYears');
+  String get projLess10 => tr('projLess10');
+  String get proj10To50 => tr('proj10To50');
+  String get proj50To100 => tr('proj50To100');
+  String get proj100Plus => tr('proj100Plus');
+  String get eduSelfTaught => tr('eduSelfTaught');
+  String get eduSchool => tr('eduSchool');
+  String get eduProfessionalTraining => tr('eduProfessionalTraining');
+  String get miniBio => tr('miniBio');
+  String get max500Chars => tr('max500Chars');
+  String get bioPlaceholder => tr('bioPlaceholder');
+  String get externalPortfolioLink => tr('externalPortfolioLink');
+  String get portfolioImages => tr('portfolioImages');
+  String get uploadImagesShowcase => tr('uploadImagesShowcase');
+  String get emailNewRequests => tr('emailNewRequests');
+  String get smsUrgentRequests => tr('smsUrgentRequests');
+  String get newsletterPros => tr('newsletterPros');
+  String get reviewReminders => tr('reviewReminders');
+  String get legalAgreement => tr('legalAgreement');
+  String get acceptAllToContinue => tr('acceptAllToContinue');
+  String get acceptTermsOfUse => tr('acceptTermsOfUse');
+  String get acceptPrivacyPolicy => tr('acceptPrivacyPolicy');
+  String get acceptGdpr => tr('acceptGdpr');
+
+  // ── Settings Screen ───────────────────────────────────────────────────────
+  String get currentPassword => tr('currentPassword');
+  String get newPassword => tr('newPassword');
+  String get confirmNewPassword => tr('confirmNewPassword');
+  String get requiredField => tr('requiredField');
+  String get min6Chars => tr('min6Chars');
+  String get passwordsDoNotMatch => tr('passwordsDoNotMatch');
+  String get passwordChangedSuccess => tr('passwordChangedSuccess');
+  String get failedToChangePassword => tr('failedToChangePassword');
+  String get enterYourPassword => tr('enterYourPassword');
+  String get passwordIsRequired => tr('passwordIsRequired');
+  String get accountDeletedSuccess => tr('accountDeletedSuccess');
+  String get accountDeactivatedSuccess => tr('accountDeactivatedSuccess');
+  String get failedToDeleteAccount => tr('failedToDeleteAccount');
+  String get failedToDeactivateAccount => tr('failedToDeactivateAccount');
+  String get updateBtn => tr('updateBtn');
+
+  // ── Provider Edit Profile Screen ──────────────────────────────────────────
+  String get profilePicMandatory => tr('profilePicMandatory');
+  String get noCoverPhoto => tr('noCoverPhoto');
+
+  // ── Chat / Messages ────────────────────────────────────────────────────────
+  String get online => _isFr ? 'En ligne' : 'Online';
+  String get offline => _isFr ? 'Hors ligne' : 'Offline';
+  String get typeAMessage => _isFr ? 'Écrivez un message...' : 'Type a message...';
+  String get labelFile => _isFr ? 'Fichier' : 'File';
+  String get labelImage => _isFr ? 'Image' : 'Image';
+  String get labelVideo => _isFr ? 'Vidéo' : 'Video';
+  String get labelCamera => _isFr ? 'Appareil photo' : 'Camera';
+  String get labelDocument => _isFr ? 'Document' : 'Document';
 }
 
 // ── Delegate ──────────────────────────────────────────────────────────────────

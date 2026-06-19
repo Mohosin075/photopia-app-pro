@@ -6,6 +6,7 @@ import 'package:photopya/controller/provider/provider_onboarding_controller.dart
 import 'package:photopya/controller/client/user_profile_controller.dart';
 import 'package:photopya/core/widgets/custom_snacbar.dart';
 import 'package:photopya/core/routes/app_routes.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderOnboardingScreen extends StatefulWidget {
   const ProviderOnboardingScreen({super.key});
@@ -43,20 +44,20 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
   void _goNext() {
     final ctrl = context.read<ProviderOnboardingController>();
     if (_currentPage == 0 && !ctrl.isStep1Valid) {
-      CustomSnackBar.show(context: context, message: 'Please fill in all required personal information fields.', isError: true);
+      CustomSnackBar.show(context: context, message: context.l10n.fillRequiredPersonalInfo, isError: true);
       return;
     }
     if (_currentPage == 1 && !ctrl.isStep2Valid) {
-      CustomSnackBar.show(context: context, message: 'Please select a domain and at least one category.', isError: true);
+      CustomSnackBar.show(context: context, message: context.l10n.selectDomainAndCategory, isError: true);
       return;
     }
     if (_currentPage == 4 && !ctrl.isStep5Valid) {
-      CustomSnackBar.show(context: context, message: 'Profile picture is required.', isError: true);
+      CustomSnackBar.show(context: context, message: context.l10n.profilePicRequired, isError: true);
       return;
     }
     if (_currentPage == _totalPages - 1) {
       if (!ctrl.isStep6Valid) {
-        CustomSnackBar.show(context: context, message: 'Please accept all legal terms to continue.', isError: true);
+        CustomSnackBar.show(context: context, message: context.l10n.acceptLegalTerms, isError: true);
         return;
       }
       _submit();
@@ -77,7 +78,7 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
     if (success) {
       Navigator.pushNamedAndRemoveUntil(context, AppRoutes.provider_bottom_navigation, (r) => false);
     } else {
-      CustomSnackBar.show(context: context, message: ctrl.errorMessage ?? 'Failed to save. Please retry.', isError: true);
+      CustomSnackBar.show(context: context, message: ctrl.errorMessage ?? context.l10n.failedToSaveRetry, isError: true);
     }
   }
 
@@ -122,20 +123,20 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
 
   Widget _buildHeader(ColorScheme cs) {
     final titles = [
-      'Personal Info',
-      'Profession',
-      'Work Area',
-      'Experience',
-      'Portfolio',
-      'Preferences'
+      context.l10n.onboardingPersonalInfo,
+      context.l10n.onboardingProfession,
+      context.l10n.onboardingWorkArea,
+      context.l10n.onboardingExperience,
+      context.l10n.onboardingPortfolio,
+      context.l10n.onboardingPreferences
     ];
     final subtitles = [
-      'Verify your identity',
-      'What do you do?',
-      'Where do you work?',
-      'Share your background',
-      'Showcase your work',
-      'Confirm & finish'
+      context.l10n.onboardingVerifyIdentity,
+      context.l10n.onboardingWhatDoYouDo,
+      context.l10n.onboardingWhereDoYouWork,
+      context.l10n.onboardingShareBackground,
+      context.l10n.onboardingShowcaseWork,
+      context.l10n.onboardingConfirmFinish
     ];
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
@@ -152,7 +153,7 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
                     child: Icon(Icons.arrow_back, size: 24.sp, color: cs.onSurface),
                   ),
                 ),
-              Text('Step ${_currentPage + 1} of $_totalPages',
+              Text(context.l10n.stepXofY((_currentPage + 1).toString(), _totalPages.toString()),
                   style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
               const Spacer(),
               if (_currentPage > 0 && _currentPage < _totalPages - 1)
@@ -161,7 +162,7 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
                     _pageController.animateToPage(_totalPages - 1,
                         duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
                   },
-                  child: Text('Skip', style: TextStyle(fontSize: 13.sp, color: cs.onSurface.withOpacity(0.5))),
+                  child: Text(context.l10n.skip, style: TextStyle(fontSize: 13.sp, color: cs.onSurface.withOpacity(0.5))),
                 ),
             ],
           ),
@@ -225,7 +226,7 @@ class _ProviderOnboardingScreenState extends State<ProviderOnboardingScreen> {
                           ? SizedBox(width: 22.sp, height: 22.sp,
                               child: CircularProgressIndicator(color: cs.onPrimary, strokeWidth: 2))
                           : Text(
-                              _currentPage == _totalPages - 1 ? 'Finish & Start' : 'Continue',
+                              _currentPage == _totalPages - 1 ? context.l10n.finishAndStart : context.l10n.continueBtn,
                               style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: cs.onPrimary),
                             ),
                     ),
@@ -261,7 +262,7 @@ class _Step1PersonalInfo extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SectionLabel('First Name', isRequired: true),
+                        _SectionLabel(context.l10n.firstName, isRequired: true),
                         SizedBox(height: 8.h),
                         _TextField(hint: 'John', value: ctrl.firstName, icon: Icons.person_outline, onChanged: (v) => ctrl.firstName = v, cs: cs),
                       ],
@@ -272,7 +273,7 @@ class _Step1PersonalInfo extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SectionLabel('Last Name', isRequired: true),
+                        _SectionLabel(context.l10n.lastName, isRequired: true),
                         SizedBox(height: 8.h),
                         _TextField(hint: 'Doe', value: ctrl.lastName, icon: Icons.person_outline, onChanged: (v) => ctrl.lastName = v, cs: cs),
                       ],
@@ -281,11 +282,11 @@ class _Step1PersonalInfo extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 16.h),
-              _SectionLabel('Email Address', isRequired: true),
+              _SectionLabel(context.l10n.emailAddress, isRequired: true),
               SizedBox(height: 8.h),
-              _TextField(hint: 'Email', value: ctrl.email, icon: Icons.email_outlined, onChanged: (v) => ctrl.email = v, cs: cs, keyboardType: TextInputType.emailAddress),
+              _TextField(hint: context.l10n.emailLabel, value: ctrl.email, icon: Icons.email_outlined, onChanged: (v) => ctrl.email = v, cs: cs, keyboardType: TextInputType.emailAddress),
               SizedBox(height: 16.h),
-              _SectionLabel('Phone Number', isRequired: true),
+              _SectionLabel(context.l10n.phoneNumber, isRequired: true),
               SizedBox(height: 8.h),
               _TextField(hint: '+33 6 12 34 56 78', value: ctrl.phone, icon: Icons.phone_outlined, onChanged: (v) => ctrl.phone = v, cs: cs, keyboardType: TextInputType.phone),
               SizedBox(height: 16.h),
@@ -295,9 +296,21 @@ class _Step1PersonalInfo extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SectionLabel('Country', isRequired: true),
+                        _SectionLabel(context.l10n.country, isRequired: true),
                         SizedBox(height: 8.h),
-                        _DropdownField(hint: 'Select', value: ctrl.country, items: const ['France', 'Belgium', 'Switzerland', 'UK'], onChanged: (v) { ctrl.country = v ?? 'France'; ctrl.notifyListeners(); }, cs: cs),
+                        _DropdownField(
+                          hint: Localizations.localeOf(context).languageCode == 'fr' ? 'Sélectionner' : 'Select',
+                          value: ctrl.country,
+                          items: const ['France', 'Belgium', 'Switzerland', 'UK'],
+                          displayLabels: {
+                            'France': 'France',
+                            'Belgium': Localizations.localeOf(context).languageCode == 'fr' ? 'Belgique' : 'Belgium',
+                            'Switzerland': Localizations.localeOf(context).languageCode == 'fr' ? 'Suisse' : 'Switzerland',
+                            'UK': Localizations.localeOf(context).languageCode == 'fr' ? 'Royaume-Uni' : 'UK',
+                          },
+                          onChanged: (v) { ctrl.country = v ?? 'France'; ctrl.notifyListeners(); },
+                          cs: cs,
+                        ),
                       ],
                     ),
                   ),
@@ -306,7 +319,7 @@ class _Step1PersonalInfo extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SectionLabel('City', isRequired: true),
+                        _SectionLabel(context.l10n.city, isRequired: true),
                         SizedBox(height: 8.h),
                         _TextField(hint: 'Paris', value: ctrl.city, icon: Icons.location_city, onChanged: (v) => ctrl.city = v, cs: cs),
                       ],
@@ -315,11 +328,14 @@ class _Step1PersonalInfo extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 16.h),
-              _SectionLabel('Address', isOptional: true),
+              _SectionLabel(context.l10n.address, isOptional: true),
               SizedBox(height: 8.h),
               _TextField(hint: '123 Main St', value: ctrl.address, icon: Icons.home_outlined, onChanged: (v) => ctrl.address = v, cs: cs),
               SizedBox(height: 16.h),
-              _SectionLabel('Date of Birth', isRequired: true),
+              _SectionLabel(
+                Localizations.localeOf(context).languageCode == 'fr' ? 'Date de naissance' : 'Date of Birth',
+                isRequired: true,
+              ),
               SizedBox(height: 8.h),
               GestureDetector(
                 onTap: () async {
@@ -349,7 +365,7 @@ class _Step1PersonalInfo extends StatelessWidget {
                       Text(
                         ctrl.dateOfBirth != null
                             ? '${ctrl.dateOfBirth!.day}/${ctrl.dateOfBirth!.month}/${ctrl.dateOfBirth!.year}'
-                            : 'Select your date of birth (Min 16)',
+                            : context.l10n.dobSelectHint,
                         style: TextStyle(
                           fontSize: 14.sp,
                           color: ctrl.dateOfBirth != null ? cs.onSurface : cs.onSurface.withOpacity(0.4),
@@ -399,13 +415,18 @@ class _Step2Profession extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SectionLabel('Primary Domain', isRequired: true),
+              _SectionLabel(context.l10n.primaryDomain, isRequired: true),
               SizedBox(height: 8.h),
               Wrap(
                 spacing: 10.w,
                 runSpacing: 10.h,
                 children: _domains.map((domain) {
                   final selected = ctrl.primaryDomain.contains(domain);
+                  final domainLabels = {
+                    'Photography': context.l10n.photography,
+                    'Videography': context.l10n.videography,
+                    'Editing': context.l10n.editing,
+                  };
                   return GestureDetector(
                     onTap: () {
                       if (selected) {
@@ -417,29 +438,44 @@ class _Step2Profession extends StatelessWidget {
                       }
                       ctrl.notifyListeners();
                     },
-                    child: _SelectChip(label: domain, selected: selected),
+                    child: _SelectChip(label: domainLabels[domain] ?? domain, selected: selected),
                   );
                 }).toList(),
               ),
               SizedBox(height: 24.h),
               
               if (ctrl.primaryDomain.isNotEmpty) ...[
-                _SectionLabel('Categories / Specialties', isRequired: true),
+                _SectionLabel(context.l10n.categoriesSpecialties, isRequired: true),
                 SizedBox(height: 4.h),
-                Text('Select at least one specialization', style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
+                Text(context.l10n.selectAtLeastOneSpecialization, style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
                 SizedBox(height: 8.h),
                 Wrap(
                   spacing: 10.w,
                   runSpacing: 10.h,
                   children: dynamicCategories.map((s) {
                     final selected = ctrl.specialties.contains(s);
+                    final categoryLabels = {
+                      'Wedding Photography': context.l10n.catWeddingPhoto,
+                      'Portrait': context.l10n.catPortrait,
+                      'Event': context.l10n.catEvent,
+                      'Product': context.l10n.catProduct,
+                      'Fashion': context.l10n.catFashion,
+                      'Wedding Video': context.l10n.catWeddingVideo,
+                      'Cinematic': context.l10n.catCinematic,
+                      'Event Coverage': context.l10n.catEventCoverage,
+                      'Commercial': context.l10n.catCommercial,
+                      'Photo Retouching': context.l10n.catPhotoRetouching,
+                      'Color Grading': context.l10n.catColorGrading,
+                      'Video Editing': context.l10n.catVideoEditing,
+                      'Motion Graphics': context.l10n.catMotionGraphics,
+                    };
                     return GestureDetector(
                       onTap: () {
                         if (selected) ctrl.specialties.remove(s);
                         else ctrl.specialties.add(s);
                         ctrl.notifyListeners();
                       },
-                      child: _SelectChip(label: s, selected: selected),
+                      child: _SelectChip(label: categoryLabels[s] ?? s, selected: selected),
                     );
                   }).toList(),
                 ),
@@ -467,17 +503,30 @@ class _Step3Location extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SectionLabel('Main City (Area of work)', isOptional: true),
+              _SectionLabel(context.l10n.mainCityWorkArea, isOptional: true),
               SizedBox(height: 8.h),
               _TextField(hint: 'e.g. Paris', value: ctrl.mainCity, icon: Icons.location_city_outlined, onChanged: (v) { ctrl.mainCity = v; }, cs: cs),
               SizedBox(height: 16.h),
-              _SectionLabel('Department', isOptional: true),
+              _SectionLabel(context.l10n.departmentLabel, isOptional: true),
               SizedBox(height: 8.h),
               _DropdownField(hint: 'e.g. 75', value: ctrl.department.isEmpty ? null : ctrl.department, items: const ['75', '92', '93', '94'], onChanged: (v) { ctrl.department = v ?? ''; ctrl.notifyListeners(); }, cs: cs),
               SizedBox(height: 16.h),
-              _SectionLabel('Intervention Radius', isOptional: true),
+              _SectionLabel(context.l10n.interventionRadius, isOptional: true),
               SizedBox(height: 8.h),
-              _DropdownField(hint: 'Select radius', value: ctrl.radius, items: _radiusOptions, onChanged: (v) { if (v != null) { ctrl.radius = v; ctrl.notifyListeners(); } }, cs: cs),
+              _DropdownField(
+                hint: Localizations.localeOf(context).languageCode == 'fr' ? 'Sélectionner le rayon' : 'Select radius',
+                value: ctrl.radius,
+                items: _radiusOptions,
+                displayLabels: {
+                  '10km': '10km',
+                  '30km': '30km',
+                  '50km': '50km',
+                  '100km': '100km',
+                  'Whole Country': context.l10n.wholeCountry,
+                },
+                onChanged: (v) { if (v != null) { ctrl.radius = v; ctrl.notifyListeners(); } },
+                cs: cs,
+              ),
               SizedBox(height: 20.h),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
@@ -492,8 +541,8 @@ class _Step3Location extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Available for travel', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: cs.onSurface)),
-                        Text('Can travel outside your area', style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
+                        Text(context.l10n.availableForTravel, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: cs.onSurface)),
+                        Text(context.l10n.canTravelOutside, style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
                       ],
                     ),
                     Switch(value: ctrl.availableForTravel, onChanged: (v) { ctrl.availableForTravel = v; ctrl.notifyListeners(); }, activeColor: cs.primary),
@@ -526,17 +575,53 @@ class _Step4Experience extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SectionLabel('Years of Experience', isOptional: true),
+              _SectionLabel(context.l10n.yearsOfExperience, isOptional: true),
               SizedBox(height: 8.h),
-              _DropdownField(hint: 'Select experience', value: ctrl.yearsOfExperience, items: _yearsOptions, onChanged: (v) { ctrl.yearsOfExperience = v; ctrl.notifyListeners(); }, cs: cs),
+              _DropdownField(
+                hint: Localizations.localeOf(context).languageCode == 'fr' ? 'Sélectionner l\'expérience' : 'Select experience',
+                value: ctrl.yearsOfExperience,
+                items: _yearsOptions,
+                displayLabels: {
+                  '<1 year': context.l10n.expLess1Year,
+                  '1-3 years': context.l10n.exp1To3Years,
+                  '3-5 years': context.l10n.exp3To5Years,
+                  '5-10 years': context.l10n.exp5To10Years,
+                  '10+ years': context.l10n.exp10PlusYears,
+                },
+                onChanged: (v) { ctrl.yearsOfExperience = v; ctrl.notifyListeners(); },
+                cs: cs,
+              ),
               SizedBox(height: 16.h),
-              _SectionLabel('Projects Completed', isOptional: true),
+              _SectionLabel(context.l10n.projectsCompleted, isOptional: true),
               SizedBox(height: 8.h),
-              _DropdownField(hint: 'Select range', value: ctrl.projectsCompleted, items: _projectsOptions, onChanged: (v) { ctrl.projectsCompleted = v; ctrl.notifyListeners(); }, cs: cs),
+              _DropdownField(
+                hint: Localizations.localeOf(context).languageCode == 'fr' ? 'Sélectionner la plage' : 'Select range',
+                value: ctrl.projectsCompleted,
+                items: _projectsOptions,
+                displayLabels: {
+                  '<10': context.l10n.projLess10,
+                  '10-50': context.l10n.proj10To50,
+                  '50-100': context.l10n.proj50To100,
+                  '100+': context.l10n.proj100Plus,
+                },
+                onChanged: (v) { ctrl.projectsCompleted = v; ctrl.notifyListeners(); },
+                cs: cs,
+              ),
               SizedBox(height: 16.h),
-              _SectionLabel('Education', isOptional: true),
+              _SectionLabel(context.l10n.education, isOptional: true),
               SizedBox(height: 8.h),
-              _DropdownField(hint: 'Select education', value: ctrl.education, items: _educationOptions, onChanged: (v) { ctrl.education = v; ctrl.notifyListeners(); }, cs: cs),
+              _DropdownField(
+                hint: Localizations.localeOf(context).languageCode == 'fr' ? 'Sélectionner l\'éducation' : 'Select education',
+                value: ctrl.education,
+                items: _educationOptions,
+                displayLabels: {
+                  'Self-taught': context.l10n.eduSelfTaught,
+                  'School': context.l10n.eduSchool,
+                  'Professional Training': context.l10n.eduProfessionalTraining,
+                },
+                onChanged: (v) { ctrl.education = v; ctrl.notifyListeners(); },
+                cs: cs,
+              ),
               SizedBox(height: 20.h),
             ],
           ),
@@ -559,7 +644,10 @@ class _Step5BioPortfolio extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SectionLabel('Profile Picture', isRequired: true),
+              _SectionLabel(
+                Localizations.localeOf(context).languageCode == 'fr' ? 'Photo de profil' : 'Profile Picture',
+                isRequired: true,
+              ),
               SizedBox(height: 12.h),
               Center(
                 child: GestureDetector(
@@ -598,9 +686,9 @@ class _Step5BioPortfolio extends StatelessWidget {
               ),
               SizedBox(height: 24.h),
               
-              _SectionLabel('Mini Bio', isOptional: true),
+              _SectionLabel(context.l10n.miniBio, isOptional: true),
               SizedBox(height: 4.h),
-              Text('Max 500 characters', style: TextStyle(fontSize: 11.sp, color: cs.onSurface.withOpacity(0.4))),
+              Text(context.l10n.max500Chars, style: TextStyle(fontSize: 11.sp, color: cs.onSurface.withOpacity(0.4))),
               SizedBox(height: 8.h),
               Container(
                 decoration: BoxDecoration(
@@ -614,7 +702,7 @@ class _Step5BioPortfolio extends StatelessWidget {
                   onChanged: (v) => ctrl.miniBio = v,
                   style: TextStyle(fontSize: 14.sp, color: cs.onSurface),
                   decoration: InputDecoration(
-                    hintText: 'Professional photographer with 5 years of experience...',
+                    hintText: context.l10n.bioPlaceholder,
                     hintStyle: TextStyle(color: cs.onSurface.withOpacity(0.4), fontSize: 14.sp),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(14.w),
@@ -624,7 +712,7 @@ class _Step5BioPortfolio extends StatelessWidget {
               ),
               SizedBox(height: 20.h),
               
-              _SectionLabel('External Portfolio Link', isOptional: true),
+              _SectionLabel(context.l10n.externalPortfolioLink, isOptional: true),
               SizedBox(height: 8.h),
               _TextField(hint: 'https://yourportfolio.com', value: ctrl.externalPortfolioLink, icon: Icons.link_outlined, onChanged: (v) { ctrl.externalPortfolioLink = v; }, cs: cs, keyboardType: TextInputType.url),
               SizedBox(height: 24.h),
@@ -632,12 +720,12 @@ class _Step5BioPortfolio extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _SectionLabel('Portfolio Images', isOptional: true),
+                  _SectionLabel(context.l10n.portfolioImages, isOptional: true),
                   Text('${ctrl.portfolioImages.length}/20', style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
                 ],
               ),
               SizedBox(height: 8.h),
-              Text('Upload between 3 to 20 images to showcase your work.', style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
+              Text(context.l10n.uploadImagesShowcase, style: TextStyle(fontSize: 12.sp, color: cs.onSurface.withOpacity(0.5))),
               SizedBox(height: 12.h),
               Wrap(
                 spacing: 8.w,
@@ -708,21 +796,24 @@ class _Step6Legal extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SectionLabel('Notification Preferences', isRequired: true),
+              _SectionLabel(
+                Localizations.localeOf(context).languageCode == 'fr' ? 'Préférences de notification' : 'Notification Preferences',
+                isRequired: true,
+              ),
               SizedBox(height: 12.h),
-              _SwitchTile(label: 'Email for new requests', icon: Icons.email_outlined, value: ctrl.emailNewRequests, onChanged: (v) { ctrl.emailNewRequests = v; ctrl.notifyListeners(); }, cs: cs),
-              _SwitchTile(label: 'SMS for urgent requests', icon: Icons.sms_outlined, value: ctrl.smsUrgentRequests, onChanged: (v) { ctrl.smsUrgentRequests = v; ctrl.notifyListeners(); }, cs: cs),
-              _SwitchTile(label: 'Newsletter & Pro tips', icon: Icons.newspaper_outlined, value: ctrl.newsletterPros, onChanged: (v) { ctrl.newsletterPros = v; ctrl.notifyListeners(); }, cs: cs),
-              _SwitchTile(label: 'Review reminders', icon: Icons.star_outline, value: ctrl.customerReviewReminder, onChanged: (v) { ctrl.customerReviewReminder = v; ctrl.notifyListeners(); }, cs: cs),
+              _SwitchTile(label: context.l10n.emailNewRequests, icon: Icons.email_outlined, value: ctrl.emailNewRequests, onChanged: (v) { ctrl.emailNewRequests = v; ctrl.notifyListeners(); }, cs: cs),
+              _SwitchTile(label: context.l10n.smsUrgentRequests, icon: Icons.sms_outlined, value: ctrl.smsUrgentRequests, onChanged: (v) { ctrl.smsUrgentRequests = v; ctrl.notifyListeners(); }, cs: cs),
+              _SwitchTile(label: context.l10n.newsletterPros, icon: Icons.newspaper_outlined, value: ctrl.newsletterPros, onChanged: (v) { ctrl.newsletterPros = v; ctrl.notifyListeners(); }, cs: cs),
+              _SwitchTile(label: context.l10n.reviewReminders, icon: Icons.star_outline, value: ctrl.customerReviewReminder, onChanged: (v) { ctrl.customerReviewReminder = v; ctrl.notifyListeners(); }, cs: cs),
               
               SizedBox(height: 24.h),
-              _SectionLabel('Legal Agreement', isRequired: true),
+              _SectionLabel(context.l10n.legalAgreement, isRequired: true),
               SizedBox(height: 4.h),
-              Text('All three must be accepted to continue.', style: TextStyle(fontSize: 11.sp, color: cs.onSurface.withOpacity(0.4))),
+              Text(context.l10n.acceptAllToContinue, style: TextStyle(fontSize: 11.sp, color: cs.onSurface.withOpacity(0.4))),
               SizedBox(height: 12.h),
-              _CheckTile(label: 'I accept the Terms of Use', value: ctrl.acceptedTerms, onChanged: (v) { ctrl.acceptedTerms = v!; ctrl.notifyListeners(); }, cs: cs),
-              _CheckTile(label: 'I accept the Privacy Policy', value: ctrl.privacyPolicy, onChanged: (v) { ctrl.privacyPolicy = v!; ctrl.notifyListeners(); }, cs: cs),
-              _CheckTile(label: 'I authorize GDPR data processing', value: ctrl.gdprAuthorization, onChanged: (v) { ctrl.gdprAuthorization = v!; ctrl.notifyListeners(); }, cs: cs),
+              _CheckTile(label: context.l10n.acceptTermsOfUse, value: ctrl.acceptedTerms, onChanged: (v) { ctrl.acceptedTerms = v!; ctrl.notifyListeners(); }, cs: cs),
+              _CheckTile(label: context.l10n.acceptPrivacyPolicy, value: ctrl.privacyPolicy, onChanged: (v) { ctrl.privacyPolicy = v!; ctrl.notifyListeners(); }, cs: cs),
+              _CheckTile(label: context.l10n.acceptGdpr, value: ctrl.gdprAuthorization, onChanged: (v) { ctrl.gdprAuthorization = v!; ctrl.notifyListeners(); }, cs: cs),
               SizedBox(height: 40.h),
             ],
           ),
@@ -763,7 +854,7 @@ class _SectionLabel extends StatelessWidget {
             ),
           if (isOptional)
             TextSpan(
-              text: ' (optional)',
+              text: ' (${context.l10n.optionalLabel})',
               style: TextStyle(
                 color: cs.onSurface.withOpacity(0.4),
                 fontSize: 10.sp,
@@ -802,7 +893,15 @@ class _DropdownField extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
   final ColorScheme cs;
-  const _DropdownField({required this.hint, required this.value, required this.items, required this.onChanged, required this.cs});
+  final Map<String, String>? displayLabels;
+  const _DropdownField({
+    required this.hint,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    required this.cs,
+    this.displayLabels,
+  });
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -821,7 +920,10 @@ class _DropdownField extends StatelessWidget {
           isExpanded: true,
           style: TextStyle(fontSize: 14.sp, color: cs.onSurface),
           borderRadius: BorderRadius.circular(12.r),
-          items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+          items: items.map((e) {
+            final label = displayLabels != null ? (displayLabels![e] ?? e) : e;
+            return DropdownMenuItem(value: e, child: Text(label));
+          }).toList(),
           onChanged: onChanged,
         ),
       ),

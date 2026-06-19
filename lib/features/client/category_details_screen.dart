@@ -9,6 +9,7 @@ import 'package:photopya/controller/client/service_list_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:photopya/data/models/service_list_model.dart';
 import 'package:photopya/controller/client/favorites_controller.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class CategoryDetailsScreen extends StatefulWidget {
   final String categoryName;
@@ -78,7 +79,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                         SizedBox(width: 4.w),
                         Expanded(
                           child: Text(
-                            widget.categoryName,
+                            context.l10n.translateCategory(widget.categoryName),
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,

@@ -77,7 +77,7 @@ class MessageListItem extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        _formatTime(conversation.lastMessageTime),
+                        _formatTime(context, conversation.lastMessageTime),
                         style: TextStyle(
                           fontSize: 11.sp.clamp(10, 13),
                           color: Colors.grey,
@@ -156,14 +156,15 @@ class MessageListItem extends StatelessWidget {
     }
   }
 
-  String _formatTime(DateTime time) {
+  String _formatTime(BuildContext context, DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
+    final isFr = Localizations.localeOf(context).languageCode == 'fr';
 
     if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
+      return isFr ? 'Il y a ${difference.inMinutes} min' : '${difference.inMinutes}m ago';
     } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
+      return isFr ? 'Il y a ${difference.inHours} h' : '${difference.inHours}h ago';
     } else {
       return DateFormat('dd/MM/yy').format(time);
     }

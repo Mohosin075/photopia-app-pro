@@ -188,43 +188,11 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
             ),
             SizedBox(height: 40.h),
 
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedService = 'photography';
-                        _selectedEquipments.clear();
-                        _radius = 200;
-                        _showFavoritesOnly = false;
-                        _locationController.text = '';
-                        _budgetRange = const RangeValues(0, 5000);
-                      });
-                      Navigator.pop(
-                        context,
-                      ); // Optional: if "clear all" should also go back
-                    },
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      side: BorderSide.none,
-                      padding: EdgeInsets.symmetric(vertical: 15.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10).r,
-                      ),
-                    ),
-                    child: Text(
-                      context.l10n.clearAll,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 16.sp.clamp(16, 18),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 15.w),
-                Expanded(
+                SizedBox(
+                  width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
                       // Apply filters logic
@@ -244,11 +212,46 @@ class _SearchFilterScreenState extends State<SearchFilterScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10).r,
                       ),
+                      elevation: 0,
                     ),
                     child: Text(
                       context.l10n.applyFilters,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
+                        fontSize: 16.sp.clamp(16, 18),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedService = 'photography';
+                        _selectedEquipments.clear();
+                        _radius = 200;
+                        _showFavoritesOnly = false;
+                        _locationController.text = '';
+                        _budgetRange = const RangeValues(0, 5000);
+                      });
+                      Navigator.pop(context);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15)),
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10).r,
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      context.l10n.clearAll,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16.sp.clamp(16, 18),
                         fontWeight: FontWeight.w600,
                       ),

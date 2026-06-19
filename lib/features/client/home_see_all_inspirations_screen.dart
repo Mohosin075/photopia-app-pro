@@ -65,7 +65,7 @@ class HomeSeeAllInspirationsScreen extends StatelessWidget {
                       AppTransitions.createPremiumRoute(
                         SearchResultScreen(
                           filters: {'theme': item.title},
-                          title: item.title,
+                          title: context.l10n.translateCategory(item.title),
                         ),
                       ),
                     );
@@ -139,7 +139,7 @@ class HomeSeeAllInspirationsScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    item.title ?? '',
+                                    context.l10n.translateCategory(item.title),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 15.sp,

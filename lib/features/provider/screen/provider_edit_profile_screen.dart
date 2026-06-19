@@ -13,6 +13,7 @@ import 'package:photopya/core/widgets/custom_snacbar.dart';
 import 'package:photopya/core/widgets/subscription_badge.dart';
 import 'package:photopya/features/client/widgets/auth_profile_image.dart';
 import 'package:photopya/core/widgets/full_screen_image_viewer.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderEditProfileScreen extends StatefulWidget {
   const ProviderEditProfileScreen({super.key});
@@ -60,8 +61,8 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: isProfile
-                ? 'Crop Profile Picture'
-                : 'Crop Cover Photo',
+                ? context.l10n.cropProfilePicture
+                : context.l10n.cropCoverPhoto,
             toolbarColor: Colors.black,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: isProfile
@@ -70,7 +71,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
             lockAspectRatio: true,
           ),
           IOSUiSettings(
-            title: isProfile ? 'Crop Profile Picture' : 'Crop Cover Photo',
+            title: isProfile ? context.l10n.cropProfilePicture : context.l10n.cropCoverPhoto,
             aspectRatioLockEnabled: true,
           ),
         ],
@@ -101,7 +102,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       if (mounted) {
         CustomSnackBar.show(
           context: context,
-          message: 'Profile picture is mandatory for creators',
+          message: context.l10n.profilePicMandatory,
           isError: true,
         );
       }
@@ -133,7 +134,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       if (navigator.mounted) {
         CustomSnackBar.show(
           context: navigator.context,
-          message: 'Profile updated successfully',
+          message: context.l10n.profileUpdatedSuccess,
           isError: false,
         );
       }
@@ -142,7 +143,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       if (mounted) {
         CustomSnackBar.show(
           context: context,
-          message: controller.errorMessage ?? 'Failed to update profile',
+          message: controller.errorMessage ?? context.l10n.updateFailed,
           isError: true,
         );
       }
@@ -208,7 +209,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          'No cover photo',
+                          context.l10n.noCoverPhoto,
                           style: TextStyle(
                             color: Theme.of(
                               context,
@@ -281,7 +282,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Profile',
+                    context.l10n.profileTitle,
                     style: TextStyle(
                       fontSize: AppTypography.h1,
                       fontWeight: FontWeight.bold,
@@ -450,10 +451,10 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildStatItem(Icons.star_border, '4.9', 'Rating'),
-        _buildStatItem(Icons.verified_outlined, '127', 'Reviews'),
-        _buildStatItem(Icons.military_tech_outlined, '95%', 'Response Rate'),
-        _buildStatItem(Icons.camera_alt_outlined, '342', 'Projects'),
+        _buildStatItem(Icons.star_border, '4.9', context.l10n.ratingLabel),
+        _buildStatItem(Icons.verified_outlined, '127', context.l10n.reviewsLabel),
+        _buildStatItem(Icons.military_tech_outlined, '95%', context.l10n.responseRateLabel),
+        _buildStatItem(Icons.camera_alt_outlined, '342', context.l10n.projectsLabel),
       ],
     );
   }
@@ -517,7 +518,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'About Me',
+            context.l10n.aboutMeTitle,
             style: TextStyle(
               fontSize: AppTypography.h2,
               fontWeight: FontWeight.bold,
@@ -547,7 +548,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           SizedBox(height: 25.h),
 
           _buildEditableSection(
-            'Specializations',
+            context.l10n.specializationsTitle,
             _tempSpecializations,
             (value) {
               setState(() {
@@ -563,7 +564,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           SizedBox(height: 25.h),
 
           _buildEditableSection(
-            'Languages',
+            context.l10n.languagesTitle,
             _tempLanguages,
             (value) {
               setState(() {
@@ -645,7 +646,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       'Hindi',
     ];
     String? _selectedLanguage;
-    final isLanguage = title == 'Languages';
+    final isLanguage = title == context.l10n.languagesTitle || title == 'Languages';
 
     showDialog(
       context: context,
@@ -655,7 +656,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
           ),
-          title: Text('Add $title'),
+          title: Text('${context.l10n.add} $title'),
           content: isLanguage
               ? Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
@@ -668,7 +669,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                       isExpanded: true,
                       value: _selectedLanguage,
                       hint: Text(
-                        'Select a language',
+                        context.l10n.selectLanguageDropdownHint,
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -701,13 +702,13 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                 )
               : TextField(
                   controller: textController,
-                  decoration: const InputDecoration(hintText: 'Enter name'),
+                  decoration: InputDecoration(hintText: context.l10n.enterSpecializationHint),
                 ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text(
-                'Cancel',
+                context.l10n.cancelBtn,
                 style: TextStyle(
                   color: Theme.of(
                     context,
@@ -730,7 +731,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                 }
               },
               child: Text(
-                'Add',
+                context.l10n.addBtn,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -785,7 +786,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Recent (${_tempRecentWork.length})',
+              context.l10n.portfolioCount(_tempRecentWork.length),
               style: TextStyle(
                 fontSize: AppTypography.h2,
                 fontWeight: FontWeight.bold,
@@ -809,7 +810,7 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
                   ),
                   SizedBox(width: 4.w),
                   Text(
-                    'Add Photo',
+                    context.l10n.addPhotoBtn,
                     style: TextStyle(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.bold,

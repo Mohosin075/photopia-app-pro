@@ -172,6 +172,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
         child: TextField(
           controller: _searchController,
+          textAlignVertical: TextAlignVertical.center,
           onChanged: (value) {
             context.read<ChatController>().searchChats(value);
           },
@@ -185,13 +186,21 @@ class _MessagesScreenState extends State<MessagesScreen> {
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               fontSize: 14.sp,
             ),
-            prefixIcon: Icon(
-              Icons.search_rounded,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-              size: 22.sp,
+            prefixIcon: Padding(
+              padding: EdgeInsets.only(left: 12.w, right: 8.w),
+              child: Icon(
+                Icons.search_rounded,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                size: 22.sp,
+              ),
+            ),
+            prefixIconConstraints: BoxConstraints(
+              minWidth: 35.w,
+              minHeight: 44.h.clamp(40, 48),
             ),
             border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
           ),
         ),
       ),
