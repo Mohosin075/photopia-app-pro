@@ -1,10 +1,15 @@
 class Urls {
   //live url -https://mohosin5003.binarybards.online
-  static const String _rootUrl = 'http://10.10.26.173:5003';
+
+
+
+  static const String _rootUrl = 'http://10.10.26.173:5000';
   static const String baseUrl = '$_rootUrl/uploads';
+
+
+
   // Socket.IO connects at the server root, NOT at /uploads
   static const String socketUrl = _rootUrl;
-  //local url - http://10.10.7.50:4003
   //authentication API
   static const String signUp = '$_rootUrl/api/v1/auth/signup';
   static const String signIn = '$_rootUrl/api/v1/auth/login';
@@ -107,6 +112,7 @@ class Urls {
   //** wallet api */
   static const String myWallet = '$_rootUrl/api/v1/wallet/my-wallet';
   static const String createWithdrawal = '$_rootUrl/api/v1/withdrawal';
+  static const String myWithdrawals = '$_rootUrl/api/v1/withdrawal/my-withdrawals';
 
   //** chat api */
   static const String chat = '$_rootUrl/api/v1/chat';

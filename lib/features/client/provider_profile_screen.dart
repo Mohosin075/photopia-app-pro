@@ -19,6 +19,7 @@ import 'package:photopya/core/widgets/full_screen_image_viewer.dart';
 import 'package:photopya/features/client/widgets/auth_profile_image.dart';
 import 'package:photopya/features/client/search_screen.dart';
 import 'package:photopya/features/client/search_result_screen.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
   final Map<String, dynamic> provider;
@@ -843,37 +844,49 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen>
                 style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 15.h),
-              if (prof?.experienceDetails?.yearsOfExperience != null)
+              if (prof?.experienceDetails?.yearsOfExperience != null && prof!.experienceDetails!.yearsOfExperience!.isNotEmpty)
                 _buildAboutDetailItem(
                   Icons.work_outline,
-                  'Experience',
-                  prof!.experienceDetails!.yearsOfExperience!,
+                  context.l10n.experience,
+                  prof.experienceDetails!.yearsOfExperience!,
                 ),
-              if (prof?.experienceDetails?.projectsCompleted != null)
+              if (prof?.experienceDetails?.projectsCompleted != null && prof!.experienceDetails!.projectsCompleted!.isNotEmpty)
                 _buildAboutDetailItem(
                   Icons.task_alt,
-                  'Projects Completed',
-                  prof!.experienceDetails!.projectsCompleted!,
+                  context.l10n.projectsLabel,
+                  prof.experienceDetails!.projectsCompleted!,
                 ),
-              if (prof?.experienceDetails?.education != null)
+              if (prof?.experienceDetails?.education != null && prof!.experienceDetails!.education!.isNotEmpty)
                 _buildAboutDetailItem(
                   Icons.school_outlined,
-                  'Education',
-                  prof!.experienceDetails!.education!,
+                  context.l10n.education,
+                  prof.experienceDetails!.education!,
                 ),
-              if (prof?.areaOfIntervention?.mainCity != null)
+              if (prof?.areaOfIntervention?.mainCity != null && prof!.areaOfIntervention!.mainCity!.isNotEmpty)
                 _buildAboutDetailItem(
                   Icons.location_city_outlined,
-                  'Service Area',
-                  '${prof!.areaOfIntervention!.mainCity!} (${prof!.areaOfIntervention!.radius ?? ''})',
+                  context.l10n.serviceArea,
+                  prof.areaOfIntervention!.mainCity!,
+                ),
+              if (prof?.areaOfIntervention?.department != null && prof!.areaOfIntervention!.department!.isNotEmpty)
+                _buildAboutDetailItem(
+                  Icons.map_outlined,
+                  'Department',
+                  prof.areaOfIntervention!.department!,
+                ),
+              if (prof?.areaOfIntervention?.radius != null && prof!.areaOfIntervention!.radius!.isNotEmpty)
+                _buildAboutDetailItem(
+                  Icons.explore_outlined,
+                  context.l10n.interventionRadius,
+                  prof.areaOfIntervention!.radius!,
                 ),
               if (prof?.areaOfIntervention?.availableForTravel != null)
                 _buildAboutDetailItem(
                   Icons.flight_takeoff_outlined,
-                  'Travel Availability',
+                  context.l10n.availableForTravel,
                   prof!.areaOfIntervention!.availableForTravel == true
-                      ? 'Available for Travel'
-                      : 'Not Available for Travel',
+                      ? context.l10n.yes
+                      : context.l10n.no,
                 ),
             ],
 

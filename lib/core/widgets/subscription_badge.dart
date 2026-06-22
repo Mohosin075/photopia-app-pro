@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class SubscriptionBadge extends StatelessWidget {
   final bool isSubscribed;
@@ -46,7 +47,7 @@ class SubscriptionBadge extends StatelessWidget {
           ),
           SizedBox(width: 4.w),
           Text(
-            'Premium',
+            context.l10n.premiumLabel,
             style: TextStyle(
               color: Colors.white,
               fontSize: fontSize ?? 10.sp,

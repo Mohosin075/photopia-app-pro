@@ -27,6 +27,17 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
   Data? _availabilityData;
   Set<int> _bookedDays = {}; // To store days of the month that have bookings
 
+  List<String> _getWeekdays() {
+    final localeCode = Localizations.localeOf(context).languageCode;
+    final formatter = DateFormat.E(localeCode);
+    return List.generate(7, (index) {
+      final date = DateTime(2026, 6, index + 1); // 2026-06-01 is Monday
+      final formatted = formatter.format(date);
+      final clean = formatted.replaceAll('.', '');
+      return clean.isEmpty ? clean : '${clean[0].toUpperCase()}${clean.substring(1)}';
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -385,7 +396,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         SizedBox(height: 15.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          children: _getWeekdays()
               .map(
                 (day) => Expanded(
                   child: Text(
@@ -575,7 +586,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    isWorking ? 'Currently: Available' : 'Currently: Blocked',
+                    isWorking ? context.l10n.currentlyAvailable : context.l10n.currentlyBlocked,
                     style: TextStyle(
                       color: isWorking ? Colors.green : Colors.red,
                       fontSize: 12.sp,
@@ -595,10 +606,10 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                     child: Icon(Icons.block, color: Colors.red, size: 20.sp),
                   ),
                   title: Text(
-                    'Block Date(s)',
+                    context.l10n.blockDates,
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
                   ),
-                  subtitle: Text('Block a single day or a range of days', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+                  subtitle: Text(context.l10n.blockDatesSubtitle, style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
                   onTap: () {
                     Navigator.pop(ctx);
                     _showBlockDateRangePicker();
@@ -616,10 +627,10 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                     child: Icon(Icons.check_circle_outline, color: Colors.green, size: 20.sp),
                   ),
                   title: Text(
-                    'Mark as Available',
+                    context.l10n.markAsAvailable,
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
                   ),
-                  subtitle: Text('Open this day for bookings / remove blocks', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+                  subtitle: Text(context.l10n.markAsAvailableSubtitle, style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
                   onTap: () {
                     Navigator.pop(ctx);
                     _resetSelectedDayToDefault();
@@ -636,10 +647,10 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                     child: Icon(Icons.event_note, color: Colors.blue, size: 20.sp),
                   ),
                   title: Text(
-                    'Manual Reservation',
+                    context.l10n.manualReservation,
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
                   ),
-                  subtitle: Text('Add a personal booking or event', style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+                  subtitle: Text(context.l10n.manualReservationSubtitle, style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
                   onTap: () {
                     Navigator.pop(ctx);
                     _showManualReservationDialog(context);
@@ -668,7 +679,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
       setState(() => _isLoading = false);
       CustomSnackBar.show(
         context: context,
-        message: success ? 'Day reset to default schedule' : 'Failed to reset day',
+        message: success ? context.l10n.dayResetSuccess : context.l10n.dayResetFailed,
         isError: !success,
       );
       _fetchAvailabilityData();
@@ -685,7 +696,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         start: _selectedDate ?? DateTime.now(),
         end: _selectedDate ?? DateTime.now(),
       ),
-      saveText: 'Block',
+      saveText: context.l10n.block,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -710,18 +721,18 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         context: context,
         builder: (dialogCtx) => AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          title: Text(isSingleDay ? 'Block Date' : 'Block Date Range'),
+          title: Text(isSingleDay ? context.l10n.blockDate : context.l10n.blockDateRange),
           content: TextField(
             controller: noteController,
             decoration: InputDecoration(
-              labelText: 'Reason / Note (optional)',
-              hintText: isSingleDay ? 'e.g. Day off, Personal work' : 'e.g. Vacation, Holiday',
+              labelText: context.l10n.blockReasonLabel,
+              hintText: isSingleDay ? context.l10n.blockReasonHintSingle : context.l10n.blockReasonHintRange,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             TextButton(
               onPressed: () async {
@@ -738,7 +749,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                   picked.end,
                   note: noteController.text.isNotEmpty 
                       ? noteController.text 
-                      : (isSingleDay ? 'Blocked Day' : 'Blocked Range'),
+                      : (isSingleDay ? context.l10n.blockedDayDefault : context.l10n.blockedRangeDefault),
                 );
 
                 if (mounted) {
@@ -746,14 +757,14 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                   CustomSnackBar.show(
                     context: context,
                     message: success 
-                        ? (isSingleDay ? 'Date blocked successfully' : 'Date range blocked successfully') 
-                        : (isSingleDay ? 'Failed to block date' : 'Failed to block date range'),
+                        ? (isSingleDay ? context.l10n.dateBlockedSuccess : context.l10n.dateRangeBlockedSuccess) 
+                        : (isSingleDay ? context.l10n.dateBlockedFailed : context.l10n.dateRangeBlockedFailed),
                     isError: !success,
                   );
                   _fetchAvailabilityData();
                 }
               },
-              child: const Text('Block'),
+              child: Text(context.l10n.block),
             ),
           ],
         ),
@@ -772,16 +783,16 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: const Text('Manual Reservation'),
+        title: Text(context.l10n.manualReservation),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Event Title (e.g. Private Shoot)',
-                  hintText: 'Private shoot or custom task',
+                decoration: InputDecoration(
+                  labelText: context.l10n.eventTitleLabel,
+                  hintText: context.l10n.eventTitleHint,
                 ),
               ),
               SizedBox(height: 10.h),
@@ -798,9 +809,9 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                 child: AbsorbPointer(
                   child: TextField(
                     controller: startTimeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Start Time',
-                      suffixIcon: Icon(Icons.access_time),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.startTime,
+                      suffixIcon: const Icon(Icons.access_time),
                     ),
                   ),
                 ),
@@ -819,9 +830,9 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                 child: AbsorbPointer(
                   child: TextField(
                     controller: endTimeController,
-                    decoration: const InputDecoration(
-                      labelText: 'End Time',
-                      suffixIcon: Icon(Icons.access_time),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.endTime,
+                      suffixIcon: const Icon(Icons.access_time),
                     ),
                   ),
                 ),
@@ -830,13 +841,13 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(context.l10n.cancel)),
           TextButton(
             onPressed: () async {
               if (titleController.text.trim().isEmpty) {
                 CustomSnackBar.show(
                   context: context,
-                  message: 'Please enter an event title',
+                  message: context.l10n.pleaseEnterEventTitle,
                   isError: true,
                 );
                 return;
@@ -861,13 +872,13 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
                 setState(() => _isLoading = false);
                 CustomSnackBar.show(
                   context: context,
-                  message: success ? 'Manual reservation added' : 'Failed to add reservation',
+                  message: success ? context.l10n.manualReservationSuccess : context.l10n.manualReservationFailed,
                   isError: !success,
                 );
                 _fetchAvailabilityData();
               }
             },
-            child: const Text('Save'),
+            child: Text(context.l10n.save),
           ),
         ],
       ),
@@ -1017,7 +1028,7 @@ class _ProviderCalendarScreenState extends State<ProviderCalendarScreen> {
         SizedBox(height: 15.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          children: _getWeekdays()
               .map(
                 (day) => Expanded(
                   child: Text(

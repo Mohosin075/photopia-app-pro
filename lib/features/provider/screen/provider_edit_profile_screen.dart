@@ -31,6 +31,15 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
   late List<String> _tempLanguages;
   late List<String> _tempRecentWork;
 
+  // Professional details
+  String? _selectedExperience;
+  String? _selectedProjects;
+  String? _selectedEducation;
+  late TextEditingController _cityController;
+  String? _selectedDepartment;
+  String? _selectedRadius;
+  bool _availableForTravel = false;
+
   File? _profilePhoto;
   File? _coverPhoto;
   final ImagePicker _picker = ImagePicker();
@@ -45,6 +54,23 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
     _tempSpecializations = List.from(controller.specializations);
     _tempLanguages = List.from(controller.languages);
     _tempRecentWork = List.from(controller.recentWork);
+
+    _selectedExperience = controller.yearsOfExperience.isEmpty ? null : controller.yearsOfExperience;
+    _selectedProjects = controller.projectsCompleted.isEmpty ? null : controller.projectsCompleted;
+    _selectedEducation = controller.education.isEmpty ? null : controller.education;
+    _cityController = TextEditingController(text: controller.mainCity);
+    _selectedDepartment = controller.department.isEmpty ? null : controller.department;
+    _selectedRadius = controller.radius.isEmpty ? null : controller.radius;
+    _availableForTravel = controller.availableForTravel;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _specialtyController.dispose();
+    _aboutController.dispose();
+    _cityController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickAndCropImage({required bool isProfile}) async {
@@ -124,6 +150,13 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
       bio: bioChanged ? newBio : null,
       profilePhoto: _profilePhoto,
       coverPhoto: _coverPhoto,
+      yearsOfExperience: _selectedExperience != controller.yearsOfExperience ? (_selectedExperience ?? '') : null,
+      projectsCompleted: _selectedProjects != controller.projectsCompleted ? (_selectedProjects ?? '') : null,
+      education: _selectedEducation != controller.education ? (_selectedEducation ?? '') : null,
+      mainCity: _cityController.text != controller.mainCity ? _cityController.text : null,
+      department: _selectedDepartment != controller.department ? (_selectedDepartment ?? '') : null,
+      radius: _selectedRadius != controller.radius ? (_selectedRadius ?? '') : null,
+      availableForTravel: _availableForTravel != controller.availableForTravel ? _availableForTravel : null,
     );
 
     if (success) {
@@ -579,6 +612,9 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           ),
           SizedBox(height: 25.h),
 
+          _buildProfessionalDetailsSection(),
+          SizedBox(height: 25.h),
+
           _buildGallerySection(),
           SizedBox(height: 40.h),
         ],
@@ -775,6 +811,259 @@ class _ProviderEditProfileScreenState extends State<ProviderEditProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProfessionalDetailsSection() {
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Professional Details',
+          style: TextStyle(
+            fontSize: AppTypography.h2,
+            fontWeight: FontWeight.bold,
+            color: cs.onSurface,
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: cs.onSurface.withOpacity(0.1),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Experience dropdown
+              _buildFormDropdown(
+                label: context.l10n.experience,
+                value: _selectedExperience,
+                items: const ['<1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years'],
+                displayLabels: {
+                  '<1 year': context.l10n.expLess1Year,
+                  '1-3 years': context.l10n.exp1To3Years,
+                  '3-5 years': context.l10n.exp3To5Years,
+                  '5-10 years': context.l10n.exp5To10Years,
+                  '10+ years': context.l10n.exp10PlusYears,
+                },
+                onChanged: (val) {
+                  setState(() {
+                    _selectedExperience = val;
+                  });
+                },
+              ),
+              SizedBox(height: 16.h),
+              
+              // Projects dropdown
+              _buildFormDropdown(
+                label: context.l10n.projectsLabel,
+                value: _selectedProjects,
+                items: const ['<10', '10-50', '50-100', '100+'],
+                displayLabels: {
+                  '<10': context.l10n.projLess10,
+                  '10-50': context.l10n.proj10To50,
+                  '50-100': context.l10n.proj50To100,
+                  '100+': context.l10n.proj100Plus,
+                },
+                onChanged: (val) {
+                  setState(() {
+                    _selectedProjects = val;
+                  });
+                },
+              ),
+              SizedBox(height: 16.h),
+
+              // Education dropdown
+              _buildFormDropdown(
+                label: context.l10n.education,
+                value: _selectedEducation,
+                items: const ['Self-taught', 'School', 'Professional Training'],
+                displayLabels: {
+                  'Self-taught': context.l10n.eduSelfTaught,
+                  'School': context.l10n.eduSchool,
+                  'Professional Training': context.l10n.eduProfessionalTraining,
+                },
+                onChanged: (val) {
+                  setState(() {
+                    _selectedEducation = val;
+                  });
+                },
+              ),
+              SizedBox(height: 16.h),
+
+              // City textfield
+              _buildFormTextField(
+                label: context.l10n.serviceArea,
+                controller: _cityController,
+                hint: 'e.g. Dhaka',
+              ),
+              SizedBox(height: 16.h),
+
+              // Department dropdown
+              _buildFormDropdown(
+                label: 'Department',
+                value: _selectedDepartment,
+                items: const [
+                  'Photography', 
+                  'Videography & Cinematography', 
+                  'Editing & Post-Production', 
+                  'Scriptwriting & Storyboarding'
+                ],
+                displayLabels: const {
+                  'Photography': 'Photography',
+                  'Videography & Cinematography': 'Videography & Cinematography',
+                  'Editing & Post-Production': 'Editing & Post-Production',
+                  'Scriptwriting & Storyboarding': 'Scriptwriting & Storyboarding',
+                },
+                onChanged: (val) {
+                  setState(() {
+                    _selectedDepartment = val;
+                  });
+                },
+              ),
+              SizedBox(height: 16.h),
+
+              // Radius dropdown
+              _buildFormDropdown(
+                label: context.l10n.interventionRadius,
+                value: _selectedRadius,
+                items: const ['10km', '30km', '50km', '100km', 'Whole Country'],
+                displayLabels: {
+                  '10km': '10km',
+                  '30km': '30km',
+                  '50km': '50km',
+                  '100km': '100km',
+                  'Whole Country': context.l10n.wholeCountry,
+                },
+                onChanged: (val) {
+                  setState(() {
+                    _selectedRadius = val;
+                  });
+                },
+              ),
+              SizedBox(height: 16.h),
+
+              // Switch for Travel
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    context.l10n.availableForTravel,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: cs.onSurface.withOpacity(0.8),
+                    ),
+                  ),
+                  Switch(
+                    value: _availableForTravel,
+                    onChanged: (val) {
+                      setState(() {
+                        _availableForTravel = val;
+                      });
+                    },
+                    activeColor: cs.primary,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFormDropdown({
+    required String label,
+    required String? value,
+    required List<String> items,
+    required Map<String, String> displayLabels,
+    required ValueChanged<String?> onChanged,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w500,
+            color: cs.onSurface.withOpacity(0.8),
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          decoration: BoxDecoration(
+            color: cs.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(color: cs.onSurface.withOpacity(0.12)),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              hint: Text(
+                'Select Option',
+                style: TextStyle(color: cs.onSurface.withOpacity(0.4), fontSize: 14.sp),
+              ),
+              dropdownColor: cs.surface,
+              isExpanded: true,
+              style: TextStyle(fontSize: 14.sp, color: cs.onSurface),
+              borderRadius: BorderRadius.circular(10.r),
+              items: items.map((e) {
+                final labelText = displayLabels[e] ?? e;
+                return DropdownMenuItem(value: e, child: Text(labelText));
+              }).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFormTextField({
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w500,
+            color: cs.onSurface.withOpacity(0.8),
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          decoration: BoxDecoration(
+            color: cs.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(color: cs.onSurface.withOpacity(0.12)),
+          ),
+          child: TextField(
+            controller: controller,
+            style: TextStyle(fontSize: 14.sp, color: cs.onSurface),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(color: cs.onSurface.withOpacity(0.4), fontSize: 14.sp),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

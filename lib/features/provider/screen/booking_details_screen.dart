@@ -9,6 +9,7 @@ import 'package:photopya/core/widgets/custom_network_image.dart';
 import 'package:photopya/data/models/conversation_model.dart';
 import 'package:photopya/data/models/chat_message_model.dart';
 import 'package:photopya/features/client/chat_screen.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
   static const String name = "/booking-details";
@@ -29,7 +30,7 @@ class BookingDetailsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Booking Details',
+          context.l10n.bookingDetailsTitle,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18.sp.clamp(18, 20),
@@ -75,7 +76,7 @@ class BookingDetailsScreen extends StatelessWidget {
                 SizedBox(height: 20.h),
                 _buildServiceDetails(context, service, location, currentBooking),
                 SizedBox(height: 20.h),
-                _buildSpecialNotes(context, location['notes']?.toString() ?? 'No special notes provided'),
+                _buildSpecialNotes(context, location['notes']?.toString() ?? ''),
                 SizedBox(height: 30.h),
                 _buildActionButtons(context, currentBooking['status']?.toString() ?? 'pending', currentBooking),
               ],
@@ -105,7 +106,7 @@ class BookingDetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Client Information',
+                    context.l10n.clientInformation,
                     style: TextStyle(
                       fontSize: 16.sp.clamp(14, 18),
                       fontWeight: FontWeight.w500,
@@ -119,7 +120,7 @@ class BookingDetailsScreen extends StatelessWidget {
                         Icon(Icons.check_circle_outline, size: 14.sp, color: Colors.green),
                         SizedBox(width: 4.w),
                         Text(
-                          'Deposit Paid: ${((currentBooking['depositPercentage'] ?? 1.0) * 100).toInt()}%',
+                          context.l10n.depositPaidPercent(((currentBooking['depositPercentage'] ?? 1.0) * 100).toInt()),
                           style: TextStyle(
                             fontSize: 12.sp,
                             color: Colors.green.shade700,
@@ -169,7 +170,7 @@ class BookingDetailsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      client['name'] ?? currentBooking['clientName'] ?? 'Unknown Client',
+                      client['name'] ?? currentBooking['clientName'] ?? context.l10n.unknownClient,
                       style: TextStyle(
                         fontSize: 17.sp.clamp(16, 18),
                         fontWeight: FontWeight.bold,
@@ -183,7 +184,7 @@ class BookingDetailsScreen extends StatelessWidget {
                         SizedBox(width: 8.w),
                         Expanded(
                           child: Text(
-                            client['email'] ?? currentBooking['clientEmail'] ?? 'No email available',
+                            client['email'] ?? currentBooking['clientEmail'] ?? context.l10n.noEmailAvailable,
                             style: TextStyle(
                               fontSize: 13.sp.clamp(12, 14),
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -251,7 +252,7 @@ class BookingDetailsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Service Details',
+            context.l10n.serviceDetailsTitle,
             style: TextStyle(
               fontSize: 16.sp.clamp(14, 18),
               fontWeight: FontWeight.w500,
@@ -259,10 +260,10 @@ class BookingDetailsScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-          _buildDetailRow(context, 'Service', service['title'] ?? 'Generic Service'),
-          _buildDetailRow(context, 'Date', currentBooking['bookingDate']?.toString().split('T')[0] ?? 'N/A'),
-          _buildDetailRow(context, 'Time', '${currentBooking['startTime'] ?? 'N/A'} - ${currentBooking['endTime'] ?? ''}'),
-          _buildDetailRow(context, 'Location', location['address'] ?? 'Location N/A'),
+          _buildDetailRow(context, context.l10n.stepService, service['title'] ?? context.l10n.unknownService),
+          _buildDetailRow(context, context.l10n.labelDate, currentBooking['bookingDate']?.toString().split('T')[0] ?? context.l10n.notAvailable),
+          _buildDetailRow(context, context.l10n.labelTime, '${currentBooking['startTime'] ?? context.l10n.notAvailable} - ${currentBooking['endTime'] ?? ''}'),
+          _buildDetailRow(context, context.l10n.location, location['address'] ?? context.l10n.locationNA),
           SizedBox(height: 10.h),
           const Divider(),
           SizedBox(height: 10.h),
@@ -300,13 +301,13 @@ class BookingDetailsScreen extends StatelessWidget {
 
               return Column(
                 children: [
-                  _buildPaymentDetailRow(context, 'Booking Subtotal', '€${subtotal.toStringAsFixed(0)}'),
+                  _buildPaymentDetailRow(context, context.l10n.bookingSubtotal, '€${subtotal.toStringAsFixed(0)}'),
                   if (commission > 0)
-                    _buildPaymentDetailRow(context, 'Platform Commission (5%)', '-€${commission.toStringAsFixed(0)}', color: Colors.redAccent),
+                    _buildPaymentDetailRow(context, context.l10n.platformCommission, '-€${commission.toStringAsFixed(0)}', color: Colors.redAccent),
                   const Divider(),
                   _buildPaymentDetailRow(
                     context, 
-                    'Your Total Earnings', 
+                    context.l10n.yourTotalEarnings, 
                     '€${earnings.toStringAsFixed(0)}', 
                     isBold: true,
                     color: Theme.of(context).colorScheme.primary
@@ -314,13 +315,13 @@ class BookingDetailsScreen extends StatelessWidget {
                   SizedBox(height: 12.h),
                   _buildPaymentDetailRow(
                     context,
-                    'Paid (Deposit)', 
+                    context.l10n.paidDeposit, 
                     '€${displayPaid.toStringAsFixed(0)}',
                     color: const Color(0xFF4CAF50),
                   ),
                   _buildPaymentDetailRow(
                     context,
-                    'Client Remaining', 
+                    context.l10n.clientRemaining, 
                     '€${displayRemaining.toStringAsFixed(0)}',
                     color: Colors.grey[600],
                   ),
@@ -402,7 +403,7 @@ class BookingDetailsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Special Notes',
+            context.l10n.specialNotesTitle,
             style: TextStyle(
               fontSize: 16.sp.clamp(14, 18),
               fontWeight: FontWeight.w500,
@@ -411,7 +412,7 @@ class BookingDetailsScreen extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
           Text(
-            notes.isEmpty ? 'No special notes provided' : notes,
+            (notes.isEmpty) ? context.l10n.noSpecialNotes : notes,
             style: TextStyle(
               fontSize: 14.sp.clamp(13, 15),
               color: Colors.grey[600],
@@ -450,7 +451,7 @@ class BookingDetailsScreen extends StatelessWidget {
               if (clientId.isEmpty) {
                 CustomSnackBar.show(
                   context: context,
-                  message: 'Client information not available',
+                  message: context.l10n.clientInfoNotAvailable,
                   isError: true,
                 );
                 return;
@@ -481,7 +482,7 @@ class BookingDetailsScreen extends StatelessWidget {
               elevation: 0,
             ),
             child: Text(
-              'Contact Client',
+              context.l10n.contactClient,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onPrimary,
                 fontSize: 15.sp.clamp(14, 16),
@@ -499,7 +500,7 @@ class BookingDetailsScreen extends StatelessWidget {
               onPressed: () => _showModifyOfferDialog(context, currentBooking),
               icon: Icon(Icons.edit_note, size: 20.sp),
               label: Text(
-                'Modify Offer',
+                context.l10n.modifyOffer,
                 style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
               ),
               style: OutlinedButton.styleFrom(
@@ -515,8 +516,8 @@ class BookingDetailsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildTextActionButton(context, 'Decline', Icons.close, Colors.red, false, currentBooking),
-              _buildTextActionButton(context, 'Accept', Icons.check, Theme.of(context).colorScheme.onSurface, true, currentBooking),
+              _buildTextActionButton(context, context.l10n.declineBtn, Icons.close, Colors.red, false, currentBooking),
+              _buildTextActionButton(context, context.l10n.acceptBtn, Icons.check, Theme.of(context).colorScheme.onSurface, true, currentBooking),
             ],
           ),
         ],
@@ -557,7 +558,7 @@ class BookingDetailsScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        isAccept ? 'Do you want to accept this?' : 'Do you want to decline this?',
+                        isAccept ? context.l10n.doYouWantToAccept : context.l10n.doYouWantToDecline,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16.sp,
@@ -595,8 +596,8 @@ class BookingDetailsScreen extends StatelessWidget {
                             CustomSnackBar.show(
                               context: context,
                               message: success 
-                                ? 'Order ${isAccept ? 'accepted' : 'declined'} successfully!' 
-                                : 'Failed to update order status',
+                                ? (isAccept ? context.l10n.orderAcceptedSuccess : context.l10n.orderDeclinedSuccess) 
+                                : context.l10n.orderStatusUpdateFailed,
                               isError: !success,
                             );
                             if (success) {
@@ -616,7 +617,7 @@ class BookingDetailsScreen extends StatelessWidget {
                               Icon(Icons.check, color: const Color(0xFF2E7D32), size: 18.sp),
                               SizedBox(width: 8.w),
                               Text(
-                                'Yes',
+                                context.l10n.yes,
                                 style: TextStyle(
                                   color: Theme.of(context).brightness == Brightness.dark ? Colors.green[300] : const Color(0xFF2E7D32),
                                   fontSize: 14.sp,
@@ -645,7 +646,7 @@ class BookingDetailsScreen extends StatelessWidget {
                               Icon(Icons.close, color: const Color(0xFFC62828), size: 18.sp),
                               SizedBox(width: 8.w),
                               Text(
-                                'No',
+                                context.l10n.no,
                                 style: TextStyle(
                                   color: Theme.of(context).brightness == Brightness.dark ? Colors.red[300] : const Color(0xFFC62828),
                                   fontSize: 14.sp,
@@ -775,7 +776,7 @@ class _ModifyOfferSheetState extends State<_ModifyOfferSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Modify Offer',
+                  context.l10n.modifyOffer,
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
@@ -789,29 +790,29 @@ class _ModifyOfferSheetState extends State<_ModifyOfferSheet> {
               ],
             ),
             SizedBox(height: 20.h),
-            _buildLabel('Package Name'),
+            _buildLabel(context.l10n.packageNameLabel),
             TextField(
               controller: _packageNameController,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-              decoration: _buildInputDecoration('Enter package name'),
+              decoration: _buildInputDecoration(context.l10n.enterPackageName),
             ),
             SizedBox(height: 15.h),
-            _buildLabel('Base Rate (€)'),
+            _buildLabel(context.l10n.baseRateLabel),
             TextField(
               controller: _baseRateController,
               keyboardType: TextInputType.number,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-              decoration: _buildInputDecoration('Enter base rate'),
+              decoration: _buildInputDecoration(context.l10n.enterBaseRate),
             ),
             SizedBox(height: 25.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildLabel('Custom Options'),
+                _buildLabel(context.l10n.customOptionsLabel),
                 TextButton.icon(
                   onPressed: _addOption,
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Add Option'),
+                  label: Text(context.l10n.addOption),
                   style: TextButton.styleFrom(
                     foregroundColor: Theme.of(context).colorScheme.primary,
                   ),
@@ -829,7 +830,7 @@ class _ModifyOfferSheetState extends State<_ModifyOfferSheet> {
                         controller: _nameControllers[index],
                         onChanged: (val) => _customOptions[index]['name'] = val,
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13.sp),
-                        decoration: _buildInputDecoration('Option name'),
+                        decoration: _buildInputDecoration(context.l10n.optionNameHint),
                       ),
                     ),
                     SizedBox(width: 10.w),
@@ -839,7 +840,7 @@ class _ModifyOfferSheetState extends State<_ModifyOfferSheet> {
                         keyboardType: TextInputType.number,
                         onChanged: (val) => _customOptions[index]['price'] = double.tryParse(val) ?? 0.0,
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13.sp),
-                        decoration: _buildInputDecoration('Price'),
+                        decoration: _buildInputDecoration(context.l10n.priceHint),
                       ),
                     ),
                     IconButton(
@@ -880,7 +881,7 @@ class _ModifyOfferSheetState extends State<_ModifyOfferSheet> {
                           Navigator.pop(context); // Go back to orders list
                           CustomSnackBar.show(
                             context: context,
-                            message: 'Offer modified successfully!',
+                            message: context.l10n.offerModifiedSuccess,
                           );
                         } else {
                           CustomSnackBar.show(
@@ -903,7 +904,7 @@ class _ModifyOfferSheetState extends State<_ModifyOfferSheet> {
                           child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                         )
                       : Text(
-                          'Update Offer',
+                          context.l10n.updateOffer,
                           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
                         ),
                   ),

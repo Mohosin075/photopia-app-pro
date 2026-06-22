@@ -33,10 +33,10 @@ class ChatController extends ChangeNotifier {
   List<ChatMessage> get messages => _messages;
 
   int get totalUnreadCount {
-    if (_chatData?.totalUnreadChats != null && _chatData!.totalUnreadChats! > 0) {
-      return _chatData!.totalUnreadChats!;
+    if (_chatData?.chats == null || _chatData!.chats!.isEmpty) {
+      return _chatData?.totalUnreadChats ?? 0;
     }
-    return (_chatData?.chats ?? []).fold(0, (sum, chat) => sum + (chat.unreadCount ?? 0));
+    return _chatData!.chats!.fold(0, (sum, chat) => sum + (chat.unreadCount ?? 0));
   }
 
   void reset() {

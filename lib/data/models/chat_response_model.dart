@@ -76,6 +76,7 @@ class ChatRoom {
         latestMessage = LatestMessage(content: latestMsgData);
       }
     }
+    unreadCount = json['unreadCount'] ?? json['unread_count'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
   }

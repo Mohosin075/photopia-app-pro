@@ -168,23 +168,51 @@ class ProviderProfileController extends ChangeNotifier {
     List<File>? newDocumentFiles,
     File? profilePhoto,
     File? coverPhoto,
+    String? yearsOfExperience,
+    String? projectsCompleted,
+    String? education,
+    String? mainCity,
+    String? department,
+    String? radius,
+    bool? availableForTravel,
   }) async {
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      // 1. Update Professional Profile Data (New Additions Only)
       bool profProfileSuccess = true;
-      bool hasProfChanges = bio != null || 
-                            (newSpecializations != null && newSpecializations.isNotEmpty) || 
-                            (newLanguages != null && newLanguages.isNotEmpty) || 
-                            (newPortfolioFiles != null && newPortfolioFiles.isNotEmpty) ||
-                            (newDocumentFiles != null && newDocumentFiles.isNotEmpty) ||
-                            coverPhoto != null;
+      bool userProfileSuccess = true;
+      bool filesSuccess = true;
 
-      if (hasProfChanges) {
-        debugPrint('👔 Updating Prof Profile with new additions...');
+      // 1. Update Professional Profile Data (New Additions & Text Details Only)
+      final Map<String, dynamic> jsonPatchBody = {};
+      if (bio != null) jsonPatchBody['bio'] = bio;
+      
+      if (newSpecializations != null) jsonPatchBody['specialties'] = newSpecializations;
+      if (newLanguages != null) jsonPatchBody['language'] = newLanguages;
+
+      // Nested Experience Details
+      if (yearsOfExperience != null || projectsCompleted != null || education != null) {
+        jsonPatchBody['experienceDetails'] = {
+          if (yearsOfExperience != null) 'yearsOfExperience': yearsOfExperience,
+          if (projectsCompleted != null) 'projectsCompleted': projectsCompleted,
+          if (education != null) 'education': education,
+        };
+      }
+
+      // Nested Area of Intervention
+      if (mainCity != null || department != null || radius != null || availableForTravel != null) {
+        jsonPatchBody['areaOfIntervention'] = {
+          if (mainCity != null) 'mainCity': mainCity,
+          if (department != null) 'department': department,
+          if (radius != null) 'radius': radius,
+          if (availableForTravel != null) 'availableForTravel': availableForTravel,
+        };
+      }
+
+      if (jsonPatchBody.isNotEmpty) {
+        debugPrint('👔 Sending JSON PATCH for prof profile: $jsonPatchBody');
         String? token = AuthController.accessToken;
 
         // Check if professional profile exists on backend
@@ -207,35 +235,47 @@ class ProviderProfileController extends ChangeNotifier {
               'privacyPolicy': true,
               'gdprAuthorization': true,
             },
+            ...jsonPatchBody, // Include the changes directly
           };
           final createResponse = await NetworkCaller.postRequest(
             url: Urls.professionalProfile,
             body: createBody,
           );
           
-          if (createResponse.isSuccess) {
-            debugPrint('👔 Base professional profile created successfully via JSON POST.');
-            exists = true;
-          } else {
-            debugPrint('❌ Failed to create base professional profile: ${createResponse.errorMessage}');
+          profProfileSuccess = createResponse.isSuccess;
+          if (!profProfileSuccess) {
             _errorMessage = createResponse.errorMessage ?? "Failed to initialize professional profile.";
-            profProfileSuccess = false;
+          }
+        } else {
+          final patchResponse = await NetworkCaller.patchRequest(
+            url: Urls.professionalProfile,
+            body: jsonPatchBody,
+          );
+          profProfileSuccess = patchResponse.isSuccess;
+          if (!profProfileSuccess) {
+            _errorMessage = patchResponse.errorMessage ?? "Failed to update professional profile details.";
           }
         }
+      }
 
-        if (profProfileSuccess && exists) {
-          final Uri uri = Uri.parse(Urls.professionalProfile);
-          final request = http.MultipartRequest('PATCH', uri);
+      // 2. Upload Files if present
+      bool hasFiles = coverPhoto != null || 
+                      (newPortfolioFiles != null && newPortfolioFiles.isNotEmpty) ||
+                      (newDocumentFiles != null && newDocumentFiles.isNotEmpty);
 
-          if (token != null && token.isNotEmpty) {
-            request.headers['Authorization'] = token.startsWith('Bearer ') ? token : 'Bearer $token';
-          }
-          request.headers['Accept'] = 'application/json';
+      if (profProfileSuccess && hasFiles) {
+        debugPrint('👔 Uploading files via Multipart Request...');
+        String? token = AuthController.accessToken;
+        final Uri uri = Uri.parse(Urls.professionalProfile);
+        final request = http.MultipartRequest('PATCH', uri);
 
-          if (bio != null) request.fields['bio'] = bio;
-          
-          // Add cover photo if present
-          if (coverPhoto != null) {
+        if (token != null && token.isNotEmpty) {
+          request.headers['Authorization'] = token.startsWith('Bearer ') ? token : 'Bearer $token';
+        }
+        request.headers['Accept'] = 'application/json';
+
+        // Add cover photo if present
+        if (coverPhoto != null) {
           final tempDir = await getTemporaryDirectory();
           final targetPath = p.join(tempDir.path, "temp_cover_${DateTime.now().millisecondsSinceEpoch}.jpg");
           
@@ -243,7 +283,7 @@ class ProviderProfileController extends ChangeNotifier {
             coverPhoto.absolute.path,
             targetPath,
             quality: 80,
-            keepExif: false, // This strips buggy EXIF and bakes orientation
+            keepExif: false,
           );
 
           if (compressedFile != null) {
@@ -258,19 +298,6 @@ class ProviderProfileController extends ChangeNotifier {
             );
             request.files.add(multipartFile);
           }
-        }
-        
-        // Add only NEW specialties as repeated keys
-        if (newSpecializations != null) {
-           for (var s in newSpecializations) {
-             request.fields['specialties[]'] = s;
-           }
-        }
-        // Add only NEW languages as repeated keys
-        if (newLanguages != null) {
-           for (var l in newLanguages) {
-             request.fields['language[]'] = l;
-           }
         }
 
         // Add ONLY new files to portfolio
@@ -308,27 +335,23 @@ class ProviderProfileController extends ChangeNotifier {
         try {
           final streamedResponse = await request.send().timeout(const Duration(seconds: 60));
           final response = await http.Response.fromStream(streamedResponse);
-          debugPrint("👔 Prof Profile Update Status: ${response.statusCode}");
-          debugPrint("👔 Prof Profile Update Body: ${response.body}");
-          
-          profProfileSuccess = (response.statusCode >= 200 && response.statusCode < 300);
-          if (!profProfileSuccess) {
-             _errorMessage = "Failed to update professional profile.";
+          debugPrint("👔 Files upload status: ${response.statusCode}");
+          filesSuccess = (response.statusCode >= 200 && response.statusCode < 300);
+          if (!filesSuccess) {
+            _errorMessage = "Failed to upload cover photo or portfolio images.";
           }
         } catch (e) {
-          debugPrint('👔 Update failed: $e');
-          _errorMessage = "Connection error during update.";
-          profProfileSuccess = false;
+          debugPrint('👔 Files upload failed: $e');
+          _errorMessage = "Connection error during files upload.";
+          filesSuccess = false;
         }
       }
-    }
 
-      bool userProfileSuccess = true;
+      // 3. Update User Profile (name, description, profile photo)
       if (description != null || name != null || profilePhoto != null) {
-        debugPrint('👔 Updating User Profile: name=$name, profilePhoto=${profilePhoto != null}');
+        debugPrint('👤 Updating User Profile: name=$name, profilePhoto=${profilePhoto != null}');
 
         if (profilePhoto != null) {
-          // Multipart request only when uploading a photo
           String? token = AuthController.accessToken;
           final Uri uri = Uri.parse(Urls.updateUserProfile);
           final request = http.MultipartRequest('PATCH', uri);
@@ -348,7 +371,7 @@ class ProviderProfileController extends ChangeNotifier {
             profilePhoto.absolute.path,
             targetPath,
             quality: 80,
-            keepExif: false, // Bakes orientation 
+            keepExif: false,
           );
 
           if (compressedFile != null) {
@@ -368,7 +391,6 @@ class ProviderProfileController extends ChangeNotifier {
             final streamedResponse = await request.send().timeout(const Duration(seconds: 60));
             final response = await http.Response.fromStream(streamedResponse);
             debugPrint('👤 User Profile Multipart Status: ${response.statusCode}');
-            debugPrint('👤 User Profile Multipart Body: ${response.body}');
             userProfileSuccess = (response.statusCode >= 200 && response.statusCode < 300);
             if (!userProfileSuccess) {
               _errorMessage = 'Server error ${response.statusCode}: ${response.body}';
@@ -379,17 +401,14 @@ class ProviderProfileController extends ChangeNotifier {
             userProfileSuccess = false;
           }
         } else {
-          // Text-only update → use JSON PATCH via NetworkCaller
           final body = <String, dynamic>{};
           if (name != null) body['name'] = name;
           if (description != null) body['description'] = description;
 
-          debugPrint('👤 Sending JSON PATCH for user profile: $body');
           final response = await NetworkCaller.patchRequest(
             url: Urls.updateUserProfile,
             body: body,
           );
-          debugPrint('👤 JSON PATCH response: ${response.statusCode} - ${response.body}');
           userProfileSuccess = response.isSuccess;
           if (!userProfileSuccess) {
             _errorMessage = response.errorMessage ?? 'Failed to update user profile.';
@@ -397,11 +416,15 @@ class ProviderProfileController extends ChangeNotifier {
         }
       }
 
-      if (profProfileSuccess && userProfileSuccess) {
+      if (profProfileSuccess && filesSuccess && userProfileSuccess) {
         await getProviderProfile();
         return true;
       } else {
-        if (_errorMessage == null && !userProfileSuccess) _errorMessage = "Failed to update user profile.";
+        if (_errorMessage == null) {
+          if (!profProfileSuccess) _errorMessage = "Failed to update professional profile details.";
+          else if (!filesSuccess) _errorMessage = "Failed to upload profile files.";
+          else _errorMessage = "Failed to update user profile.";
+        }
         return false;
       }
     } catch (e) {

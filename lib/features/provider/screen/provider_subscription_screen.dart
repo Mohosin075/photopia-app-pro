@@ -6,6 +6,7 @@ import 'package:photopya/core/widgets/custom_snacbar.dart';
 import 'package:photopya/data/models/subscription_plan_model.dart';
 import 'package:photopya/features/provider/widgets/provider_custom_bottom_nav_bar.dart';
 import 'package:photopya/features/provider/screen/BottomNavigationBar/bottom_navigation_screen.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderSubscriptionScreen extends StatefulWidget {
   const ProviderSubscriptionScreen({super.key});
@@ -34,7 +35,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
        if (mounted) {
          CustomSnackBar.show(
            context: context,
-           message: 'Subscription successful! You are now a Pro member.',
+           message: context.l10n.subscriptionSuccess,
            isError: false,
          );
        }
@@ -60,7 +61,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Subscription',
+          context.l10n.subscriptionTitle,
           style: TextStyle(
             color: Colors.black,
             fontSize: 18.sp,
@@ -83,12 +84,12 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
                   Icon(Icons.error_outline, size: 48.sp, color: Colors.grey),
                   SizedBox(height: 16.h),
                   Text(
-                    controller.errorMessage ?? 'Something went wrong',
+                    controller.errorMessage ?? context.l10n.somethingWentWrong,
                     style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
                   ),
                   TextButton(
                     onPressed: () => controller.fetchPlans(),
-                    child: const Text('Retry', style: TextStyle(color: Colors.black)),
+                    child: Text(context.l10n.tryAgain, style: const TextStyle(color: Colors.black)),
                   ),
                 ],
               ),
@@ -99,7 +100,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
           if (plans.isEmpty) {
             return Center(
               child: Text(
-                'No subscription plans available',
+                context.l10n.noSubscriptionPlans,
                 style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
               ),
             );
@@ -130,7 +131,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
                           Icon(Icons.workspace_premium, color: const Color(0xFFFFB300), size: 24.sp),
                           SizedBox(width: 8.w),
                           Text(
-                            plan.name ?? 'Premium Plan',
+                            plan.name ?? context.l10n.premiumPlan,
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
@@ -181,7 +182,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
                                   Icon(Icons.check_circle, color: Colors.green, size: 16.sp),
                                   SizedBox(width: 4.w),
                                   Text(
-                                    'Active',
+                                    context.l10n.active,
                                     style: TextStyle(
                                       color: Colors.green,
                                       fontWeight: FontWeight.bold,
@@ -210,7 +211,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
                                     height: 16.sp,
                                     child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                   )
-                                : const Text('Subscribe Now'),
+                                : Text(context.l10n.subscribeNow),
                             ),
                         ],
                       ),
@@ -222,7 +223,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
                 // Benefits Section
                 if (plan.features != null && plan.features!.isNotEmpty) ...[
                   Text(
-                    'Premium Benefits',
+                    context.l10n.premiumBenefitsTitle,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -241,7 +242,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
                   child: GestureDetector(
                     onTap: () => _showTermsModal(context),
                     child: Text(
-                      'View Terms & Conditions',
+                      context.l10n.viewTermsConditions,
                       style: TextStyle(
                         color: Colors.grey[500],
                         fontSize: 13.sp,
@@ -286,12 +287,12 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Terms & Conditions'),
+          title: Text(context.l10n.termsConditionsTitle),
           content: SizedBox(
             width: double.maxFinite,
             child: SingleChildScrollView(
               child: Text(
-                controller.termsContent ?? 'No content available',
+                controller.termsContent ?? context.l10n.noContentAvailable,
                 style: TextStyle(fontSize: 14.sp, height: 1.5),
               ),
             ),
@@ -299,7 +300,7 @@ class _ProviderSubscriptionScreenState extends State<ProviderSubscriptionScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Close', style: TextStyle(color: Colors.black)),
+              child: Text(context.l10n.close, style: const TextStyle(color: Colors.black)),
             ),
           ],
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),

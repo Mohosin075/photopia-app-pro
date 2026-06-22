@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +12,7 @@ import 'package:photopya/core/network/urls.dart';
 import 'package:photopya/core/constants/location_data.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:photopya/controller/category_controller.dart';
+import 'package:photopya/controller/location_controller.dart';
 import 'package:photopya/controller/provider/service_controller.dart';
 import 'package:photopya/data/models/category_model.dart';
 import 'package:photopya/data/models/provider_service_model.dart';
@@ -39,6 +42,7 @@ class _ProviderCreateListingScreenState
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _equipmentController = TextEditingController();
+  final TextEditingController _otherServiceController = TextEditingController();
 
   // Pricing controllers
   final TextEditingController _weekdayHourlyRateController =
@@ -81,6 +85,7 @@ class _ProviderCreateListingScreenState
   double _serviceRadius = 25.0;
   bool _acceptOutsideRadius = false;
   final List<String> _equipment = [];
+  final List<String> _otherServices = [];
   final List<File> _selectedImages = [];
   final List<String> _existingNetworkImages = []; // Track original images URL
   final ImagePicker _picker = ImagePicker();
@@ -322,6 +327,7 @@ class _ProviderCreateListingScreenState
     _countryController.dispose();
     _durationController.dispose();
     _equipmentController.dispose();
+    _otherServiceController.dispose();
     _weekdayHourlyRateController.dispose();
     _weekendHourlyRateController.dispose();
     _dailyRateController.dispose();
@@ -1081,6 +1087,10 @@ class _ProviderCreateListingScreenState
           SizedBox(height: 15.h),
           _buildLabel(context.l10n.subCategory, isRequired: true),
           _buildSubCategoryDropdown(errorText: _localFieldErrors['subCategory']),
+          SizedBox(height: 15.h),
+          _buildLabel(context.l10n.otherServiceName),
+          _buildOtherServicesInput(),
+          _buildOtherServicesList(),
           // SizedBox(height: 15.h),
           // _buildLabel('Service Types (Select multiple)', isRequired: true),
           // _buildServiceTypeDropdown(errorText: _localFieldErrors['serviceType']),
@@ -1213,6 +1223,7 @@ class _ProviderCreateListingScreenState
           '${context.l10n.city}/${context.l10n.country}: ${_locationController.text}, ${_countryController.text}',
           '${context.l10n.coverageRadius}: ${_serviceRadius.toInt()} km',
           'Outside Range Booking: ${_acceptOutsideRadius ? "Accepted" : "Not Accepted"}',
+          if (_otherServices.isNotEmpty) '${context.l10n.otherServicesProvided}: ${_otherServices.join(", ")}',
         ], onEdit: () => _jumpToStep(0)),
         
         SizedBox(height: 20.h),
@@ -3007,8 +3018,6 @@ class _ProviderCreateListingScreenState
 
 
   Widget _buildLocationAutocomplete({String? errorText}) {
-    final allCities = LocationData.countriesAndCities.values.expand((cities) => cities).toList();
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -3023,33 +3032,78 @@ class _ProviderCreateListingScreenState
             ),
           ),
           child: Autocomplete<String>(
-            optionsBuilder: (TextEditingValue textEditingValue) {
-              if (textEditingValue.text.isEmpty) {
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              final query = textEditingValue.text.trim();
+              if (query.length < 3) {
                 return const Iterable<String>.empty();
               }
-              return allCities.where((String city) {
-                return city.toLowerCase().contains(textEditingValue.text.toLowerCase());
-              });
+              
+              // 1. Try backend search
+              try {
+                final locationController = Provider.of<LocationController>(context, listen: false);
+                final backendResults = await locationController.searchLocations(query);
+                if (backendResults.isNotEmpty) {
+                  return backendResults.map<String>((item) {
+                    if (item is Map) {
+                      return item['description']?.toString() ?? item['formattedAddress']?.toString() ?? item['name']?.toString() ?? '';
+                    }
+                    return item.toString();
+                  }).where((s) => s.isNotEmpty).toList();
+                }
+              } catch (e) {
+                debugPrint("Backend location search error: $e");
+              }
+
+              // 2. Fallback: Search from OpenStreetMap Nominatim API (fully dynamic, worldwide)
+              try {
+                final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&addressdetails=1&limit=5&accept-language=en');
+                final response = await http.get(url, headers: {'User-Agent': 'PhotopiaApp/1.0'});
+                if (response.statusCode == 200) {
+                  final List<dynamic> data = jsonDecode(response.body);
+                  return data.map<String>((item) {
+                    return item['display_name']?.toString() ?? '';
+                  }).where((s) => s.isNotEmpty).toList();
+                }
+              } catch (e) {
+                debugPrint("Nominatim search error: $e");
+              }
+
+              return const Iterable<String>.empty();
             },
-            onSelected: (String selection) {
-              setState(() {
-                _locationController.text = selection;
-                _selectedCity = selection;
-                
-                // Automatically find the country for this city if possible
-                LocationData.countriesAndCities.forEach((country, cities) {
-                  if (cities.contains(selection)) {
-                    _countryController.text = country;
-                    _selectedCountry = country;
-                  }
+            onSelected: (String selection) async {
+              // Automatically extract country and city from selection
+              final parts = selection.split(',');
+              if (parts.length >= 2) {
+                final countryPart = parts.last.trim();
+                final cityPart = parts[0].trim();
+                setState(() {
+                  _locationController.text = cityPart;
+                  _selectedCity = cityPart;
+                  _selectedCountry = countryPart;
+                  _countryController.text = countryPart;
+                  _localFieldErrors.remove('city');
+                });
+              } else {
+                setState(() {
+                  _locationController.text = selection;
+                  _selectedCity = selection;
+                  _localFieldErrors.remove('city');
                 });
                 
-                _localFieldErrors.remove('city');
-              });
+                final locationController = Provider.of<LocationController>(context, listen: false);
+                final geocodeResult = await locationController.geocodeAddress(selection);
+                if (geocodeResult != null) {
+                  setState(() {
+                    _selectedCountry = geocodeResult['country']?.toString();
+                    if (_selectedCountry != null) {
+                      _countryController.text = _selectedCountry!;
+                    }
+                  });
+                }
+              }
             },
             fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-              // Sync our controller with the autocomplete controller
-              if (controller.text != _locationController.text && _locationController.text.isNotEmpty && controller.text.isEmpty) {
+              if (controller.text != _locationController.text) {
                 controller.text = _locationController.text;
               }
               
@@ -3065,6 +3119,35 @@ class _ProviderCreateListingScreenState
                 decoration: InputDecoration(
                   hintText: context.l10n.enterCityOrRegion,
                   prefixIcon: Icon(Icons.location_on_outlined, size: 20.sp),
+                  suffixIcon: Consumer<LocationController>(
+                    builder: (context, locCtrl, child) {
+                      return locCtrl.isLoading
+                          ? SizedBox(
+                              width: 20.w,
+                              height: 20.h,
+                              child: const Padding(
+                                padding: EdgeInsets.all(12),
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            )
+                          : IconButton(
+                              icon: Icon(Icons.my_location, size: 20.sp, color: Theme.of(context).colorScheme.primary),
+                              onPressed: () async {
+                                await locCtrl.determinePosition();
+                                if (locCtrl.currentAddress.isNotEmpty) {
+                                  setState(() {
+                                    _locationController.text = locCtrl.city ?? locCtrl.currentAddress;
+                                    controller.text = locCtrl.city ?? locCtrl.currentAddress;
+                                    _selectedCity = locCtrl.city;
+                                    _selectedCountry = locCtrl.country;
+                                    _countryController.text = locCtrl.country ?? '';
+                                    _localFieldErrors.remove('city');
+                                  });
+                                }
+                              },
+                            );
+                    },
+                  ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 ),
@@ -3079,7 +3162,7 @@ class _ProviderCreateListingScreenState
                   borderRadius: BorderRadius.circular(10.r),
                   color: Theme.of(context).colorScheme.surface,
                   child: Container(
-                    width: 300.w, // Match width or constraint
+                    width: 300.w,
                     constraints: BoxConstraints(maxHeight: 200.h),
                     child: ListView.builder(
                       padding: EdgeInsets.zero,
@@ -4072,6 +4155,109 @@ class _ProviderCreateListingScreenState
 
     // Default to photography if we can't match it (safest fallback for this app)
     return 'photography';
+  }
+
+  Widget _buildOtherServicesInput() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              ),
+            ),
+            child: TextField(
+              controller: _otherServiceController,
+              decoration: InputDecoration(
+                hintText: 'e.g. Drone Videography',
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  fontSize: AppTypography.bodyLarge,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 12.h,
+                ),
+              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
+          ),
+        ),
+        SizedBox(width: 12.w),
+        GestureDetector(
+          onTap: () {
+            if (_otherServiceController.text.trim().isNotEmpty) {
+              setState(() {
+                _otherServices.add(_otherServiceController.text.trim());
+                _otherServiceController.clear();
+              });
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.onSurface,
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Text(
+              'Add',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.surface,
+                fontSize: AppTypography.bodyLarge,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtherServicesList() {
+    if (_otherServices.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: EdgeInsets.only(top: 10.h),
+      child: Wrap(
+        spacing: 8.w,
+        runSpacing: 8.h,
+        children: _otherServices.map((item) {
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: AppTypography.bodySmall,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.87),
+                  ),
+                ),
+                SizedBox(width: 4.w),
+                GestureDetector(
+                  onTap: () => setState(() => _otherServices.remove(item)),
+                  child: Icon(
+                    Icons.close,
+                    size: 14.sp,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 }
 

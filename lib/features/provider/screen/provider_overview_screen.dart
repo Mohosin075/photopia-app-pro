@@ -264,7 +264,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
             children: [
               Icon(Icons.calendar_month_outlined, size: 18.sp),
               SizedBox(width: 8.w),
-              Text('Availability Settings'),
+              Text(context.l10n.availabilitySettingsTitle),
             ],
           ),
         ),
@@ -276,7 +276,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
               Icon(Icons.delete_outline, size: 18.sp, color: Colors.redAccent),
               SizedBox(width: 8.w),
               Text(
-                'Delete Listing',
+                context.l10n.deleteListing,
                 style: TextStyle(color: Colors.redAccent),
               ),
             ],
@@ -426,7 +426,7 @@ class _ProviderOverviewScreenState extends State<ProviderOverviewScreen> {
                 flex: 1,
                 child: _buildListingButton(
                   icon: Icons.calendar_month_outlined,
-                  label: 'Availability',
+                  label: context.l10n.availability,
                   onTap: () {
                     Navigator.push(
                       context,

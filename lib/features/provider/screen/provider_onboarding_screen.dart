@@ -509,7 +509,18 @@ class _Step3Location extends StatelessWidget {
               SizedBox(height: 16.h),
               _SectionLabel(context.l10n.departmentLabel, isOptional: true),
               SizedBox(height: 8.h),
-              _DropdownField(hint: 'e.g. 75', value: ctrl.department.isEmpty ? null : ctrl.department, items: const ['75', '92', '93', '94'], onChanged: (v) { ctrl.department = v ?? ''; ctrl.notifyListeners(); }, cs: cs),
+              _DropdownField(
+                hint: 'Select Department', 
+                value: ctrl.department.isEmpty ? null : ctrl.department, 
+                items: const [
+                  'Photography', 
+                  'Videography & Cinematography', 
+                  'Editing & Post-Production', 
+                  'Scriptwriting & Storyboarding'
+                ], 
+                onChanged: (v) { ctrl.department = v ?? ''; ctrl.notifyListeners(); }, 
+                cs: cs,
+              ),
               SizedBox(height: 16.h),
               _SectionLabel(context.l10n.interventionRadius, isOptional: true),
               SizedBox(height: 8.h),
@@ -711,11 +722,6 @@ class _Step5BioPortfolio extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
-              
-              _SectionLabel(context.l10n.externalPortfolioLink, isOptional: true),
-              SizedBox(height: 8.h),
-              _TextField(hint: 'https://yourportfolio.com', value: ctrl.externalPortfolioLink, icon: Icons.link_outlined, onChanged: (v) { ctrl.externalPortfolioLink = v; }, cs: cs, keyboardType: TextInputType.url),
-              SizedBox(height: 24.h),
               
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

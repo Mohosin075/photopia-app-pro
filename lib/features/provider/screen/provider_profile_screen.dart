@@ -35,6 +35,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   final TextEditingController _aboutController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
   File? _coverPhoto;
   File? _profilePhoto;
 
@@ -43,6 +44,14 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   List<String> _tempLanguages = [];
   List<dynamic> _tempPortfolio = [];
   List<dynamic> _tempDocuments = [];
+
+  // Professional details editing state
+  String? _tempYearsOfExperience;
+  String? _tempProjectsCompleted;
+  String? _tempEducation;
+  String? _tempDepartment;
+  String? _tempRadius;
+  bool _tempAvailableForTravel = false;
 
   // Tracking deletions for the /remove-items API
   final Set<String> _removedSpecializations = {};
@@ -71,6 +80,13 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         _tempLanguages = List<String>.from(ctrl.languages);
         _tempPortfolio = List<dynamic>.from(ctrl.recentWork);
         _tempDocuments = List<dynamic>.from(ctrl.uploadedDocuments);
+        _tempYearsOfExperience = ctrl.yearsOfExperience.isEmpty ? null : ctrl.yearsOfExperience;
+        _tempProjectsCompleted = ctrl.projectsCompleted.isEmpty ? null : ctrl.projectsCompleted;
+        _tempEducation = ctrl.education.isEmpty ? null : ctrl.education;
+        _cityController.text = ctrl.mainCity;
+        _tempDepartment = ctrl.department.isEmpty ? null : ctrl.department;
+        _tempRadius = ctrl.radius.isEmpty ? null : ctrl.radius;
+        _tempAvailableForTravel = ctrl.availableForTravel;
         _profilePhoto = null;
         _coverPhoto = null;
         setState(() {});
@@ -90,6 +106,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     _aboutController.dispose();
     _bioController.dispose();
     _nameController.dispose();
+    _cityController.dispose();
     super.dispose();
   }
 
@@ -214,6 +231,13 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       newDocumentFiles: _tempDocuments.whereType<File>().toList(),
       profilePhoto: _profilePhoto,
       coverPhoto: _coverPhoto,
+      yearsOfExperience: _tempYearsOfExperience != controller.yearsOfExperience ? (_tempYearsOfExperience ?? '') : null,
+      projectsCompleted: _tempProjectsCompleted != controller.projectsCompleted ? (_tempProjectsCompleted ?? '') : null,
+      education: _tempEducation != controller.education ? (_tempEducation ?? '') : null,
+      mainCity: _cityController.text != controller.mainCity ? _cityController.text : null,
+      department: _tempDepartment != controller.department ? (_tempDepartment ?? '') : null,
+      radius: _tempRadius != controller.radius ? (_tempRadius ?? '') : null,
+      availableForTravel: _tempAvailableForTravel != controller.availableForTravel ? _tempAvailableForTravel : null,
     );
 
     setState(() => _isSaving = false);
@@ -234,6 +258,13 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         _tempLanguages = List<String>.from(controller.languages);
         _tempPortfolio = List<dynamic>.from(controller.recentWork);
         _tempDocuments = List<dynamic>.from(controller.uploadedDocuments);
+        _tempYearsOfExperience = controller.yearsOfExperience.isEmpty ? null : controller.yearsOfExperience;
+        _tempProjectsCompleted = controller.projectsCompleted.isEmpty ? null : controller.projectsCompleted;
+        _tempEducation = controller.education.isEmpty ? null : controller.education;
+        _cityController.text = controller.mainCity;
+        _tempDepartment = controller.department.isEmpty ? null : controller.department;
+        _tempRadius = controller.radius.isEmpty ? null : controller.radius;
+        _tempAvailableForTravel = controller.availableForTravel;
         setState(() {});
 
         CustomSnackBar.show(
@@ -1196,6 +1227,162 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     );
   }
 
+  Widget _buildEditableDetailDropdown({
+    required IconData icon,
+    required String label,
+    required String? value,
+    required List<String> items,
+    required Map<String, String> displayLabels,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 18.sp,
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+          ),
+          SizedBox(width: 12.w),
+          Text(
+            '$label:',
+            style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: Theme.of(context).dividerColor.withOpacity(0.2),
+                ),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: value,
+                  isDense: true,
+                  isExpanded: true,
+                  hint: Text(
+                    'Select',
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                  ),
+                  dropdownColor: Theme.of(context).colorScheme.surface,
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  borderRadius: BorderRadius.circular(8.r),
+                  items: items.map((e) {
+                    final l = displayLabels[e] ?? e;
+                    return DropdownMenuItem(
+                      value: e,
+                      child: Text(
+                        l,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: onChanged,
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditableDetailTextField({
+    required IconData icon,
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 18.sp,
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+          ),
+          SizedBox(width: 12.w),
+          Text(
+            '$label:',
+            style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Container(
+              height: 36.h,
+              alignment: Alignment.centerRight,
+              child: TextField(
+                controller: controller,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                decoration: InputDecoration(
+                  hintText: hint,
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(vertical: 8.h),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditableDetailSwitch({
+    required IconData icon,
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 18.sp,
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+          ),
+          SizedBox(width: 12.w),
+          Text(
+            '$label:',
+            style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
+          ),
+          const Spacer(),
+          SizedBox(
+            height: 24.h,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              activeColor: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildProfessionalDetailsSection(
     ProviderProfileController controller,
   ) {
@@ -1225,37 +1412,153 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           ),
           child: Column(
             children: [
-              if (controller.yearsOfExperience.isNotEmpty)
+              if (!_isEditing) ...[
                 _buildDetailRow(
                   Icons.work_outline,
                   context.l10n.experience,
-                  controller.yearsOfExperience,
+                  controller.yearsOfExperience.isEmpty ? 'Not specified' : controller.yearsOfExperience,
                 ),
-              if (controller.projectsCompleted.isNotEmpty)
                 _buildDetailRow(
                   Icons.task_alt,
                   context.l10n.projectsLabel,
-                  controller.projectsCompleted,
+                  controller.projectsCompleted.isEmpty ? 'Not specified' : controller.projectsCompleted,
                 ),
-              if (controller.education.isNotEmpty)
                 _buildDetailRow(
                   Icons.school_outlined,
                   context.l10n.education,
-                  controller.education,
+                  controller.education.isEmpty ? 'Not specified' : controller.education,
                 ),
-              if (controller.mainCity.isNotEmpty)
                 _buildDetailRow(
                   Icons.location_city_outlined,
                   context.l10n.serviceArea,
-                  '${controller.mainCity} (${controller.radius})',
+                  controller.mainCity.isEmpty ? 'Not specified' : controller.mainCity,
                 ),
-              _buildDetailRow(
-                Icons.flight_takeoff_outlined,
-                context.l10n.availableForTravel,
-                controller.availableForTravel
-                    ? context.l10n.yes
-                    : context.l10n.no,
-              ),
+                _buildDetailRow(
+                  Icons.map_outlined,
+                  'Department',
+                  controller.department.isEmpty ? 'Not specified' : controller.department,
+                ),
+                _buildDetailRow(
+                  Icons.explore_outlined,
+                  context.l10n.interventionRadius,
+                  controller.radius.isEmpty ? 'Not specified' : controller.radius,
+                ),
+                _buildDetailRow(
+                  Icons.flight_takeoff_outlined,
+                  context.l10n.availableForTravel,
+                  controller.availableForTravel
+                      ? context.l10n.yes
+                      : context.l10n.no,
+                ),
+              ] else ...[
+                _buildEditableDetailDropdown(
+                  icon: Icons.work_outline,
+                  label: context.l10n.experience,
+                  value: _tempYearsOfExperience,
+                  items: const ['<1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years'],
+                  displayLabels: {
+                    '<1 year': context.l10n.expLess1Year,
+                    '1-3 years': context.l10n.exp1To3Years,
+                    '3-5 years': context.l10n.exp3To5Years,
+                    '5-10 years': context.l10n.exp5To10Years,
+                    '10+ years': context.l10n.exp10PlusYears,
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      _tempYearsOfExperience = val;
+                    });
+                  },
+                ),
+                _buildEditableDetailDropdown(
+                  icon: Icons.task_alt,
+                  label: context.l10n.projectsLabel,
+                  value: _tempProjectsCompleted,
+                  items: const ['<10', '10-50', '50-100', '100+'],
+                  displayLabels: {
+                    '<10': context.l10n.projLess10,
+                    '10-50': context.l10n.proj10To50,
+                    '50-100': context.l10n.proj50To100,
+                    '100+': context.l10n.proj100Plus,
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      _tempProjectsCompleted = val;
+                    });
+                  },
+                ),
+                _buildEditableDetailDropdown(
+                  icon: Icons.school_outlined,
+                  label: context.l10n.education,
+                  value: _tempEducation,
+                  items: const ['Self-taught', 'School', 'Professional Training'],
+                  displayLabels: {
+                    'Self-taught': context.l10n.eduSelfTaught,
+                    'School': context.l10n.eduSchool,
+                    'Professional Training': context.l10n.eduProfessionalTraining,
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      _tempEducation = val;
+                    });
+                  },
+                ),
+                _buildEditableDetailTextField(
+                  icon: Icons.location_city_outlined,
+                  label: context.l10n.serviceArea,
+                  controller: _cityController,
+                  hint: 'e.g. Dhaka',
+                ),
+                _buildEditableDetailDropdown(
+                  icon: Icons.map_outlined,
+                  label: 'Department',
+                  value: _tempDepartment,
+                  items: const [
+                    'Photography', 
+                    'Videography & Cinematography', 
+                    'Editing & Post-Production', 
+                    'Scriptwriting & Storyboarding'
+                  ],
+                  displayLabels: const {
+                    'Photography': 'Photography',
+                    'Videography & Cinematography': 'Videography & Cinematography',
+                    'Editing & Post-Production': 'Editing & Post-Production',
+                    'Scriptwriting & Storyboarding': 'Scriptwriting & Storyboarding',
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      _tempDepartment = val;
+                    });
+                  },
+                ),
+                _buildEditableDetailDropdown(
+                  icon: Icons.map_outlined,
+                  label: context.l10n.interventionRadius,
+                  value: _tempRadius,
+                  items: const ['10km', '30km', '50km', '100km', 'Whole Country'],
+                  displayLabels: {
+                    '10km': '10km',
+                    '30km': '30km',
+                    '50km': '50km',
+                    '100km': '100km',
+                    'Whole Country': context.l10n.wholeCountry,
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      _tempRadius = val;
+                    });
+                  },
+                ),
+                _buildEditableDetailSwitch(
+                  icon: Icons.flight_takeoff_outlined,
+                  label: context.l10n.availableForTravel,
+                  value: _tempAvailableForTravel,
+                  onChanged: (val) {
+                    setState(() {
+                      _tempAvailableForTravel = val;
+                    });
+                  },
+                ),
+              ],
             ],
           ),
         ),

@@ -123,8 +123,8 @@ class _PhotopiaState extends State<Photopia> {
                 locale: context.locale,
                 supportedLocales: context.supportedLocales,
                 localizationsDelegates: [
-                  AppLocalizations.delegate,
                   ...context.localizationDelegates,
+                  AppLocalizations.delegate,
                 ],
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,

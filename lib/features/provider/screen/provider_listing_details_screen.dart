@@ -10,6 +10,7 @@ import 'package:photopya/core/widgets/video_player_screen.dart';
 import 'package:photopya/features/provider/screen/provider_create_listing_screen.dart';
 import 'package:photopya/data/models/service_duration.dart';
 import 'package:provider/provider.dart';
+import 'package:photopya/core/localization/app_localizations.dart';
 
 class ProviderListingDetailsScreen extends StatefulWidget {
   final String listingId;
@@ -203,7 +204,7 @@ class _ProviderListingDetailsScreenState
                   children: [
                     Expanded(
                       child: Text(
-                        listing.title ?? 'No Title',
+                        listing.title ?? context.l10n.noTitle,
                         style: TextStyle(
                           fontSize: AppTypography.h1,
                           fontWeight: FontWeight.bold,
@@ -221,7 +222,7 @@ class _ProviderListingDetailsScreenState
                         borderRadius: BorderRadius.circular(6.r),
                       ),
                       child: Text(
-                        listing.status ?? 'Active',
+                        listing.status ?? context.l10n.active,
                         style: TextStyle(
                           fontSize: AppTypography.bodySmall,
                           color: const Color(0xFF2E7D32),
@@ -249,7 +250,7 @@ class _ProviderListingDetailsScreenState
                     Icon(Icons.circle, size: 4.sp, color: Colors.grey[400]),
                     SizedBox(width: 8.w),
                     Text(
-                      listing.duration?.formattedDisplay ?? 'per session',
+                      listing.duration?.formattedDisplay ?? context.l10n.perSession,
                       style: TextStyle(
                         fontSize: AppTypography.bodyLarge,
                         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -270,7 +271,7 @@ class _ProviderListingDetailsScreenState
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    listing.category?.name ?? 'Photography',
+                    context.l10n.translateCategory(listing.category?.name ?? 'Photography'),
                     style: TextStyle(
                       fontSize: AppTypography.bodySmall,
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
@@ -285,7 +286,7 @@ class _ProviderListingDetailsScreenState
 
                 // Description
                 Text(
-                  'Description',
+                  context.l10n.description,
                   style: TextStyle(
                     fontSize: AppTypography.h2,
                     fontWeight: FontWeight.bold,
@@ -294,7 +295,7 @@ class _ProviderListingDetailsScreenState
                 ),
                 SizedBox(height: 10.h),
                 Text(
-                  listing.description ?? 'No description provided.',
+                  listing.description ?? context.l10n.noDescriptionAvailable,
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -308,7 +309,7 @@ class _ProviderListingDetailsScreenState
 
                 // Location
                 Text(
-                  'Location',
+                  context.l10n.location,
                   style: TextStyle(
                     fontSize: AppTypography.h2,
                     fontWeight: FontWeight.bold,
@@ -321,7 +322,7 @@ class _ProviderListingDetailsScreenState
                       ? '${listing.location!.address!}\n${listing.location?.city ?? ''}, ${listing.location?.country ?? ''}'
                       : (listing.location?.city != null || listing.location?.country != null)
                           ? '${listing.location?.city ?? ''}, ${listing.location?.country ?? ''}'
-                          : 'No location address provided.',
+                          : context.l10n.locationNotSet,
                   style: TextStyle(
                     fontSize: AppTypography.bodyLarge,
                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -331,7 +332,7 @@ class _ProviderListingDetailsScreenState
                 if (listing.location?.type != null) ...[
                   SizedBox(height: 8.h),
                   Text(
-                    'Type: ${listing.location!.type == 'REMOTE' ? 'Remote' : 'On-site'}',
+                    context.l10n.typePrefix(listing.location!.type == 'REMOTE' ? context.l10n.remote : context.l10n.onSite),
                     style: TextStyle(
                       fontSize: AppTypography.bodyMedium,
                       color: Theme.of(context).colorScheme.primary,
@@ -342,7 +343,7 @@ class _ProviderListingDetailsScreenState
                 if (listing.location?.serviceRadiusKm != null && listing.location!.serviceRadiusKm! > 0) ...[
                   SizedBox(height: 4.h),
                   Text(
-                    'Service Radius: ${listing.location!.serviceRadiusKm} km',
+                    context.l10n.serviceRadiusKm(listing.location!.serviceRadiusKm.toString()),
                     style: TextStyle(
                       fontSize: AppTypography.bodyMedium,
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -357,7 +358,7 @@ class _ProviderListingDetailsScreenState
                 // Equipment Utilized
                 if (listing.equipment != null && listing.equipment!.isNotEmpty) ...[
                   Text(
-                    'Equipment Utilized',
+                    context.l10n.equipmentUtilized,
                     style: TextStyle(
                       fontSize: AppTypography.h2,
                       fontWeight: FontWeight.bold,
@@ -395,7 +396,7 @@ class _ProviderListingDetailsScreenState
                 // Add-ons
                 if (listing.addons != null && listing.addons!.isNotEmpty) ...[
                   Text(
-                    'Add-ons Available',
+                    context.l10n.addonsAvailable,
                     style: TextStyle(
                       fontSize: AppTypography.h2,
                       fontWeight: FontWeight.bold,
@@ -445,7 +446,7 @@ class _ProviderListingDetailsScreenState
                 // Auto-Accept & Booking Rules
                 if (listing.autoAcceptBookings != null || listing.autoAccept != null) ...[
                   Text(
-                    'Auto-Accept & Booking Rules',
+                    context.l10n.autoAcceptBookingRules,
                     style: TextStyle(
                       fontSize: AppTypography.h2,
                       fontWeight: FontWeight.bold,
@@ -480,8 +481,8 @@ class _ProviderListingDetailsScreenState
                             SizedBox(width: 8.w),
                             Text(
                               (listing.autoAcceptBookings?.enabled == true || listing.autoAccept?.isEnabled == true)
-                                  ? 'Auto-Accept Bookings: Enabled'
-                                  : 'Auto-Accept Bookings: Disabled',
+                                  ? context.l10n.autoAcceptBookingsEnabled
+                                  : context.l10n.autoAcceptBookingsDisabled,
                               style: TextStyle(
                                 fontSize: AppTypography.bodyLarge,
                                 fontWeight: FontWeight.bold,
@@ -493,7 +494,7 @@ class _ProviderListingDetailsScreenState
                         if (listing.autoAcceptBookings?.enabled == true || listing.autoAccept?.isEnabled == true) ...[
                           SizedBox(height: 12.h),
                           Text(
-                            '• Minimum Budget: €${listing.autoAcceptBookings?.minimumBudget?.toInt() ?? listing.autoAccept?.minBudget ?? 0}',
+                            '• ${context.l10n.minimumBudgetPrefix((listing.autoAcceptBookings?.minimumBudget?.toInt() ?? listing.autoAccept?.minBudget ?? 0).toString())}',
                             style: TextStyle(
                               fontSize: AppTypography.bodyMedium,
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -501,7 +502,7 @@ class _ProviderListingDetailsScreenState
                           ),
                           SizedBox(height: 6.h),
                           Text(
-                            '• Within Radius: ${listing.autoAcceptBookings?.withinRadiusKm?.toInt() ?? listing.autoAccept?.withinRadius ?? 30} km',
+                            '• ${context.l10n.withinRadiusPrefix((listing.autoAcceptBookings?.withinRadiusKm?.toInt() ?? listing.autoAccept?.withinRadius ?? 30).toString())}',
                             style: TextStyle(
                               fontSize: AppTypography.bodyMedium,
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -509,7 +510,7 @@ class _ProviderListingDetailsScreenState
                           ),
                           SizedBox(height: 6.h),
                           Text(
-                            '• Verified Clients Only: ${((listing.autoAcceptBookings?.verifiedClientsOnly ?? listing.autoAccept?.verifiedClientsOnly) == true) ? "Yes" : "No"}',
+                            '• ${context.l10n.verifiedClientsOnlyPrefix(((listing.autoAcceptBookings?.verifiedClientsOnly ?? listing.autoAccept?.verifiedClientsOnly) == true) ? context.l10n.yes : context.l10n.no)}',
                             style: TextStyle(
                               fontSize: AppTypography.bodyMedium,
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -527,7 +528,7 @@ class _ProviderListingDetailsScreenState
                 // Availability Slots
                 if (listing.availabilitySlots != null && listing.availabilitySlots!.isNotEmpty) ...[
                   Text(
-                    'Availability Slots',
+                    context.l10n.availabilitySlots,
                     style: TextStyle(
                       fontSize: AppTypography.h2,
                       fontWeight: FontWeight.bold,
@@ -598,7 +599,7 @@ class _ProviderListingDetailsScreenState
                             ),
                           ),
                           Text(
-                            'Total Views',
+                            context.l10n.totalViews,
                             style: TextStyle(
                               fontSize: AppTypography.bodySmall,
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
@@ -628,7 +629,7 @@ class _ProviderListingDetailsScreenState
                               ),
                             ),
                             Text(
-                              'Bookings',
+                              context.l10n.bookingsTitle,
                               style: TextStyle(
                                 fontSize: AppTypography.bodySmall,
                                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
@@ -671,7 +672,7 @@ class _ProviderListingDetailsScreenState
                           ),
                         ),
                         child: Text(
-                          'Edit Listing',
+                          context.l10n.editListing,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.surface,
                             fontSize: AppTypography.h2,
@@ -739,7 +740,7 @@ class _ProviderListingDetailsScreenState
                   children: [
                     Expanded(
                       child: Text(
-                        'Do you want to delete this?',
+                        context.l10n.doYouWantToDelete,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16.sp,
@@ -771,8 +772,8 @@ class _ProviderListingDetailsScreenState
                               .deleteListing(widget.listingId);
                           if (result && mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Listing deleted successfully'),
+                              SnackBar(
+                                content: Text(context.l10n.listingDeletedSuccess),
                               ),
                             );
                             Navigator.pop(context); // Go back to listings
@@ -783,7 +784,7 @@ class _ProviderListingDetailsScreenState
                                   context
                                           .read<MyListingController>()
                                           .errorMessage ??
-                                      'Failed to delete listing',
+                                      context.l10n.listingDeleteFailed,
                                 ),
                               ),
                             );
@@ -802,7 +803,7 @@ class _ProviderListingDetailsScreenState
                                   color: Color(0xFF2E7D32), size: 18),
                               SizedBox(width: 8.w),
                               Text(
-                                'Yes',
+                                context.l10n.yes,
                                 style: TextStyle(
                                   color: const Color(0xFF2E7D32),
                                   fontSize: 14.sp,
@@ -831,7 +832,7 @@ class _ProviderListingDetailsScreenState
                               Icon(Icons.close, size: 18.sp, color: Colors.red),
                               SizedBox(width: 8.w),
                               Text(
-                                'No',
+                                context.l10n.no,
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.bold,
