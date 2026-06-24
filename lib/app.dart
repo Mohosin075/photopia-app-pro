@@ -46,6 +46,7 @@ import 'package:photopya/features/provider/screen/BottomNavigationBar/bottom_nav
 import 'package:photopya/core/notification/notification_service.dart';
 import 'package:photopya/controller/category_controller.dart';
 import 'package:photopya/core/theme/app_theme.dart';
+import 'package:flutter/services.dart';
 
 class Photopia extends StatefulWidget {
   const Photopia({super.key});
@@ -58,6 +59,12 @@ class _PhotopiaState extends State<Photopia> {
   @override
   void initState() {
     super.initState();
+    // Configure default system status bar style (transparent with light/dark icons support)
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ));
     // Initialize notification service after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationService.instance.init();

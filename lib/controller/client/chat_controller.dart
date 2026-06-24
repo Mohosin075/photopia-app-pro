@@ -205,6 +205,14 @@ class ChatController extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = '';
 
+    // Local update: Clear unread count for this chat room immediately when entering it
+    if (chatId.isNotEmpty && _chatData?.chats != null) {
+      final int chatIndex = _chatData!.chats!.indexWhere((c) => c.sId == chatId);
+      if (chatIndex != -1) {
+        _chatData!.chats![chatIndex].unreadCount = 0;
+      }
+    }
+
     connectSocket(); // Ensure socket connection when navigating directly
 
     if (chatId.isEmpty) {

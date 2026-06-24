@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,9 @@ import 'package:photopya/controller/auth_controller.dart';
 import 'package:photopya/core/network/Api_service/network_caller.dart';
 import 'package:photopya/core/network/urls.dart';
 import 'package:photopya/firebase_options.dart';
+import 'package:photopya/data/models/conversation_model.dart';
+import 'package:photopya/features/client/chat_screen.dart';
+import 'package:photopya/core/utils/app_transitions.dart';
 
 // Top-level background message handler
 @pragma('vm:entry-point')
@@ -109,7 +113,12 @@ class NotificationService {
             "🔔 NotificationService: Notification Tap Payload: ${response.payload}",
           );
           if (response.payload != null) {
-            _handleNavigation(response.payload!);
+            try {
+              final Map<String, dynamic> data = jsonDecode(response.payload!);
+              _handleFCMDataPayload(data);
+            } catch (_) {
+              _handleNavigation(response.payload!);
+            }
           }
         },
       );
@@ -130,9 +139,7 @@ class NotificationService {
         debugPrint(
           "🔔 NotificationService: Notification clicked while in background",
         );
-        if (message.data['actionUrl'] != null) {
-          _handleNavigation(message.data['actionUrl']);
-        }
+        _handleFCMDataPayload(message.data);
       });
 
       // 5. Handle Initial Message (Terminated State)
@@ -142,9 +149,7 @@ class NotificationService {
           debugPrint(
             "🔔 NotificationService: App launched from terminated state via notification",
           );
-          if (initialMessage.data['actionUrl'] != null) {
-            _handleNavigation(initialMessage.data['actionUrl']);
-          }
+          _handleFCMDataPayload(initialMessage.data);
         }
       } catch (e) {
         debugPrint("🔔 NotificationService: Error getting initial message: $e");
@@ -266,10 +271,41 @@ class NotificationService {
           ),
           iOS: const DarwinNotificationDetails(),
         ),
-        payload: message.data['actionUrl'],
+        payload: jsonEncode(message.data),
       );
     } else {
       debugPrint("🔔 NotificationService: No displayable content (title/body empty) for message: ${message.messageId}");
+    }
+  }
+
+  void _handleFCMDataPayload(Map<String, dynamic> data) {
+    if (data.isEmpty) return;
+    
+    final String? type = data['type']?.toString();
+    final String? chatId = data['chatId']?.toString();
+    final String? senderId = data['senderId']?.toString();
+    final String senderName = data['senderName']?.toString() ?? data['title']?.toString() ?? 'Chat Support';
+    final String senderAvatar = data['senderAvatar']?.toString() ?? '';
+
+    debugPrint("🔔 NotificationService: Handling FCM payload type: $type, chatId: $chatId");
+
+    if (type == 'NEW_MESSAGE' && chatId != null && chatId.isNotEmpty) {
+      final conversation = Conversation(
+        id: chatId,
+        name: senderName,
+        lastMessage: data['messagePreview']?.toString() ?? '',
+        avatarUrl: senderAvatar,
+        lastMessageTime: DateTime.now(),
+        receiverId: senderId,
+      );
+
+      navigatorKey.currentState?.push(
+        AppTransitions.createPremiumRoute(
+          ChatScreen(conversation: conversation),
+        ),
+      );
+    } else if (data['actionUrl'] != null && data['actionUrl'].toString().isNotEmpty) {
+      _handleNavigation(data['actionUrl'].toString());
     }
   }
 
