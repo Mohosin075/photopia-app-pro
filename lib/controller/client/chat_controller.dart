@@ -132,7 +132,7 @@ class ChatController extends ChangeNotifier {
 
     _socket?.on('updateChatList::$userId', (data) {
       debugPrint('Socket: updateChatList received');
-      getChats();
+      getChats(showLoading: false);
     });
 
     // Join Notification Room
@@ -142,7 +142,7 @@ class ChatController extends ChangeNotifier {
     _socket?.on('notification', (data) {
       debugPrint('!!! [SOCKET_DEBUG] Notification received: $data');
       NotificationController.instance.onNewNotification(data);
-      getChats(); // Ensure chat list updates in real-time when receiving generic pings
+      getChats(showLoading: false); // Ensure chat list updates in real-time when receiving generic pings
     });
 
     // Catch-all for debug: Log ALL incoming events
@@ -171,10 +171,12 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<bool> getChats() async {
-    _isLoading = true;
-    _errorMessage = '';
-    notifyListeners();
+  Future<bool> getChats({bool showLoading = true}) async {
+    if (showLoading || _chatData == null) {
+      _isLoading = true;
+      _errorMessage = '';
+      notifyListeners();
+    }
 
     // Ensure socket is alive every time we fetch chats
     connectSocket();

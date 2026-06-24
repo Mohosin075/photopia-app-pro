@@ -205,13 +205,29 @@ class PopularLocation {
 }
 
 class Inspiration {
+  String? id;
   String? title;
+  String? linkText;
+  String? subCategoryId;
+  String? subCategoryName;
+  int? order;
   String? description;
   String? link;
   String? icon;
   String? image;
 
-  Inspiration({this.title, this.description, this.link, this.icon, this.image});
+  Inspiration({
+    this.id,
+    this.title,
+    this.linkText,
+    this.subCategoryId,
+    this.subCategoryName,
+    this.order,
+    this.description,
+    this.link,
+    this.icon,
+    this.image,
+  });
 
   factory Inspiration.fromJson(Map<String, dynamic> json) {
     String? imageUrl = json['image']?.toString();
@@ -223,11 +239,26 @@ class Inspiration {
       imageUrl = "$base$path";
     }
 
+    final subCategory = json['subCategoryId'];
+    String? subId;
+    String? subName;
+    if (subCategory is Map<String, dynamic>) {
+      subId = subCategory['_id']?.toString() ?? subCategory['id']?.toString();
+      subName = subCategory['name']?.toString();
+    } else if (subCategory is String) {
+      subId = subCategory;
+    }
+
     return Inspiration(
-      title: json['title'],
-      description: json['description'],
-      link: json['link'],
-      icon: json['icon'],
+      id: json['_id']?.toString() ?? json['id']?.toString(),
+      title: json['title']?.toString(),
+      linkText: json['linkText']?.toString(),
+      subCategoryId: subId,
+      subCategoryName: subName,
+      order: json['order'] is num ? (json['order'] as num).toInt() : 0,
+      description: json['description']?.toString(),
+      link: json['link']?.toString(),
+      icon: json['icon']?.toString(),
       image: imageUrl,
     );
   }

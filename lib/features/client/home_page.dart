@@ -361,141 +361,153 @@ class _MyHomePageState extends State<MyHomePage> {
     required bool isDark,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        margin: EdgeInsets.only(bottom: 12.h),
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.04) : Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200,
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    question,
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 6.h),
-                  Row(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16.r),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 280.w,
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [Colors.white.withOpacity(0.05), Colors.white.withOpacity(0.02)]
+                    : [Colors.grey.shade100.withOpacity(0.8), Colors.white.withOpacity(0.9)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: isDark ? Colors.white.withOpacity(0.12) : Colors.grey.shade300.withOpacity(0.5),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "→ ",
+                        question,
                         style: TextStyle(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade400,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Expanded(
-                        child: Text(
-                          actionText,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white70 : Colors.black54,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.orange.shade400.withOpacity(0.5),
+                      SizedBox(height: 8.h),
+                      Row(
+                        children: [
+                          Text(
+                            "→ ",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade400,
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                          Expanded(
+                            child: Text(
+                              actionText,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white70 : Colors.black54,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.orange.shade400.withOpacity(0.5),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                SizedBox(width: 8.w),
+                Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade200.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 12.sp,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 8.w),
-            Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 12.sp,
-                color: isDark ? Colors.white70 : Colors.black54,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildProjectIdeasSection() {
+  Widget _buildProjectIdeasSection(List<Inspiration> items) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      child: Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.02) : Colors.grey.shade50.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(24.r),
-          border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200,
-            width: 1.5,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          title: context.l10n.ideasForProject,
+          onSeeAllTap: () {
+            Navigator.push(
+              context,
+              AppTransitions.createPremiumRoute(
+                HomeSeeAllInspirationsScreen(
+                  title: context.l10n.ideasForProject,
+                  inspirations: items,
+                ),
+              ),
+            );
+          },
+        ),
+        SizedBox(
+          height: 125.h,
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return Container(
+                margin: EdgeInsets.only(right: 16.w, bottom: 8.h),
+                child: _buildIdeaCard(
+                  question: item.title ?? '',
+                  actionText: item.linkText ?? 'See packages',
+                  isDark: isDark,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      AppTransitions.createPremiumRoute(
+                        SearchResultScreen(
+                          filters: {
+                            'subCategory': item.subCategoryId,
+                            'isActive': 'true',
+                            'status': 'ACTIVE',
+                          },
+                          title: item.subCategoryName ?? item.title,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  "💡",
-                  style: TextStyle(fontSize: 18.sp),
-                ),
-                SizedBox(width: 8.w),
-                Text(
-                  context.l10n.ideasForProject.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w800,
-                    color: isDark ? Colors.white : Colors.black87,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-            _buildIdeaCard(
-              question: "Are 💒 you planning a wedding?",
-              actionText: "See our wedding packages",
-              isDark: isDark,
-              onTap: () {},
-            ),
-            _buildIdeaCard(
-              question: "Launch 🚀 your brand?",
-              actionText: "Visual Identity Packs",
-              isDark: isDark,
-              onTap: () {},
-            ),
-            _buildIdeaCard(
-              question: "Need 📱 social content?",
-              actionText: "Social Media Plans",
-              isDark: isDark,
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
+      ],
     );
   }
 
@@ -1520,8 +1532,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
 
                           // 8. Ideas
-                          _buildProjectIdeasSection(),
-                          SizedBox(height: 20.h),
+                          if (data.inspirations != null && data.inspirations!.isNotEmpty)
+                            Column(
+                              children: [
+                                _buildProjectIdeasSection(data.inspirations!),
+                                SizedBox(height: 20.h),
+                              ],
+                            ),
 
                           SizedBox(height: 100.h),
                         ],

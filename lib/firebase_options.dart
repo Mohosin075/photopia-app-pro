@@ -55,11 +55,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBpbJ-O5x0PIE5PqFcCovQLY3XgO7BYCIE',
-    appId: '1:402116155765:android:bb4ecb915f3ad10209db3c',
-    messagingSenderId: '402116155765',
-    projectId: 'photopia-fe0c4',
-    storageBucket: 'photopia-fe0c4.firebasestorage.app',
+    apiKey: 'AIzaSyBI3Lk3IqjuiNRjekYnej79-qbBQ_ssTGg',
+    appId: '1:640401747174:android:12bcdc201c23ff7de31f27',
+    messagingSenderId: '640401747174',
+    projectId: 'photopia-2505f',
+    storageBucket: 'photopia-2505f.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

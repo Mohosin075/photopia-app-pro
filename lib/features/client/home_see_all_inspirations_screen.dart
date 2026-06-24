@@ -64,8 +64,12 @@ class HomeSeeAllInspirationsScreen extends StatelessWidget {
                     Navigator.of(context).push(
                       AppTransitions.createPremiumRoute(
                         SearchResultScreen(
-                          filters: {'theme': item.title},
-                          title: context.l10n.translateCategory(item.title),
+                          filters: {
+                            'subCategory': item.subCategoryId,
+                            'isActive': 'true',
+                            'status': 'ACTIVE',
+                          },
+                          title: item.subCategoryName ?? item.title,
                         ),
                       ),
                     );
