@@ -126,7 +126,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
               crossAxisCount: 2,
               mainAxisSpacing: 15.h,
               crossAxisSpacing: 15.w,
-              childAspectRatio: 0.55,
+              childAspectRatio: 0.48,
             ),
             itemCount: 4,
             itemBuilder: (context, index) => ServiceCardSkeleton(),
@@ -141,7 +141,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
             crossAxisCount: 2,
             mainAxisSpacing: 15.h,
             crossAxisSpacing: 15.w,
-            childAspectRatio: 0.55,
+            childAspectRatio: 0.48,
           ),
           itemCount: controller.favoritePosts.length,
           itemBuilder: (context, index) {

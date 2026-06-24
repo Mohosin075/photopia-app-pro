@@ -23,7 +23,6 @@ ios/.symlinks/
 .web_manifest
 
 # IDE
-.vscode/
 .idea/
 *.iml
 *.swp
@@ -34,5 +33,5 @@ ios/.symlinks/
 Thumbs.db
 
 # Environment
-.env
-.env.local
+config.bat
+node_modules

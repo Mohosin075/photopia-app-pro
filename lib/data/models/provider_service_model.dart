@@ -1,3 +1,4 @@
+import 'package:photopya/core/network/urls.dart';
 import 'package:photopya/data/models/category_model.dart';
 import 'package:photopya/data/models/service_duration.dart';
 
@@ -109,6 +110,7 @@ class Data {
   AutoAccept? autoAccept;
   AutoAcceptBookings? autoAcceptBookings;
   List<AvailabilitySlot>? availabilitySlots;
+  List<String>? otherServices;
   String? createdAt;
   String? updatedAt;
   int? iV;
@@ -145,11 +147,36 @@ class Data {
     this.autoAccept,
     this.autoAcceptBookings,
     this.availabilitySlots,
+    this.otherServices,
     this.createdAt,
     this.updatedAt,
     this.iV,
     this.id,
   });
+
+  /// Converts any raw image value (String path, full URL, or Map with 'url' key)
+  /// into a full absolute URL. Mirrors ServiceItem._formatUrl so both models
+  /// handle the API's image format consistently.
+  static String? _formatUrl(dynamic url) {
+    if (url == null) return null;
+
+    String? urlString;
+    if (url is String) {
+      urlString = url;
+    } else if (url is Map && url.containsKey('url')) {
+      urlString = url['url']?.toString();
+    } else {
+      urlString = url.toString();
+    }
+
+    if (urlString == null || urlString.isEmpty) return null;
+    if (urlString.startsWith('http')) return urlString;
+
+    // Build full URL from server root (NOT /uploads — images live at /images/)
+    final String root = Urls.rootUrl;
+    final String path = urlString.startsWith('/') ? urlString : '/$urlString';
+    return '$root$path';
+  }
 
   Data.fromJson(Map<String, dynamic> json) {
     providerId = json['providerId'] != null && json['providerId'] is Map
@@ -188,9 +215,13 @@ class Data {
         ? new Location.fromJson(json['location'])
         : null;
     gallery = json['gallery'] != null
-        ? List<dynamic>.from(json['gallery'])
+        ? (json['gallery'] as List)
+            .map((e) => _formatUrl(e))
+            .where((e) => e != null && e.isNotEmpty)
+            .cast<String>()
+            .toList()
         : null;
-    coverMedia = json['coverMedia'];
+    coverMedia = _formatUrl(json['coverMedia'] ?? json['coverPhoto'] ?? json['cover_media']);
     status = json['status'];
     isVerified = json['isVerified'];
     isActive = json['isActive'];
@@ -217,6 +248,9 @@ class Data {
         availabilitySlots!.add(new AvailabilitySlot.fromJson(v));
       });
     }
+    otherServices = json['otherServices'] != null
+        ? List<String>.from(json['otherServices'])
+        : null;
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];
@@ -278,6 +312,9 @@ class Data {
     }
     if (this.availabilitySlots != null) {
       data['availabilitySlots'] = this.availabilitySlots!.map((v) => v.toJson()).toList();
+    }
+    if (this.otherServices != null) {
+      data['otherServices'] = this.otherServices;
     }
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;

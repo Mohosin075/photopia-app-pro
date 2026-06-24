@@ -124,6 +124,7 @@ class ServiceItem {
 
   List<Addon>? addons;
   AutoAcceptBookings? autoAcceptBookings;
+  List<String>? otherServices;
 
   // Travel & Fees
   double? travelFeePerKm;
@@ -165,6 +166,7 @@ class ServiceItem {
     this.depositPercentage,
     this.addons,
     this.autoAcceptBookings,
+    this.otherServices,
   });
 
   /// Returns true if this service has at least one package defined
@@ -291,6 +293,9 @@ class ServiceItem {
           : (json['autoAccept'] != null
               ? AutoAcceptBookings.fromJson(json['autoAccept'])
               : null),
+      otherServices: json['otherServices'] != null
+          ? List<String>.from(json['otherServices'])
+          : [],
     );
   }
 
@@ -323,6 +328,7 @@ class ServiceItem {
     data['tags'] = tags;
     data['equipment'] = equipment;
     data['gallery'] = gallery;
+    data['otherServices'] = otherServices;
     data['responseTime'] = responseTime;
     data['completedProjects'] = completedProjects;
     data['serviceType'] = serviceType;

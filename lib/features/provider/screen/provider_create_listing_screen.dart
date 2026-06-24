@@ -157,6 +157,10 @@ class _ProviderCreateListingScreenState
         _equipment.addAll(listing.equipment!);
       }
 
+      if (listing.otherServices != null && listing.otherServices!.isNotEmpty) {
+        _otherServices.addAll(listing.otherServices!);
+      }
+
       if (listing.pricingType != null) {
         if (listing.pricingType == "HOURLY") {
           _selectedPricingModel = 'By Hour';
@@ -758,6 +762,7 @@ class _ProviderCreateListingScreenState
       subCategory: _selectedSubCategory?.id,
       tags: [..._customTags],
       equipment: _equipment,
+      otherServices: _otherServices,
       pricingType: _selectedPricingModel == 'By Hour'
           ? "HOURLY"
           : _selectedPricingModel == 'By Day'
@@ -1319,7 +1324,9 @@ class _ProviderCreateListingScreenState
                                 : Image.network(
                                     img.toString().startsWith('http')
                                         ? img.toString()
-                                        : "${Urls.baseUrl}$img",
+                                        : (img.toString().startsWith('/')
+                                            ? '${Urls.rootUrl}$img'
+                                            : '${Urls.rootUrl}/$img'),
                                     width: double.infinity,
                                     fit: BoxFit.cover,
                                   );
@@ -4029,7 +4036,9 @@ class _ProviderCreateListingScreenState
           final String? existingUrl = isExisting
               ? (_existingNetworkImages[index].startsWith('http')
                     ? _existingNetworkImages[index]
-                    : "${Urls.baseUrl}${_existingNetworkImages[index]}")
+                    : (_existingNetworkImages[index].startsWith('/')
+                        ? '${Urls.rootUrl}${_existingNetworkImages[index]}'
+                        : '${Urls.rootUrl}/${_existingNetworkImages[index]}'))
               : null;
           final File? newFile = !isExisting
               ? _selectedImages[index - _existingNetworkImages.length]

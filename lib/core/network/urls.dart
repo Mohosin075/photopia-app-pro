@@ -4,6 +4,7 @@ class Urls {
 
 
   static const String _rootUrl = 'http://10.10.26.173:5000';
+  static const String rootUrl = _rootUrl; // public alias for URL construction
   static const String baseUrl = '$_rootUrl/uploads';
 
 

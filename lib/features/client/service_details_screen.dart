@@ -107,7 +107,43 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                 _buildSectionTitle(context.l10n.aboutLabel),
                                 SizedBox(height: 8.h),
                                 TranslatedText(description, style: TextStyle(fontSize: 13.sp.clamp(13, 14), color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8), height: 1.5)),
-                                if (equipment.isNotEmpty) ...[
+                                 if (serviceDetail != null && serviceDetail.otherServices != null && serviceDetail.otherServices!.isNotEmpty) ...[
+                                   SizedBox(height: 25.h),
+                                   Row(
+                                     children: [
+                                       Icon(Icons.add_task_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface),
+                                       SizedBox(width: 8.w),
+                                       _buildSectionTitle("Other Services Offered"),
+                                     ],
+                                   ),
+                                   SizedBox(height: 12.h),
+                                   Wrap(
+                                     spacing: 8.w,
+                                     runSpacing: 8.h,
+                                     children: serviceDetail.otherServices!.map((serviceName) {
+                                       return Container(
+                                         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                                         decoration: BoxDecoration(
+                                           color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                                           borderRadius: BorderRadius.circular(20.r),
+                                           border: Border.all(
+                                             color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                                             width: 1,
+                                           ),
+                                         ),
+                                         child: Text(
+                                           serviceName,
+                                           style: TextStyle(
+                                             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
+                                             fontWeight: FontWeight.w600,
+                                             fontSize: 12.sp,
+                                           ),
+                                         ),
+                                       );
+                                     }).toList(),
+                                   ),
+                                 ],
+                                 if (equipment.isNotEmpty) ...[
                                   SizedBox(height: 25.h),
                                   Row(children: [Icon(Icons.camera_alt_outlined, size: 20.sp, color: Theme.of(context).colorScheme.onSurface), SizedBox(width: 8.w), _buildSectionTitle(context.l10n.equipmentLabel)]),
                                   SizedBox(height: 12.h),

@@ -271,7 +271,10 @@ class _ServiceCardState extends State<ServiceCard> {
                           Wrap(
                             spacing: 4.w,
                             runSpacing: 4.h,
-                            children: _resolvedTags.take(3).map((tag) {
+                            children: _resolvedTags
+                                .toSet() // deduplicate
+                                .take(2) // max 2 unique tags
+                                .map((tag) {
                               final label = tag.startsWith('#') ? tag : '#$tag';
                               return GestureDetector(
                                 onTap: () {

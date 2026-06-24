@@ -271,10 +271,34 @@ class ServiceController extends ChangeNotifier {
         }
       }
 
-      // Send raw gallery and coverMedia as string paths to satisfy Zod URL constraints if relative
-      dataMap['coverMedia'] = serviceData.coverMedia;
-      if (serviceData.gallery != null) {
-        dataMap['gallery'] = serviceData.gallery;
+      // Convert relative paths to full URLs to satisfy Zod URL validation on the server.
+      // Images stored as "/images/xxx.png" must be sent as "http://server/images/xxx.png".
+      String toFullUrl(dynamic path) {
+        if (path == null) return '';
+        final String p = path.toString().trim();
+        if (p.isEmpty) return '';
+        if (p.startsWith('http://') || p.startsWith('https://')) return p;
+        final String prefix = p.startsWith('/') ? Urls.rootUrl : '${Urls.rootUrl}/';
+        return '$prefix$p';
+      }
+
+      // Build valid gallery URLs from existing network images
+      final List<String> validGallery = (serviceData.gallery ?? [])
+          .map((item) => toFullUrl(item))
+          .where((url) => url.isNotEmpty)
+          .toList();
+
+      final String validCoverMedia = toFullUrl(serviceData.coverMedia);
+
+      if (validCoverMedia.isNotEmpty) {
+        // We have an existing cover — send it
+        dataMap['coverMedia'] = validCoverMedia;
+        dataMap['gallery'] = validGallery;
+      } else {
+        // No existing cover — new images will be uploaded as multipart files.
+        // Remove these fields entirely so Zod URL validation doesn't reject empty strings.
+        dataMap.remove('coverMedia');
+        dataMap.remove('gallery');
       }
 
       // Remove fields that should not be sent for update
